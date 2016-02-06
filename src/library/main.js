@@ -1,14 +1,3 @@
-//TODO: this method of include assumes relative location
-document.write('<script type="text/javaScript" src="library/DicePool.js"></script>');
-document.write('<script type="text/javaScript" src="library/Die.js"></script>');
-document.write('<script type="text/javaScript" src="library/Draw.js"></script>');
-document.write('<script type="text/javaScript" src="library/examples.js"></script>');
-document.write('<script type="text/javaScript" src="library/numberGroup.js"></script>');
-document.write('<script type="text/javaScript" src="library/Polynomial.js"></script>');
-document.write('<script type="text/javaScript" src="library/prototypes.js"></script>');
-document.write('<script type="text/javaScript" src="library/special dice.js"></script>');
-document.write('<script type="text/javaScript" src="library/stats util.js"></script>');
-
 const Silent = true;
 
 function combineRegex(regex1, regex2){
