@@ -1,5 +1,5 @@
 'use strict';
-Tester.prototypes = {Array: {}, Math: {}, String: {}};
+Tester.prototypes = {Array: {}, Math: {}, Number: {}, String: {}};
 Tester.prototypes.Array.contains = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -10,7 +10,7 @@ Tester.prototypes.Array.contains = function(isFirst)
    testResults.push({Expected: false, Actual: ['1', '2', '3'].contains(2), Description: 'Type strict'});
    //testResults.push({Expected: false, Actual: ['1', undefined].contains(), Description: 'No arg'}); undefined behavior
 
-   TesterUtility.displayResults('Tester.prototypes.Array.contains', testResults, isFirst);
+   TesterUtility.displayResults('prototypes Array.prototype.contains', testResults, isFirst);
 };
 Tester.prototypes.Array.removeByIndex = function(isFirst)
 {
@@ -95,7 +95,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
        testResults.push({Expected: new Error('Illegal index type: string'), Actual: e, Description: 'Type strict'});
    }
 
-   TesterUtility.displayResults('Tester.prototypes.Array.removeByIndex', testResults, isFirst);
+   TesterUtility.displayResults('prototypes Array.prototype.removeByIndex', testResults, isFirst);
 };
 Tester.prototypes.Array.removeElement = function(isFirst)
 {
@@ -128,7 +128,7 @@ Tester.prototypes.Array.removeElement = function(isFirst)
        testResults.push({Expected: new Error('Element not found: 20'), Actual: e, Description: 'Type strict'});
    }
 
-   TesterUtility.displayResults('Tester.prototypes.Array.removeElement', testResults, isFirst);
+   TesterUtility.displayResults('prototypes Array.prototype.removeElement', testResults, isFirst);
 };
 Tester.prototypes.Math.factorial = function(isFirst)
 {
@@ -144,7 +144,7 @@ Tester.prototypes.Math.factorial = function(isFirst)
    testResults.push({Expected: undefined, Actual: Math.factorial(2.4), Description: 'Input: 2.4'});
    testResults.push({Expected: Infinity, Actual: Math.factorial(Infinity), Description: 'Input: Infinity'});
 
-   TesterUtility.displayResults('Tester.prototypes.Math.factorial', testResults, isFirst);
+   TesterUtility.displayResults('prototypes Math.factorial', testResults, isFirst);
 };
 Tester.prototypes.Math.summation = function(isFirst)
 {
@@ -157,7 +157,22 @@ Tester.prototypes.Math.summation = function(isFirst)
    testResults.push({Expected: Infinity, Actual: Math.summation([Infinity]), Description: 'Infinity'});
    testResults.push({Expected: NaN, Actual: Math.summation([NaN, -Infinity]), Description: 'NaN'});
 
-   TesterUtility.displayResults('Math.summation', testResults, isFirst);
+   TesterUtility.displayResults('prototypes Math.summation', testResults, isFirst);
+};
+Tester.prototypes.Number.isNatural = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: true, Actual: Number.isNatural(5), Description: 'Happy path'});
+   testResults.push({Expected: true, Actual: Number.isNatural(new Number(5)), Description: 'Boxed'});
+   testResults.push({Expected: false, Actual: Number.isNatural({}), Description: 'Wrong type'});
+   testResults.push({Expected: false, Actual: Number.isNatural(2.5), Description: 'Not an integer'});
+   testResults.push({Expected: false, Actual: Number.isNatural(NaN), Description: 'NaN'});
+   testResults.push({Expected: false, Actual: Number.isNatural(Infinity), Description: 'Infinity'});
+   testResults.push({Expected: false, Actual: Number.isNatural(-5), Description: 'Negative'});
+
+   TesterUtility.displayResults('prototypes Number.isNatural', testResults, isFirst);
 };
 Tester.prototypes.String.contains = function(isFirst)
 {
@@ -170,5 +185,5 @@ Tester.prototypes.String.contains = function(isFirst)
    //testResults.push({Expected: false, Actual: 'me 2 you'.contains(2), Description: 'Type strict'}); undefined behavior
    //testResults.push({Expected: false, Actual: 'me undefined you'.contains(), Description: 'No arg'}); undefined behavior
 
-   TesterUtility.displayResults('Tester.prototypes.String.contains', testResults, isFirst);
+   TesterUtility.displayResults('prototypes String.prototype.contains', testResults, isFirst);
 };

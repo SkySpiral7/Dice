@@ -94,6 +94,15 @@ Tester.Die._parseString = function(isFirst)
    } catch(e){testResults.push({Error: e, Action: 'Fudge die: zeroed'});}
 
    try{
+   Die._parseString('d!');
+   TesterUtility.failedToThrow(testResults, 'No sideCount');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d!\nexpected sideCount. Found: !'), Actual: e, Description: 'No sideCount'});
+   }
+
+   try{
    returned = Die._parseString('d3r1!');
    testResults.push({Expected: Die.explodeTypes.Normal, Actual: returned.explodeType, Description: '2 short: explode'});
    testResults.push({Expected: '==1', Actual: returned.rerollCriteria, Description: '2 short: reroll'});
@@ -142,5 +151,14 @@ Tester.Die._parseString = function(isFirst)
        testResults.push({Expected: new Error('d3r-1 reroll 0\nmultiple reroll criteria found. Max is 1'), Actual: e, Description: '2 reroll'});
    }
 
-   TesterUtility.displayResults('Tester.Die._parseString', testResults, isFirst);
+   try{
+   Die._parseString('d3 exploding rocks');
+   TesterUtility.failedToThrow(testResults, 'Unparsable');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d3 exploding rocks\nUnparsable:  rocks'), Actual: e, Description: 'Unparsable'});
+   }
+
+   TesterUtility.displayResults('Die Die._parseString', testResults, isFirst);
 };

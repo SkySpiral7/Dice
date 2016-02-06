@@ -81,6 +81,19 @@ if (undefined === Math.summation)
    };
 }
 /**
+@returns {!boolean} true if input is a number that isn't Infinity or NaN. And is an integer greater than 0.
+*/
+if (undefined === Number.isNatural)
+{
+   Number.isNatural = function(input)
+   {
+      if(input instanceof Number) input = input.valueOf();
+      if('number' !== typeof(input)) return false;  //wrong type
+      if(Math.trunc(input) !== input || !Number.isFinite(input)) return false;  //not an integer
+      return (input > 0);
+   };
+}
+/**
 @param {!string} substring to search for (case sensitive)
 @returns {!boolean} true if this string contains the substring
 */

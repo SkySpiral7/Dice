@@ -321,6 +321,12 @@ function Die(diceStringGiven, nameArray){
     return constructorCalled(this);
     //if this is a named die then diceStringGiven will be ignored (since it is actually the first name or something else)
 };
+/**
+This function is used in the constructor of Die. It parses the inputString into an object.
+You should have no use for it although it isn't harmful to call.
+@param {!string} inputString
+@returns {!object} the object needed to create a Die. Not optimized or validated.
+*/
 Die._parseString = function(inputString)
 {
    var jsonResult = {originalString: inputString};
@@ -347,21 +353,19 @@ Die._parseString = function(inputString)
       jsonResult.isNegativeDice = false;  //-1df and +1df are the same thing. clear flag so that a leading '-' isn't displayed
       workingString = workingString.substring(1);  //chop off 'f'
    }
-   else
+   else if ((/^\d+/).test(workingString))
    {
       jsonResult.isFudgeDie = false;
       jsonResult.sideCount = Number.parseInt(workingString);  //only parses leading integer
-      if(jsonResult.sideCount <= 0 || Number.isNaN(jsonResult.sideCount)) throw new Error(inputString + '\ninvalid sideCount: ' + jsonResult.sideCount);
       workingString = workingString.substring(jsonResult.sideCount.toString().length);  //remove sideCount from workingString
    }
+   else throw new Error(inputString + '\nexpected sideCount. Found: ' + workingString);
 
    //shorthand must come before longhand
    while (workingString.length > 0)
    {
       if ('!' === workingString[0])
       {
-         //TODO: re: keep parse errors but move rest into a validation function
-         if(1 === jsonResult.sideCount) throw new Error(inputString + '\nInfinite exploding. sideCount: 1');
          if(undefined !== jsonResult.explodeType) throw new Error(inputString + '\nmultiple explosions found. Max is 1');
          workingString = workingString.substring(1);  //chop off '!'
          if ('!' === workingString[0])  //if it had '!!'
@@ -394,7 +398,6 @@ Die._parseString = function(inputString)
       //as per the robustness principle I don't care about English grammar as long as the meaning is clear
       if ((/^(?: penetrat(?:ing|e)| compound(?:ing)?)? explo(?:sions?|ding|de)(?: dic?e)?/).test(workingString))
       {
-         if(1 === jsonResult.sideCount) throw new Error(inputString + '\nInfinite exploding. sideCount: 1');
          if(undefined !== jsonResult.explodeType) throw new Error(inputString + '\nmultiple explosions found. Max is 1');
          if (workingString.startsWith(' compound'))
          {
@@ -450,3 +453,15 @@ Die._parseString = function(inputString)
 };
 /**This is an enum since Symbols aren't well supported enough yet.*/
 Die.explodeTypes = {Normal: {}, Compound: {}, Penetrating: {}};
+/**
+This function is used in the constructor of Die. It throws if there is anything invalid about the input.
+You should have no use for it although it isn't harmful to call.
+@param {!object} input which may be slightly modified
+*/
+Die._validate = function(input)
+{
+   if(undefined === input.sideCount) throw new Error(input.originalString + '\ninput.sideCount is required');
+   //TODO: re: ...
+   if(input.sideCount <= 0 || !Number.isFinite(input.sideCount) || Math.trunc(input.sideCount) !== input.sideCount) throw new Error(input.originalString + '\ninvalid sideCount: ' + input.sideCount);
+   if(1 === input.sideCount && undefined !== input.explodeType) throw new Error(input.originalString + '\nInfinite exploding. sideCount: 1');
+};
