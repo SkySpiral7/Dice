@@ -21,7 +21,7 @@ Polynomial.createDiePolynomial = function(dieObject, explodeCount){
           if(dieObject.doesPenetrate && explodeIndex > 0) die--;
           if(dieObject.nameArray.length!=0) die=dieObject.nameArray[die];  //named dice are always coins and never negative
           if(!isNaN(die)) die+=dieObject.constantModifier;
-          if(dieObject.isNegativeDice) die*=-1;
+          if(dieObject.isDieNegative) die*=-1;
           if(explodeIndex > 0 && dieObject.doesCompoundExplode) die+=(dieMax*explodeIndex);  //modified here for rerolling reasons. sum for compound
          if (reroll==undefined || !eval(die+''+reroll))
          {

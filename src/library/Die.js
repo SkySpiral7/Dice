@@ -1,6 +1,6 @@
 function Die(diceStringGiven, nameArray){
    //private:
-    var isNegativeDice=false;
+    var isDieNegative=false;
     var doesUseZero=false;
     var isFudgeDie=false;
     var sideCount=0;
@@ -21,7 +21,7 @@ function Die(diceStringGiven, nameArray){
    this.generateString = function()
    {
        var dieString='';
-       if(isNegativeDice) dieString+='-';
+       if(isDieNegative) dieString+='-';
        if(doesUseZero) dieString+='z';
        else dieString+='d';
        if(isFudgeDie) dieString+='F';
@@ -37,7 +37,7 @@ function Die(diceStringGiven, nameArray){
    this.getStats = function(){
        var returnObject={};
        returnObject.nameArray=nameArray.slice();  //copies array so that it is read only
-       returnObject.isNegativeDice=isNegativeDice;
+       returnObject.isDieNegative=isDieNegative;
        returnObject.doesUseZero=doesUseZero;
        returnObject.isFudgeDie=isFudgeDie;
        returnObject.sideCount=sideCount;
@@ -52,7 +52,7 @@ function Die(diceStringGiven, nameArray){
    };
    this.equals = function(otherDie){
        if(!(otherDie instanceof Die)) return false;
-       if(isNegativeDice!=otherDie.isNegativeDice) return false;
+       if(isDieNegative!=otherDie.isDieNegative) return false;
        if(doesUseZero!=otherDie.doesUseZero) return false;
        if(isFudgeDie!=otherDie.isFudgeDie) return false;
        if(sideCount!=otherDie.sideCount) return false;
@@ -151,7 +151,7 @@ function Die(diceStringGiven, nameArray){
           //replacedTotal=total;
           //total=this.minMaxDoing(total);
           if(rerollCriteria!=undefined && eval(''+valueRolled+rerollCriteria)) continue;  //TODO what does it mean to have "2d6r6!"? impossible but get another die and reroll
-          if(isNegativeDice) valueRolled*=-1;
+          if(isDieNegative) valueRolled*=-1;
           valueArray.push(valueRolled);
           if(doesPenetrate) isPenetrated=true;  //anotherDie will have already been set to true or false
           if(anotherDie) continue;  //exploded. roll again after recording the value
@@ -195,7 +195,7 @@ function Die(diceStringGiven, nameArray){
        if((doesExplode || doesCompoundExplode) && constantModifier!=0 && !isNaN(explodeValue)) explodeValue+=constantModifier; //updates explodeValue. includes pen
       if (doesCompoundExplode)  //reroll criteria for compound must be validated differently
       {  //TODO: test
-          //minimumPossible and explodeValue ignore isNegativeDice. TODO: consider isNegativeDice
+          //minimumPossible and explodeValue ignore isDieNegative. TODO: consider isDieNegative
           var minimumPossible=rerollCountLoopIndex;  //min value
           if(nameArray.length!=0) minimumPossible=nameArray[rerollCountLoopIndex];
           if(!isNaN(minimumPossible)) minimumPossible+=constantModifier;  //not else since it could be both
@@ -239,7 +239,7 @@ function Die(diceStringGiven, nameArray){
           constantModifier+=Number((/\d+$/).exec(rerollCriteria)[0]);  //plus this means it always has this value
           //+= to include already existing modifiers. such as d6r!=4+2 -> z1+6
           rerollCriteria=undefined;
-          //isNegativeDice=false;  //unchanged
+          //isDieNegative=false;  //unchanged
           doesExplode=false;  //doesn't explode due to having only 1 valid value
           doesPenetrate=false;
           doesCompoundExplode=false;
@@ -250,7 +250,7 @@ function Die(diceStringGiven, nameArray){
           var newSideCount=Number((/\d+$/).exec(rerollCriteria)[0]);  //since can't roll above this it becomes new side maximum
           if(rerollCriteria.startsWith(">=")) newSideCount--;  //can't roll it either means lower the max by 1
           //if(sideCount > newSideCount):  //always true due to if(!canReroll) above
-          //isNegativeDice=false;  //unchanged
+          //isDieNegative=false;  //unchanged
           doesExplode=false;  //doesn't explode due to explodeValue being impossible to roll (ditto for compound)
           doesPenetrate=false;
           if(sideCount > newSideCount) doesCompoundExplode=false;  //TODO: confirm this
@@ -303,7 +303,7 @@ function Die(diceStringGiven, nameArray){
    function namedConstructor(){  //doesn't need to know this
        //none of these errors should be possible
        if(isFudgeDie) throw new Error(diceStringGiven+"\nfudge dice can't have named sides");
-       if(isNegativeDice) throw new Error(diceStringGiven+"\nnamed dice can't be negative");
+       if(isDieNegative) throw new Error(diceStringGiven+"\nnamed dice can't be negative");
        doesUseZero=true;  //always a coin
        sideCount=nameArray.length;  //just ignore the number of sides passed and use the number of names given
        if(doesExplode || doesCompoundExplode) throw new Error(diceStringGiven+"\nnamed dice can't explode (compound or otherwise).");
@@ -332,8 +332,8 @@ Die._parseString = function(inputString)
    var jsonResult = {originalString: inputString};
    var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy. trim, lower case and replace all whitespace with space
 
-   if((/^-/).test(workingString)){jsonResult.isNegativeDice = true; workingString = workingString.substring(1);}  //chop off '-'
-   else jsonResult.isNegativeDice = false;  //TODO: re: consider removing this and have DicePool track it
+   if((/^-/).test(workingString)){jsonResult.isDieNegative = true; workingString = workingString.substring(1);}  //chop off '-'
+   else jsonResult.isDieNegative = false;  //TODO: re: consider removing this and have DicePool track it
    if((/^1[^\d%]/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
    else if((/^0[^\d%]/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');
    else if((/^[\d%]/).test(workingString)) throw new Error(inputString + '\ndie count (if provided) must be 1 (or -1). Otherwise use DicePool');
@@ -350,7 +350,7 @@ Die._parseString = function(inputString)
       jsonResult.isFudgeDie = true;  //this is only used for describing the die as a string
       jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
       jsonResult.sideCount = 3;
-      jsonResult.isNegativeDice = false;  //-1df and +1df are the same thing. clear flag so that a leading '-' isn't displayed
+      jsonResult.isDieNegative = false;  //-1df and +1df are the same thing. clear flag so that a leading '-' isn't displayed
       workingString = workingString.substring(1);  //chop off 'f'
    }
    else if ((/^\d+/).test(workingString))
@@ -472,9 +472,9 @@ Die._validate = function(input)
    if(undefined == input.sideCount) throw new Error(input.originalString + '\nsideCount is required');
    if(!Number.isNatural(input.sideCount)) throw new Error(input.originalString + '\ninvalid sideCount: ' + input.sideCount);
 
-   if(input.isNegativeDice instanceof Boolean) input.isNegativeDice = input.isNegativeDice.valueOf();
-   if(undefined == input.isNegativeDice) input.isNegativeDice = false;
-   else if(true !== input.isNegativeDice && false !== input.isNegativeDice) throw new Error(input.originalString + '\ninvalid isNegativeDice: ' + input.isNegativeDice);
+   if(input.isDieNegative instanceof Boolean) input.isDieNegative = input.isDieNegative.valueOf();
+   if(undefined == input.isDieNegative) input.isDieNegative = false;
+   else if(true !== input.isDieNegative && false !== input.isDieNegative) throw new Error(input.originalString + '\ninvalid isDieNegative: ' + input.isDieNegative);
 
    if(input.constantModifier instanceof Number) input.constantModifier = input.constantModifier.valueOf();
    if(undefined == input.constantModifier) input.constantModifier = 0;
@@ -504,7 +504,7 @@ Die._validate = function(input)
    {
       var maxValue = input.sideCount + input.constantModifier;
       var minValue = 1 + input.constantModifier;
-      if (input.isNegativeDice)
+      if (input.isDieNegative)
       {
          maxValue *= -1;
          minValue *= -1;
@@ -513,8 +513,7 @@ Die._validate = function(input)
       if(eval(''+maxValue+input.rerollCriteria) && eval(''+minValue+input.rerollCriteria))
          throw new Error(input.originalString + '\nInfinite rerolling: ' + JSON.stringify({
             rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
-            isNegativeDice: input.isNegativeDice
-            //TODO: re: rename isNegativeDice to isDieNegative
+            isDieNegative: input.isDieNegative
          }));
       //you can only have 1 reroll criteria. so you can't 1d6r=1r=6 therefore if both min and max are rerolled then they all are
    }

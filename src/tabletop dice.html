@@ -405,7 +405,7 @@ ScatterDie(alwaysScatter)
     getStats()
        the values returned in the copy object are always the same:
        nameArray=[];
-       isNegativeDice=false;
+       isDieNegative=false;
        doesUseZero=true;
        isFudge=false;
        sideCount=360;
@@ -658,7 +658,7 @@ Die(diceStringGiven, nameArray)
        keep in mind that rerolling is optimized which may make some of the following attributes different than expected
        the attributes of die (that are returned by getStats) are as follows:
        nameArray: (a copy is made) empty by default. this contains the values of each of the die's sides if it is a named die
-       isNegativeDice: false by default. this indicates if the die is positive or negative. if negative the result rolled will be negative
+       isDieNegative: false by default. this indicates if the die is positive or negative. if negative the result rolled will be negative
        doesUseZero: false by default. this indicates if the die starts at zero instead of 1. this is also true for fudge dice
        isFudge: false by default. this indicates if the die is a fudge die which is numbered -1, 0, 1
        sideCount: 0 by default although it is never possible to have such a die since an error will be thrown instead.

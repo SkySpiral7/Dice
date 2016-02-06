@@ -22,7 +22,7 @@ function DicePool(diceStringGiven, nameArray){
        if(constantModifier!=0) poolString+=constantModifier;
       for (var i=0; i < diceArray.length;)
       {
-          if(!diceArray[i].getStats().isNegativeDice) poolString+='+';
+          if(!diceArray[i].getStats().isDieNegative) poolString+='+';
           var dieName=diceArray[i].getName();
           var count=1; i++;
           if(!(diceArray[i] instanceof ScatterDie)) for(; i < diceArray.length && dieName==diceArray[i].getName(); i++) count++;
@@ -344,8 +344,8 @@ function DicePool(diceStringGiven, nameArray){
          }
           //else: below
           holder=holder.toLowerCase();
-          var isNegativeDicePool=holder.startsWith('-');
-          if(isNegativeDicePool) holder=holder.substring(1);  //chop off '-'
+          var isDieNegativePool=holder.startsWith('-');
+          if(isDieNegativePool) holder=holder.substring(1);  //chop off '-'
           if(!(/^\d+/).test(holder)) holder="1"+holder;  //must have leading number for diceCount
           var diceCount=(/^\d+/).exec(holder)[0];
           holder=holder.substring(diceCount.length);  //chop off the match from the total string
@@ -364,7 +364,7 @@ function DicePool(diceStringGiven, nameArray){
           if(!(/^[zd]/).test(holder)) throw new Error(diceStringGiven+"\n"+remainingString+"Dice must use 'd' or 'z' to specify the dice type");
           var remainder=Die(holder);  //has a return type of all unused text
           holder=holder.substring(0, holder.length-remainder.length);  //everything before remainder
-          if(isNegativeDicePool) holder="-"+holder;  //add negative
+          if(isDieNegativePool) holder="-"+holder;  //add negative
           for(var i=0; i < diceCount; i++) objectGiven.addDie(new Die(holder, nameArray));  //the only spot that needs to know this
           holder=remainder;
       }

@@ -62,7 +62,7 @@ function ScatterDie(alwaysScatter){
    this.getStats = function(){
        var returnObject={};
        returnObject.nameArray=[];
-       returnObject.isNegativeDice=false;
+       returnObject.isDieNegative=false;
        returnObject.doesUseZero=true;
        returnObject.isFudgeDie=false;
        returnObject.sideCount=360;

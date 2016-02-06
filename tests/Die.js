@@ -8,14 +8,14 @@ Tester.Die._parseString = function(isFirst)
    try{
    originalString = '1d6';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, isNegativeDice: false, constantModifier: 0, sideCount: 6, isFudgeDie: false};
+   expected = {originalString: originalString, isDieNegative: false, constantModifier: 0, sideCount: 6, isFudgeDie: false};
    testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 1d6'});
    } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
 
    try{
    originalString = '\n  -Z5\t ';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, isNegativeDice: true, constantModifier: -1, sideCount: 5, isFudgeDie: false};
+   expected = {originalString: originalString, isDieNegative: true, constantModifier: -1, sideCount: 5, isFudgeDie: false};
    testResults.push({Expected: expected, Actual: returned, Description: 'Trim lower: -z5'});
    } catch(e){testResults.push({Error: e, Action: 'Trim lower'});}
 
@@ -82,14 +82,14 @@ Tester.Die._parseString = function(isFirst)
    try{
    originalString = '-1dF';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, isNegativeDice: false, constantModifier: -2, sideCount: 3, isFudgeDie: true};
+   expected = {originalString: originalString, isDieNegative: false, constantModifier: -2, sideCount: 3, isFudgeDie: true};
    testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: negative'});
    } catch(e){testResults.push({Error: e, Action: 'Fudge die: negative'});}
 
    try{
    originalString = 'zf';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, isNegativeDice: false, constantModifier: -2, sideCount: 3, isFudgeDie: true};
+   expected = {originalString: originalString, isDieNegative: false, constantModifier: -2, sideCount: 3, isFudgeDie: true};
    testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: zeroed'});
    } catch(e){testResults.push({Error: e, Action: 'Fudge die: zeroed'});}
 
@@ -170,7 +170,7 @@ Tester.Die._validate = function(isFirst)
    var testResults = [], returned, expected;
    try{
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, isNegativeDice: false, constantModifier: 0, sideCount: 6, isFudgeDie: false};
+   expected = {originalString: originalString, isDieNegative: false, constantModifier: 0, sideCount: 6, isFudgeDie: false};
    testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 1d6'});
    } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
 
