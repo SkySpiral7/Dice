@@ -162,3 +162,26 @@ Tester.Die._parseString = function(isFirst)
 
    TesterUtility.displayResults('Die Die._parseString', testResults, isFirst);
 };
+Tester.Die._validate = function(isFirst)
+{
+   return;  //TODO: re: test
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], returned, expected;
+   try{
+   returned = Die._parseString(originalString);
+   expected = {originalString: originalString, isNegativeDice: false, constantModifier: 0, sideCount: 6, isFudgeDie: false};
+   testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 1d6'});
+   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
+
+   try{
+   Die._parseString('d3 exploding rocks');
+   TesterUtility.failedToThrow(testResults, 'Unparsable');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d3 exploding rocks\nUnparsable:  rocks'), Actual: e, Description: 'Unparsable'});
+   }
+
+   TesterUtility.displayResults('Die Die._validate', testResults, isFirst);
+};

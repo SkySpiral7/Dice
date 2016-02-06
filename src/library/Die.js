@@ -380,7 +380,7 @@ Die._parseString = function(inputString)
          }
          else jsonResult.explodeType = Die.explodeTypes.Normal;
       }
-      else if ((/^r(?:[<>]=?|[!=]==?|=)?-?\d+/).test(workingString))  //can't do [<>=!]=? since that would allow '!' alone
+      else if ((/^r(?:[<>]=?|[!=]?==?)?-?\d+/).test(workingString))
       {
          if(undefined !== jsonResult.rerollCriteria) throw new Error(inputString + '\nmultiple reroll criteria found. Max is 1');
             //could theoretically be an array of criteria but throw for now
@@ -456,12 +456,66 @@ Die.explodeTypes = {Normal: {}, Compound: {}, Penetrating: {}};
 /**
 This function is used in the constructor of Die. It throws if there is anything invalid about the input.
 You should have no use for it although it isn't harmful to call.
-@param {!object} input which may be slightly modified
+@param {!object} input which may be slightly modified (ie gaining default values)
 */
 Die._validate = function(input)
 {
-   if(undefined === input.sideCount) throw new Error(input.originalString + '\ninput.sideCount is required');
-   //TODO: re: ...
-   if(input.sideCount <= 0 || !Number.isFinite(input.sideCount) || Math.trunc(input.sideCount) !== input.sideCount) throw new Error(input.originalString + '\ninvalid sideCount: ' + input.sideCount);
-   if(1 === input.sideCount && undefined !== input.explodeType) throw new Error(input.originalString + '\nInfinite exploding. sideCount: 1');
+   //(undefined == x) is the same as (undefined === x || null === x) unlike (!x) which detects falsy values
+   if(input.originalString instanceof String) input.originalString = input.originalString.valueOf();
+   else if ('string' !== typeof(input.originalString))
+   {
+      input.originalString = undefined;
+      input.originalString = JSON.stringify(input.originalString);  //this is safe because JSON.stringify ignores undefined values
+   }
+
+   if(input.sideCount instanceof Number) input.sideCount = input.sideCount.valueOf();  //unbox so that === behaves as expected
+   if(undefined == input.sideCount) throw new Error(input.originalString + '\nsideCount is required');
+   if(!Number.isNatural(input.sideCount)) throw new Error(input.originalString + '\ninvalid sideCount: ' + input.sideCount);
+
+   if(input.isNegativeDice instanceof Boolean) input.isNegativeDice = input.isNegativeDice.valueOf();
+   if(undefined == input.isNegativeDice) input.isNegativeDice = false;
+   else if(true !== input.isNegativeDice && false !== input.isNegativeDice) throw new Error(input.originalString + '\ninvalid isNegativeDice: ' + input.isNegativeDice);
+
+   if(input.constantModifier instanceof Number) input.constantModifier = input.constantModifier.valueOf();
+   if(undefined == input.constantModifier) input.constantModifier = 0;
+   else if(!Number.isInteger(input.constantModifier)) throw new Error(input.originalString + '\ninvalid constantModifier: ' + input.constantModifier);
+
+   if(input.isFudgeDie instanceof Boolean) input.isFudgeDie = input.isFudgeDie.valueOf();
+   if(undefined == input.isFudgeDie) input.isFudgeDie = false;
+   else if(true !== input.isFudgeDie && false !== input.isFudgeDie) throw new Error(input.originalString + '\ninvalid isFudgeDie: ' + input.isFudgeDie);
+
+   if (undefined != input.rerollCriteria)
+   {
+      input.rerollCriteria = input.rerollCriteria.toString();
+      if(!(/^(?:[<>]=?|[!=]==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(input.originalString + '\ninvalid rerollCriteria: ' + input.rerollCriteria);
+   }
+
+   if (undefined != input.explodeType)
+   {
+      if(Die.explodeTypes.Normal !== input.explodeType && Die.explodeTypes.Compound !== input.explodeType && Die.explodeTypes.Penetrating !== input.explodeType)
+         throw new Error(input.originalString + '\ninvalid explodeType: ' + input.explodeType);
+   }
+
+   //all fields are valid when alone. Now validate combinations
+
+   if(1 === input.sideCount && undefined != input.explodeType) throw new Error(input.originalString + '\nInfinite exploding. sideCount: 1');
+
+   if (undefined != input.rerollCriteria)
+   {
+      var maxValue = input.sideCount + input.constantModifier;
+      var minValue = 1 + input.constantModifier;
+      if (input.isNegativeDice)
+      {
+         maxValue *= -1;
+         minValue *= -1;
+         //technically min and max value also need to be switched but that doesn't matter
+      }
+      if(eval(''+maxValue+input.rerollCriteria) && eval(''+minValue+input.rerollCriteria))
+         throw new Error(input.originalString + '\nInfinite rerolling: ' + JSON.stringify({
+            rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
+            isNegativeDice: input.isNegativeDice
+            //TODO: re: rename isNegativeDice to isDieNegative
+         }));
+      //you can only have 1 reroll criteria. so you can't 1d6r=1r=6 therefore if both min and max are rerolled then they all are
+   }
 };

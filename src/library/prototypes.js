@@ -15,7 +15,7 @@ if (undefined === Array.prototype.removeByIndex)
    {
       if(index instanceof Number) index = index.valueOf();
       if('number' !== typeof(index)) throw new Error('Illegal index type: ' + typeof(index));
-      if(Number.isNaN(index) || index < 0 || Math.trunc(index) !== index) throw new Error('Illegal index: ' + index);
+      if(Number.isNaN(index) || index < 0 || Math.floor(index) !== index) throw new Error('Illegal index: ' + index);
       if(index >= this.length) throw new Error('Illegal index: ' + index + '. length=' + this.length);
       return this.splice(index, 1)[0];
    };
@@ -52,7 +52,7 @@ if (undefined === Math.factorial)
    {
       if(input instanceof Number) input = input.valueOf();
       if('number' !== typeof(input) || Number.isNaN(input)) return NaN;
-      if(input < 0 || Math.trunc(input) !== input) return undefined;
+      if(input < 0 || Math.floor(input) !== input) return undefined;
       //factorial is actually defined for both of these cases but I do not know how to calculate them
       //nor do I care since I don't need it (YAGNI)
       if(Infinity === input) return Infinity;  //to prevent getting stuck in the loop
@@ -81,18 +81,22 @@ if (undefined === Math.summation)
    };
 }
 /**
-@returns {!boolean} true if input is a number that isn't Infinity or NaN. And is an integer greater than 0.
+Polyfill for ECMAScript 2015 (6th Edition, ECMA-262)
+@returns {!boolean} true if input is a whole number that isn't Infinity or NaN
 */
-if (undefined === Number.isNatural)
+if (undefined === Number.isInteger)
 {
-   Number.isNatural = function(input)
+   Number.isInteger = function(input)
    {
-      if(input instanceof Number) input = input.valueOf();
+      //if(input instanceof Number) input = input.valueOf();  //very type strict
       if('number' !== typeof(input)) return false;  //wrong type
-      if(Math.trunc(input) !== input || !Number.isFinite(input)) return false;  //not an integer
-      return (input > 0);
+      return (Number.isFinite(input) && Math.floor(input) === input);
    };
 }
+/**
+@returns {!boolean} true if input is a number that isn't Infinity or NaN. And is an integer greater than 0.
+*/
+if (undefined === Number.isNatural){Number.isNatural = function(input){return (Number.isInteger(input) && input > 0);};}
 /**
 @param {!string} substring to search for (case sensitive)
 @returns {!boolean} true if this string contains the substring

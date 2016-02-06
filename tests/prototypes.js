@@ -159,18 +159,35 @@ Tester.prototypes.Math.summation = function(isFirst)
 
    TesterUtility.displayResults('prototypes Math.summation', testResults, isFirst);
 };
+Tester.prototypes.Number.isInteger = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: true, Actual: Number.isInteger(5), Description: 'Happy path'});
+   testResults.push({Expected: true, Actual: Number.isInteger(-5), Description: 'Negative'});
+   testResults.push({Expected: true, Actual: Number.isInteger(0), Description: 'Zero'});
+   testResults.push({Expected: false, Actual: Number.isInteger({}), Description: 'Wrong type'});
+   testResults.push({Expected: false, Actual: Number.isInteger(new Number(5)), Description: 'Very type strict'});
+   testResults.push({Expected: false, Actual: Number.isInteger(2.5), Description: 'Not an integer'});
+   testResults.push({Expected: false, Actual: Number.isInteger(NaN), Description: 'NaN'});
+   testResults.push({Expected: false, Actual: Number.isInteger(Infinity), Description: 'Infinity'});
+
+   TesterUtility.displayResults('prototypes Number.isInteger', testResults, isFirst);
+};
 Tester.prototypes.Number.isNatural = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: true, Actual: Number.isNatural(5), Description: 'Happy path'});
-   testResults.push({Expected: true, Actual: Number.isNatural(new Number(5)), Description: 'Boxed'});
    testResults.push({Expected: false, Actual: Number.isNatural({}), Description: 'Wrong type'});
+   testResults.push({Expected: false, Actual: Number.isNatural(new Number(5)), Description: 'Very type strict'});
    testResults.push({Expected: false, Actual: Number.isNatural(2.5), Description: 'Not an integer'});
    testResults.push({Expected: false, Actual: Number.isNatural(NaN), Description: 'NaN'});
    testResults.push({Expected: false, Actual: Number.isNatural(Infinity), Description: 'Infinity'});
    testResults.push({Expected: false, Actual: Number.isNatural(-5), Description: 'Negative'});
+   testResults.push({Expected: false, Actual: Number.isNatural(0), Description: 'Zero'});
 
    TesterUtility.displayResults('prototypes Number.isNatural', testResults, isFirst);
 };
