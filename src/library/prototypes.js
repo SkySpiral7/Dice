@@ -30,23 +30,19 @@ if (undefined === Array.prototype.removeElement)
    };
 }
 /**
-Returns the summation of every element in the array (using Number() on each element to try to convert it to a number).
-If the array contains arrays this function is deep and calls summation() on each of them.
+@param {!number[]} elements not typeof number will be ignored. NaN and Infinity won't be ignored.
 @returns {!number} the numeric summation of the array
 */
-if (undefined === Array.prototype.summation)
+if (undefined === Math.summation)
 {
-   Array.prototype.summation = function()  //TODO: re: should this be deep? Or be a util?
+   Math.summation = function(array)
    {
       var total = 0;
-      for (var i = 0; i < this.length; ++i)
+      for (var i = 0; i < array.length; ++i)
       {
-         if(this[i] instanceof Array) total += this[i].summation();  //is deep
-         else
-         {
-            var thisValue = Number(this[i]);  //catches empty string, null, undefined and NaN. although a few of those return 0 but that's fine too (does the same thing)
-            if(!isNaN(thisValue)) total += thisValue;  //TODO: re: non numbers could be undefined behavior
-         }
+         var thisValue = array[i];  //stored so that array[i] is not mutated
+         if(thisValue instanceof Number) thisValue = thisValue.valueOf();
+         if('number' === typeof(thisValue)) total += thisValue;
       }
       return total;
    };
@@ -64,6 +60,7 @@ if(undefined === Array.prototype.contains){Array.prototype.contains = function(e
 /**
 Factorial is defined as the multiplication of all positive integers less than and equal to the input.
 Except 0 and 1 which return 1. This function does not use recursion.
+Using iteration allows very fast speed: input of 170 (the highest non-infinity result) finishes in 0 milliseconds.
 Examples:
 (NaN or '2') return NaN;
 (Infinity) return Infinity;

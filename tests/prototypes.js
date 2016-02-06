@@ -1,5 +1,5 @@
 'use strict';
-Tester.prototypes = {Array: {testAll: function(isFirst){TesterUtility.testAll(this, isFirst);}}};
+Tester.prototypes = {Array: {}, Math: {}, String: {}};
 Tester.prototypes.Array.removeByIndex = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -118,24 +118,6 @@ Tester.prototypes.Array.removeElement = function(isFirst)
 
    TesterUtility.displayResults('Tester.prototypes.Array.removeElement', testResults, isFirst);
 };
-/*
-TODO: re: can't test until I know what to do with it
-Tester.prototypes.Array.summatioun = fnction(isFirst)
-{
-   TesterUtility.clearResults(isFirst);
-
-   var testResults = [], testArray, returned;
-
-   try{
-   testArray = [1, 20, -3];
-   returned = testArray.removeElement(20);
-   testResults.push({Expected: JSON.stringify([1, -3]), Actual: JSON.stringify(testArray), Description: 'Happy path: removed 20'});
-   testResults.push({Expected: 1, Actual: returned, Description: 'Happy path: returned index of removed element'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
-
-   TesterUtility.displayResults('Tester.prototypes.Array.summation', testResults, isFirst);
-};
-*/
 Tester.prototypes.Array.contains = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -148,7 +130,6 @@ Tester.prototypes.Array.contains = function(isFirst)
 
    TesterUtility.displayResults('Tester.prototypes.Array.contains', testResults, isFirst);
 };
-Tester.prototypes.String = {testAll: function(isFirst){TesterUtility.testAll(this, isFirst);}};
 Tester.prototypes.String.contains = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -161,4 +142,33 @@ Tester.prototypes.String.contains = function(isFirst)
    //testResults.push({Expected: false, Actual: 'me undefined you'.contains(), Description: 'No arg'}); undefined behavior
 
    TesterUtility.displayResults('Tester.prototypes.String.contains', testResults, isFirst);
+};
+Tester.prototypes.Math.factorial = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: 24, Actual: Math.factorial(4), Description: 'Input: 4'});
+   testResults.push({Expected: 1, Actual: Math.factorial(0), Description: 'Input: 0'});
+   testResults.push({Expected: 1, Actual: Math.factorial(1), Description: 'Input: 1'});
+   testResults.push({Expected: NaN, Actual: Math.factorial(NaN), Description: 'Input: NaN'});
+   testResults.push({Expected: NaN, Actual: Math.factorial('string'), Description: 'Input: string'});
+   testResults.push({Expected: undefined, Actual: Math.factorial(-2), Description: 'Input: -2'});
+   testResults.push({Expected: undefined, Actual: Math.factorial(2.4), Description: 'Input: 2.4'});
+   testResults.push({Expected: Infinity, Actual: Math.factorial(Infinity), Description: 'Input: Infinity'});
+
+   TesterUtility.displayResults('Tester.prototypes.Math.factorial', testResults, isFirst);
+};
+Tester.prototypes.Math.summation = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: 5, Actual: Math.summation([1, 2, new Number(5), -3]), Description: 'Happy path'});
+   testResults.push({Expected: 0, Actual: Math.summation([]), Description: 'Empty'});
+   testResults.push({Expected: -5, Actual: Math.summation(['1', true, -5]), Description: 'Ignore non-numbers'});
+   testResults.push({Expected: Infinity, Actual: Math.summation([Infinity]), Description: 'Infinity'});
+   testResults.push({Expected: NaN, Actual: Math.summation([NaN, -Infinity]), Description: 'NaN'});
+
+   TesterUtility.displayResults('Math.summation', testResults, isFirst);
 };
