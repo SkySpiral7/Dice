@@ -123,4 +123,4 @@ function nextCartesianProduct(array1Given, array2Given){  //they aren't changed
        results.push(thisRow);  //group done
    }
     return results;
-}*/  //see exmaple in function doc
+}*/  //see example in function doc

@@ -85,11 +85,13 @@ Draw.diceBellCurve(new DicePool(myDiceString));
 <!--
 various notes:
 rewrite everything
--named dice should not be instanceof die. call the new object Spinner
+-named dice should not be instanceof die. call the new object Spinner: to String/JSON, getSides, roll etc
+-NumericSpinner also. which has all die functions (some may do nothing)
+-also consider SimpleDie: Math.ceil(Math.random()*sideCount); 2 is either 1 or 2
 -methods for string parsing. die only takes string or json
 -dicepool only takes string, array of json, or array of die
 -make dice and dicepool's toString return the code needed to create them: 'new DicePool("2d6")' toJSON only return "2d6"
--make sure to doc everything
+-make sure to doc everything: including include.js
 -make sure it is all tested
 -currently explosions must be before reroll (put in functions)
 consumers:
@@ -105,6 +107,7 @@ then look into new functionality
 -custom die takes a callback function which is sent the value on roll
 -maybe above can simplify min/max, reroll, explosions, etc
 -make a numbered Spinner which can be used for stats etc
+-deck object? not what this was made for...
 
 stats note: http://mathforum.org/library/drmath/view/52207.html
 this approach will work fast but will not work for named dice and drop/keep

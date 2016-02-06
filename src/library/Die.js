@@ -163,100 +163,7 @@ function Die(diceStringGiven, nameArray){
    this.spin = this.roll;  //spinner alias
    function constructorCalled(objectGiven){
        if(nameArray.length!=0){if(!namedConstructor()); return '';}  //TODO if a named die is entirely numbers it is allowed everything
-       var holder=diceStringGiven.trim().toLowerCase().replace(/\s/g, ' ');  //make copy. trim, lower case and replace all whitespace with space
 
-       if((/^-/).test(holder)){isNegativeDice=true; holder=holder.substring(1);}  //chop off '-'
-       if((/^1/).test(holder)) holder=holder.substring(1);  //chop off 1
-       if((/^0/).test(holder)) throw new Error(diceStringGiven+"\nyou can't make a dice object with 0 dice. That's invalid");
-       if((/^\d+/).test(holder)) throw new Error(diceStringGiven+"\nyou can't make a dice object with more than one die, instead use a dice pool object");
-       if((/^z/).test(holder)) doesUseZero=true;  //event of 3z2 for 3 coins 0 or 1
-       if(!(/^[zd]/).test(holder)) throw new Error(diceStringGiven+"\ndice must use 'd' or 'z' to specify the dice type");
-       holder=holder.substring(1);  //chop off 'd' or 'z'
-       if((/^%/).test(holder)) holder=holder.replace(/%/, "100");  //replace first % with 100
-       holder=holder.replace(/%/g, "00");  //replace all other % with 2 more zeroes
-      if (holder.startsWith("f"))  //already converted to lower case
-      {
-          doesUseZero=true;  //so that .roll works right. plus this does in fact use the number 0
-          isFudgeDie=true;  //set flag for later
-          sideCount=3;  //they have 3 sides
-          holder=holder.substring(1);  //chop of 'f'
-      }
-      else
-      {
-          sideCount=parseInt(holder);  //to capture the next number
-          if(sideCount == 0) throw new Error(diceStringGiven+"\nhas a bad number of sides.");  //avoid bad numbers
-          holder=holder.substring(sideCount.toString().length);  //remove sideCount from holder
-      }
-      while (holder.length > 0)
-      {
-         if (holder.startsWith('!'))
-         {
-             if(sideCount==1) throw new Error(diceStringGiven+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
-             if(doesCompoundExplode || doesExplode) throw new Error(diceStringGiven+"\nExplosion defined more than once. This is invalid.");
-             holder=holder.substring(1);  //chop off '!'
-            if (holder.startsWith('!'))  //if it had "!!"
-            {
-                holder=holder.substring(1);
-                doesCompoundExplode=true;
-            }
-            else if (holder.startsWith("p"))
-            {
-                holder=holder.substring(1);  //chop off 'p'
-                doesExplode=true;  //penetrating needs both set
-                doesPenetrate=true;
-            }
-             else doesExplode=true;  //doesCompoundExplode and doesExplode can't both be true
-         }
-         else if ((/^r(?:[<>=]=?|!=)?-?\d+/).test(holder))  //can't do [<>=!]=? since that would allow '!' alone
-         {
-             if(rerollCriteria!=undefined) throw new Error(diceStringGiven+"\nMore than one reroll criteria specified. This is not possible.");
-                //could theoretically be an array of criteria but throw for now
-             holder=holder.substring(1);  //chop off 'r'
-             if((/^-?\d+/).test(holder)) holder='=='+holder;  //default
-             rerollCriteria=(/^..?-?\d+/).exec(holder)[0];
-             holder=holder.substring(rerollCriteria.length);  //remove rerollCriteria from holder
-             if(rerollCriteria.startsWith("=") && !rerollCriteria.startsWith("==")) rerollCriteria='='+rerollCriteria;  //must be double equal signs for eval
-         }
-          else break;
-      }
-      while (holder.length > 0)  //longhand loop
-      {
-         if ((/^(?:\spenetrat(?:ing|e)|\scompound(?:ing)?)?\sexplo(?:sions?|ding|de)(?:\sdic?e)?/).test(holder))
-         {
-             if(sideCount==1) throw new Error(diceStringGiven+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
-             if(doesCompoundExplode || doesExplode) throw new Error(diceStringGiven+"\nExplosion defined more than once. This is invalid.");
-             holder=holder.replace(/\sexplo(?:sions?|ding|de)(?:\sdic?e)?/, '');  //remove word(s)
-            if (holder.startsWith(' compound'))
-            {
-                holder=holder.replace(/\scompound(?:ing)?/, '');  //remove word
-                doesCompoundExplode=true;
-            }
-            else if (holder.startsWith(" penetrat"))
-            {
-                holder=holder.replace(/\spenetrat(?:ing|e)/, '');  //remove word
-                doesExplode=true;  //penetrating needs both set
-                doesPenetrate=true;
-            }
-             else doesExplode=true;  //doesCompoundExplode and doesExplode can't both be true
-         }
-         else if ((/^\sreroll\s(?:dic?e\s(?:that\sare\s)?)?(?:(?:greater|less)\sthan(?:\sor\sequal(?:\sto)?)?\s|(?:not\s)?equal(?:\sto)?\s)?-?\d+/).test(holder))
-         {
-             if(rerollCriteria!=undefined) throw new Error(diceStringGiven+"\nMore than one reroll criteria specified. This is not possible.");
-                //could theoretically be an array of criteria but throw for now
-             holder=holder.replace(/^\sreroll\s(?:dic?e\s(?:that\sare\s)?)?/, '');  //remove word(s)
-             rerollCriteria='';
-             if((/^greater than (?:or )?/).test(holder)){rerollCriteria+='>'; holder=holder.replace(/^greater than (?:or )?/, '');}
-             else if((/^less than (?:or )?/).test(holder)){rerollCriteria+='<'; holder=holder.replace(/^less than (?:or )?/, '');}
-             else if((/^not /).test(holder)){rerollCriteria+='!'; holder=holder.replace(/^not /, '');}
-             if((/^equal(?: to)? /).test(holder)){rerollCriteria+='='; holder=holder.replace(/^equal(?: to)? /, '');}
-             if(rerollCriteria=='=' || rerollCriteria=='') rerollCriteria='==';  //first is if 'equal' and the other is default
-             rerollCriteria+=parseInt(holder);  //grab number
-             holder=holder.replace(/^-?\d+/, '');  //remove
-         }
-          else break;
-      }
-
-       if((/^\s*[-+]\s*\d+$/).test(holder)){constantModifier=Number(holder); holder='';}
       if (isFudgeDie)  //was created as a fudge die
       {
           constantModifier--;  //1 lower
@@ -414,3 +321,111 @@ function Die(diceStringGiven, nameArray){
     return constructorCalled(this);
     //if this is a named die then diceStringGiven will be ignored (since it is actually the first name or something else)
 };
+Die._parseString = function(inputString)
+{
+   var jsonResult = {};
+   var holder = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy. trim, lower case and replace all whitespace with space
+
+   jsonResult.originalString = inputString;
+   if((/^-/).test(holder)){jsonResult.isNegativeDice=true; holder=holder.substring(1);}  //chop off '-'
+   else jsonResult.isNegativeDice=false;
+   if((/^1\D/).test(holder)) holder=holder.substring(1);  //chop off 1
+   else if((/^0/).test(holder)) throw new Error(inputString+"\nyou can't make a dice object with 0 dice. That's invalid");
+   else if((/^(?:\d+|%)/).test(holder)) throw new Error(inputString+"\nyou can't make a dice object with more than one die, instead use a dice pool object");
+
+   jsonResult.constantModifier = 0;
+   if((/^z/).test(holder)) jsonResult.constantModifier = -1;
+   if(!(/^[zd]/).test(holder)) throw new Error(inputString+"\ndice must use 'd' or 'z' to specify the dice type");
+   holder=holder.substring(1);  //chop off 'd' or 'z'
+   if((/^%/).test(holder)) holder=holder.replace(/%/, "100");  //replace first % with 100
+   holder=holder.replace(/%/g, "00");  //replace all other % with 2 more zeros
+
+   if (holder.startsWith("f"))  //already converted to lower case
+   {
+      jsonResult.isFudgeDie = true;  //set flag for later
+      jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
+      jsonResult.sideCount = 3;
+      jsonResult.isNegativeDice = false;  //-1df and +1df are the same thing. clear flag so that a leading '-' isn't displayed
+      holder=holder.substring(1);  //chop off 'f'
+   }
+   else
+   {
+      jsonResult.sideCount=parseInt(holder);  //to capture the next number
+      if(jsonResult.sideCount == 0) throw new Error(inputString+"\nhas a bad number of sides.");
+      holder=holder.substring(jsonResult.sideCount.toString().length);  //remove sideCount from holder
+   }
+
+   while (holder.length > 0)
+   {
+      if (holder.startsWith('!'))
+      {
+         //TODO: re: keep parse errors but move rest into a validation function
+         if(jsonResult.sideCount==1) throw new Error(inputString+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
+         if(undefined !== jsonResult.explodeType) throw new Error(inputString+"\nExplosion defined more than once. This is invalid.");
+         holder=holder.substring(1);  //chop off '!'
+         if (holder.startsWith('!'))  //if it had "!!"
+         {
+            holder=holder.substring(1);
+            jsonResult.explodeType = Die.explodeTypes.Compound;
+         }
+         else if (holder.startsWith("p"))
+         {
+            holder=holder.substring(1);  //chop off 'p'
+            jsonResult.explodeType = Die.explodeTypes.Penetrating;
+         }
+         else jsonResult.explodeType = Die.explodeTypes.Normal;
+      }
+      else if ((/^r(?:[<>]=?|[!=]==?|=)?-?\d+/).test(holder))  //can't do [<>=!]=? since that would allow '!' alone
+      {
+         if(jsonResult.rerollCriteria!=undefined) throw new Error(inputString+"\nMore than one reroll criteria specified. This is not possible.");
+            //could theoretically be an array of criteria but throw for now
+         holder=holder.substring(1);  //chop off 'r'
+         if((/^-?\d+/).test(holder)) holder='=='+holder;  //default
+         jsonResult.rerollCriteria=(/^.=?=?-?\d+/).exec(holder)[0];
+         holder=holder.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from holder
+         if(jsonResult.rerollCriteria === "=") jsonResult.rerollCriteria='==';  //must be double equal signs for eval
+      }
+      else break;
+   }
+   while (holder.length > 0)  //longhand loop
+   {
+      if ((/^(?: penetrat(?:ing|e)| compound(?:ing)?)? explo(?:sions?|ding|de)(?: dic?e)?/).test(holder))
+      {
+         if(jsonResult.sideCount==1) throw new Error(inputString+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
+         if(undefined !== jsonResult.explodeType) throw new Error(inputString+"\nExplosion defined more than once. This is invalid.");
+         if (holder.startsWith(' compound'))
+         {
+            holder=holder.replace(/ compound(?:ing)?/, '');  //remove word
+            jsonResult.explodeType = Die.explodeTypes.Compound;
+         }
+         else if (holder.startsWith(" penetrat"))
+         {
+            holder=holder.replace(/ penetrat(?:ing|e)/, '');  //remove word
+            jsonResult.explodeType = Die.explodeTypes.Penetrating;
+         }
+         else jsonResult.explodeType = Die.explodeTypes.Normal;
+         holder=holder.replace(/ explo(?:sions?|ding|de)(?: dic?e)?/, '');  //remove word(s)
+      }
+      else if ((/^ reroll (?:dic?e (?:that are )?)?(?:(?:greater|less) than(?: or equal(?: to)?)? |(?:not )?equal(?: to)? )?-?\d+/).test(holder))
+      {
+         if(jsonResult.rerollCriteria!=undefined) throw new Error(inputString+"\nMore than one reroll criteria specified. This is not possible.");
+            //could theoretically be an array of criteria but throw for now
+         holder=holder.replace(/^ reroll (?:dic?e (?:that are )?)?/, '');  //remove word(s)
+         jsonResult.rerollCriteria='';
+         if((/^greater than (?:or )?/).test(holder)){jsonResult.rerollCriteria+='>'; holder=holder.replace(/^greater than (?:or )?/, '');}
+         else if((/^less than (?:or )?/).test(holder)){jsonResult.rerollCriteria+='<'; holder=holder.replace(/^less than (?:or )?/, '');}
+         else if((/^not /).test(holder)){jsonResult.rerollCriteria+='!'; holder=holder.replace(/^not /, '');}
+         if((/^equal(?: to)? /).test(holder)){jsonResult.rerollCriteria+='='; holder=holder.replace(/^equal(?: to)? /, '');}
+         if(jsonResult.rerollCriteria=='=' || jsonResult.rerollCriteria=='') jsonResult.rerollCriteria='==';  //first is if 'equal' and the other is default
+         jsonResult.rerollCriteria+=parseInt(holder);  //grab number
+         holder=holder.replace(/^-?\d+/, '');  //remove
+      }
+      else break;
+   }
+   //if((/^ *[-+] *\d+$/).test(holder)){jsonResult.constantModifier=Number(holder); holder='';}
+   jsonResult.remainingString = holder;
+
+   return jsonResult;
+};
+/**This is an enum since Symbols aren't well supported enough yet.*/
+Die.explodeTypes = {Normal: {}, Compound: {}, Penetrating: {}};
