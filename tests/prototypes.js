@@ -1,5 +1,17 @@
 'use strict';
 Tester.prototypes = {Array: {}, Math: {}, String: {}};
+Tester.prototypes.Array.contains = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: true, Actual: ['a', 'b', 'c'].contains('b'), Description: 'Happy path: middle'});
+   testResults.push({Expected: false, Actual: ['a', 'b', 'c'].contains('B'), Description: 'Not found'});
+   testResults.push({Expected: false, Actual: ['1', '2', '3'].contains(2), Description: 'Type strict'});
+   //testResults.push({Expected: false, Actual: ['1', undefined].contains(), Description: 'No arg'}); undefined behavior
+
+   TesterUtility.displayResults('Tester.prototypes.Array.contains', testResults, isFirst);
+};
 Tester.prototypes.Array.removeByIndex = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -118,31 +130,6 @@ Tester.prototypes.Array.removeElement = function(isFirst)
 
    TesterUtility.displayResults('Tester.prototypes.Array.removeElement', testResults, isFirst);
 };
-Tester.prototypes.Array.contains = function(isFirst)
-{
-   TesterUtility.clearResults(isFirst);
-
-   var testResults = [];
-   testResults.push({Expected: true, Actual: ['a', 'b', 'c'].contains('b'), Description: 'Happy path: middle'});
-   testResults.push({Expected: false, Actual: ['a', 'b', 'c'].contains('B'), Description: 'Not found'});
-   testResults.push({Expected: false, Actual: ['1', '2', '3'].contains(2), Description: 'Type strict'});
-   //testResults.push({Expected: false, Actual: ['1', undefined].contains(), Description: 'No arg'}); undefined behavior
-
-   TesterUtility.displayResults('Tester.prototypes.Array.contains', testResults, isFirst);
-};
-Tester.prototypes.String.contains = function(isFirst)
-{
-   TesterUtility.clearResults(isFirst);
-
-   var testResults = [];
-   testResults.push({Expected: true, Actual: 'me pop you'.contains('pop'), Description: 'Happy path: middle'});
-   testResults.push({Expected: true, Actual: 'me pop you'.contains('me pop you'), Description: 'Entire string'});
-   testResults.push({Expected: false, Actual: 'me pop you'.contains('POP'), Description: 'Case sensitive'});
-   //testResults.push({Expected: false, Actual: 'me 2 you'.contains(2), Description: 'Type strict'}); undefined behavior
-   //testResults.push({Expected: false, Actual: 'me undefined you'.contains(), Description: 'No arg'}); undefined behavior
-
-   TesterUtility.displayResults('Tester.prototypes.String.contains', testResults, isFirst);
-};
 Tester.prototypes.Math.factorial = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -171,4 +158,17 @@ Tester.prototypes.Math.summation = function(isFirst)
    testResults.push({Expected: NaN, Actual: Math.summation([NaN, -Infinity]), Description: 'NaN'});
 
    TesterUtility.displayResults('Math.summation', testResults, isFirst);
+};
+Tester.prototypes.String.contains = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: true, Actual: 'me pop you'.contains('pop'), Description: 'Happy path: middle'});
+   testResults.push({Expected: true, Actual: 'me pop you'.contains('me pop you'), Description: 'Entire string'});
+   testResults.push({Expected: false, Actual: 'me pop you'.contains('POP'), Description: 'Case sensitive'});
+   //testResults.push({Expected: false, Actual: 'me 2 you'.contains(2), Description: 'Type strict'}); undefined behavior
+   //testResults.push({Expected: false, Actual: 'me undefined you'.contains(), Description: 'No arg'}); undefined behavior
+
+   TesterUtility.displayResults('Tester.prototypes.String.contains', testResults, isFirst);
 };
