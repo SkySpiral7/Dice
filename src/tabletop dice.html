@@ -23,6 +23,9 @@ p.basic
 </style>
 <script type="text/javaScript" src="library/main.js"></script>
 <script>
+/**
+Called by the Execute button. It simply calls eval() on the inputCode's text and writes to results if there was an error.
+*/
 function main()
 {
    document.getElementById('results').value = '';
@@ -43,12 +46,21 @@ function main()
    }
    //writeln("\nEnd of program");
 }
+/**
+@param {!string} message to append to the results text area.
+*/
 function write(message){document.getElementById('results').value += message;}
+/**
+@param {!string} message to append to the results text area followed by an new line.
+*/
 function writeln(message)
 {
    if(0 === arguments.length) message = '';
    write(message + '\n');
 }
+/**
+Hides or shows the bottom section of Function Documentation.
+*/
 function toggleDoc()
 {
     var docStyle = document.getElementById('functionDoc').style;
@@ -81,6 +93,11 @@ rewrite everything
 -currently explosions must be before reroll (put in functions)
 gh-pages
 finish stack exchange
+consumers:
+-warhammer
+-L5R
+-eval
+-a form for dice, add to pool button, roll pool, and stats pool
 then look into new functionality
 -custom die takes a callback function which is sent the value on roll
 -maybe above can simplify min/max, reroll, explosions, etc
@@ -272,52 +289,8 @@ Very doubtful
 <br /><br />
 <a href="javascript:toggleDoc();">Toggle Function Documentation</a><br />
 <div id="functionDoc" style="display: none;"><h1>Function Documentation</h1>
-<a>Javascript 1.2 is required so that things like Array.prototype.concat exist (see </a><a href="http://www.w3schools.com/jsref/jsref_concat_array.asp">Documentation</a><a>)</a><br />
-<h3>Built into standard objects</h3>
-<pre>
-Math.factorial(numberGiven)
-    (static function) returns the factorial of numberGiven without using recursion
-    if numberGiven isn't a number it returns NaN (type conversion is not attempted). if numberGiven is Infinity it returns Infinity.
-    if numberGiven is less than 0 or not an integer it returns undefined
-Array.prototype.indexOf(obj, fromIndex)  //see: <a href="http://www.w3schools.com/jsref/jsref_indexof_array.asp">Documentation</a>
-Array.prototype.toSource()
-    returns a string that represents the array with [] around it
-    any arrays contained this will be called recursively
-    for any other element it is converted to string using ''+obj
-    although not very helpful see: <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/toSource">Documentation</a>
-Array.prototype.removeIndex(index){return this.splice(index, 1);}
-    removes that index of the array (and returns the removed element)
-Array.prototype.removeElement(obj){var foundIndex=this.indexOf(obj); this.removeIndex(foundIndex); return foundIndex;}
-    removes that object from the array and returns the index that was removed
-Array.prototype.summation()
-    returns the summation of every element in the array (using Number() on each element to try to convert it to a number)
-    if the array contains arrays it is deep calling summation() of them
-String.prototype.trim()
-    returns a string that is the same except does not have leading or trailing spaces (original string is unchanged)
-String.prototype.startsWith(prefix)
-    returns true if the string begins with suffix
-String.prototype.endsWith(suffix)
-    returns true if the string ends with suffix
-String.prototype.contains(substring)
-    returns true if the string contains the substring
-
-contains and containsExact return true if the array contains obj
-Array.prototype.contains(obj)  //uses == (2) which converts types
-Array.prototype.containsExact(obj)  //uses === (3) which also matches types
-</pre>
+<a>If you are reading this you have no excuse not to have a modern browser.</a><br />
 <h3>Predefined function list</h3>
-<p class="function">main()</p>
-<p class="description">Called by the Execute button. It simply calls eval() on the Code's text and writes to Output if
-there was an error.</p>
-
-<pre>
-<script>document.write(write);</script>  //is a simple way to write to the output box
-<script>document.write(writeln);</script>
-</pre>
-
-<p class="function">toggleDoc()</p>
-<p class="description">Hides or shows this section of Function Documentation.</p>
-
 <pre>
 isBotch(valueArray, botchValue)
     checks to see if every number in valueArray matches the botchValue

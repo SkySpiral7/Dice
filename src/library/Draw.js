@@ -217,7 +217,7 @@ Draw.compareDiceBellCurve = function(firstPoolGiven, secondPoolGiven){  //TODO: 
    {
        out += Draw.generateDiceCompareTable(firstPoolGiven.getName(), secondPoolGiven.getName(), rollData1, rollData2);
        //not appended but replaced. out is only appending for the debug strings
-       //out+=rollData1.toSource() + '<br/>\n' + rollData2.toSource();
+       //out+=JSON.stringify(rollData1) + '<br/>\n' + JSON.stringify(rollData2);
    }
     else out+=rollData1 + rollData2;  //message for debugging (string)
 
