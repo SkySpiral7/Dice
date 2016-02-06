@@ -323,107 +323,108 @@ function Die(diceStringGiven, nameArray){
 };
 Die._parseString = function(inputString)
 {
-   var jsonResult = {};
-   var holder = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy. trim, lower case and replace all whitespace with space
+   var jsonResult = {originalString: inputString};
+   var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy. trim, lower case and replace all whitespace with space
 
-   jsonResult.originalString = inputString;
-   if((/^-/).test(holder)){jsonResult.isNegativeDice=true; holder=holder.substring(1);}  //chop off '-'
-   else jsonResult.isNegativeDice=false;
-   if((/^1\D/).test(holder)) holder=holder.substring(1);  //chop off 1
-   else if((/^0/).test(holder)) throw new Error(inputString+"\nyou can't make a dice object with 0 dice. That's invalid");
-   else if((/^(?:\d+|%)/).test(holder)) throw new Error(inputString+"\nyou can't make a dice object with more than one die, instead use a dice pool object");
+   if((/^-/).test(workingString)){jsonResult.isNegativeDice = true; workingString = workingString.substring(1);}  //chop off '-'
+   else jsonResult.isNegativeDice = false;  //TODO: re: consider removing this and have DicePool track it
+   if((/^1[^\d%]/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
+   else if((/^0[^\d%]/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');
+   else if((/^[\d%]/).test(workingString)) throw new Error(inputString + '\ndie count (if provided) must be 1 (or -1). Otherwise use DicePool');
 
    jsonResult.constantModifier = 0;
-   if((/^z/).test(holder)) jsonResult.constantModifier = -1;
-   if(!(/^[zd]/).test(holder)) throw new Error(inputString+"\ndice must use 'd' or 'z' to specify the dice type");
-   holder=holder.substring(1);  //chop off 'd' or 'z'
-   if((/^%/).test(holder)) holder=holder.replace(/%/, "100");  //replace first % with 100
-   holder=holder.replace(/%/g, "00");  //replace all other % with 2 more zeros
+   if((/^z/).test(workingString)) jsonResult.constantModifier = -1;
+   if(!(/^[zd]/).test(workingString)) throw new Error(inputString + '\nexpected "d" or "z". Found: ' + workingString);
+   workingString = workingString.substring(1);  //chop off 'd' or 'z'
+   if((/^%/).test(workingString)) workingString = workingString.replace(/%/, '100');  //replace first % with 100
+   workingString = workingString.replace(/%/g, '00');  //replace all other % with 2 more zeros
 
-   if (holder.startsWith("f"))  //already converted to lower case
+   if ('f' === workingString[0])
    {
-      jsonResult.isFudgeDie = true;  //set flag for later
+      jsonResult.isFudgeDie = true;  //this is only used for describing the die as a string
       jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
       jsonResult.sideCount = 3;
       jsonResult.isNegativeDice = false;  //-1df and +1df are the same thing. clear flag so that a leading '-' isn't displayed
-      holder=holder.substring(1);  //chop off 'f'
+      workingString = workingString.substring(1);  //chop off 'f'
    }
    else
    {
-      jsonResult.sideCount=parseInt(holder);  //to capture the next number
-      if(jsonResult.sideCount == 0) throw new Error(inputString+"\nhas a bad number of sides.");
-      holder=holder.substring(jsonResult.sideCount.toString().length);  //remove sideCount from holder
+      jsonResult.isFudgeDie = false;
+      jsonResult.sideCount = Number.parseInt(workingString);  //only parses leading integer
+      if(jsonResult.sideCount <= 0 || Number.isNaN(jsonResult.sideCount)) throw new Error(inputString + '\ninvalid sideCount: ' + jsonResult.sideCount);
+      workingString = workingString.substring(jsonResult.sideCount.toString().length);  //remove sideCount from workingString
    }
 
-   while (holder.length > 0)
+   while (workingString.length > 0)
    {
-      if (holder.startsWith('!'))
+      if ('!' === workingString[0])
       {
          //TODO: re: keep parse errors but move rest into a validation function
          if(jsonResult.sideCount==1) throw new Error(inputString+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
          if(undefined !== jsonResult.explodeType) throw new Error(inputString+"\nExplosion defined more than once. This is invalid.");
-         holder=holder.substring(1);  //chop off '!'
-         if (holder.startsWith('!'))  //if it had "!!"
+         workingString=workingString.substring(1);  //chop off '!'
+         if (workingString.startsWith('!'))  //if it had "!!"
          {
-            holder=holder.substring(1);
+            workingString=workingString.substring(1);
             jsonResult.explodeType = Die.explodeTypes.Compound;
          }
-         else if (holder.startsWith("p"))
+         else if (workingString.startsWith("p"))
          {
-            holder=holder.substring(1);  //chop off 'p'
+            workingString=workingString.substring(1);  //chop off 'p'
             jsonResult.explodeType = Die.explodeTypes.Penetrating;
          }
          else jsonResult.explodeType = Die.explodeTypes.Normal;
       }
-      else if ((/^r(?:[<>]=?|[!=]==?|=)?-?\d+/).test(holder))  //can't do [<>=!]=? since that would allow '!' alone
+      else if ((/^r(?:[<>]=?|[!=]==?|=)?-?\d+/).test(workingString))  //can't do [<>=!]=? since that would allow '!' alone
       {
          if(jsonResult.rerollCriteria!=undefined) throw new Error(inputString+"\nMore than one reroll criteria specified. This is not possible.");
             //could theoretically be an array of criteria but throw for now
-         holder=holder.substring(1);  //chop off 'r'
-         if((/^-?\d+/).test(holder)) holder='=='+holder;  //default
-         jsonResult.rerollCriteria=(/^.=?=?-?\d+/).exec(holder)[0];
-         holder=holder.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from holder
+         workingString=workingString.substring(1);  //chop off 'r'
+         if((/^-?\d+/).test(workingString)) workingString='=='+workingString;  //default
+         jsonResult.rerollCriteria=(/^.=?=?-?\d+/).exec(workingString)[0];
+         workingString=workingString.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from workingString
          if(jsonResult.rerollCriteria === "=") jsonResult.rerollCriteria='==';  //must be double equal signs for eval
       }
       else break;
    }
-   while (holder.length > 0)  //longhand loop
+   while (workingString.length > 0)  //longhand loop
    {
-      if ((/^(?: penetrat(?:ing|e)| compound(?:ing)?)? explo(?:sions?|ding|de)(?: dic?e)?/).test(holder))
+      if ((/^(?: penetrat(?:ing|e)| compound(?:ing)?)? explo(?:sions?|ding|de)(?: dic?e)?/).test(workingString))
       {
          if(jsonResult.sideCount==1) throw new Error(inputString+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
          if(undefined !== jsonResult.explodeType) throw new Error(inputString+"\nExplosion defined more than once. This is invalid.");
-         if (holder.startsWith(' compound'))
+         if (workingString.startsWith(' compound'))
          {
-            holder=holder.replace(/ compound(?:ing)?/, '');  //remove word
+            workingString=workingString.replace(/ compound(?:ing)?/, '');  //remove word
             jsonResult.explodeType = Die.explodeTypes.Compound;
          }
-         else if (holder.startsWith(" penetrat"))
+         else if (workingString.startsWith(" penetrat"))
          {
-            holder=holder.replace(/ penetrat(?:ing|e)/, '');  //remove word
+            workingString=workingString.replace(/ penetrat(?:ing|e)/, '');  //remove word
             jsonResult.explodeType = Die.explodeTypes.Penetrating;
          }
          else jsonResult.explodeType = Die.explodeTypes.Normal;
-         holder=holder.replace(/ explo(?:sions?|ding|de)(?: dic?e)?/, '');  //remove word(s)
+         workingString=workingString.replace(/ explo(?:sions?|ding|de)(?: dic?e)?/, '');  //remove word(s)
       }
-      else if ((/^ reroll (?:dic?e (?:that are )?)?(?:(?:greater|less) than(?: or equal(?: to)?)? |(?:not )?equal(?: to)? )?-?\d+/).test(holder))
+      else if ((/^ reroll (?:dic?e (?:that are )?)?(?:(?:greater|less) than(?: or equal(?: to)?)? |(?:not )?equal(?: to)? )?-?\d+/).test(workingString))
       {
          if(jsonResult.rerollCriteria!=undefined) throw new Error(inputString+"\nMore than one reroll criteria specified. This is not possible.");
             //could theoretically be an array of criteria but throw for now
-         holder=holder.replace(/^ reroll (?:dic?e (?:that are )?)?/, '');  //remove word(s)
+         workingString=workingString.replace(/^ reroll (?:dic?e (?:that are )?)?/, '');  //remove word(s)
          jsonResult.rerollCriteria='';
-         if((/^greater than (?:or )?/).test(holder)){jsonResult.rerollCriteria+='>'; holder=holder.replace(/^greater than (?:or )?/, '');}
-         else if((/^less than (?:or )?/).test(holder)){jsonResult.rerollCriteria+='<'; holder=holder.replace(/^less than (?:or )?/, '');}
-         else if((/^not /).test(holder)){jsonResult.rerollCriteria+='!'; holder=holder.replace(/^not /, '');}
-         if((/^equal(?: to)? /).test(holder)){jsonResult.rerollCriteria+='='; holder=holder.replace(/^equal(?: to)? /, '');}
+         if((/^greater than (?:or )?/).test(workingString)){jsonResult.rerollCriteria+='>'; workingString=workingString.replace(/^greater than (?:or )?/, '');}
+         else if((/^less than (?:or )?/).test(workingString)){jsonResult.rerollCriteria+='<'; workingString=workingString.replace(/^less than (?:or )?/, '');}
+         else if((/^not /).test(workingString)){jsonResult.rerollCriteria+='!'; workingString=workingString.replace(/^not /, '');}
+         if((/^equal(?: to)? /).test(workingString)){jsonResult.rerollCriteria+='='; workingString=workingString.replace(/^equal(?: to)? /, '');}
          if(jsonResult.rerollCriteria=='=' || jsonResult.rerollCriteria=='') jsonResult.rerollCriteria='==';  //first is if 'equal' and the other is default
-         jsonResult.rerollCriteria+=parseInt(holder);  //grab number
-         holder=holder.replace(/^-?\d+/, '');  //remove
+         jsonResult.rerollCriteria+=parseInt(workingString);  //grab number
+         workingString=workingString.replace(/^-?\d+/, '');  //remove
       }
       else break;
    }
-   //if((/^ *[-+] *\d+$/).test(holder)){jsonResult.constantModifier=Number(holder); holder='';}
-   jsonResult.remainingString = holder;
+   //for now keep constantModifier internal only
+   //if((/^ *[-+] *\d+$/).test(workingString)){jsonResult.constantModifier=Number(workingString); workingString='';}
+   if('' !== workingString) throw new Error(inputString + '\nUnparsable: ' + workingString);
 
    return jsonResult;
 };
