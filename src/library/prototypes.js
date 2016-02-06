@@ -1,8 +1,20 @@
+'use strict';
 /**
 @param {!number} index at which the element is located that should be removed
 @returns the removed element
+@throws if index is illegal
 */
-if(undefined === Array.prototype.removeByIndex){Array.prototype.removeByIndex = function(index){return this.splice(index, 1);}}
+if (undefined === Array.prototype.removeByIndex)
+{
+   Array.prototype.removeByIndex = function(index)
+   {
+      if(index instanceof Number) index = index.valueOf();
+      if('number' !== typeof(index)) throw new Error('Illegal index type: ' + typeof(index));
+      if(Number.isNaN(index) || index < 0 || Math.trunc(index) !== index) throw new Error('Illegal index: ' + index);
+      if(index >= this.length) throw new Error('Illegal index: ' + index + '. length=' + this.length);
+      return this.splice(index, 1)[0];
+   };
+}
 /**
 @param element the first occurrence of which will be removed
 @returns {!number} the index of the removed element
@@ -65,7 +77,7 @@ if (undefined === Math.factorial)
    {
       if(input instanceof Number) input = input.valueOf();
       if('number' !== typeof(input) || Number.isNaN(input)) return NaN;
-      if(input < 0 || Math.floor(input) !== input) return undefined;
+      if(input < 0 || Math.trunc(input) !== input) return undefined;
       //factorial is actually defined for both of these cases but I do not know how to calculate them
       //nor do I care since I don't need it (YAGNI)
       if(Infinity === input) return Infinity;  //to prevent getting stuck in the loop
