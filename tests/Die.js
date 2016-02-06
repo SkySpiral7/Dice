@@ -93,7 +93,54 @@ Tester.Die._parseString = function(isFirst)
    testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: zeroed'});
    } catch(e){testResults.push({Error: e, Action: 'Fudge die: zeroed'});}
 
-   //TODO: re: test: inputString.replace(/\s+/g, ' ');
+   try{
+   returned = Die._parseString('d3r1!');
+   testResults.push({Expected: Die.explodeTypes.Normal, Actual: returned.explodeType, Description: '2 short: explode'});
+   testResults.push({Expected: '==1', Actual: returned.rerollCriteria, Description: '2 short: reroll'});
+   } catch(e){testResults.push({Error: e, Action: '2 short'});}
+
+   try{
+   //also tests: inputString.replace(/\s+/g, ' ');
+   returned = Die._parseString('d3 reroll dice less\t\rthan 3 compound explode die');
+   testResults.push({Expected: Die.explodeTypes.Compound, Actual: returned.explodeType, Description: '2 long: explode'});
+   testResults.push({Expected: '<3', Actual: returned.rerollCriteria, Description: '2 long: reroll'});
+   } catch(e){testResults.push({Error: e, Action: '2 long'});}
+
+   try{
+   returned = Die._parseString('d3r>=2 penetrating exploding dice');
+   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: returned.explodeType, Description: 'Short long: explode'});
+   testResults.push({Expected: '>=2', Actual: returned.rerollCriteria, Description: 'Short long: reroll'});
+   } catch(e){testResults.push({Error: e, Action: 'Short long'});}
+
+   try{
+   returned = Die._parseString('d3!pr===2');
+   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: returned.explodeType, Description: 'Short Penetrating: explode'});
+   testResults.push({Expected: '===2', Actual: returned.rerollCriteria, Description: 'Short Penetrating: reroll'});
+   } catch(e){testResults.push({Error: e, Action: 'Short Penetrating'});}
+
+   try{
+   returned = Die._parseString('d3r!==-2!!');
+   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: returned.explodeType, Description: 'Short compound: explode'});
+   testResults.push({Expected: '!==-2', Actual: returned.rerollCriteria, Description: 'Short compound: reroll'});
+   } catch(e){testResults.push({Error: e, Action: 'Short compound'});}
+
+   try{
+   Die._parseString('d3! explode');
+   TesterUtility.failedToThrow(testResults, '2 explode');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d3! explode\nmultiple explosions found. Max is 1'), Actual: e, Description: '2 explode'});
+   }
+
+   try{
+   Die._parseString('d3r-1 reroll 0');
+   TesterUtility.failedToThrow(testResults, '2 reroll');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d3r-1 reroll 0\nmultiple reroll criteria found. Max is 1'), Actual: e, Description: '2 reroll'});
+   }
 
    TesterUtility.displayResults('Tester.Die._parseString', testResults, isFirst);
 };

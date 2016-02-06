@@ -355,70 +355,90 @@ Die._parseString = function(inputString)
       workingString = workingString.substring(jsonResult.sideCount.toString().length);  //remove sideCount from workingString
    }
 
+   //shorthand must come before longhand
    while (workingString.length > 0)
    {
       if ('!' === workingString[0])
       {
          //TODO: re: keep parse errors but move rest into a validation function
-         if(jsonResult.sideCount==1) throw new Error(inputString+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
-         if(undefined !== jsonResult.explodeType) throw new Error(inputString+"\nExplosion defined more than once. This is invalid.");
-         workingString=workingString.substring(1);  //chop off '!'
-         if (workingString.startsWith('!'))  //if it had "!!"
+         if(1 === jsonResult.sideCount) throw new Error(inputString + '\nInfinite exploding. sideCount: 1');
+         if(undefined !== jsonResult.explodeType) throw new Error(inputString + '\nmultiple explosions found. Max is 1');
+         workingString = workingString.substring(1);  //chop off '!'
+         if ('!' === workingString[0])  //if it had '!!'
          {
-            workingString=workingString.substring(1);
+            workingString = workingString.substring(1);
             jsonResult.explodeType = Die.explodeTypes.Compound;
          }
-         else if (workingString.startsWith("p"))
+         else if ('p' === workingString[0])
          {
-            workingString=workingString.substring(1);  //chop off 'p'
+            workingString = workingString.substring(1);  //chop off 'p'
             jsonResult.explodeType = Die.explodeTypes.Penetrating;
          }
          else jsonResult.explodeType = Die.explodeTypes.Normal;
       }
       else if ((/^r(?:[<>]=?|[!=]==?|=)?-?\d+/).test(workingString))  //can't do [<>=!]=? since that would allow '!' alone
       {
-         if(jsonResult.rerollCriteria!=undefined) throw new Error(inputString+"\nMore than one reroll criteria specified. This is not possible.");
+         if(undefined !== jsonResult.rerollCriteria) throw new Error(inputString + '\nmultiple reroll criteria found. Max is 1');
             //could theoretically be an array of criteria but throw for now
-         workingString=workingString.substring(1);  //chop off 'r'
-         if((/^-?\d+/).test(workingString)) workingString='=='+workingString;  //default
-         jsonResult.rerollCriteria=(/^.=?=?-?\d+/).exec(workingString)[0];
-         workingString=workingString.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from workingString
-         if(jsonResult.rerollCriteria === "=") jsonResult.rerollCriteria='==';  //must be double equal signs for eval
+         workingString = workingString.substring(1);  //chop off 'r'
+         if((/^-?\d+/).test(workingString)) workingString = '==' + workingString;  //default
+         jsonResult.rerollCriteria = (/^.=?=?-?\d+/).exec(workingString)[0];
+         workingString = workingString.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from workingString
+         if('=' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';  //must be double equal signs for eval
       }
       else break;
    }
+   //TODO: re: figure out how to make DRY while still enforcing shorthand then longhand
    while (workingString.length > 0)  //longhand loop
    {
+      //as per the robustness principle I don't care about English grammar as long as the meaning is clear
       if ((/^(?: penetrat(?:ing|e)| compound(?:ing)?)? explo(?:sions?|ding|de)(?: dic?e)?/).test(workingString))
       {
-         if(jsonResult.sideCount==1) throw new Error(inputString+"\nInfinite exploding. A single sided die is not allowed to explode because it would be infinite.");
-         if(undefined !== jsonResult.explodeType) throw new Error(inputString+"\nExplosion defined more than once. This is invalid.");
+         if(1 === jsonResult.sideCount) throw new Error(inputString + '\nInfinite exploding. sideCount: 1');
+         if(undefined !== jsonResult.explodeType) throw new Error(inputString + '\nmultiple explosions found. Max is 1');
          if (workingString.startsWith(' compound'))
          {
-            workingString=workingString.replace(/ compound(?:ing)?/, '');  //remove word
+            workingString = workingString.replace(/ compound(?:ing)?/, '');  //remove word
             jsonResult.explodeType = Die.explodeTypes.Compound;
          }
          else if (workingString.startsWith(" penetrat"))
          {
-            workingString=workingString.replace(/ penetrat(?:ing|e)/, '');  //remove word
+            workingString = workingString.replace(/ penetrat(?:ing|e)/, '');  //remove word
             jsonResult.explodeType = Die.explodeTypes.Penetrating;
          }
          else jsonResult.explodeType = Die.explodeTypes.Normal;
-         workingString=workingString.replace(/ explo(?:sions?|ding|de)(?: dic?e)?/, '');  //remove word(s)
+         workingString = workingString.replace(/ explo(?:sions?|ding|de)(?: dic?e)?/, '');  //remove word(s)
       }
       else if ((/^ reroll (?:dic?e (?:that are )?)?(?:(?:greater|less) than(?: or equal(?: to)?)? |(?:not )?equal(?: to)? )?-?\d+/).test(workingString))
       {
-         if(jsonResult.rerollCriteria!=undefined) throw new Error(inputString+"\nMore than one reroll criteria specified. This is not possible.");
+         if(undefined !== jsonResult.rerollCriteria) throw new Error(inputString + '\nmultiple reroll criteria found. Max is 1');
             //could theoretically be an array of criteria but throw for now
-         workingString=workingString.replace(/^ reroll (?:dic?e (?:that are )?)?/, '');  //remove word(s)
-         jsonResult.rerollCriteria='';
-         if((/^greater than (?:or )?/).test(workingString)){jsonResult.rerollCriteria+='>'; workingString=workingString.replace(/^greater than (?:or )?/, '');}
-         else if((/^less than (?:or )?/).test(workingString)){jsonResult.rerollCriteria+='<'; workingString=workingString.replace(/^less than (?:or )?/, '');}
-         else if((/^not /).test(workingString)){jsonResult.rerollCriteria+='!'; workingString=workingString.replace(/^not /, '');}
-         if((/^equal(?: to)? /).test(workingString)){jsonResult.rerollCriteria+='='; workingString=workingString.replace(/^equal(?: to)? /, '');}
-         if(jsonResult.rerollCriteria=='=' || jsonResult.rerollCriteria=='') jsonResult.rerollCriteria='==';  //first is if 'equal' and the other is default
-         jsonResult.rerollCriteria+=parseInt(workingString);  //grab number
-         workingString=workingString.replace(/^-?\d+/, '');  //remove
+         workingString = workingString.replace(/^ reroll (?:dic?e (?:that are )?)?/, '');  //remove word(s)
+         if ((/^greater than (?:or )?/).test(workingString))
+         {
+            jsonResult.rerollCriteria = '>';
+            workingString = workingString.replace(/^greater than (?:or )?/, '');
+         }
+         else if ((/^less than (?:or )?/).test(workingString))
+         {
+            jsonResult.rerollCriteria = '<';
+            workingString = workingString.replace(/^less than (?:or )?/, '');
+         }
+         else if ((/^not /).test(workingString))
+         {
+            jsonResult.rerollCriteria = '!';
+            workingString = workingString.replace(/^not /, '');
+         }
+         else jsonResult.rerollCriteria = '';
+
+         if ((/^equal(?: to)? /).test(workingString))
+         {
+            jsonResult.rerollCriteria += '=';
+            workingString = workingString.replace(/^equal(?: to)? /, '');
+         }
+         if('=' === jsonResult.rerollCriteria || '' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';  //first is if 'equal' and the other is default
+         jsonResult.rerollCriteria += Number.parseInt(workingString);  //grab number
+         workingString = workingString.replace(/^-?\d+/, '');  //remove
       }
       else break;
    }
