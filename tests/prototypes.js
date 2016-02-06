@@ -1,10 +1,10 @@
 'use strict';
-Tester.Array = {prototype: {testAll: function(isFirst){TesterUtility.testAll(this, isFirst);}}};
-Tester.Array.prototype.removeByIndex=function(isFirst)
+Tester.prototypes = {Array: {testAll: function(isFirst){TesterUtility.testAll(this, isFirst);}}};
+Tester.prototypes.Array.removeByIndex = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults=[], testArray, returned;
+   var testResults = [], testArray, returned;
 
    try{
    testArray = [1, 2, 3];
@@ -83,5 +83,82 @@ Tester.Array.prototype.removeByIndex=function(isFirst)
        testResults.push({Expected: new Error('Illegal index type: string'), Actual: e, Description: 'Type strict'});
    }
 
-   TesterUtility.displayResults('Tester.Array.prototype.removeByIndex', testResults, isFirst);
+   TesterUtility.displayResults('Tester.prototypes.Array.removeByIndex', testResults, isFirst);
+};
+Tester.prototypes.Array.removeElement = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], testArray, returned;
+
+   try{
+   testArray = [1, 20, -3];
+   returned = testArray.removeElement(20);
+   testResults.push({Expected: JSON.stringify([1, -3]), Actual: JSON.stringify(testArray), Description: 'Happy path: removed 20'});
+   testResults.push({Expected: 1, Actual: returned, Description: 'Happy path: returned index of removed element'});
+   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
+
+   try{
+   testArray.removeElement('blue');
+   TesterUtility.failedToThrow(testResults, 'Not found');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('Element not found: blue'), Actual: e, Description: 'Not found'});
+   }
+
+   try{
+   testArray.removeElement('20');
+   TesterUtility.failedToThrow(testResults, 'Type strict');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('Element not found: 20'), Actual: e, Description: 'Type strict'});
+   }
+
+   TesterUtility.displayResults('Tester.prototypes.Array.removeElement', testResults, isFirst);
+};
+/*
+TODO: re: can't test until I know what to do with it
+Tester.prototypes.Array.summatioun = fnction(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], testArray, returned;
+
+   try{
+   testArray = [1, 20, -3];
+   returned = testArray.removeElement(20);
+   testResults.push({Expected: JSON.stringify([1, -3]), Actual: JSON.stringify(testArray), Description: 'Happy path: removed 20'});
+   testResults.push({Expected: 1, Actual: returned, Description: 'Happy path: returned index of removed element'});
+   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
+
+   TesterUtility.displayResults('Tester.prototypes.Array.summation', testResults, isFirst);
+};
+*/
+Tester.prototypes.Array.contains = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: true, Actual: ['a', 'b', 'c'].contains('b'), Description: 'Happy path: middle'});
+   testResults.push({Expected: false, Actual: ['a', 'b', 'c'].contains('B'), Description: 'Not found'});
+   testResults.push({Expected: false, Actual: ['1', '2', '3'].contains(2), Description: 'Type strict'});
+   //testResults.push({Expected: false, Actual: ['1', undefined].contains(), Description: 'No arg'}); undefined behavior
+
+   TesterUtility.displayResults('Tester.prototypes.Array.contains', testResults, isFirst);
+};
+Tester.prototypes.String = {testAll: function(isFirst){TesterUtility.testAll(this, isFirst);}};
+Tester.prototypes.String.contains = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: true, Actual: 'me pop you'.contains('pop'), Description: 'Happy path: middle'});
+   testResults.push({Expected: true, Actual: 'me pop you'.contains('me pop you'), Description: 'Entire string'});
+   testResults.push({Expected: false, Actual: 'me pop you'.contains('POP'), Description: 'Case sensitive'});
+   //testResults.push({Expected: false, Actual: 'me 2 you'.contains(2), Description: 'Type strict'}); undefined behavior
+   //testResults.push({Expected: false, Actual: 'me undefined you'.contains(), Description: 'No arg'}); undefined behavior
+
+   TesterUtility.displayResults('Tester.prototypes.String.contains', testResults, isFirst);
 };

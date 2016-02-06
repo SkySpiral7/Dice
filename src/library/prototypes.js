@@ -24,7 +24,8 @@ if (undefined === Array.prototype.removeElement)
    Array.prototype.removeElement = function(obj)
    {
       var foundIndex = this.indexOf(obj);
-      this.removeByIndex(foundIndex);  //TODO: re: breaks if not found. therefore test
+      if(-1 === foundIndex) throw new Error('Element not found: ' + obj);
+      this.removeByIndex(foundIndex);
       return foundIndex;
    };
 }
@@ -51,7 +52,7 @@ if (undefined === Array.prototype.summation)
    };
 }
 /**
-@param {!string} substring to search for
+@param {!string} substring to search for (case sensitive)
 @returns {!boolean} true if this string contains the substring
 */
 if(undefined === String.prototype.contains){String.prototype.contains = function(substring){return (-1 !== this.indexOf(substring));};}
