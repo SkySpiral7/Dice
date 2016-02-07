@@ -264,15 +264,166 @@ Tester.Die._validate = function(isFirst)
        testResults.push({Expected: new Error('1d6\nInfinite exploding. sideCount: 1'), Actual: e, Description: 'infinite exploding'});
    }
 
+   TesterUtility.displayResults('Die Die._validate', testResults, isFirst);
+};
+Tester.Die._validateReroll = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], input, expected;
+
    try{
-   input = {originalString: '1d6', sideCount: 6, rerollCriteria: '!==2'};
-   expected = {originalString: '1d6', sideCount: 6, constantModifier: 0, isFudgeDie: false, rerollCriteria: '!==2'};
-   Die._validate(input);
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '===0'});
+   TesterUtility.failedToThrow(testResults, 'reroll impossible: === small');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nimpossible to reroll:\n{"rerollCriteria":"===0","sideCount":6,"constantModifier":0}'),
+         Actual: e, Description: 'reroll impossible: === small'});
+   }
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '<=0'});
+   TesterUtility.failedToThrow(testResults, 'reroll impossible: <= small');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nimpossible to reroll:\n{"rerollCriteria":"<=0","sideCount":6,"constantModifier":0}'),
+         Actual: e, Description: 'reroll impossible: <= small'});
+   }
+
+   try{
+   input = {originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '<=1'};
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '<=1'};
+   Die._validateReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Reroll <= min'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll <= min'});}
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '<1'});
+   TesterUtility.failedToThrow(testResults, 'reroll impossible: < min');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nimpossible to reroll:\n{"rerollCriteria":"<1","sideCount":6,"constantModifier":0}'),
+         Actual: e, Description: 'reroll impossible: < min'});
+   }
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '===7'});
+   TesterUtility.failedToThrow(testResults, 'reroll impossible: === large');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nimpossible to reroll:\n{"rerollCriteria":"===7","sideCount":6,"constantModifier":0}'),
+         Actual: e, Description: 'reroll impossible: === large'});
+   }
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '>=7'});
+   TesterUtility.failedToThrow(testResults, 'reroll impossible: >= large');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nimpossible to reroll:\n{"rerollCriteria":">=7","sideCount":6,"constantModifier":0}'),
+         Actual: e, Description: 'reroll impossible: >= large'});
+   }
+
+   try{
+   input = {originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '>=6'};
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '>=6'};
+   Die._validateReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Reroll >= max'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll >= max'});}
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '>6'});
+   TesterUtility.failedToThrow(testResults, 'reroll impossible: > max');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nimpossible to reroll:\n{"rerollCriteria":">6","sideCount":6,"constantModifier":0}'),
+         Actual: e, Description: 'reroll impossible: > max'});
+   }
+
+   try{
+   input = {originalString: '1d6', sideCount: 10, constantModifier: 0, rerollCriteria: '===11', explodeType: Die.explodeTypes.Compound};
+   expected = {originalString: '1d6', sideCount: 10, constantModifier: 0, rerollCriteria: '===11', explodeType: Die.explodeTypes.Compound};
+   Die._validateReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Reroll compound === large'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll compound === large'});}
+
+   try{
+   input = {originalString: '1d6', sideCount: 10, constantModifier: 0, rerollCriteria: '>21', explodeType: Die.explodeTypes.Compound};
+   expected = {originalString: '1d6', sideCount: 10, constantModifier: 0, rerollCriteria: '>21', explodeType: Die.explodeTypes.Compound};
+   Die._validateReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Reroll compound > large'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll compound > large'});}
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 1, constantModifier: 1, rerollCriteria: '!==2'});
+   TesterUtility.failedToThrow(testResults, 'reroll impossible: !== only');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nimpossible to reroll:\n{"rerollCriteria":"!==2","sideCount":1,"constantModifier":1}'),
+         Actual: e, Description: 'reroll impossible: !== only'});
+   }
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '>=5', explodeType: Die.explodeTypes.Normal});
+   TesterUtility.failedToThrow(testResults, 'ambiguous not compound');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nambiguous: does value 6 reroll or explode?\n'+
+         '{"rerollCriteria":">=5","sideCount":6,"constantModifier":0,"explodeType":"{Normal}"}'),
+         Actual: e, Description: 'ambiguous not compound'});
+   }
+
+   try{
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '===13', explodeType: Die.explodeTypes.Compound});
+   TesterUtility.failedToThrow(testResults, 'ambiguous compound');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nambiguous: does value 13 reroll or explode?\n'+
+         '{"rerollCriteria":"===13","sideCount":6,"constantModifier":1,"explodeType":"{Compound}"}'),
+         Actual: e, Description: 'ambiguous compound'});
+   }
+
+   try{
+   input = {originalString: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '>=13', explodeType: Die.explodeTypes.Compound};
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '>=13', explodeType: Die.explodeTypes.Compound};
+   Die._validateReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'not ambiguous compound >='});
+   } catch(e){testResults.push({Error: e, Action: 'not ambiguous compound >='});}
+
+   try{
+   input = {originalString: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '<=13', explodeType: Die.explodeTypes.Compound};
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '<=13', explodeType: Die.explodeTypes.Compound};
+   Die._validateReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'not ambiguous compound <='});
+   } catch(e){testResults.push({Error: e, Action: 'not ambiguous compound <='});}
+
+   try{
+   input = {originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '!==2'};
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '!==2'};
+   Die._validateReroll(input);
    testResults.push({Expected: expected, Actual: input, Description: 'Reroll !=2'});
    } catch(e){testResults.push({Error: e, Action: 'Reroll !=2'});}
 
    try{
-   Die._validate({originalString: '1d6', sideCount: 1, rerollCriteria: '===1'});
+   Die._validateReroll({originalString: '1d6', sideCount: 1, constantModifier: 0, rerollCriteria: '===1'});
    TesterUtility.failedToThrow(testResults, 'infinite rerolling: 1');
    }
    catch(e)
@@ -283,7 +434,7 @@ Tester.Die._validate = function(isFirst)
    }
 
    try{
-   Die._validate({originalString: '1d6', sideCount: 6, constantModifier: 10, rerollCriteria: '<1000'});
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 10, rerollCriteria: '<1000'});
    //minValue: 11
    //maxValue: 16
    TesterUtility.failedToThrow(testResults, 'infinite rerolling: positive');
@@ -296,7 +447,7 @@ Tester.Die._validate = function(isFirst)
    }
 
    try{
-   Die._validate({originalString: '1d6', sideCount: 6, constantModifier: -10, rerollCriteria: '>=-9'});
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: -10, rerollCriteria: '>=-9'});
    //minValue: -9
    //maxValue: -4
    TesterUtility.failedToThrow(testResults, 'infinite rerolling: negative');
@@ -309,7 +460,7 @@ Tester.Die._validate = function(isFirst)
    }
 
    try{
-   Die._validate({originalString: '1d6', sideCount: 6, rerollCriteria: '!=10'});
+   Die._validateReroll({originalString: '1d6', sideCount: 6, constantModifier: 0, rerollCriteria: '!==10'});
    TesterUtility.failedToThrow(testResults, 'infinite rerolling: !=');
    }
    catch(e)
@@ -317,33 +468,6 @@ Tester.Die._validate = function(isFirst)
        testResults.push({Expected: new Error(
          '1d6\nInfinite rerolling:\n{"rerollCriteria":"!==10","sideCount":6,"constantModifier":0}'),
          Actual: e, Description: 'infinite rerolling: !='});
-   }
-
-   TesterUtility.displayResults('Die Die._validate', testResults, isFirst);
-};
-Tester.Die._validateReroll = function(isFirst)
-{
-   return;  //TODO: re: ADD TESTS
-   TesterUtility.clearResults(isFirst);
-
-   var testResults = [], input, expected;
-
-   try{
-   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1,
-      rerollCriteria: '==1', explodeType: Die.explodeTypes.Normal};
-   input = JSON.clone(expected);
-   input.explodeType = Die.explodeTypes.Normal;  //can't be cloned
-   Die._validate(input);
-   testResults.push({Expected: expected, Actual: input, Description: 'Happy path'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
-
-   try{
-   Die._validate({originalString: '1d6', sideCount: -2.5});
-   TesterUtility.failedToThrow(testResults, 'invalid sideCount');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('1d6\ninvalid sideCount: -2.5'), Actual: e, Description: 'invalid sideCount'});
    }
 
    TesterUtility.displayResults('Die Die._validateReroll', testResults, isFirst);

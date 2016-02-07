@@ -380,8 +380,12 @@ Die._validateReroll = function(input)
    var possibleToReroll;
    if((input.rerollCriteria.startsWith('===') || input.rerollCriteria.startsWith('<')) && minValue > rerollValue)
       possibleToReroll = false;
+   else if((/^<[^=]/).test(input.rerollCriteria) && minValue === rerollValue)
+      possibleToReroll = false;
    else if((input.rerollCriteria.startsWith('===') || input.rerollCriteria.startsWith('>')) &&
       Die.explodeTypes.Compound !== input.explodeType && rerollValue > maxValue)
+      possibleToReroll = false;
+   else if((/^>[^=]/).test(input.rerollCriteria) && maxValue === rerollValue)
       possibleToReroll = false;
    else if(input.rerollCriteria.startsWith('!==') && 1 === input.sideCount && rerollValue === maxValue)
       possibleToReroll = false;
@@ -394,11 +398,6 @@ Die._validateReroll = function(input)
       }));
    }
 
-   if (undefined != input.explodeType && eval('' + maxValue + input.rerollCriteria))
-      throw new Error(input.originalString + '\nambiguous: does value ' + maxValue + ' reroll or explode?\n' + JSON.stringify({
-         rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
-         explodeType: input.explodeType
-      }));
    if (Die.explodeTypes.Compound === input.explodeType)
    {
       var compoundRerollValue = rerollValue - input.constantModifier;
@@ -415,6 +414,11 @@ Die._validateReroll = function(input)
          //> and < enforce minimum/maximum # of explosions which is fine
       }
    }
+   else if (undefined != input.explodeType && eval('' + maxValue + input.rerollCriteria))
+      throw new Error(input.originalString + '\nambiguous: does value ' + maxValue + ' reroll or explode?\n' + JSON.stringify({
+         rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
+         explodeType: input.explodeType
+      }));
    //TODO: re: detect infinite reroll for 1d10!r<=9 optimization required
 
    //infinite rerolling check doesn't apply to explode because of the above ambiguous checks
