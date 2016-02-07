@@ -462,11 +462,12 @@ Die._validate = function(input)
 {
    //(undefined == x) is the same as (undefined === x || null === x) unlike (!x) which detects falsy values
    if(input.originalString instanceof String) input.originalString = input.originalString.valueOf();
-   else if ('string' !== typeof(input.originalString))
+   else if (undefined == input.originalString)
    {
-      input.originalString = undefined;
-      input.originalString = JSON.stringify(input.originalString);  //this is safe because JSON.stringify ignores undefined values
+      input.originalString = undefined;  //in case it was null
+      input.originalString = JSON.stringify(input);  //this is safe because JSON.stringify ignores undefined values
    }
+   else if('string' !== typeof(input.originalString)) throw new Error(input.originalString + '\noriginalString must be a string but was: ' + typeof(input.originalString));
 
    if(input.sideCount instanceof Number) input.sideCount = input.sideCount.valueOf();  //unbox so that === behaves as expected
    if(undefined == input.sideCount) throw new Error(input.originalString + '\nsideCount is required');
@@ -478,7 +479,7 @@ Die._validate = function(input)
 
    if(input.constantModifier instanceof Number) input.constantModifier = input.constantModifier.valueOf();
    if(undefined == input.constantModifier) input.constantModifier = 0;
-   else if(!Number.isInteger(input.constantModifier)) throw new Error(input.originalString + '\ninvalid constantModifier: ' + input.constantModifier);
+   else if(!Number.isInteger(input.constantModifier)) throw new Error(input.originalString + '\nconstantModifier must be an integer but was: ' + input.constantModifier);
 
    if(input.isFudgeDie instanceof Boolean) input.isFudgeDie = input.isFudgeDie.valueOf();
    if(undefined == input.isFudgeDie) input.isFudgeDie = false;
@@ -486,7 +487,7 @@ Die._validate = function(input)
 
    if (undefined != input.rerollCriteria)
    {
-      input.rerollCriteria = input.rerollCriteria.toString();
+      input.rerollCriteria = input.rerollCriteria.toString();  //unboxes or converts
       if(!(/^(?:[<>]=?|[!=]==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(input.originalString + '\ninvalid rerollCriteria: ' + input.rerollCriteria);
    }
 
@@ -502,15 +503,15 @@ Die._validate = function(input)
 
    if (undefined != input.rerollCriteria)
    {
-      var maxValue = input.sideCount + input.constantModifier;
       var minValue = 1 + input.constantModifier;
+      var maxValue = input.sideCount + input.constantModifier;
       if (input.isDieNegative)
       {
-         maxValue *= -1;
          minValue *= -1;
+         maxValue *= -1;
          //technically min and max value also need to be switched but that doesn't matter
       }
-      if(eval(''+maxValue+input.rerollCriteria) && eval(''+minValue+input.rerollCriteria))
+      if(eval('' + minValue + input.rerollCriteria) && eval('' + maxValue + input.rerollCriteria))
          throw new Error(input.originalString + '\nInfinite rerolling: ' + JSON.stringify({
             rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
             isDieNegative: input.isDieNegative

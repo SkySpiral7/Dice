@@ -35,6 +35,11 @@ if (undefined === Array.prototype.removeElement)
    };
 }
 /**
+@returns a copy of the input according to JSON.stringify. Objects with toJSON defined will stay that way
+because JSON.parse is not given a reviver (say goodbye to dates and dice).
+*/
+if(undefined === JSON.clone){JSON.clone = function(input){return JSON.parse(JSON.stringify(input));};}
+/**
 Factorial is defined as the multiplication of all positive integers less than and equal to the input.
 Except 0 and 1 which return 1. This function does not use recursion.
 Using iteration allows very fast speed: input of 170 (the highest non-infinity result) finishes in 0 milliseconds.

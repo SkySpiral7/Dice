@@ -1,5 +1,5 @@
 'use strict';
-Tester.prototypes = {Array: {}, Math: {}, Number: {}, String: {}};
+Tester.prototypes = {Array: {}, JSON: {}, Math: {}, Number: {}, String: {}};
 Tester.prototypes.Array.contains = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -129,6 +129,21 @@ Tester.prototypes.Array.removeElement = function(isFirst)
    }
 
    TesterUtility.displayResults('prototypes Array.prototype.removeElement', testResults, isFirst);
+};
+Tester.prototypes.JSON.clone = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: 5, Actual: JSON.clone(5), Description: 'Input: 5'});
+   testResults.push({Expected: {'f': 1}, Actual: JSON.clone({'f': 1}), Description: 'Input object'});
+
+   var given = {'f': 1};
+   var actual = JSON.clone(given);
+   given.g = 5;
+   testResults.push({Expected: {'f': 1}, Actual: actual, Description: 'Returns a different object'});
+
+   TesterUtility.displayResults('prototypes JSON.clone', testResults, isFirst);
 };
 Tester.prototypes.Math.factorial = function(isFirst)
 {
