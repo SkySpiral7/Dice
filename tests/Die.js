@@ -265,6 +265,13 @@ Tester.Die._validate = function(isFirst)
    }
 
    try{
+   input = {originalString: '1d6', sideCount: 6, rerollCriteria: '!==2'};
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 0, isFudgeDie: false, rerollCriteria: '!==2'};
+   Die._validate(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Reroll !=2'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll !=2'});}
+
+   try{
    Die._validate({originalString: '1d6', sideCount: 1, rerollCriteria: '===1'});
    TesterUtility.failedToThrow(testResults, 'infinite rerolling: 1');
    }
@@ -274,17 +281,6 @@ Tester.Die._validate = function(isFirst)
          '1d6\nInfinite rerolling: {"rerollCriteria":"===1","sideCount":1,"constantModifier":0}'),
          Actual: e, Description: 'infinite rerolling: 1'});
    }
-
-   // try{
-   // Die._validate({originalString: '1d6', sideCount: 6, rerollCriteria: '!=10'});
-   // TesterUtility.failedToThrow(testResults, 'infinite rerolling: 1');
-   // }
-   // catch(e)
-   // {
-   //     testResults.push({Expected: new Error(
-   //       '1d6\nInfinite rerolling: {"rerollCriteria":"!==2","sideCount":1,"constantModifier":0}'),
-   //       Actual: e, Description: 'infinite rerolling: 1'});
-   // }
 
    try{
    Die._validate({originalString: '1d6', sideCount: 6, constantModifier: 10, rerollCriteria: '<1000'});
@@ -310,6 +306,17 @@ Tester.Die._validate = function(isFirst)
        testResults.push({Expected: new Error(
          '1d6\nInfinite rerolling: {"rerollCriteria":">=-9","sideCount":6,"constantModifier":-10}'),
          Actual: e, Description: 'infinite rerolling: negative'});
+   }
+
+   try{
+   Die._validate({originalString: '1d6', sideCount: 6, rerollCriteria: '!=10'});
+   TesterUtility.failedToThrow(testResults, 'infinite rerolling: !=');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(
+         '1d6\nInfinite rerolling: {"rerollCriteria":"!==10","sideCount":6,"constantModifier":0}'),
+         Actual: e, Description: 'infinite rerolling: !='});
    }
 
    TesterUtility.displayResults('Die Die._validate', testResults, isFirst);

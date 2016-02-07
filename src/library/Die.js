@@ -362,12 +362,18 @@ Die._validate = function(input)
    {
       var minValue = 1 + input.constantModifier;
       var maxValue = input.sideCount + input.constantModifier;
-      if(eval('' + minValue + input.rerollCriteria) && eval('' + maxValue + input.rerollCriteria))
-         throw new Error(input.originalString + '\nInfinite rerolling: ' + JSON.stringify({
-            rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier
-         }));
+      var infiniteReroll = false;
+      if (input.rerollCriteria.startsWith('!=='))
+      {
+         var rerollValue = Number.parseInt(input.rerollCriteria.substring(3));
+         infiniteReroll = (rerollValue < minValue || rerollValue > maxValue);  //the only number allowed is impossible to roll
+      }
+      else infiniteReroll = (eval('' + minValue + input.rerollCriteria) && eval('' + maxValue + input.rerollCriteria));
       //you can only have 1 reroll criteria. so you can't 1d6r=1r=6 therefore if both min and max are rerolled then they all are
-      //TODO: re: !=2 will cause this to fail
+
+      if(infiniteReroll) throw new Error(input.originalString + '\nInfinite rerolling: ' + JSON.stringify({
+         rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier
+      }));
    }
 };
 /**
@@ -386,7 +392,7 @@ Die._optimizeReroll = function(input)
    var explodeValue = maxValue;
    //explode is not affected by constantModifier but reroll is
 
-   if ('!==' === rerollCriteria)
+   if (rerollCriteria.startsWith('!=='))
    {
       //not much of a die anymore but this is what you asked for
       //this is the most optimized of all
@@ -458,4 +464,3 @@ if reroll then start over
 Define fudge:
 1d3-2 without rerolling or exploding
 */
-//TODO: re: tests
