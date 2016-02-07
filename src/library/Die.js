@@ -164,140 +164,6 @@ function Die(diceStringGiven, nameArray){
    function constructorCalled(objectGiven){
        if(nameArray.length!=0){if(!namedConstructor()); return '';}  //TODO if a named die is entirely numbers it is allowed everything
 
-      if (isFudgeDie)  //was created as a fudge die
-      {
-          constantModifier--;  //1 lower
-          isFudgeDie=(constantModifier==-1);  //z3-1 is fudge otherwise false because it just isn't fudge
-      }
-       if(doesUseZero && constantModifier > 0){doesUseZero=false; constantModifier--;}
-      if (rerollCriteria==undefined)
-      {
-         if (doesExplode || doesCompoundExplode)  //includes pen
-         {
-             explodeValue=sideCount;
-             if(nameArray.length > 0) explodeValue=nameArray[nameArray.length-1];  //last value
-             //else if(isFudgeDie) explodeValue=1;  //covered below
-             else if(doesUseZero) explodeValue--;
-             if(!isNaN(explodeValue)) explodeValue+=constantModifier;  //so that named die may have this too
-         }
-          return holder;
-      }
-       //else:
-       //loop through every possible value and make sure at least 1 is possible to land on
-       var possibleToRoll=false, maxValue, rerollCountLoopIndex, canReroll=false;
-       if(nameArray.length > 0){maxValue=nameArray.length-1; rerollCountLoopIndex=0;}  //based on get min/max value but shorter and I can't call those here
-       //else if(isFudgeDie){maxValue=1; rerollCountLoopIndex=-1;}  //uses doesUseZero with constantModifier
-       else if(doesUseZero){maxValue=(sideCount-1); rerollCountLoopIndex=0;}
-       else{maxValue=sideCount; rerollCountLoopIndex=1;}
-       if(doesPenetrate) rerollCountLoopIndex--;  //the pen die is 1 less so check to see if this is valid
-       if(nameArray.length > 0 && (doesExplode || doesCompoundExplode)){explodeValue=nameArray[maxValue]; maxValue--;}
-       else if(doesExplode || doesCompoundExplode){explodeValue=maxValue; maxValue--;}  //it must be able to land on something else to prevent infinite explosions
-       if((doesExplode || doesCompoundExplode) && constantModifier!=0 && !isNaN(explodeValue)) explodeValue+=constantModifier; //updates explodeValue. includes pen
-      if (doesCompoundExplode)  //reroll criteria for compound must be validated differently
-      {  //TODO: test
-          //minimumPossible and explodeValue ignore isDieNegative. TODO: consider isDieNegative
-          var minimumPossible=rerollCountLoopIndex;  //min value
-          if(nameArray.length!=0) minimumPossible=nameArray[rerollCountLoopIndex];
-          if(!isNaN(minimumPossible)) minimumPossible+=constantModifier;  //not else since it could be both
-          var rerollNumber=Number((/\d+$/).exec(rerollCriteria)[0]);  //always valid due to being at this point in the code (get abs value by ignoring -)
-         if (rerollCriteria.startsWith(">"))
-         {
-             if(eval(''+minimumPossible+rerollCriteria)) throw new Error(diceStringGiven+"\nInfinite explosions. This means that the die can't be rolled.");
-             canReroll=true;  //due to the maximum being infinite the possibility of rerolling always exists
-         }
-          else if (rerollCriteria.startsWith("==") && rerollNumber%explodeValue==0){}  //canReroll=false;  //do nothing since already set
-          //die can never land on a side of explodeValue and the number must be within range
-          else if(rerollNumber >= minimumPossible) canReroll=true;  //covers each of these: <, != and ==
-          //check for canReroll. check if # > min for valid
-      }
-      else
-      {
-         for (; rerollCountLoopIndex <= maxValue; rerollCountLoopIndex++)
-         {
-             var valueConsidered=rerollCountLoopIndex;
-             if(nameArray.length!=0) valueConsidered=nameArray[rerollCountLoopIndex];
-             if(!isNaN(valueConsidered)) valueConsidered+=constantModifier;  //not else since it could be both
-             if(eval(''+valueConsidered+rerollCriteria)) canReroll=true;
-             else possibleToRoll=true;
-             //if(nameArray.length!=0 && rerollCountLoopIndex+1==nameArray.length) break;  //named die has 1 less but already covered by maxValue=nameArray.length-1
-             if(possibleToRoll && canReroll) break;  //found all I need
-         }
-          if(doesExplode && eval(''+explodeValue+rerollCriteria)){doesExplode=doesPenetrate=false; explodeValue=undefined;}  //exploding is not possible due to reroll. compound on the other hand is still possible
-          if(!possibleToRoll && doesExplode) throw new Error(diceStringGiven+"\nInfinite explosions. This means that the die can't be rolled.");
-          //it can land on the max side but that causes an explosion and always is that same side
-          else if(!possibleToRoll) throw new Error(diceStringGiven+"\nInfinite rerolling. This means that the die can't be rolled.");
-      }
-
-       //TODO: optimize: -3df === 3df; 1d6+1d6 === 2d6
-       //reroll optimizing section:
-       if(!canReroll) rerollCriteria=undefined;  //it isn't possible to reroll so just remove the overhead
-      else if (rerollCriteria.startsWith("!="))  //optimized so that it doesn't have to roll until it can keep it
-      {
-          isFudgeDie=false;
-          sideCount=1;
-          doesUseZero=true;  //it is 1z1 so that it always rolls 0
-          constantModifier+=Number((/\d+$/).exec(rerollCriteria)[0]);  //plus this means it always has this value
-          //+= to include already existing modifiers. such as d6r!=4+2 -> z1+6
-          rerollCriteria=undefined;
-          //isDieNegative=false;  //unchanged
-          doesExplode=false;  //doesn't explode due to having only 1 valid value
-          doesPenetrate=false;
-          doesCompoundExplode=false;
-          explodeValue=undefined;
-      }
-      else if (rerollCriteria.startsWith(">"))
-      {
-          var newSideCount=Number((/\d+$/).exec(rerollCriteria)[0]);  //since can't roll above this it becomes new side maximum
-          if(rerollCriteria.startsWith(">=")) newSideCount--;  //can't roll it either means lower the max by 1
-          //if(sideCount > newSideCount):  //always true due to if(!canReroll) above
-          //isDieNegative=false;  //unchanged
-          doesExplode=false;  //doesn't explode due to explodeValue being impossible to roll (ditto for compound)
-          doesPenetrate=false;
-          if(sideCount > newSideCount) doesCompoundExplode=false;  //TODO: confirm this
-          explodeValue=undefined;
-          //doesUseZero=false;  //unchanged
-          //isFudgeDie=false;  //checked later
-          newSideCount-=constantModifier;  //thus shows what would need to be rolled before constantModifier for the highest possible
-          sideCount=newSideCount;
-          //constantModifier+=Number((/\d+$/).exec(rerollCriteria)[0]);  //unchanged except by doesUseZero optimized later
-          rerollCriteria=undefined;  //no longer possible to reroll
-      }
-       //doesCompoundExplode is handled differently since the extra dies rolled need to be unchanged
-      else if (rerollCriteria.startsWith("<") && doesCompoundExplode)  //else if < reduce the sideCount, increase constantModifier and remove the reroll
-      {
-          if(rerollNumber==undefined) var rerollNumber=Number((/\d+$/).exec(rerollCriteria)[0]);  //should already exist
-          //if(!rerollCriteria.startsWith("<=")) rerollNumber--;  //exclude a side
-          rerollNumber-=constantModifier;
-          constantModifier+=Math.floor(rerollNumber/sideCount)*sideCount;
-          //if() might remove reroll TODO
-      }
-      else if (rerollCriteria.startsWith("<"))  // && !doesCompoundExplode  //else if < reduce the sideCount, increase constantModifier and remove the reroll
-      {
-          var rerollCount=Number((/\d+$/).exec(rerollCriteria)[0]);
-          if(!rerollCriteria.startsWith("<=")) rerollCount--;  //exclude a side
-          sideCount-=rerollCount;  //TODO: I think this causes a conflict with explosions (explodeValue)
-          constantModifier+=rerollCount;
-          rerollCriteria=undefined;
-      }
-       else if(doesCompoundExplode){}  //do nothing. compound can't be optimized in any other way
-      else if (!doesUseZero)  //rerollCriteria.startsWith("==")
-      {
-          if(rerollCriteria == "==1"){sideCount--; constantModifier++; rerollCriteria=undefined;}  //bump up so that the random range is smaller
-          else if(rerollCriteria == ('=='+sideCount)){sideCount--; rerollCriteria=undefined;}  //can't roll max. explodeValue has already been removed
-      }
-      else  //rerollCriteria.startsWith("==")
-      {
-          if(rerollCriteria == "==0"){sideCount--; doesUseZero=false; rerollCriteria=undefined;}  //doesUseZero that can't roll 0
-          //cleared doesUseZero instead of constantModifier++ then checking if(doesUseZero && constantModifier > 0) since they'd end up the same
-          else if(rerollCriteria == ('=='+(sideCount-1))){sideCount--; rerollCriteria=undefined;}  //can't roll max. explodeValue has already been removed
-      }
-      //else can stay the same since any other == would need to be replaced with named all numbers. and be impossible for explosions
-
-       //final processing:
-       isFudgeDie=(isFudgeDie && sideCount==3 && constantModifier==-1 && doesUseZero);  //checks isFudgeDie so that z3-1 is false
-       //if(holder.length > 0) throw new Error(diceStringGiven+"\nhas incorrect syntax. After processing the string remaining was\n"+holder);
-       if(sideCount==1 && doesExplode) throw new Error(diceStringGiven+"\nProgramming error: Infinite explosions due to rerolling optimizing.");
-       //might've become invalid due to optimizing
        return holder;
    };
    function namedConstructor(){  //doesn't need to know this
@@ -332,8 +198,6 @@ Die._parseString = function(inputString)
    var jsonResult = {originalString: inputString};
    var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy. trim, lower case and replace all whitespace with space
 
-   if((/^-/).test(workingString)){jsonResult.isDieNegative = true; workingString = workingString.substring(1);}  //chop off '-'
-   else jsonResult.isDieNegative = false;  //TODO: re: consider removing this and have DicePool track it
    if((/^1[^\d%]/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
    else if((/^0[^\d%]/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');
    else if((/^[\d%]/).test(workingString)) throw new Error(inputString + '\ndie count (if provided) must be 1 (or -1). Otherwise use DicePool');
@@ -350,7 +214,6 @@ Die._parseString = function(inputString)
       jsonResult.isFudgeDie = true;  //this is only used for describing the die as a string
       jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
       jsonResult.sideCount = 3;
-      jsonResult.isDieNegative = false;  //-1df and +1df are the same thing. clear flag so that a leading '-' isn't displayed
       workingString = workingString.substring(1);  //chop off 'f'
    }
    else if ((/^\d+/).test(workingString))
@@ -451,8 +314,6 @@ Die._parseString = function(inputString)
 
    return jsonResult;
 };
-/**This is an enum since Symbols aren't well supported enough yet.*/
-Die.explodeTypes = {Normal: {}, Compound: {}, Penetrating: {}};
 /**
 This function is used in the constructor of Die. It throws if there is anything invalid about the input.
 You should have no use for it although it isn't harmful to call.
@@ -473,10 +334,6 @@ Die._validate = function(input)
    if(undefined == input.sideCount) throw new Error(input.originalString + '\nsideCount is required');
    if(!Number.isNatural(input.sideCount)) throw new Error(input.originalString + '\ninvalid sideCount: ' + input.sideCount);
 
-   if(input.isDieNegative instanceof Boolean) input.isDieNegative = input.isDieNegative.valueOf();
-   if(undefined == input.isDieNegative) input.isDieNegative = false;
-   else if(true !== input.isDieNegative && false !== input.isDieNegative) throw new Error(input.originalString + '\ninvalid isDieNegative: ' + input.isDieNegative);
-
    if(input.constantModifier instanceof Number) input.constantModifier = input.constantModifier.valueOf();
    if(undefined == input.constantModifier) input.constantModifier = 0;
    else if(!Number.isInteger(input.constantModifier)) throw new Error(input.originalString + '\nconstantModifier must be an integer but was: ' + input.constantModifier);
@@ -488,7 +345,8 @@ Die._validate = function(input)
    if (undefined != input.rerollCriteria)
    {
       input.rerollCriteria = input.rerollCriteria.toString();  //unboxes or converts
-      if(!(/^(?:[<>]=?|[!=]==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(input.originalString + '\ninvalid rerollCriteria: ' + input.rerollCriteria);
+      if(!(/^(?:[<>]=?|[!=]?==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(input.originalString + '\ninvalid rerollCriteria: ' + input.rerollCriteria);
+      input.rerollCriteria = input.rerollCriteria.replace(/^([!=])=*/, '$1==');  //forces !== and ===
    }
 
    if (undefined != input.explodeType)
@@ -505,17 +363,105 @@ Die._validate = function(input)
    {
       var minValue = 1 + input.constantModifier;
       var maxValue = input.sideCount + input.constantModifier;
-      if (input.isDieNegative)
-      {
-         minValue *= -1;
-         maxValue *= -1;
-         //technically min and max value also need to be switched but that doesn't matter
-      }
       if(eval('' + minValue + input.rerollCriteria) && eval('' + maxValue + input.rerollCriteria))
          throw new Error(input.originalString + '\nInfinite rerolling: ' + JSON.stringify({
-            rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
-            isDieNegative: input.isDieNegative
+            rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier
          }));
       //you can only have 1 reroll criteria. so you can't 1d6r=1r=6 therefore if both min and max are rerolled then they all are
+      //TODO: re: !=2 will cause this to fail
    }
 };
+/**
+This function is used in the constructor of Die. It modifies input to reduce or eliminate reroll without
+changing functionality. So that less rolls occur when calling die.roll().
+You should have no use for it although it isn't harmful to call.
+@param {!object} input which might be modified (anything except originalString may be touched)
+*/
+//TODO: re: isFudgeDie may need to be touched more depending on how Die display works
+Die._optimizeReroll = function(input)
+{
+   if(undefined == input.rerollCriteria) return;  //fast path
+
+   return;
+   var minValue = 1 + input.constantModifier;
+   var maxValue = input.sideCount + input.constantModifier;
+   var explodeValue = maxValue;
+   //explode is not affected by constantModifier but reroll is
+
+   if ('!==' === rerollCriteria)
+   {
+      //not much of a die anymore but this is what you asked for
+      //this is the most optimized of all
+      input.sideCount = 1;
+      input.isFudgeDie = false;
+      input.explodeType = undefined;
+
+      input.constantModifier = Number.parseInt(rerollCriteria.substring(3));
+      --input.constantModifier;  //because the sideCount always adds 1
+      input.rerollCriteria = undefined;
+   }
+   return;
+   //TODO: re: more. See below
+      if (rerollCriteria.startsWith(">"))
+      {
+          var newSideCount=Number((/\d+$/).exec(rerollCriteria)[0]);  //since can't roll above this it becomes new side maximum
+          if(rerollCriteria.startsWith(">=")) newSideCount--;  //can't roll it either means lower the max by 1
+          //if(sideCount > newSideCount):  //always true due to if(!canReroll) above
+          //isDieNegative=false;  //unchanged
+          doesExplode=false;  //doesn't explode due to explodeValue being impossible to roll (ditto for compound)
+          doesPenetrate=false;
+          if(sideCount > newSideCount) doesCompoundExplode=false;  //TODO: confirm this
+          explodeValue=undefined;
+          //doesUseZero=false;  //unchanged
+          //isFudgeDie=false;  //checked later
+          newSideCount-=constantModifier;  //thus shows what would need to be rolled before constantModifier for the highest possible
+          sideCount=newSideCount;
+          //constantModifier+=Number((/\d+$/).exec(rerollCriteria)[0]);  //unchanged except by doesUseZero optimized later
+          rerollCriteria=undefined;  //no longer possible to reroll
+      }
+       //doesCompoundExplode is handled differently since the extra dies rolled need to be unchanged
+      else if (rerollCriteria.startsWith("<") && doesCompoundExplode)  //else if < reduce the sideCount, increase constantModifier and remove the reroll
+      {
+          if(rerollNumber==undefined) var rerollNumber=Number((/\d+$/).exec(rerollCriteria)[0]);  //should already exist
+          //if(!rerollCriteria.startsWith("<=")) rerollNumber--;  //exclude a side
+          rerollNumber-=constantModifier;
+          constantModifier+=Math.floor(rerollNumber/sideCount)*sideCount;
+          //if() might remove reroll TODO
+      }
+      else if (rerollCriteria.startsWith("<"))  // && !doesCompoundExplode  //else if < reduce the sideCount, increase constantModifier and remove the reroll
+      {
+          var rerollCount=Number((/\d+$/).exec(rerollCriteria)[0]);
+          if(!rerollCriteria.startsWith("<=")) rerollCount--;  //exclude a side
+          sideCount-=rerollCount;  //TODO: I think this causes a conflict with explosions (explodeValue)
+          constantModifier+=rerollCount;
+          rerollCriteria=undefined;
+      }
+       else if(doesCompoundExplode){}  //do nothing. compound can't be optimized in any other way
+      else if (!doesUseZero)  //rerollCriteria.startsWith("==")
+      {
+          if(rerollCriteria == "==1"){sideCount--; constantModifier++; rerollCriteria=undefined;}  //bump up so that the random range is smaller
+          else if(rerollCriteria == ('=='+sideCount)){sideCount--; rerollCriteria=undefined;}  //can't roll max. explodeValue has already been removed
+      }
+      else  //rerollCriteria.startsWith("==")
+      {
+          if(rerollCriteria == "==0"){sideCount--; doesUseZero=false; rerollCriteria=undefined;}  //doesUseZero that can't roll 0
+          //cleared doesUseZero instead of constantModifier++ then checking if(doesUseZero && constantModifier > 0) since they'd end up the same
+          else if(rerollCriteria == ('=='+(sideCount-1))){sideCount--; rerollCriteria=undefined;}  //can't roll max. explodeValue has already been removed
+      }
+      //else can stay the same since any other == would need to be replaced with named all numbers. and be impossible for explosions
+};
+/**This is an enum since Symbols aren't well supported enough yet.*/
+Die.explodeTypes = {Normal: {}, Compound: {}, Penetrating: {}};
+/*
+Precedence:
+roll value
+add constant
+if maximum then explode until done
+if reroll then start over
+
+Define fudge:
+1d3-2 that claims to be fudge
+without rerolling or exploding
+*/
+//TODO: re: enforce fudge
+//TODO: re: tests

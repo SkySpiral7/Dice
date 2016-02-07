@@ -1,3 +1,5 @@
+//TODO: optimize: 1d6+1d6 === 2d6
+//TODO: re: keep isDieNegative in DicePool
 function DicePool(diceStringGiven, nameArray){
    //private:
     var diceArray=[];
