@@ -211,14 +211,13 @@ Die._parseString = function(inputString)
 
    if ('f' === workingString[0])
    {
-      jsonResult.isFudgeDie = true;  //this is only used for describing the die as a string
+      //isFudgeDie is defined in validate
       jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
       jsonResult.sideCount = 3;
       workingString = workingString.substring(1);  //chop off 'f'
    }
    else if ((/^\d+/).test(workingString))
    {
-      jsonResult.isFudgeDie = false;
       jsonResult.sideCount = Number.parseInt(workingString);  //only parses leading integer
       workingString = workingString.substring(jsonResult.sideCount.toString().length);  //remove sideCount from workingString
    }
@@ -316,6 +315,7 @@ Die._parseString = function(inputString)
 };
 /**
 This function is used in the constructor of Die. It throws if there is anything invalid about the input.
+It also normalizes the input and defines isFudgeDie (ignoring old value).
 You should have no use for it although it isn't harmful to call.
 @param {!object} input which may be slightly modified (ie gaining default values)
 */
@@ -338,10 +338,6 @@ Die._validate = function(input)
    if(undefined == input.constantModifier) input.constantModifier = 0;
    else if(!Number.isInteger(input.constantModifier)) throw new Error(input.originalString + '\nconstantModifier must be an integer but was: ' + input.constantModifier);
 
-   if(input.isFudgeDie instanceof Boolean) input.isFudgeDie = input.isFudgeDie.valueOf();
-   if(undefined == input.isFudgeDie) input.isFudgeDie = false;
-   else if(true !== input.isFudgeDie && false !== input.isFudgeDie) throw new Error(input.originalString + '\ninvalid isFudgeDie: ' + input.isFudgeDie);
-
    if (undefined != input.rerollCriteria)
    {
       input.rerollCriteria = input.rerollCriteria.toString();  //unboxes or converts
@@ -354,6 +350,9 @@ Die._validate = function(input)
       if(Die.explodeTypes.Normal !== input.explodeType && Die.explodeTypes.Compound !== input.explodeType && Die.explodeTypes.Penetrating !== input.explodeType)
          throw new Error(input.originalString + '\ninvalid explodeType: ' + input.explodeType);
    }
+
+   input.isFudgeDie = (3 === input.sideCount && -2 === input.constantModifier &&
+      undefined == input.rerollCriteria && undefined == input.explodeType);
 
    //all fields are valid when alone. Now validate combinations
 
@@ -377,7 +376,6 @@ changing functionality. So that less rolls occur when calling die.roll().
 You should have no use for it although it isn't harmful to call.
 @param {!object} input which might be modified (anything except originalString may be touched)
 */
-//TODO: re: isFudgeDie may need to be touched more depending on how Die display works
 Die._optimizeReroll = function(input)
 {
    if(undefined == input.rerollCriteria) return;  //fast path
@@ -393,7 +391,6 @@ Die._optimizeReroll = function(input)
       //not much of a die anymore but this is what you asked for
       //this is the most optimized of all
       input.sideCount = 1;
-      input.isFudgeDie = false;
       input.explodeType = undefined;
 
       input.constantModifier = Number.parseInt(rerollCriteria.substring(3));
@@ -413,7 +410,6 @@ Die._optimizeReroll = function(input)
           if(sideCount > newSideCount) doesCompoundExplode=false;  //TODO: confirm this
           explodeValue=undefined;
           //doesUseZero=false;  //unchanged
-          //isFudgeDie=false;  //checked later
           newSideCount-=constantModifier;  //thus shows what would need to be rolled before constantModifier for the highest possible
           sideCount=newSideCount;
           //constantModifier+=Number((/\d+$/).exec(rerollCriteria)[0]);  //unchanged except by doesUseZero optimized later
@@ -460,8 +456,6 @@ if maximum then explode until done
 if reroll then start over
 
 Define fudge:
-1d3-2 that claims to be fudge
-without rerolling or exploding
+1d3-2 without rerolling or exploding
 */
-//TODO: re: enforce fudge
 //TODO: re: tests

@@ -8,14 +8,14 @@ Tester.Die._parseString = function(isFirst)
    try{
    originalString = '1d6';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, constantModifier: 0, sideCount: 6, isFudgeDie: false};
+   expected = {originalString: originalString, constantModifier: 0, sideCount: 6};
    testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 1d6'});
    } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
 
    try{
    originalString = '\n  Z5\t ';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, constantModifier: -1, sideCount: 5, isFudgeDie: false};
+   expected = {originalString: originalString, constantModifier: -1, sideCount: 5};
    testResults.push({Expected: expected, Actual: returned, Description: 'Trim lower: z5'});
    } catch(e){testResults.push({Error: e, Action: 'Trim lower'});}
 
@@ -82,14 +82,14 @@ Tester.Die._parseString = function(isFirst)
    try{
    originalString = '1dF';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, constantModifier: -2, sideCount: 3, isFudgeDie: true};
+   expected = {originalString: originalString, constantModifier: -2, sideCount: 3};
    testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: happy'});
    } catch(e){testResults.push({Error: e, Action: 'Fudge die: happy'});}
 
    try{
    originalString = 'zf';
    returned = Die._parseString(originalString);
-   expected = {originalString: originalString, constantModifier: -2, sideCount: 3, isFudgeDie: true};
+   expected = {originalString: originalString, constantModifier: -2, sideCount: 3};
    testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: zeroed'});
    } catch(e){testResults.push({Error: e, Action: 'Fudge die: zeroed'});}
 
@@ -169,7 +169,7 @@ Tester.Die._validate = function(isFirst)
    var testResults = [], input, expected;
 
    try{
-   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1, isFudgeDie: true,
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1, isFudgeDie: false,
       rerollCriteria: '===1', explodeType: Die.explodeTypes.Normal};
    input = JSON.clone(expected);
    input.explodeType = Die.explodeTypes.Normal;  //can't be cloned
@@ -178,8 +178,15 @@ Tester.Die._validate = function(isFirst)
    } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
 
    try{
+   expected = {originalString: '1d6', sideCount: 3, constantModifier: -2, isFudgeDie: true};
+   input = JSON.clone(expected);
+   Die._validate(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Happy path: fudge'});
+   } catch(e){testResults.push({Error: e, Action: 'Happy path: fudge'});}
+
+   try{
    input = {originalString: new String('1d6'), sideCount: new Number(6),
-      constantModifier: new Number(0), isFudgeDie: new Boolean(false), rerollCriteria: new String('=1')};
+      constantModifier: new Number(0), rerollCriteria: new String('=1')};
    //expected.rerollCriteria = '==1';  //somehow causes Happy path to fail
    expected = {originalString: '1d6', sideCount: 6, constantModifier: 0, isFudgeDie: false,
       rerollCriteria: '===1'};
@@ -228,15 +235,6 @@ Tester.Die._validate = function(isFirst)
    catch(e)
    {
        testResults.push({Expected: new Error('1d6\nconstantModifier must be an integer but was: 2.5'), Actual: e, Description: 'invalid constantModifier'});
-   }
-
-   try{
-   Die._validate({originalString: '1d6', sideCount: 6, isFudgeDie: 2});
-   TesterUtility.failedToThrow(testResults, 'invalid isFudgeDie');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('1d6\ninvalid isFudgeDie: 2'), Actual: e, Description: 'invalid isFudgeDie'});
    }
 
    try{
@@ -324,7 +322,7 @@ Tester.Die._optimizeReroll = function(isFirst)
    var testResults = [], input, expected;
 
    try{
-   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1, isFudgeDie: true,
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1,
       rerollCriteria: '==1', explodeType: Die.explodeTypes.Normal};
    input = JSON.clone(expected);
    input.explodeType = Die.explodeTypes.Normal;  //can't be cloned
