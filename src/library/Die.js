@@ -1,3 +1,4 @@
+'use strict';
 function Die(diceStringGiven, nameArray){
    //private:
     var isDieNegative=false;
@@ -301,7 +302,8 @@ Die._parseString = function(inputString)
             jsonResult.rerollCriteria += '=';
             workingString = workingString.replace(/^equal(?: to)? /, '');
          }
-         if('=' === jsonResult.rerollCriteria || '' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';  //first is if 'equal' and the other is default
+         if('=' === jsonResult.rerollCriteria || '' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';
+           //first is if 'equal' and the other is default
          jsonResult.rerollCriteria += Number.parseInt(workingString);  //grab number
          workingString = workingString.replace(/^-?\d+/, '');  //remove
       }
@@ -328,7 +330,8 @@ Die._validate = function(input)
       input.originalString = undefined;  //in case it was null
       input.originalString = JSON.stringify(input);  //this is safe because JSON.stringify ignores undefined values
    }
-   else if('string' !== typeof(input.originalString)) throw new Error(input.originalString + '\noriginalString must be a string but was: ' + typeof(input.originalString));
+   else if('string' !== typeof(input.originalString)) throw new Error(input.originalString +
+      '\noriginalString must be a string but was: ' + typeof(input.originalString));
 
    if(input.sideCount instanceof Number) input.sideCount = input.sideCount.valueOf();  //unbox so that === behaves as expected
    if(undefined == input.sideCount) throw new Error(input.originalString + '\nsideCount is required');
@@ -336,12 +339,14 @@ Die._validate = function(input)
 
    if(input.constantModifier instanceof Number) input.constantModifier = input.constantModifier.valueOf();
    if(undefined == input.constantModifier) input.constantModifier = 0;
-   else if(!Number.isInteger(input.constantModifier)) throw new Error(input.originalString + '\nconstantModifier must be an integer but was: ' + input.constantModifier);
+   else if(!Number.isInteger(input.constantModifier)) throw new Error(input.originalString +
+      '\nconstantModifier must be an integer but was: ' + input.constantModifier);
 
    if (undefined != input.rerollCriteria)
    {
       input.rerollCriteria = input.rerollCriteria.toString();  //unboxes or converts
-      if(!(/^(?:[<>]=?|[!=]?==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(input.originalString + '\ninvalid rerollCriteria: ' + input.rerollCriteria);
+      if(!(/^(?:[<>]=?|[!=]?==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(input.originalString +
+         '\ninvalid rerollCriteria: ' + input.rerollCriteria);
       input.rerollCriteria = input.rerollCriteria.replace(/^([!=])=*/, '$1==');  //forces !== and ===
    }
 
@@ -358,20 +363,71 @@ Die._validate = function(input)
 
    if(1 === input.sideCount && undefined != input.explodeType) throw new Error(input.originalString + '\nInfinite exploding. sideCount: 1');
 
-   if (undefined != input.rerollCriteria)
-   {
-      var minValue = 1 + input.constantModifier;
-      var maxValue = input.sideCount + input.constantModifier;
-      var infiniteReroll = false;
-      if (input.rerollCriteria.startsWith('!=='))
-      {
-         var rerollValue = Number.parseInt(input.rerollCriteria.substring(3));
-         infiniteReroll = (rerollValue < minValue || rerollValue > maxValue);  //the only number allowed is impossible to roll
-      }
-      else infiniteReroll = (eval('' + minValue + input.rerollCriteria) && eval('' + maxValue + input.rerollCriteria));
-      //you can only have 1 reroll criteria. so you can't 1d6r=1r=6 therefore if both min and max are rerolled then they all are
+   if(undefined != input.rerollCriteria) Die._validateReroll(input);
+};
+/**
+This function is called by Die._validate. It throws if there is anything invalid about rerolling.
+You should have no use for it although it isn't harmful to call.
+@param {!object} input which won't be modified
+*/
+Die._validateReroll = function(input)
+{
+   var minValue = 1 + input.constantModifier;
+   var maxValue = input.sideCount + input.constantModifier;
+   var rerollValue = Number.parseInt((/-?\d+$/).exec(input.rerollCriteria)[0]);
 
-      if(infiniteReroll) throw new Error(input.originalString + '\nInfinite rerolling: ' + JSON.stringify({
+   {
+   var possibleToReroll;
+   if((input.rerollCriteria.startsWith('===') || input.rerollCriteria.startsWith('<')) && minValue > rerollValue)
+      possibleToReroll = false;
+   else if((input.rerollCriteria.startsWith('===') || input.rerollCriteria.startsWith('>')) &&
+      Die.explodeTypes.Compound !== input.explodeType && rerollValue > maxValue)
+      possibleToReroll = false;
+   else if(input.rerollCriteria.startsWith('!==') && 1 === input.sideCount && rerollValue === maxValue)
+      possibleToReroll = false;
+   else possibleToReroll = true;
+
+   if(!possibleToReroll)
+      throw new Error(input.originalString + '\nimpossible to reroll:\n' + JSON.stringify({
+         rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
+         explodeType: input.explodeType
+      }));
+   }
+
+   if (undefined != input.explodeType && eval('' + maxValue + input.rerollCriteria))
+      throw new Error(input.originalString + '\nambiguous: does value ' + maxValue + ' reroll or explode?\n' + JSON.stringify({
+         rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
+         explodeType: input.explodeType
+      }));
+   if (Die.explodeTypes.Compound === input.explodeType)
+   {
+      var compoundRerollValue = rerollValue - input.constantModifier;
+      var rerollExplodeValue = (compoundRerollValue % input.sideCount === 0);
+      if (rerollExplodeValue)
+      {
+         if(input.rerollCriteria.startsWith('!==') || input.rerollCriteria.startsWith('==='))
+            throw new Error(input.originalString + '\nambiguous: does value ' + rerollValue + ' reroll or explode?\n' +
+               JSON.stringify({
+                  rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
+                  explodeType: input.explodeType
+               })
+            );
+         //> and < enforce minimum/maximum # of explosions which is fine
+      }
+   }
+   //TODO: re: detect infinite reroll for 1d10!r<=9 optimization required
+
+   //infinite rerolling check doesn't apply to explode because of the above ambiguous checks
+   if (undefined == input.explodeType)
+   {
+      var infiniteReroll = false;
+      if(input.rerollCriteria.startsWith('!==')) infiniteReroll = (rerollValue < minValue || rerollValue > maxValue);
+         //the only number allowed is impossible to roll
+      else infiniteReroll = (eval('' + minValue + input.rerollCriteria) && eval('' + maxValue + input.rerollCriteria));
+         //you can only have 1 reroll criteria: you can't 1d6r=1r=6
+         //therefore if both min and max are rerolled then they all are
+
+      if(infiniteReroll) throw new Error(input.originalString + '\nInfinite rerolling:\n' + JSON.stringify({
          rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier
       }));
    }
@@ -380,7 +436,7 @@ Die._validate = function(input)
 This function is used in the constructor of Die. It modifies input to reduce or eliminate reroll without
 changing functionality. So that less rolls occur when calling die.roll().
 You should have no use for it although it isn't harmful to call.
-@param {!object} input which might be modified (anything except originalString may be touched)
+@param {!object} input which might be modified (anything except originalString and isFudgeDie may be touched)
 */
 Die._optimizeReroll = function(input)
 {
@@ -453,13 +509,18 @@ Die._optimizeReroll = function(input)
       //else can stay the same since any other == would need to be replaced with named all numbers. and be impossible for explosions
 };
 /**This is an enum since Symbols aren't well supported enough yet.*/
-Die.explodeTypes = {Normal: {}, Compound: {}, Penetrating: {}};
+Die.explodeTypes = {
+   Normal: {toString: function(){return '{Normal}';}, toJSON: function(){return '{Normal}';}},
+   Compound: {toString: function(){return '{Compound}';}, toJSON: function(){return '{Compound}';}},
+   Penetrating: {toString: function(){return '{Penetrating}';}, toJSON: function(){return '{Penetrating}';}}
+};
 /*
 Precedence:
 roll value
 add constant
 if maximum then explode until done
-if reroll then start over
+if penetrating subtract 1
+if reroll then reroll
 
 Define fudge:
 1d3-2 without rerolling or exploding

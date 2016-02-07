@@ -129,7 +129,7 @@ Tester.Die._parseString = function(isFirst)
 
    try{
    returned = Die._parseString('d3r!==-2!!');
-   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: returned.explodeType, Description: 'Short compound: explode'});
+   testResults.push({Expected: Die.explodeTypes.Compound, Actual: returned.explodeType, Description: 'Short compound: explode'});
    testResults.push({Expected: '!==-2', Actual: returned.rerollCriteria, Description: 'Short compound: reroll'});
    } catch(e){testResults.push({Error: e, Action: 'Short compound'});}
 
@@ -169,7 +169,7 @@ Tester.Die._validate = function(isFirst)
    var testResults = [], input, expected;
 
    try{
-   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1, isFudgeDie: false,
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: -1, isFudgeDie: false,
       rerollCriteria: '===1', explodeType: Die.explodeTypes.Normal};
    input = JSON.clone(expected);
    input.explodeType = Die.explodeTypes.Normal;  //can't be cloned
@@ -278,7 +278,7 @@ Tester.Die._validate = function(isFirst)
    catch(e)
    {
        testResults.push({Expected: new Error(
-         '1d6\nInfinite rerolling: {"rerollCriteria":"===1","sideCount":1,"constantModifier":0}'),
+         '1d6\nInfinite rerolling:\n{"rerollCriteria":"===1","sideCount":1,"constantModifier":0}'),
          Actual: e, Description: 'infinite rerolling: 1'});
    }
 
@@ -291,7 +291,7 @@ Tester.Die._validate = function(isFirst)
    catch(e)
    {
        testResults.push({Expected: new Error(
-         '1d6\nInfinite rerolling: {"rerollCriteria":"<1000","sideCount":6,"constantModifier":10}'),
+         '1d6\nInfinite rerolling:\n{"rerollCriteria":"<1000","sideCount":6,"constantModifier":10}'),
          Actual: e, Description: 'infinite rerolling: positive'});
    }
 
@@ -304,7 +304,7 @@ Tester.Die._validate = function(isFirst)
    catch(e)
    {
        testResults.push({Expected: new Error(
-         '1d6\nInfinite rerolling: {"rerollCriteria":">=-9","sideCount":6,"constantModifier":-10}'),
+         '1d6\nInfinite rerolling:\n{"rerollCriteria":">=-9","sideCount":6,"constantModifier":-10}'),
          Actual: e, Description: 'infinite rerolling: negative'});
    }
 
@@ -315,11 +315,38 @@ Tester.Die._validate = function(isFirst)
    catch(e)
    {
        testResults.push({Expected: new Error(
-         '1d6\nInfinite rerolling: {"rerollCriteria":"!==10","sideCount":6,"constantModifier":0}'),
+         '1d6\nInfinite rerolling:\n{"rerollCriteria":"!==10","sideCount":6,"constantModifier":0}'),
          Actual: e, Description: 'infinite rerolling: !='});
    }
 
    TesterUtility.displayResults('Die Die._validate', testResults, isFirst);
+};
+Tester.Die._validateReroll = function(isFirst)
+{
+   return;  //TODO: re: ADD TESTS
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], input, expected;
+
+   try{
+   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1,
+      rerollCriteria: '==1', explodeType: Die.explodeTypes.Normal};
+   input = JSON.clone(expected);
+   input.explodeType = Die.explodeTypes.Normal;  //can't be cloned
+   Die._validate(input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Happy path'});
+   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
+
+   try{
+   Die._validate({originalString: '1d6', sideCount: -2.5});
+   TesterUtility.failedToThrow(testResults, 'invalid sideCount');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('1d6\ninvalid sideCount: -2.5'), Actual: e, Description: 'invalid sideCount'});
+   }
+
+   TesterUtility.displayResults('Die Die._validateReroll', testResults, isFirst);
 };
 Tester.Die._optimizeReroll = function(isFirst)
 {
