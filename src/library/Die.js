@@ -1,193 +1,7 @@
 'use strict';
-function Die(diceStringGiven, nameArray){
-   //private:
-    var isDieNegative=false;
-    var doesUseZero=false;
-    var isFudgeDie=false;
-    var sideCount=0;
-    var doesExplode=false;  //die options
-    var doesPenetrate=false;
-    var doesCompoundExplode=false;
-    //var minMaxSwitch="None";
-    //var minMaxValue=0;
-    var rerollCriteria;  //==undefined;
-    var explodeValue;  //used for stats not anywhere else
-    var constantModifier=0;
-    var dieName;  //==undefined;
-   this.setName = function(nameGiven){dieName=nameGiven;};
-   this.getName = function(){
-       if(dieName==undefined) return this.generateString();
-       return dieName;
-   }
-   this.generateString = function()
-   {
-       var dieString='';
-       if(isDieNegative) dieString+='-';
-       if(doesUseZero) dieString+='z';
-       else dieString+='d';
-       if(isFudgeDie) dieString+='F';
-       else dieString+=sideCount;
-       if(doesExplode || doesCompoundExplode) dieString+='!';
-       if(doesPenetrate) dieString+='p';
-       else if(doesCompoundExplode) dieString+='!';
-       if(rerollCriteria!=undefined) dieString+='r'+rerollCriteria;
-       if(constantModifier > 0) dieString+='+'+constantModifier;
-       else if(!isFudgeDie && constantModifier < 0) dieString+=constantModifier;  //fudge has a -1 but don't show that since it would be wrong
-       return dieString;
-   };
-   this.getStats = function(){
-       var returnObject={};
-       returnObject.nameArray=nameArray.slice();  //copies array so that it is read only
-       returnObject.isDieNegative=isDieNegative;
-       returnObject.doesUseZero=doesUseZero;
-       returnObject.isFudgeDie=isFudgeDie;
-       returnObject.sideCount=sideCount;
-       returnObject.doesExplode=doesExplode;
-       returnObject.doesPenetrate=doesPenetrate;
-       returnObject.doesCompoundExplode=doesCompoundExplode;
-       returnObject.rerollCriteria=rerollCriteria;
-       returnObject.explodeValue=explodeValue;
-       returnObject.constantModifier=constantModifier;
-       returnObject.dieName=dieName;
-       return returnObject;
-   };
-   this.equals = function(otherDie){
-       if(!(otherDie instanceof Die)) return false;
-       if(isDieNegative!=otherDie.isDieNegative) return false;
-       if(doesUseZero!=otherDie.doesUseZero) return false;
-       if(isFudgeDie!=otherDie.isFudgeDie) return false;
-       if(sideCount!=otherDie.sideCount) return false;
-       if(doesExplode!=otherDie.doesExplode) return false;
-       if(doesPenetrate!=otherDie.doesPenetrate) return false;
-       if(doesCompoundExplode!=otherDie.doesCompoundExplode) return false;
-       if(rerollCriteria!=otherDie.rerollCriteria) return false;
-       if(explodeValue!=otherDie.explodeValue) return false;
-       if(constantModifier!=otherDie.constantModifier) return false;
-       //if(dieName!=otherDie.dieName) return false;  //do not compare these
-       if(nameArray.length!=otherDie.nameArray.length) return false;
-       for(var i=0; i < nameArray.length; i++) if(nameArray[i]!=otherDie.nameArray[i]) return false;  //note that it ignores object type
-       return true;
-   };
-   this.hasNames = function(){return (nameArray.length!=0);};
-   this.isFudge = function(){return isFudgeDie;};
-   this.getMaxValue = function(){  //TODO redoc and note that it assumes the sum
-       if(rerollCriteria!=undefined && rerollCriteria.startsWith('>') && doesCompoundExplode) return (Number((/\d+$/).exec(rerollCriteria)[0])+constantModifier);  //reroll caps the Infinity
-       if(doesExplode || doesCompoundExplode) return Infinity;  //doesExplode includes doesPenetrate; Infinity is a number
-      if (rerollCriteria!=undefined)
-      {
-          //loop through every possible value (at least 1 is possible to be at this point) and return the highest possible
-         for (var rerollCountLoopIndex=sideCount; rerollCountLoopIndex >= this.getMinValue(); rerollCountLoopIndex--)  //backwards so to hit the highest first
-         {
-             var valueConsidered=rerollCountLoopIndex;
-             if(nameArray.length!=0) valueConsidered=nameArray[rerollCountLoopIndex];
-             if(!isNaN(valueConsidered)) valueConsidered+=constantModifier;
-             if(!eval(''+valueConsidered+rerollCriteria)) return valueConsidered;  //it is not rerolled
-         }
-          alert("Program error. Unforseen location inside Die.getMaxValue");
-      }
-       if(nameArray.length > 0 && !isNaN(nameArray[sideCount-1])) return (Number(nameArray[sideCount-1])+constantModifier);
-       //TODO if all numbers this might not be the max. sort them on creation to solve this
-       if(nameArray.length > 0) return nameArray[sideCount-1];
-       if(isFudgeDie) return 1;  //has no constant modifier and doesn't explode
-       if(doesUseZero) return (sideCount-1+constantModifier);
-       return (sideCount+constantModifier);
-   };
-   this.getMinValue = function(){  //TODO redoc
-       var possibleMinValue;
-       if(nameArray.length > 0) possibleMinValue=nameArray[0];
-       //else if(isFudgeDie) return -1;  //see doesUseZero constantModifier instead due to reroll
-       else if(doesUseZero) possibleMinValue=0;
-       else possibleMinValue=1;
-       possibleMinValue+=constantModifier;
-       if(rerollCriteria==undefined) return possibleMinValue;
-       //loop through every possible value (at least 1 is possible to be at this point) and return the lowest possible
-       if(nameArray.length > 0) possibleMinValue=0;  //must start at 0 for the loop to work
-      while (true)  //a valid value will be found. I know this because it does not infinitely reroll due to validity checked in constructor
-      {
-          var valueConsidered=possibleMinValue;
-          if(nameArray.length!=0) valueConsidered=nameArray[possibleMinValue];
-          if(nameArray.length!=0 && !isNaN(valueConsidered)) valueConsidered+=constantModifier;
-          if(!eval(''+valueConsidered+rerollCriteria)) return valueConsidered;  //it is not rerolled
-          possibleMinValue++;
-      }
-       //Unreachable
-   };
-   this.getSides = function(){return sideCount;};
-   //currently unreachable anyway:
-   /*function minMaxCounting(holder){  //doesn't need to know this
-       minMaxSwitch="None";
-      if (combineRegex(DicePool.minMaxRegexStart, /\d+/).test(holder))
-      {
-          if((/max/).test(holder)) minMaxSwitch="Max";  //contains the word max
-          else minMaxSwitch="Min";
-          holder=holder.replace(DicePool.minMaxRegexStart, "");  //chop off
-          minMaxValue=parseInt((/^\d+/).exec(holder)+'');  //to capture the number. it looks pointless to +'' but I don't know another way to change regex object to int
-          holder=holder.replace(/^\d+/, "");
-      }
-       return holder;
-   };
-   function minMaxDoing(total){  //doesn't need to know this
-       if(minMaxSwitch=="None") return total;
-       if(minMaxSwitch=="Min" && total < minMaxValue) return minMaxValue;  //did not reach min
-       else if(minMaxSwitch=="Max" && total > minMaxValue) return minMaxValue;  //exceeded max
-       return total;
-   };*/
-   this.roll = function(){
-       var valueArray=[];
-       var isPenetrated=false;
-      while (true)  //so I can loop around (for rerolling and exploding) without recursion
-      {
-          var anotherDie=false;
-          var valueRolled=0;
-          //var total=0;
-          //var replacedTotal=0;
-          valueRolled=Math.ceil(Math.random()*sideCount);  //ceil to start at 1
-          while(valueRolled%sideCount==0 && doesCompoundExplode){valueRolled+=Math.ceil(Math.random()*sideCount);}
-          if(valueRolled==sideCount && doesExplode) anotherDie=true;
-          if(isPenetrated) valueRolled--;  //value of 1 less
-          if(doesUseZero) valueRolled--;  //but coins start at 0
-          //if(isFudgeDie) uses constantModifier below
-          if(nameArray.length!=0) valueRolled=nameArray[valueRolled];  //named dice are always coins and never negative
-          if(!isNaN(valueRolled)) valueRolled+=constantModifier;
-          //replacedTotal=total;
-          //total=this.minMaxDoing(total);
-          if(rerollCriteria!=undefined && eval(''+valueRolled+rerollCriteria)) continue;  //TODO what does it mean to have "2d6r6!"? impossible but get another die and reroll
-          if(isDieNegative) valueRolled*=-1;
-          valueArray.push(valueRolled);
-          if(doesPenetrate) isPenetrated=true;  //anotherDie will have already been set to true or false
-          if(anotherDie) continue;  //exploded. roll again after recording the value
-          break;  //no more values
-      }
-       return valueArray;
-   };
-   this.flip = this.roll;  //coin alias
-   this.spin = this.roll;  //spinner alias
-   function constructorCalled(objectGiven){
-       if(nameArray.length!=0){if(!namedConstructor()); return '';}  //TODO if a named die is entirely numbers it is allowed everything
-
-       return holder;
-   };
-   function namedConstructor(){  //doesn't need to know this
-       //none of these errors should be possible
-       if(isFudgeDie) throw new Error(diceStringGiven+"\nfudge dice can't have named sides");
-       if(isDieNegative) throw new Error(diceStringGiven+"\nnamed dice can't be negative");
-       doesUseZero=true;  //always a coin
-       sideCount=nameArray.length;  //just ignore the number of sides passed and use the number of names given
-       if(doesExplode || doesCompoundExplode) throw new Error(diceStringGiven+"\nnamed dice can't explode (compound or otherwise).");
-       //if(minMaxValue!=0 || minMaxSwitch!="None") throw new Error(diceStringGiven+"\na named dice can't have a min or max");
-       return false;  //all numbers
-   };
-   //constructor:
-    if(diceStringGiven==undefined) diceStringGiven="1d6";  //default
-    nameArray=argumentsToArray(arguments);
-    //TODO: doc: let me count the ways: Die(), Die("1d6"), Die("heads", "tails"), Die("yes", "no", "maybe"), Die(["yes", "no", "maybe"])
-    if(nameArray==undefined || nameArray.length==1) nameArray=[];  //make empty array (not provided or diceStringGiven only)
-    else if(nameArray.length==2 && nameArray[0]==undefined) nameArray=[];
-    else if(nameArray.length==2 && (nameArray[1] instanceof Array) && nameArray[1].length==0) nameArray=[];  //name passed was an empty array (DicePool does this)
-    if(nameArray.length==0 && typeof(diceStringGiven)!="string") throw new Error("Die("+diceStringGiven+", ~) the first parameter must be a string type");
-    return constructorCalled(this);
-    //if this is a named die then diceStringGiven will be ignored (since it is actually the first name or something else)
-};
+function Die(arg1)
+{
+}
 /**
 This function is used in the constructor of Die. It parses the inputString into an object.
 You should have no use for it although it isn't harmful to call.
@@ -444,24 +258,20 @@ You should have no use for it although it isn't harmful to call.
 */
 Die._optimizeReroll = function(input)
 {
-   if(undefined == input.rerollCriteria) return;  //fast path
-
-   return;
    var minValue = 1 + input.constantModifier;
    var maxValue = input.sideCount + input.constantModifier;
-   var explodeValue = maxValue;
-   //explode is not affected by constantModifier but reroll is
+   var rerollValue = Number.parseInt((/-?\d+$/).exec(input.rerollCriteria)[0]);
 
-   if (rerollCriteria.startsWith('!=='))
+   if (input.rerollCriteria.startsWith('!=='))
    {
       //not much of a die anymore but this is what you asked for
       //this is the most optimized of all
       input.sideCount = 1;
       input.explodeType = undefined;
-
-      input.constantModifier = Number.parseInt(rerollCriteria.substring(3));
-      --input.constantModifier;  //because the sideCount always adds 1
       input.rerollCriteria = undefined;
+
+      input.constantModifier = rerollValue - 1;  //-1 because the sideCount always adds 1
+      return;
    }
    return;
    //TODO: re: more. See below
@@ -523,8 +333,11 @@ Precedence:
 roll value
 add constant
 if maximum then explode until done
-if penetrating subtract 1
 if reroll then reroll
+if penetrating subtract 1
+
+TODO: re: error or warn about reroll penetrating
+TODO: re: 1df! stops being a fudge die. should instead get error
 
 Define fudge:
 1d3-2 without rerolling or exploding

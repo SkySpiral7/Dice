@@ -474,28 +474,18 @@ Tester.Die._validateReroll = function(isFirst)
 };
 Tester.Die._optimizeReroll = function(isFirst)
 {
-   return;  //TODO: re: ADD TESTS
    TesterUtility.clearResults(isFirst);
 
    var testResults = [], input, expected;
 
    try{
-   expected = {originalString: '1d6', sideCount: 6, constantModifier: 1,
-      rerollCriteria: '==1', explodeType: Die.explodeTypes.Normal};
-   input = JSON.clone(expected);
-   input.explodeType = Die.explodeTypes.Normal;  //can't be cloned
-   Die._validate(input);
-   testResults.push({Expected: expected, Actual: input, Description: 'Happy path'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
-
-   try{
-   Die._validate({originalString: '1d6', sideCount: -2.5});
-   TesterUtility.failedToThrow(testResults, 'invalid sideCount');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('1d6\ninvalid sideCount: -2.5'), Actual: e, Description: 'invalid sideCount'});
-   }
+   input = {originalString: '1d6', sideCount: 6, constantModifier: 1,
+      rerollCriteria: '!==4', explodeType: Die.explodeTypes.Normal};
+   expected = {originalString: '1d6', sideCount: 1, constantModifier: 3,
+      rerollCriteria: undefined, explodeType: undefined};
+   Die._optimizeReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: '!=='});
+   } catch(e){testResults.push({Error: e, Action: '!=='});}
 
    TesterUtility.displayResults('Die Die._optimizeReroll', testResults, isFirst);
 };
