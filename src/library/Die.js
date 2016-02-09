@@ -3,6 +3,38 @@ function Die(arg1)
 {
    var name, sideCount, constantModifier, isFudgeDie, rerollCriteria, explodeType;
 
+   this.roll = function(randomSource)
+   {
+      if(undefined == randomSource) randomSource = Math.random;
+      if('function' !== typeof(randomSource)) throw new Error(name +
+         '\nrandomSource must be a function but was a ' + typeof(randomSource) + ' with toString: ' + randomSource);
+      //TODO: re: consider moving randomSource into Die's data
+
+      var valueArray = [];
+      var maxValue = sideCount + constantModifier;
+      while (true)  //so I can loop around (for rerolling and exploding) without recursion
+      {
+         var valueRolled = Math.floor(randomSource() * sideCount) + 1;  //+1 for a min of 1 and a max of sideCount
+            //can't use Math.ceil because exactly 0 wouldn't become 1
+            //TODO: re: consider forcing constantModifier to have the +1 instead
+         valueRolled += constantModifier;
+         if (valueRolled === maxValue && undefined !== explodeType)
+         {
+            if(Die.explodeTypes.Compound === explodeType) throw new Error('Not yet implemented');
+            //while(valueRolled%sideCount==0 && doesCompoundExplode){valueRolled+=Math.ceil(Math.random()*sideCount);}
+
+            //exploding dice can't reroll the max value. validate prevents it
+            if(0 !== valueArray.length && Die.explodeTypes.Penetrating === explodeType) --valueRolled;
+            valueArray.push(valueRolled);
+            continue;
+         }
+         if(undefined !== rerollCriteria && eval('' + valueRolled + rerollCriteria)) continue;
+         if(0 !== valueArray.length && Die.explodeTypes.Penetrating === explodeType) --valueRolled;
+         valueArray.push(valueRolled);
+         break;
+      }
+       return valueArray;
+   };
    /**@returns an object will all Die data elements in it. It can be passed into new Die()*/
    this.toJSON = function()
    {
@@ -16,6 +48,7 @@ function Die(arg1)
          explodeType: explodeType
       };
    };
+
    /**You can't call this function. It is only used internally to create a Die object.*/
    this._constructor = function()
    {
@@ -35,6 +68,7 @@ function Die(arg1)
       isFudgeDie = arg1.isFudgeDie;
       rerollCriteria = arg1.rerollCriteria;
       explodeType = arg1.explodeType;
+      arg1 = undefined;  //no longer needed
    };
    this._constructor();
 }

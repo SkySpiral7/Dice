@@ -42,7 +42,7 @@ if(undefined === JSON.clone){JSON.clone = function(input){return JSON.parse(JSON
 /**
 Factorial is defined as the multiplication of all positive integers less than and equal to the input.
 Except 0 and 1 which return 1. This function does not use recursion.
-Using iteration allows very fast speed: input of 170 (the highest non-infinity result) finishes in 0 milliseconds.
+Note that on my computer in Chrome an input of 170 (the highest non-infinity result) finishes in 0 milliseconds.
 Examples:
 (NaN or '2') return NaN;
 (Infinity) return Infinity;

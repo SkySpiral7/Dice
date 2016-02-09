@@ -1,5 +1,80 @@
 'use strict';
+function NonRandomNumberGenerator(numberArray)  //TODO: re: put this somewhere and test it
+{
+   this.generate = function()
+   {
+      if(0 === numberArray.length) throw new Error('Ran out of numbers');
+      return numberArray.shift();
+   };
+}
+function convertNonRandomDie(sides, numberArray)
+{
+   for (var i = 0; i < numberArray.length; ++i)
+   {
+      numberArray[i] = (numberArray[i] - 1) / sides;
+   }
+   return new NonRandomNumberGenerator(numberArray).generate;
+}
 Tester.Die = {};
+Tester.Die.roll = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, nonRandomNumbers, generator;
+
+   try{
+   //use the only die that isn't random
+   testResults.push({Expected: [1], Actual: new Die(1).roll(), Description: 'No arg'});
+   } catch(e){testResults.push({Error: e, Action: 'No arg'});}
+
+   try{
+   new Die().roll(5);
+   TesterUtility.failedToThrow(testResults, 'randomSource wrong type');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('1d6\nrandomSource must be a function but was a number with toString: 5'),
+         Actual: e, Description: 'randomSource wrong type'});
+   }
+
+   try{
+   generator = new NonRandomNumberGenerator([0]).generate;
+   actual = new Die().roll(generator);
+   testResults.push({Expected: [1], Actual: actual, Description: 'Random exactly 0 is 1'});
+   } catch(e){testResults.push({Error: e, Action: 'Random exactly 0 is 1'});}
+
+   try{
+   generator = new NonRandomNumberGenerator([(1 - Number.EPSILON)]).generate;
+   actual = new Die(1000000).roll(generator);
+   testResults.push({Expected: [1000000], Actual: actual, Description: 'Random almost 1 is max'});
+   } catch(e){testResults.push({Error: e, Action: 'Random almost 1 is max'});}
+
+   try{
+   generator = convertNonRandomDie(8, [3,5]);
+   actual = new Die({sideCount: 8, constantModifier: 10, rerollCriteria: '===13'}).roll(generator);
+   testResults.push({Expected: [15], Actual: actual, Description: 'Reroll uses constantModifier'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll uses constantModifier'});}
+
+   try{
+   generator = convertNonRandomDie(8, [8,3,8,5]);
+   actual = new Die('d8!r3').roll(generator);
+   testResults.push({Expected: [8, 8, 5], Actual: actual, Description: 'Regular explode with reroll'});
+   } catch(e){testResults.push({Error: e, Action: 'Regular explode with reroll'});}
+
+   try{
+   generator = convertNonRandomDie(8, [8,3,8,5]);
+   actual = new Die('d8r3!p').roll(generator);
+   testResults.push({Expected: [8, 7, 4], Actual: actual, Description: 'Penetrating explode then reroll'});
+   } catch(e){testResults.push({Error: e, Action: 'Penetrating explode then reroll'});}
+
+   try{
+   generator = convertNonRandomDie(8, [3,8,5]);
+   actual = new Die('d8r3!p').roll(generator);
+   testResults.push({Expected: [8, 4], Actual: actual, Description: 'Reroll then penetrating explode'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll then penetrating explode'});}
+
+   TesterUtility.displayResults('Die new Die().roll()', testResults, isFirst);
+};
 Tester.Die._constructor = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
