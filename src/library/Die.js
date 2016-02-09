@@ -104,6 +104,8 @@ Die._parseString = function(inputString)
       jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
       jsonResult.sideCount = 3;
       workingString = workingString.substring(1);  //chop off 'f'
+      if('' !== workingString) throw new Error(inputString + '\nFudge/Fate dice don\'t explode or reroll. Illegal: ' + workingString);
+      return jsonResult;
    }
    else if ((/^\d+/).test(workingString))
    {
@@ -368,54 +370,7 @@ Die._optimizeReroll = function(input)
    }
    if(input.rerollCriteria.startsWith('===')) return;  //otherwise only possible to optimize with a white list
 
-   return;
-   //TODO: re: more. See below
-      if (rerollCriteria.startsWith(">"))
-      {
-          var newSideCount=Number((/\d+$/).exec(rerollCriteria)[0]);  //since can't roll above this it becomes new side maximum
-          if(rerollCriteria.startsWith(">=")) newSideCount--;  //can't roll it either means lower the max by 1
-          //if(sideCount > newSideCount):  //always true due to if(!canReroll) above
-          //isDieNegative=false;  //unchanged
-          doesExplode=false;  //doesn't explode due to explodeValue being impossible to roll (ditto for compound)
-          doesPenetrate=false;
-          if(sideCount > newSideCount) doesCompoundExplode=false;  //TODO: confirm this
-          explodeValue=undefined;
-          //doesUseZero=false;  //unchanged
-          newSideCount-=constantModifier;  //thus shows what would need to be rolled before constantModifier for the highest possible
-          sideCount=newSideCount;
-          //constantModifier+=Number((/\d+$/).exec(rerollCriteria)[0]);  //unchanged except by doesUseZero optimized later
-          rerollCriteria=undefined;  //no longer possible to reroll
-      }
-       //doesCompoundExplode is handled differently since the extra dies rolled need to be unchanged
-      else if (rerollCriteria.startsWith("<") && doesCompoundExplode)  //else if < reduce the sideCount, increase constantModifier and remove the reroll
-      {
-          if(rerollNumber==undefined) var rerollNumber=Number((/\d+$/).exec(rerollCriteria)[0]);  //should already exist
-          //if(!rerollCriteria.startsWith("<=")) rerollNumber--;  //exclude a side
-          rerollNumber-=constantModifier;
-          constantModifier+=Math.floor(rerollNumber/sideCount)*sideCount;
-          //if() might remove reroll TODO
-      }
-      else if (rerollCriteria.startsWith("<"))  // && !doesCompoundExplode  //else if < reduce the sideCount, increase constantModifier and remove the reroll
-      {
-          var rerollCount=Number((/\d+$/).exec(rerollCriteria)[0]);
-          if(!rerollCriteria.startsWith("<=")) rerollCount--;  //exclude a side
-          sideCount-=rerollCount;  //TODO: I think this causes a conflict with explosions (explodeValue)
-          constantModifier+=rerollCount;
-          rerollCriteria=undefined;
-      }
-       else if(doesCompoundExplode){}  //do nothing. compound can't be optimized in any other way
-      else if (!doesUseZero)  //rerollCriteria.startsWith("==")
-      {
-          if(rerollCriteria == "==1"){sideCount--; constantModifier++; rerollCriteria=undefined;}  //bump up so that the random range is smaller
-          else if(rerollCriteria == ('=='+sideCount)){sideCount--; rerollCriteria=undefined;}  //can't roll max. explodeValue has already been removed
-      }
-      else  //rerollCriteria.startsWith("==")
-      {
-          if(rerollCriteria == "==0"){sideCount--; doesUseZero=false; rerollCriteria=undefined;}  //doesUseZero that can't roll 0
-          //cleared doesUseZero instead of constantModifier++ then checking if(doesUseZero && constantModifier > 0) since they'd end up the same
-          else if(rerollCriteria == ('=='+(sideCount-1))){sideCount--; rerollCriteria=undefined;}  //can't roll max. explodeValue has already been removed
-      }
-      //else can stay the same since any other == would need to be replaced with named all numbers. and be impossible for explosions
+   //TODO: re: more _optimizeReroll. See old
 };
 /**This is an enum since Symbols aren't well supported enough yet.*/
 Die.explodeTypes = {
@@ -432,7 +387,6 @@ if reroll then reroll
 if penetrating subtract 1
 
 TODO: re: error or warn about reroll penetrating
-TODO: re: 1df! stops being a fudge die. should instead get error
 
 Define fudge:
 1d3-2 without rerolling or exploding

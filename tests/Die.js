@@ -214,6 +214,16 @@ Tester.Die._parseString = function(isFirst)
    } catch(e){testResults.push({Error: e, Action: 'Fudge die: zeroed'});}
 
    try{
+   Die._parseString('df!');
+   TesterUtility.failedToThrow(testResults, 'Fudge die: illegal');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('df!\nFudge/Fate dice don\'t explode or reroll. Illegal: !'),
+         Actual: e, Description: 'Fudge die: illegal'});
+   }
+
+   try{
    Die._parseString('d!');
    TesterUtility.failedToThrow(testResults, 'No sideCount');
    }
