@@ -163,12 +163,14 @@ Die._validate = function(input)
          '\ninvalid rerollCriteria: ' + input.rerollCriteria);
       input.rerollCriteria = input.rerollCriteria.replace(/^([!=])=*/, '$1==');  //forces !== and ===
    }
+   else delete input.rerollCriteria;
 
    if (undefined != input.explodeType)
    {
       if(Die.explodeTypes.Normal !== input.explodeType && Die.explodeTypes.Compound !== input.explodeType && Die.explodeTypes.Penetrating !== input.explodeType)
          throw new Error(input.originalString + '\ninvalid explodeType: ' + input.explodeType);
    }
+   else delete input.explodeType;
 
    input.isFudgeDie = (3 === input.sideCount && -2 === input.constantModifier &&
       undefined == input.rerollCriteria && undefined == input.explodeType);
@@ -267,12 +269,29 @@ Die._optimizeReroll = function(input)
       //not much of a die anymore but this is what you asked for
       //this is the most optimized of all
       input.sideCount = 1;
-      input.explodeType = undefined;
-      input.rerollCriteria = undefined;
+      delete input.explodeType;
+      delete input.rerollCriteria;
 
       input.constantModifier = rerollValue - 1;  //-1 because the sideCount always adds 1
       return;
    }
+
+   if(undefined !== input.explodeType && input.rerollCriteria.startsWith('===')) return;  //TODO: re: might optimize later
+   if (('===' + minValue) === input.rerollCriteria)
+   {
+      --input.sideCount;
+      ++input.constantModifier;
+      delete input.rerollCriteria;
+      return;
+   }
+   if (('===' + maxValue) === input.rerollCriteria)
+   {
+      --input.sideCount;
+      delete input.rerollCriteria;
+      return;
+   }
+   if(input.rerollCriteria.startsWith('===')) return;  //otherwise only possible to optimize with a white list
+
    return;
    //TODO: re: more. See below
       if (rerollCriteria.startsWith(">"))
