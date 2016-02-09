@@ -1,6 +1,42 @@
 'use strict';
 function Die(arg1)
 {
+   var name, sideCount, constantModifier, isFudgeDie, rerollCriteria, explodeType;
+
+   /**@returns an object will all Die data elements in it. It can be passed into new Die()*/
+   this.toJSON = function()
+   {
+      return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
+         'instanceof': 'Die',  //this is for a JSON reviver
+         name: name,  //yes I realize that name might be JSON of the same thing: it's not infinite and it's the best I can do
+         sideCount: sideCount,
+         constantModifier: constantModifier,
+         isFudgeDie: isFudgeDie,
+         rerollCriteria: rerollCriteria,
+         explodeType: explodeType
+      };
+   };
+   /**You can't call this function. It is only used internally to create a Die object.*/
+   this._constructor = function()
+   {
+      if(undefined !== sideCount) throw new Error('Illegal access');
+
+      if(undefined == arg1) arg1 = {name: '1d6', sideCount: 6};
+      else if(arg1 instanceof Number || arg1 instanceof String) arg1 = arg1.valueOf();
+      if('number' === typeof(arg1)) arg1 = {name: '1d' + arg1, sideCount: arg1};
+      else if('string' === typeof(arg1)) arg1 = Die._parseString(arg1);
+
+      Die._validate(arg1);
+      if(undefined !== arg1.rerollCriteria) Die._optimizeReroll(arg1);
+
+      name = arg1.name;
+      sideCount = arg1.sideCount;
+      constantModifier = arg1.constantModifier;
+      isFudgeDie = arg1.isFudgeDie;
+      rerollCriteria = arg1.rerollCriteria;
+      explodeType = arg1.explodeType;
+   };
+   this._constructor();
 }
 /**
 This function is used in the constructor of Die. It parses the inputString into an object.
@@ -137,6 +173,8 @@ You should have no use for it although it isn't harmful to call.
 */
 Die._validate = function(input)
 {
+   //don't bother checking typeof(input) is object. sideCount required will throw anyway
+
    //(undefined == x) is the same as (undefined === x || null === x) unlike (!x) which detects falsy values
    if(input.name instanceof String) input.name = input.name.valueOf();
    else if (undefined == input.name)

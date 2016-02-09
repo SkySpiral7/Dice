@@ -1,5 +1,44 @@
 'use strict';
 Tester.Die = {};
+Tester.Die._constructor = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], die, input, expected;
+
+   try{
+   die = new Die();
+   expected = {name: '1d6', sideCount: 6, constantModifier: 0, isFudgeDie: false,
+      rerollCriteria: undefined, explodeType: undefined, 'instanceof': 'Die'};
+   testResults.push({Expected: expected, Actual: die.toJSON(), Description: 'No arg'});
+   } catch(e){testResults.push({Error: e, Action: 'No arg'});}
+
+   try{
+   die = new Die();
+   die._constructor();
+   TesterUtility.failedToThrow(testResults, 'Call _constructor');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
+   }
+
+   try{
+   die = new Die(new Number(3));
+   expected = {name: '1d3', sideCount: 3, constantModifier: 0, isFudgeDie: false,
+      rerollCriteria: undefined, explodeType: undefined, 'instanceof': 'Die'};
+   testResults.push({Expected: expected, Actual: die.toJSON(), Description: 'Number arg'});
+   } catch(e){testResults.push({Error: e, Action: 'Number arg'});}
+
+   try{
+   die = new Die('d4');
+   expected = {name: 'd4', sideCount: 4, constantModifier: 0, isFudgeDie: false,
+      rerollCriteria: undefined, explodeType: undefined, 'instanceof': 'Die'};
+   testResults.push({Expected: expected, Actual: die.toJSON(), Description: 'String arg'});
+   } catch(e){testResults.push({Error: e, Action: 'String arg'});}
+
+   TesterUtility.displayResults('Die new Die()._constructor', testResults, isFirst);
+};
 Tester.Die._parseString = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
