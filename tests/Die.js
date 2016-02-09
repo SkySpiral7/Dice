@@ -50,28 +50,34 @@ Tester.Die.roll = function(isFirst)
    } catch(e){testResults.push({Error: e, Action: 'Random almost 1 is max'});}
 
    try{
-   generator = convertNonRandomDie(8, [3,5]);
+   generator = convertNonRandomDie(8, [3, 5]);
    actual = new Die({sideCount: 8, constantModifier: 10, rerollCriteria: '===13'}).roll(generator);
    testResults.push({Expected: [15], Actual: actual, Description: 'Reroll uses constantModifier'});
    } catch(e){testResults.push({Error: e, Action: 'Reroll uses constantModifier'});}
 
    try{
-   generator = convertNonRandomDie(8, [8,3,8,5]);
+   generator = convertNonRandomDie(8, [8, 3, 8, 5]);
    actual = new Die('d8!r3').roll(generator);
    testResults.push({Expected: [8, 8, 5], Actual: actual, Description: 'Regular explode with reroll'});
    } catch(e){testResults.push({Error: e, Action: 'Regular explode with reroll'});}
 
    try{
-   generator = convertNonRandomDie(8, [8,3,8,5]);
+   generator = convertNonRandomDie(8, [8, 3, 8, 5]);
    actual = new Die('d8r3!p').roll(generator);
    testResults.push({Expected: [8, 7, 4], Actual: actual, Description: 'Penetrating explode then reroll'});
    } catch(e){testResults.push({Error: e, Action: 'Penetrating explode then reroll'});}
 
    try{
-   generator = convertNonRandomDie(8, [3,8,5]);
+   generator = convertNonRandomDie(8, [3, 8, 5]);
    actual = new Die('d8r3!p').roll(generator);
    testResults.push({Expected: [8, 4], Actual: actual, Description: 'Reroll then penetrating explode'});
    } catch(e){testResults.push({Error: e, Action: 'Reroll then penetrating explode'});}
+
+   try{
+   generator = convertNonRandomDie(8, [8, 8, 1, 8, 1]);
+   actual = new Die('d8!!r17').roll(generator);
+   testResults.push({Expected: [9], Actual: actual, Description: 'Reroll with compound explode'});
+   } catch(e){testResults.push({Error: e, Action: 'Reroll with compound explode'});}
 
    TesterUtility.displayResults('Die new Die().roll()', testResults, isFirst);
 };

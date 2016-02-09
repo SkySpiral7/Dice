@@ -112,11 +112,6 @@ function Die(diceStringGiven, nameArray){
     var explodeValue;  //used for stats not anywhere else
     var constantModifier=0;
     var dieName;  //==undefined;
-   this.setName = function(nameGiven){dieName=nameGiven;};
-   this.getName = function(){
-       if(dieName==undefined) return this.generateString();
-       return dieName;
-   }
    this.generateString = function()
    {
        var dieString='';
@@ -132,22 +127,6 @@ function Die(diceStringGiven, nameArray){
        if(constantModifier > 0) dieString+='+'+constantModifier;
        else if(!isFudgeDie && constantModifier < 0) dieString+=constantModifier;  //fudge has a -1 but don't show that since it would be wrong
        return dieString;
-   };
-   this.getStats = function(){
-       var returnObject={};
-       returnObject.nameArray=nameArray.slice();  //copies array so that it is read only
-       returnObject.isDieNegative=isDieNegative;
-       returnObject.doesUseZero=doesUseZero;
-       returnObject.isFudgeDie=isFudgeDie;
-       returnObject.sideCount=sideCount;
-       returnObject.doesExplode=doesExplode;
-       returnObject.doesPenetrate=doesPenetrate;
-       returnObject.doesCompoundExplode=doesCompoundExplode;
-       returnObject.rerollCriteria=rerollCriteria;
-       returnObject.explodeValue=explodeValue;
-       returnObject.constantModifier=constantModifier;
-       returnObject.dieName=dieName;
-       return returnObject;
    };
    this.equals = function(otherDie){
        if(!(otherDie instanceof Die)) return false;
@@ -166,8 +145,6 @@ function Die(diceStringGiven, nameArray){
        for(var i=0; i < nameArray.length; i++) if(nameArray[i]!=otherDie.nameArray[i]) return false;  //note that it ignores object type
        return true;
    };
-   this.hasNames = function(){return (nameArray.length!=0);};
-   this.isFudge = function(){return isFudgeDie;};
    this.getMaxValue = function(){  //TODO redoc and note that it assumes the sum
        if(rerollCriteria!=undefined && rerollCriteria.startsWith('>') && doesCompoundExplode) return (Number((/\d+$/).exec(rerollCriteria)[0])+constantModifier);  //reroll caps the Infinity
        if(doesExplode || doesCompoundExplode) return Infinity;  //doesExplode includes doesPenetrate; Infinity is a number
@@ -210,7 +187,6 @@ function Die(diceStringGiven, nameArray){
       }
        //Unreachable
    };
-   this.getSides = function(){return sideCount;};
    //currently unreachable anyway:
    /*function minMaxCounting(holder){  //doesn't need to know this
        minMaxSwitch="None";
@@ -230,59 +206,6 @@ function Die(diceStringGiven, nameArray){
        else if(minMaxSwitch=="Max" && total > minMaxValue) return minMaxValue;  //exceeded max
        return total;
    };*/
-   this.roll = function(){
-       var valueArray=[];
-       var isPenetrated=false;
-      while (true)  //so I can loop around (for rerolling and exploding) without recursion
-      {
-          var anotherDie=false;
-          var valueRolled=0;
-          //var total=0;
-          //var replacedTotal=0;
-          valueRolled=Math.ceil(Math.random()*sideCount);  //ceil to start at 1
-          while(valueRolled%sideCount==0 && doesCompoundExplode){valueRolled+=Math.ceil(Math.random()*sideCount);}
-          if(valueRolled==sideCount && doesExplode) anotherDie=true;
-          if(isPenetrated) valueRolled--;  //value of 1 less
-          if(doesUseZero) valueRolled--;  //but coins start at 0
-          //if(isFudgeDie) uses constantModifier below
-          if(nameArray.length!=0) valueRolled=nameArray[valueRolled];  //named dice are always coins and never negative
-          if(!isNaN(valueRolled)) valueRolled+=constantModifier;
-          //replacedTotal=total;
-          //total=this.minMaxDoing(total);
-          if(rerollCriteria!=undefined && eval(''+valueRolled+rerollCriteria)) continue;  //TODO what does it mean to have "2d6r6!"? impossible but get another die and reroll
-          if(isDieNegative) valueRolled*=-1;
-          valueArray.push(valueRolled);
-          if(doesPenetrate) isPenetrated=true;  //anotherDie will have already been set to true or false
-          if(anotherDie) continue;  //exploded. roll again after recording the value
-          break;  //no more values
-      }
-       return valueArray;
-   };
    this.flip = this.roll;  //coin alias
    this.spin = this.roll;  //spinner alias
-   function constructorCalled(objectGiven){
-       if(nameArray.length!=0){if(!namedConstructor()); return '';}  //TODO if a named die is entirely numbers it is allowed everything
-
-       return holder;
-   };
-   function namedConstructor(){  //doesn't need to know this
-       //none of these errors should be possible
-       if(isFudgeDie) throw new Error(diceStringGiven+"\nfudge dice can't have named sides");
-       if(isDieNegative) throw new Error(diceStringGiven+"\nnamed dice can't be negative");
-       doesUseZero=true;  //always a coin
-       sideCount=nameArray.length;  //just ignore the number of sides passed and use the number of names given
-       if(doesExplode || doesCompoundExplode) throw new Error(diceStringGiven+"\nnamed dice can't explode (compound or otherwise).");
-       //if(minMaxValue!=0 || minMaxSwitch!="None") throw new Error(diceStringGiven+"\na named dice can't have a min or max");
-       return false;  //all numbers
-   };
-   //constructor:
-    if(diceStringGiven==undefined) diceStringGiven="1d6";  //default
-    nameArray=argumentsToArray(arguments);
-    //TODO: doc: let me count the ways: Die(), Die("1d6"), Die("heads", "tails"), Die("yes", "no", "maybe"), Die(["yes", "no", "maybe"])
-    if(nameArray==undefined || nameArray.length==1) nameArray=[];  //make empty array (not provided or diceStringGiven only)
-    else if(nameArray.length==2 && nameArray[0]==undefined) nameArray=[];
-    else if(nameArray.length==2 && (nameArray[1] instanceof Array) && nameArray[1].length==0) nameArray=[];  //name passed was an empty array (DicePool does this)
-    if(nameArray.length==0 && typeof(diceStringGiven)!="string") throw new Error("Die("+diceStringGiven+", ~) the first parameter must be a string type");
-    return constructorCalled(this);
-    //if this is a named die then diceStringGiven will be ignored (since it is actually the first name or something else)
 };

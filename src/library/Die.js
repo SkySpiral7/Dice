@@ -12,27 +12,31 @@ function Die(arg1)
 
       var valueArray = [];
       var maxValue = sideCount + constantModifier;
-      while (true)  //so I can loop around (for rerolling and exploding) without recursion
+      var needsValue, valueRolled;
+      do  //so I can loop around (for rerolling and exploding) without recursion
       {
-         var valueRolled = Math.floor(randomSource() * sideCount) + 1;  //+1 for a min of 1 and a max of sideCount
+         valueRolled = Math.floor(randomSource() * sideCount) + 1;  //+1 for a min of 1 and a max of sideCount
             //can't use Math.ceil because exactly 0 wouldn't become 1
             //TODO: re: consider forcing constantModifier to have the +1 instead
          valueRolled += constantModifier;
-         if (valueRolled === maxValue && undefined !== explodeType)
-         {
-            if(Die.explodeTypes.Compound === explodeType) throw new Error('Not yet implemented');
-            //while(valueRolled%sideCount==0 && doesCompoundExplode){valueRolled+=Math.ceil(Math.random()*sideCount);}
+         needsValue = false;
 
-            //exploding dice can't reroll the max value. validate prevents it
+         //exploding dice can't reroll the max value. validate prevents it
+         if(valueRolled === maxValue && undefined !== explodeType) needsValue = true;
+         else if (Die.explodeTypes.Compound === explodeType)
+         {
+            //now that I have a non-explode I can sum them all together to simulate a single die value
+            valueRolled += Math.summation(valueArray);
+            valueArray = [];  //clear out valueArray so that reroll can start fresh
+         }
+
+         if(undefined !== rerollCriteria && eval('' + valueRolled + rerollCriteria)) needsValue = true;
+         else
+         {
             if(0 !== valueArray.length && Die.explodeTypes.Penetrating === explodeType) --valueRolled;
             valueArray.push(valueRolled);
-            continue;
          }
-         if(undefined !== rerollCriteria && eval('' + valueRolled + rerollCriteria)) continue;
-         if(0 !== valueArray.length && Die.explodeTypes.Penetrating === explodeType) --valueRolled;
-         valueArray.push(valueRolled);
-         break;
-      }
+      } while(needsValue);
        return valueArray;
    };
    /**@returns an object will all Die data elements in it. It can be passed into new Die()*/
