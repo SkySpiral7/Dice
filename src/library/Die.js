@@ -1,8 +1,20 @@
 'use strict';
+/**
+A single die object (for multiple dice see DicePool). It can be created in the following ways:
+new Die() for a 1d6
+new Die(20) for a 1d20
+new Die('d10!!')
+new Die({name: 'My die', sideCount: 6, constantModifier: -1, rerollCriteria: '===1', explodeType: Die.explodeTypes.Normal})
+*/
 function Die(arg1)
 {
    var name, sideCount, constantModifier, isFudgeDie, rerollCriteria, explodeType;
 
+   /**
+   @param {?function} randomSource a function that returns a random number between 0 inclusive and 1 exclusive.
+   If not provided Math.random will be used.
+   @returns {number[]} the results of rolling the die. Rerolls will not be included
+   */
    this.roll = function(randomSource)
    {
       if(undefined == randomSource) randomSource = Math.random;
@@ -72,6 +84,7 @@ function Die(arg1)
       isFudgeDie = arg1.isFudgeDie;
       rerollCriteria = arg1.rerollCriteria;
       explodeType = arg1.explodeType;
+
       arg1 = undefined;  //no longer needed
    };
    this._constructor();

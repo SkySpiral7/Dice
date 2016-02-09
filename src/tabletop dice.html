@@ -634,16 +634,6 @@ numberGroup(diceStringGiven)
 <pre>
 Die(diceStringGiven, nameArray)
 {
-    this object represents a single die of any kind except Scatter Die.
-    the roll function is the only one that does not simply return read-only information about the die
-
-    hasNames()
-       returns true if the die uses the nameArray, ie if it is a named die
-    setName(nameGiven)
-       gives this die a name. not to be confused with the nameArray which represents the value of each side
-       instead the nameGiven has no impact on the die's functionality and is only used when calling getName
-    getName()
-       returns the name if it has been set otherwise generateString is called
     generateString()
        returns a string that represents the details of the die
        if the string is sent to a Die constructor a duplicate will be created
@@ -674,54 +664,15 @@ Die(diceStringGiven, nameArray)
           this is the value that will cause an explosion. because of this is can't be the final result of a roll
        constantModifier: 0 by default. reroll optimizing may cause this value to be different than expected
           this is a constant modifier that is added to each value rolled before reroll but after explosions are determined
-    isFudge()
-       returns true if the die is a fudge die
-    getMaxValue()
-       returns the value which is on the last side of the die which is also the maximum possible value unless it is a named die
-       if it is a named die is just returns the name of the last side regardless of whether or not it is the maximum value
-    getMinValue()
-       returns the value which is on the first side of the die which is also the minimum possible value unless it is a named die
-       if it is a named die is just returns the name of the first side regardless of whether or not it is the minimum value
-    getSides()
-       returns the number sides the die has
-    flip() or spin()
-       these are both aliases for roll() (since Die could also be called a coin or spinner)
-    roll()
-       outputs nothing but returns a random possible side. the name of the side is returned if it exists
-       otherwise the side value is returned. coin starting at 0 and fudge die have been accounted for
-       if the die explodes (not compound) then an array of every rolled value is returned
-       compound exploding and penetrating exploding have been accounted for
-    constructor()
-       although not a function that can be called it is listed here to show all the different ways the Die object can be created using the keyword new
-       Die() using this will make a standard 6 sided die
-       Die(diceString) this will make the die as normal ie as specified by the string. it will not be a named die.
-          for details on the diceString see the "basic description" at the top. the differences for diceString are: must contain only a single die with
-          an optional 1, must not indicate a scatter die, and must not contain min/max, drop/keep or sorting
-       Die(name1, name2, ...) if given 2 or more arguments, each argument will be used as the value of each side of a named die just like nameArray
-          names may be passed as anything objects, strings, numbers etc
-       Die(nameArray) given an array each elements will be used as the value of each side of a named die. an array with a single string element is the only way
-          to get a single sided named die since normally a single parameter (except an array) would be read as diceString
 }
 DicePool(diceStringGiven, nameArray)
 {
     dice pool is an object that holds an array of dice and some other functionality.
-    it is not a wrapper but contains new functions that do not exist elsewhere
 
-    first some static members:
-    DicePool.minMaxRegexStart = /^\s(?:with\s)?(?:a\s)?(?:min|max)(?:imum)?\s(?:of\s)?/;
-    DicePool.dropKeepRegexShortHand = /^[dk][hl]?\d*/;
-    DicePool.dropKeepRegexStart = /^\s(?:drop(?:ping)?|remov(?:e|ing)|ignor(?:e|ing)|keep(?:ping)?)/;
-
-    setName(nameGiven)
-       gives this dice pool a name. the nameGiven has no impact on the dice pool's functionality and is only used when calling getName
-    getName()
-       returns the name if it has been set otherwise generateString is called
     generateString()
        returns a string that represents the details of the dice pool
        it calls generateString for each die contained in the dice pool then it adds dice pool information
        if the string is sent to a Dice Pool constructor a duplicate will be created
-    getAllDice(){return diceArray.slice();};  //copies array so that it is read only
-       returns an array of die objects which this pool contains
     getStats()
        returns an object that has a copy of every attribute of this dice pool
        the object returned is not a dice pool object and only has copies of the values so that these values can't be changed
@@ -744,20 +695,6 @@ DicePool(diceStringGiven, nameArray)
        it will display the total after min/max, the removed values and the previous total before min/max
        if all the dice are fudge the sign will be displayed without separation such as: "+-0+ = 1"
        named dice will be separated by comma in the dice list and not be counted for the total
-    add(newDiceStringPassed, nameArray)
-       used to add dice to the dice pool. called by the constructor but may also be called elsewhere
-       newDiceStringPassed must have correct syntax for a Die object (diceStringGiven) except that
-       if multiple dice are indicated they will be parsed into multiple Die objects
-    addDie(newDieObject)
-       adds the given die to the pool
-       newDieObject must be a Die object
-    addAllDice(newDice)
-       adds the given dice to the pool
-       newDice must be either an array of Die objects or a DicePool object
-       if newDice is a DicePool object then getAllDice() will be called
-       no other properties from the other DicePool will be used
-    getSize()
-       returns the number of dice in the pool
     roll()
        rolls every die in the pool and returns an array of those values
        all forms of exploding have already been accounted for and so has drop/keep
