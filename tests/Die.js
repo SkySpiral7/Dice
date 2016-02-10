@@ -15,6 +15,14 @@ function convertNonRandomDie(sides, numberArray)
    }
    return new NonRandomNumberGenerator(numberArray).generate;
 }
+function convertDiceResults(sides, numberArray)
+{
+   for (var i = 0; i < numberArray.length; ++i)
+   {
+      numberArray[i] = (numberArray[i] - 1) / sides;
+   }
+   return numberArray;
+}
 Tester.Die = {};
 Tester.Die.roll = function(isFirst)
 {

@@ -37,7 +37,7 @@ function DicePool(name, diceArray)
             {
                groupResults[groupResultIndex] *= -1;
                //TODO: re: might be possible to optimize this into the die by changing the constant
-               //would need to double check math for exploding first
+               //would need to double check math for exploding first. no that would mess up drop/keep
             }
          }
          results = results.concat(groupResults);
@@ -51,41 +51,52 @@ DicePool.dropKeepTypes = {
    {
       toString: function(){return '{DropLowest}';},
       toJSON: function(){return '{DropLowest}';},
-      perform: function(dropKeepCount, diceResults)
+      /**diceResults will have dropCount number of elements removed.
+      The ones closes to -Infinity will be removed.*/
+      perform: function(dropCount, diceResults)
       {
-         var newResults = [];
-         return diceResults;
+         diceResults.sort(numericAscending);
+         for(var i = dropCount; i > 0; --i){diceResults.shift();}
       }
    },
    DropHighest:
    {
       toString: function(){return '{DropHighest}';},
       toJSON: function(){return '{DropHighest}';},
-      perform: function(dropKeepCount, diceResults)
+      /**diceResults will have dropCount number of elements removed.
+      The ones closes to Infinity will be removed.*/
+      perform: function(dropCount, diceResults)
       {
-         var newResults = [];
-         return diceResults;
+         diceResults.sort(numericAscending);
+         diceResults.reverse();
+         for(var i = dropCount; i > 0; --i){diceResults.shift();}
       }
    },
    KeepLowest:
    {
       toString: function(){return '{KeepLowest}';},
       toJSON: function(){return '{KeepLowest}';},
-      perform: function(dropKeepCount, diceResults)
+      /**diceResults will have all but dropCount number of elements removed.
+      The ones closes to -Infinity will be kept (possibly all of them).*/
+      perform: function(keepCount, diceResults)
       {
-         var newResults = [];
-         return diceResults;
+         var dropCount = (diceResults.length - keepCount);
+         if(dropCount > 0) DicePool.dropKeepTypes.DropHighest.perform(dropCount, diceResults);
       }
    },
    KeepHighest:
    {
       toString: function(){return '{KeepHighest}';},
       toJSON: function(){return '{KeepHighest}';},
-      perform: function(dropKeepCount, diceResults)
+      /**diceResults will have all but dropCount number of elements removed.
+      The ones closes to Infinity will be kept (possibly all of them).*/
+      perform: function(keepCount, diceResults)
       {
-         var newResults = [];
-         return diceResults;
+         var dropCount = (diceResults.length - keepCount);
+         if(dropCount > 0) DicePool.dropKeepTypes.DropLowest.perform(dropCount, diceResults);
       }
    }
 };
 //ignore for now: min/max, sorting
+/**Pass this into Array.prototype.sort for the order to be from -Infinity to Infinity.*/
+function numericAscending(a,b){return (a - b);}  //TODO: re: put somewhere else
