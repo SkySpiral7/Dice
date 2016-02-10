@@ -64,6 +64,13 @@ function Die(arg1)
          explodeType: explodeType
       };
    };
+   /**@returns true if other is equal to this.*/
+   this.equals = function(other)
+   {
+      if(!(other instanceof Die)) return false;
+      if(this === other) return true;
+      return (JSON.stringify(this) === JSON.stringify(other));
+   };
 
    /**You can't call this function. It is only used internally to create a Die object.*/
    this._constructor = function()
@@ -98,7 +105,7 @@ You should have no use for it although it isn't harmful to call.
 Die._parseString = function(inputString)
 {
    var jsonResult = {name: inputString};
-   var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy. trim, lower case and replace all whitespace with space
+   var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy so that parse errors can use inputString
 
    if((/^1[^\d%]/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
    else if((/^0[^\d%]/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');

@@ -9,18 +9,16 @@ Tester.DicePool.roll = function(isFirst)
    try{
    nonRandomNumbers = convertDiceResults(8, [5, 8]);
    nonRandomNumbers = nonRandomNumbers.concat(convertDiceResults(16, [12, 16]));
-   actual = new DicePool('2d8+2d16', [
-      {
-         die: new Die(8),
-         dieCount: 2
-      },
-      {
-         die: new Die(16),
-         dieCount: 2
-      }
-   ]).roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
+   actual = new DicePool('2d8+2d16').roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
    testResults.push({Expected: [5, 8, 12, 16], Actual: actual, Description: 'Happy path 2d8+2d16'});
    } catch(e){testResults.push({Error: e, Action: 'Happy path 2d8+2d16'});}
+
+   try{
+   nonRandomNumbers = convertDiceResults(8, [5, 8]);
+   nonRandomNumbers = nonRandomNumbers.concat(convertDiceResults(16, [12, 16]));
+   actual = new DicePool('2d8-2d16').roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
+   testResults.push({Expected: [5, 8, -12, -16], Actual: actual, Description: 'Negative 2d8-2d16'});
+   } catch(e){testResults.push({Error: e, Action: 'Negative 2d8-2d16'});}
 
    try{
    nonRandomNumbers = convertDiceResults(8, [5, 8]);
@@ -36,6 +34,64 @@ Tester.DicePool.roll = function(isFirst)
    } catch(e){testResults.push({Error: e, Action: 'Hooked up to drop/keep'});}
 
    TesterUtility.displayResults('DicePool new DicePool().roll()', testResults, isFirst);
+};
+Tester.DicePool._constructor = function(isFirst)
+{
+   return;  //TODO: re: requires toJSON
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, nonRandomNumbers;
+
+   try{
+   returned = new DicePool('2d4').toJSON();
+   expected = [
+      {
+         die: new Die(4),
+         dieCount: 2
+      }
+   ];
+   testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 2d8+2d16'});
+   } catch(e){testResults.push({Error: e, Action: 'Happy path: 2d8+2d16'});}
+
+   TesterUtility.displayResults('DicePool new DicePool()._constructor()', testResults, isFirst);
+};
+Tester.DicePool._parseString = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], returned, expected;
+   try{
+   returned = DicePool._parseString('2d8+2d16');
+   expected = [
+      {
+         die: new Die(8),
+         dieCount: 2
+      },
+      {
+         die: new Die(16),
+         dieCount: 2
+      }
+   ];
+   testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 2d8+2d16'});
+   } catch(e){testResults.push({Error: e, Action: 'Happy path: 2d8+2d16'});}
+
+   try{
+   returned = DicePool._parseString('d8-3d16');
+   expected = [
+      {
+         die: new Die(8),
+         dieCount: 1
+      },
+      {
+         die: new Die(16),
+         dieCount: 3,
+         areDiceNegative: true
+      }
+   ];
+   testResults.push({Expected: expected, Actual: returned, Description: 'Negative: d8-3d16'});
+   } catch(e){testResults.push({Error: e, Action: 'Negative: d8-3d16'});}
+
+   TesterUtility.displayResults('DicePool DicePool._parseString', testResults, isFirst);
 };
 Tester.DicePool.dropKeepTypes = function(isFirst)
 {
