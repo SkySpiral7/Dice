@@ -103,8 +103,7 @@ Tester.Die._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Action: 'No arg'});}
 
    try{
-   die = new Die();
-   die._constructor();
+   new Die()._constructor();
    TesterUtility.failedToThrow(testResults, 'Call _constructor');
    }
    catch(e)

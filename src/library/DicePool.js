@@ -14,6 +14,15 @@ new DicePool('PoolName', [
    areDiceNegative: false
 }
 ]);
+new DicePool({name: 'PoolName', diceArray: [
+{
+   die: new Die(),  //will roll the same object twice
+   dieCount: 2,
+   dropKeepType: DicePool.dropKeepTypes.DropLowest,
+   dropKeepCount: 1,
+   areDiceNegative: false
+}
+]});
 */
 function DicePool(arg1, arg2)
 {
@@ -47,6 +56,22 @@ function DicePool(arg1, arg2)
       }
       return results;
    };
+   /**@returns an object with all DicePool data elements in it. It can be passed into new DicePool()*/
+   this.toJSON = function()
+   {
+      return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
+         'instanceof': 'DicePool',  //this is for a JSON reviver
+         name: name,
+         diceArray: diceArray
+      };
+   };
+   /**@returns true if other is equal to this.*/
+   this.equals = function(other)
+   {
+      if(!(other instanceof DicePool)) return false;
+      if(this === other) return true;
+      return (JSON.stringify(this) === JSON.stringify(other));
+   };
 
    /**You can't call this function. It is only used internally to create a DicePool object.*/
    this._constructor = function()
@@ -55,12 +80,21 @@ function DicePool(arg1, arg2)
 
       if(arg1 instanceof String) arg1 = arg1.valueOf();
       if('string' === typeof(arg1) && undefined == arg2) arg2 = DicePool._parseString(arg1);
-      else if(undefined == arg2){arg2 = arg1; arg1 = 'DicePool';}
+      else if (undefined == arg2 && undefined != arg1.diceArray)
+      {
+         arg2 = arg1.diceArray;
+         arg1 = arg1.name;
+      }
+      else if (undefined == arg2)
+      {
+         arg2 = arg1;
+         arg1 = 'DicePool';
+      }
 
       //DicePool._validate(arg2);
 
       name = arg1;
-      diceArray = arg2;  //TODO: re: should I do a defense copy?
+      diceArray = arg2;  //TODO: re: should I do a defense copy? Also in toJSON
 
       arg1 = undefined;  //no longer needed
       arg2 = undefined;

@@ -37,21 +37,53 @@ Tester.DicePool.roll = function(isFirst)
 };
 Tester.DicePool._constructor = function(isFirst)
 {
-   return;  //TODO: re: requires toJSON
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], actual, nonRandomNumbers;
+   var testResults = [], returned, expected;
 
    try{
-   returned = new DicePool('2d4').toJSON();
-   expected = [
+   returned = new DicePool(new String('2d4')).toJSON();
+   expected = {'instanceof': 'DicePool', name: '2d4', diceArray: [
       {
          die: new Die(4),
          dieCount: 2
       }
-   ];
-   testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 2d8+2d16'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path: 2d8+2d16'});}
+   ]};
+   testResults.push({Expected: expected, Actual: returned, Description: 'Calls _parseString'});
+   } catch(e){testResults.push({Error: e, Action: 'Calls _parseString'});}
+
+   try{
+   returned = new DicePool('2d4').toJSON();
+   returned = new DicePool(returned).toJSON();
+   expected = {'instanceof': 'DicePool', name: '2d4', diceArray: [
+      {
+         die: new Die(4),
+         dieCount: 2
+      }
+   ]};
+   testResults.push({Expected: expected, Actual: returned, Description: 'Allows result of toJSON'});
+   } catch(e){testResults.push({Error: e, Action: 'Allows result of toJSON'});}
+
+   try{
+   returned = new DicePool('2d4').toJSON();
+   returned = new DicePool(returned.diceArray).toJSON();
+   expected = {'instanceof': 'DicePool', name: 'DicePool', diceArray: [
+      {
+         die: new Die(4),
+         dieCount: 2
+      }
+   ]};
+   testResults.push({Expected: expected, Actual: returned, Description: 'Allows diceArray'});
+   } catch(e){testResults.push({Error: e, Action: 'Allows diceArray'});}
+
+   try{
+   new DicePool('2d4')._constructor();
+   TesterUtility.failedToThrow(testResults, 'Call _constructor');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
+   }
 
    TesterUtility.displayResults('DicePool new DicePool()._constructor()', testResults, isFirst);
 };

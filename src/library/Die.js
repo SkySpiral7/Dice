@@ -51,7 +51,7 @@ function Die(arg1)
       } while(needsValue);
        return valueArray;
    };
-   /**@returns an object will all Die data elements in it. It can be passed into new Die()*/
+   /**@returns an object with all Die data elements in it. It can be passed into new Die()*/
    this.toJSON = function()
    {
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
