@@ -7,7 +7,7 @@ new DicePool('2d8+2d16')
 new DicePool('PoolName', [
 {
    die: new Die(),  //will roll the same object twice
-   count: 2,
+   dieCount: 2,
    dropKeepType: DicePool.dropKeepTypes.DropLowest,
    dropKeepCount: 1,
    areDiceNegative: false
@@ -22,21 +22,70 @@ function DicePool(name, diceArray)
    this.roll = function(randomSource)
    {
       var results = [];
-      for (var diceIndex = 0; diceIndex < diceArray.length; ++diceIndex)
+      for (var groupIndex = 0; groupIndex < diceArray.length; ++groupIndex)
       {
-         for (var dieCount = 0; dieCount < diceArray[diceIndex].count; ++dieCount)
+         var groupResults = [];
+         for (var dieIndex = 0; dieIndex < diceArray[groupIndex].dieCount; ++dieIndex)
          {
-            results = results.concat(diceArray[diceIndex].die.roll(randomSource));
+            groupResults = groupResults.concat(diceArray[groupIndex].die.roll(randomSource));
          }
+         if(undefined !== diceArray[groupIndex].dropKeepType) diceArray[groupIndex].dropKeepType.
+            perform(diceArray[groupIndex].dropKeepCount, groupResults);
+         if (diceArray[groupIndex].areDiceNegative)  //the only valid truthy value is true
+         {
+            for (var groupResultIndex = 0; groupResultIndex < groupResults.length; ++groupResultIndex)
+            {
+               groupResults[groupResultIndex] *= -1;
+               //TODO: re: might be possible to optimize this into the die by changing the constant
+               //would need to double check math for exploding first
+            }
+         }
+         results = results.concat(groupResults);
       }
       return results;
    };
 }
-/**This is an enum.*/
+/**This is an enum and strategy pattern.*/
 DicePool.dropKeepTypes = {
-   DropLowest: {toString: function(){return '{DropLowest}';}, toJSON: function(){return '{DropLowest}';}},
-   DropHighest: {toString: function(){return '{DropHighest}';}, toJSON: function(){return '{DropHighest}';}},
-   KeepLowest: {toString: function(){return '{KeepLowest}';}, toJSON: function(){return '{KeepLowest}';}},
-   KeepHighest: {toString: function(){return '{KeepHighest}';}, toJSON: function(){return '{KeepHighest}';}}
+   DropLowest:
+   {
+      toString: function(){return '{DropLowest}';},
+      toJSON: function(){return '{DropLowest}';},
+      perform: function(dropKeepCount, diceResults)
+      {
+         var newResults = [];
+         return diceResults;
+      }
+   },
+   DropHighest:
+   {
+      toString: function(){return '{DropHighest}';},
+      toJSON: function(){return '{DropHighest}';},
+      perform: function(dropKeepCount, diceResults)
+      {
+         var newResults = [];
+         return diceResults;
+      }
+   },
+   KeepLowest:
+   {
+      toString: function(){return '{KeepLowest}';},
+      toJSON: function(){return '{KeepLowest}';},
+      perform: function(dropKeepCount, diceResults)
+      {
+         var newResults = [];
+         return diceResults;
+      }
+   },
+   KeepHighest:
+   {
+      toString: function(){return '{KeepHighest}';},
+      toJSON: function(){return '{KeepHighest}';},
+      perform: function(dropKeepCount, diceResults)
+      {
+         var newResults = [];
+         return diceResults;
+      }
+   }
 };
 //ignore for now: min/max, sorting
