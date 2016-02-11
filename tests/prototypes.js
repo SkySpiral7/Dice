@@ -23,14 +23,14 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
    returned = testArray.removeByIndex(0);
    testResults.push({Expected: JSON.stringify([2, 3]), Actual: JSON.stringify(testArray), Description: 'Happy path: removed index 0'});
    testResults.push({Expected: 1, Actual: returned, Description: 'Happy path: returned removed value'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
    testArray = ['a', 'b', 'c'];
    returned = testArray.removeByIndex(1);
    testResults.push({Expected: JSON.stringify(['a', 'c']), Actual: JSON.stringify(testArray), Description: 'Easy: removed index 1'});
    testResults.push({Expected: 'b', Actual: returned, Description: 'Easy: returned removed value'});
-   } catch(e){testResults.push({Error: e, Action: 'Easy'});}
+   } catch(e){testResults.push({Error: e, Description: 'Easy'});}
 
    try{
    testArray.removeByIndex(10);
@@ -108,7 +108,7 @@ Tester.prototypes.Array.removeElement = function(isFirst)
    returned = testArray.removeElement(20);
    testResults.push({Expected: JSON.stringify([1, -3]), Actual: JSON.stringify(testArray), Description: 'Happy path: removed 20'});
    testResults.push({Expected: 1, Actual: returned, Description: 'Happy path: returned index of removed element'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path'});}
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
    testArray.removeElement('blue');

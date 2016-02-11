@@ -11,14 +11,14 @@ Tester.DicePool.roll = function(isFirst)
    nonRandomNumbers = nonRandomNumbers.concat(convertDiceResults(16, [12, 16]));
    actual = new DicePool('2d8+2d16').roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
    testResults.push({Expected: [5, 8, 12, 16], Actual: actual, Description: 'Happy path 2d8+2d16'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path 2d8+2d16'});}
+   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
 
    try{
    nonRandomNumbers = convertDiceResults(8, [5, 8]);
    nonRandomNumbers = nonRandomNumbers.concat(convertDiceResults(16, [12, 16]));
    actual = new DicePool('2d8-2d16').roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
    testResults.push({Expected: [5, 8, -12, -16], Actual: actual, Description: 'Negative 2d8-2d16'});
-   } catch(e){testResults.push({Error: e, Action: 'Negative 2d8-2d16'});}
+   } catch(e){testResults.push({Error: e, Description: 'Negative 2d8-2d16'});}
 
    try{
    nonRandomNumbers = convertDiceResults(8, [5, 8]);
@@ -31,7 +31,7 @@ Tester.DicePool.roll = function(isFirst)
       }
    ]).roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
    testResults.push({Expected: [8], Actual: actual, Description: 'Hooked up to drop/keep'});
-   } catch(e){testResults.push({Error: e, Action: 'Hooked up to drop/keep'});}
+   } catch(e){testResults.push({Error: e, Description: 'Hooked up to drop/keep'});}
 
    TesterUtility.displayResults('DicePool new DicePool().roll()', testResults, isFirst);
 };
@@ -50,7 +50,7 @@ Tester.DicePool._constructor = function(isFirst)
       }
    ]};
    testResults.push({Expected: expected, Actual: returned, Description: 'Calls _parseString'});
-   } catch(e){testResults.push({Error: e, Action: 'Calls _parseString'});}
+   } catch(e){testResults.push({Error: e, Description: 'Calls _parseString'});}
 
    try{
    returned = new DicePool('2d4').toJSON();
@@ -62,7 +62,7 @@ Tester.DicePool._constructor = function(isFirst)
       }
    ]};
    testResults.push({Expected: expected, Actual: returned, Description: 'Allows result of toJSON'});
-   } catch(e){testResults.push({Error: e, Action: 'Allows result of toJSON'});}
+   } catch(e){testResults.push({Error: e, Description: 'Allows result of toJSON'});}
 
    try{
    returned = new DicePool('2d4').toJSON();
@@ -74,7 +74,7 @@ Tester.DicePool._constructor = function(isFirst)
       }
    ]};
    testResults.push({Expected: expected, Actual: returned, Description: 'Allows diceArray'});
-   } catch(e){testResults.push({Error: e, Action: 'Allows diceArray'});}
+   } catch(e){testResults.push({Error: e, Description: 'Allows diceArray'});}
 
    try{
    new DicePool('2d4')._constructor();
@@ -105,7 +105,7 @@ Tester.DicePool._parseString = function(isFirst)
       }
    ];
    testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 2d8+2d16'});
-   } catch(e){testResults.push({Error: e, Action: 'Happy path: 2d8+2d16'});}
+   } catch(e){testResults.push({Error: e, Description: 'Happy path: 2d8+2d16'});}
 
    try{
    returned = DicePool._parseString('d8-3d16');
@@ -121,7 +121,7 @@ Tester.DicePool._parseString = function(isFirst)
       }
    ];
    testResults.push({Expected: expected, Actual: returned, Description: 'Negative: d8-3d16'});
-   } catch(e){testResults.push({Error: e, Action: 'Negative: d8-3d16'});}
+   } catch(e){testResults.push({Error: e, Description: 'Negative: d8-3d16'});}
 
    TesterUtility.displayResults('DicePool DicePool._parseString', testResults, isFirst);
 };
@@ -135,37 +135,37 @@ Tester.DicePool.dropKeepTypes = function(isFirst)
    input = [2, 1, 3, 1];
    DicePool.dropKeepTypes.DropLowest.perform(2, input);
    testResults.push({Expected: [2, 3], Actual: input, Description: 'DropLowest'});
-   } catch(e){testResults.push({Error: e, Action: 'DropLowest'});}
+   } catch(e){testResults.push({Error: e, Description: 'DropLowest'});}
 
    try{
    input = [2, 1, 3, 4];
    DicePool.dropKeepTypes.DropHighest.perform(2, input);
    testResults.push({Expected: [2, 1], Actual: input, Description: 'DropHighest'});
-   } catch(e){testResults.push({Error: e, Action: 'DropHighest'});}
+   } catch(e){testResults.push({Error: e, Description: 'DropHighest'});}
 
    try{
    input = [2, 1, 3, 4];
    DicePool.dropKeepTypes.KeepLowest.perform(2, input);
    testResults.push({Expected: [2, 1], Actual: input, Description: 'KeepLowest'});
-   } catch(e){testResults.push({Error: e, Action: 'KeepLowest'});}
+   } catch(e){testResults.push({Error: e, Description: 'KeepLowest'});}
 
    try{
    input = [2, 1, 3, 4];
    DicePool.dropKeepTypes.KeepLowest.perform(20, input);
    testResults.push({Expected: [2, 1, 3, 4], Actual: input, Description: 'KeepLowest: all'});
-   } catch(e){testResults.push({Error: e, Action: 'KeepLowest: all'});}
+   } catch(e){testResults.push({Error: e, Description: 'KeepLowest: all'});}
 
    try{
    input = [2, 1, 3, 1];
    DicePool.dropKeepTypes.KeepHighest.perform(2, input);
    testResults.push({Expected: [2, 3], Actual: input, Description: 'KeepHighest'});
-   } catch(e){testResults.push({Error: e, Action: 'KeepHighest'});}
+   } catch(e){testResults.push({Error: e, Description: 'KeepHighest'});}
 
    try{
    input = [2, 1, 3, 1];
    DicePool.dropKeepTypes.KeepHighest.perform(4, input);
    testResults.push({Expected: [2, 1, 3, 1], Actual: input, Description: 'KeepHighest: all'});
-   } catch(e){testResults.push({Error: e, Action: 'KeepHighest: all'});}
+   } catch(e){testResults.push({Error: e, Description: 'KeepHighest: all'});}
 
    TesterUtility.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', testResults, isFirst);
 };
