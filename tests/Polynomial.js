@@ -73,3 +73,35 @@ Tester.Polynomial.addTerm = function(isFirst)
 
    TesterUtility.displayResults('Polynomial new Polynomial().addTerm()', testResults, isFirst);
 };
+Tester.Polynomial.multiply = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], polynomial, actual, expected;
+
+   try{
+   polynomial = new Polynomial(new Die('dF'));
+   polynomial.multiply(new Polynomial(new Die('dF')));
+   actual = polynomial.toJSON().terms;
+   expected = [
+      {coefficient: 1, exponent: 2},
+      {coefficient: 2, exponent: 1},
+      {coefficient: 3, exponent: 0},
+      {coefficient: 2, exponent: -1},
+      {coefficient: 1, exponent: -2}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '2dF'});
+   } catch(e){testResults.push({Error: e, Description: '2dF'});}
+
+   try{
+   new Polynomial(new Die()).multiply(2);
+   TesterUtility.failedToThrow(testResults, 'Illegal arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('Expected: Polynomial. Got: Number'),
+         Actual: e, Description: 'Illegal arg'});
+   }
+
+   TesterUtility.displayResults('Polynomial new Polynomial().multiply()', testResults, isFirst);
+};

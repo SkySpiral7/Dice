@@ -4,12 +4,28 @@ function Polynomial(die)
 {
    var termArray;
 
+   /**
+   This function lets you multiply this Polynomial by otherPoly (this Polynomial is mutated to be the result).
+   If this is 3x^2 + 1 then this.multiply(this) is 9x^4 + 6x^2 + 1.
+   */
    this.multiply = function(otherPoly)
    {
-      /*for (var i = 0; i < termArray.length; ++i)
+      if(!(otherPoly instanceof Polynomial)) throw new Error('Expected: Polynomial. Got: ' + otherPoly.constructor.name);
+      //copy out termArray so that this.addTerm can be used for the new terms
+      var oldTermArray = termArray;
+      termArray = [];
+      var otherTerms = otherPoly.toJSON().terms;
+      while (0 !== oldTermArray.length)
       {
-         termArray.push({exponent: currentValue, coefficient: 1});
-      }*/
+         var currentTerm = oldTermArray.shift();
+         for (var i = 0; i < otherTerms.length; ++i)
+         {
+            var newCoefficient = currentTerm.coefficient * otherTerms[i].coefficient;
+            var newExponent = currentTerm.exponent + otherTerms[i].exponent;
+            //addTerm will combine already existing terms if possible
+            this.addTerm({exponent: newExponent, coefficient: newCoefficient});
+         }
+      }
    };
    this.negate = function()
    {
@@ -66,11 +82,4 @@ new Polynomial('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from
 {coefficient: -1, exponent: 1},
 {coefficient: 2, exponent: 0}
 ]
-*/
-/*
-(3x^2 + 1)^2
-(3x^2 + 1)(3x^2 + 1)
-(3x^2 * 3x^2) + (1 * 3x^2) + (3x^2 * 1) + (1 * 1)
-9x^4 + 3x^2 + 3x^2 + 1
-9x^4 + 6x^2 + 1
 */
