@@ -101,7 +101,7 @@ if (undefined === Number.isInteger)
 /**
 @returns {!boolean} true if input is a number that isn't Infinity or NaN. And is an integer greater than 0.
 */
-if (undefined === Number.isNatural){Number.isNatural = function(input){return (Number.isInteger(input) && input > 0);};}
+if(undefined === Number.isNatural){Number.isNatural = function(input){return (Number.isInteger(input) && input > 0);};}
 /**
 @param {!string} substring to search for (case sensitive)
 @returns {!boolean} true if this string contains the substring
