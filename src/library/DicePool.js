@@ -56,6 +56,7 @@ function DicePool(arg1, arg2)
       }
       return results;
    };
+   //TODO: re: consider toDiceArray and creating from a dice array
    /**@returns an object with all DicePool data elements in it. It can be passed into new DicePool()*/
    this.toJSON = function()
    {
@@ -91,7 +92,7 @@ function DicePool(arg1, arg2)
          arg1 = 'DicePool';
       }
 
-      //DicePool._validate(arg2);
+      //DicePool._validate(arg2);  //TODO: re: DicePool._validate and others
 
       name = arg1;
       pool = arg2;  //TODO: re: should I do a defense copy? Also in toJSON

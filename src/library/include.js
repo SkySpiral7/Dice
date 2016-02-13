@@ -1,7 +1,7 @@
 'use strict';
 
-//next: Polynomial, GenerateHtml
-var fileNames = ['DicePool', 'Die', 'prototypes', 'Statistics'];
+//next: GenerateHtml
+var fileNames = ['DicePool', 'Die', 'Polynomial', 'prototypes', 'Statistics'];
 if(undefined === this['includePath']) this.includePath = '';
 
 for (var i = 0; i < fileNames.length; ++i)

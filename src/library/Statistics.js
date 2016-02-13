@@ -30,8 +30,12 @@ Statistics.analyze('2d6'):  //I might not support a string argument
 Statistics.useBruteForce = function()
 {
 };
-Statistics.usePolynomial = function()
+Statistics.usePolynomial = function(dicePool)
 {
+   //assert: no dice explode or drop
+   /*var finishedPolys = [], diceArray = dicePool.toJSON().diceArray;
+   for(var i = 0; i < diceArray.length; ++i){finishedPolys.push(new Polynomial(diceArray[i], 0));}
+   return Polynomial.multiplyPolynomials(finishedPolys, poolGiven);*/
 };
 Statistics.useDroppingAlgorithm = function()
 {
@@ -88,7 +92,7 @@ Statistics.calculateAggregates = function(stats)
       else deviationSquareSum += (dev * stats[i].probability);
    }
    var standardDeviation = Math.sqrt(deviationSquareSum / count);
-   return {
+   return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
       minimum: min, maximum: max, mean: mean, standardDeviation: standardDeviation
    };
 //an empty array (garbage in) returns {minimum: Infinity, maximum: -Infinity, mean: NaN, standardDeviation: NaN} (garbage out)
