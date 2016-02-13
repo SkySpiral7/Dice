@@ -5,7 +5,7 @@
 An object than represents a collection of die objects.
 It can be created in the following ways:
 new DicePool('2d8+2d16')
-new DicePool('PoolName', [
+new DicePool('PoolName', [  //PoolName is optional. You may pass in only a single argument.
 {
    die: new Die(),  //will roll the same object twice
    dieCount: 2,

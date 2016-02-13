@@ -1,5 +1,6 @@
 'use strict';
 
+//next: Polynomial, GenerateHtml, Statistics
 var fileNames = ['DicePool', 'Die', 'prototypes'];
 if(undefined === this['includePath']) this.includePath = '';
 
