@@ -6,12 +6,22 @@ function Polynomial(die)
 
    this.multiply = function(otherPoly)
    {
+      /*for (var i = 0; i < termArray.length; ++i)
+      {
+         termArray.push({exponent: currentValue, coefficient: 1});
+      }*/
    };
    this.negate = function()
    {
    };
-   this.push = function(term)
+   this.addTerm = function(term)
    {
+      for (var i = 0; i < termArray.length; ++i)
+      {
+         if(termArray[i].exponent === term.exponent){termArray[i].coefficient += term.coefficient; return;}
+      }
+      termArray.push(term);
+      termArray.sort(exponentDescending);  //TODO: is this needed?
    };
    /**@returns an object with all Polynomial data elements in it*/
    this.toJSON = function()
@@ -40,11 +50,14 @@ function Polynomial(die)
          //coefficient: number of ways to roll it (always starts as 1 without explosions etc)
          termArray.push({exponent: currentValue, coefficient: 1});
       }
+      termArray.sort(exponentDescending);
 
       die = undefined;  //no longer needed
    };
    this._constructor();
 }
+/**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: Infinity.*/
+function exponentDescending(a,b){return (b.exponent - a.exponent);}  //TODO: re: put somewhere else
 /*Example API:
 new Polynomial('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from string
 [
@@ -53,4 +66,11 @@ new Polynomial('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from
 {coefficient: -1, exponent: 1},
 {coefficient: 2, exponent: 0}
 ]
+*/
+/*
+(3x^2 + 1)^2
+(3x^2 + 1)(3x^2 + 1)
+(3x^2 * 3x^2) + (1 * 3x^2) + (3x^2 * 1) + (1 * 1)
+9x^4 + 3x^2 + 3x^2 + 1
+9x^4 + 6x^2 + 1
 */
