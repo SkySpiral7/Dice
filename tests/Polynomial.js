@@ -48,7 +48,29 @@ Tester.Polynomial.addTerm = function(isFirst)
 
    try{
    polynomial = new Polynomial(new Die('dF'));
-   polynomial.addTerm({coefficient: 2, exponent: 0});
+   polynomial.addTerm({coefficient: 'sd', exponent: 0});
+   TesterUtility.failedToThrow(testResults, 'Invalid coefficient');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('term.coefficient must be a number but was: string'),
+         Actual: e, Description: 'Invalid coefficient'});
+   }
+
+   try{
+   polynomial = new Polynomial(new Die('dF'));
+   polynomial.addTerm({coefficient: 2, exponent: 'sd'});
+   TesterUtility.failedToThrow(testResults, 'Invalid exponent');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('term.exponent must be a number but was: string'),
+         Actual: e, Description: 'Invalid exponent'});
+   }
+
+   try{
+   polynomial = new Polynomial(new Die('dF'));
+   polynomial.addTerm({coefficient: new Number(2), exponent: new Number(0)});
    actual = polynomial.toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 1},
@@ -70,6 +92,29 @@ Tester.Polynomial.addTerm = function(isFirst)
    ];
    testResults.push({Expected: expected, Actual: actual, Description: 'New term'});
    } catch(e){testResults.push({Error: e, Description: 'New term'});}
+
+   try{
+   polynomial = new Polynomial(new Die('dF'));
+   polynomial.addTerm({coefficient: -1, exponent: 0});
+   actual = polynomial.toJSON().terms;
+   expected = [
+      {coefficient: 1, exponent: 1},
+      {coefficient: 1, exponent: -1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Remove 0 coefficients'});
+   } catch(e){testResults.push({Error: e, Description: 'Remove 0 coefficients'});}
+
+   try{
+   polynomial = new Polynomial(new Die('dF'));
+   polynomial.addTerm({coefficient: 0, exponent: 2});
+   actual = polynomial.toJSON().terms;
+   expected = [
+      {coefficient: 1, exponent: 1},
+      {coefficient: 1, exponent: 0},
+      {coefficient: 1, exponent: -1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Don\'t add 0 coefficients'});
+   } catch(e){testResults.push({Error: e, Description: 'Don\'t add 0 coefficients'});}
 
    TesterUtility.displayResults('Polynomial new Polynomial().addTerm()', testResults, isFirst);
 };

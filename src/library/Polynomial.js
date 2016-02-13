@@ -30,11 +30,26 @@ function Polynomial(die)
    this.negate = function()
    {
    };
+   /**
+   This function lets you add a term to this Polynomial (this Polynomial is mutated to be the result).
+   If you have a Polynomial p then p.addTerm({coefficient: 3, exponent: 2}) is p + 3x^2.
+   */
    this.addTerm = function(term)
    {
+      if(term.coefficient instanceof Number) term.coefficient = term.coefficient.valueOf();
+      else if('number' !== typeof(term.coefficient)) throw new Error('term.coefficient must be a number but was: ' + typeof(term.coefficient));
+      if(term.exponent instanceof Number) term.exponent = term.exponent.valueOf();
+      else if('number' !== typeof(term.exponent)) throw new Error('term.exponent must be a number but was: ' + typeof(term.exponent));
+
+      if(0 === term.coefficient) return;  //fast path and to prevent adding it
       for (var i = 0; i < termArray.length; ++i)
       {
-         if(termArray[i].exponent === term.exponent){termArray[i].coefficient += term.coefficient; return;}
+         if (termArray[i].exponent === term.exponent)
+         {
+            termArray[i].coefficient += term.coefficient;
+            if(0 === termArray[i].coefficient) termArray.removeByIndex(i);
+            return;
+         }
       }
       termArray.push(term);
       termArray.sort(exponentDescending);  //TODO: is this needed?
@@ -47,6 +62,7 @@ function Polynomial(die)
          terms: termArray  //TODO: re: consider defensive copy
       };
    };
+
    /**You can't call this function. It is only used internally to create a Polynomial object.*/
    this._constructor = function()
    {
