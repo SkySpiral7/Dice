@@ -34,6 +34,7 @@ function Polynomial(die)
       var maxValue = die.sideCount + die.constantModifier;
       for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
       {
+         if(undefined !== die.rerollCriteria && eval('' + currentValue + die.rerollCriteria)) continue;  //exclude reroll values
          //http://mathforum.org/library/drmath/view/52207.html
          //exponent: a possible thing to roll (eg 1 to sideCount)
          //coefficient: number of ways to roll it (always starts as 1 without explosions etc)
