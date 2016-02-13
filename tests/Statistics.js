@@ -46,6 +46,26 @@ Tester.Statistics.calculateAggregates = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
+   Statistics.calculateAggregates({});
+   TesterUtility.failedToThrow(testResults, 'Wrong type arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('stats must be an array but was: object'),
+         Actual: e, Description: 'Wrong type arg'});
+   }
+
+   try{
+   Statistics.calculateAggregates([]);
+   TesterUtility.failedToThrow(testResults, 'Empty array arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('stats must not be an empty array'),
+         Actual: e, Description: 'Empty array arg'});
+   }
+
+   try{
    actual = Statistics.calculateAggregates([
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
@@ -66,14 +86,3 @@ Tester.Statistics.calculateAggregates = function(isFirst)
 
    TesterUtility.displayResults('Statistics Statistics.calculateAggregates', testResults, isFirst);
 };
-/*
-   try{
-   new Die().roll(5);
-   TesterUtility.failedToThrow(testResults, 'randomSource wrong type');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('1d6\nrandomSource must be a function but was a number with toString: 5'),
-         Actual: e, Description: 'randomSource wrong type'});
-   }
-*/

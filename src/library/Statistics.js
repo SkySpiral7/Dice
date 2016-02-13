@@ -64,10 +64,14 @@ Statistics.determineProbability = function(stats)
 Statistics.calculateAggregates = function(stats)
 {
    var min = Infinity, max = -Infinity, count = 0, sum = 0;
+   if(!(stats instanceof Array)) throw new Error('stats must be an array but was: ' + typeof(stats));
+   if(0 === stats.length) throw new Error('stats must not be an empty array');
+   //an empty array would return {minimum: Infinity, maximum: -Infinity, mean: NaN, standardDeviation: NaN}
    for (var i = 0; i < stats.length; ++i)
    {
       //stats[i].frequency of 0 means the result is impossible which shouldn't exist in the array
       //if it does exist (garbage in) it will only affect min/max (garbage out)
+      //TODO: re: consider validation instead of garbage in/out
       if(stats[i].result < min) min = stats[i].result;
       if(stats[i].result > max) max = stats[i].result;
       if (undefined != stats[i].frequency)
@@ -95,8 +99,6 @@ Statistics.calculateAggregates = function(stats)
    return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
       minimum: min, maximum: max, mean: mean, standardDeviation: standardDeviation
    };
-//an empty array (garbage in) returns {minimum: Infinity, maximum: -Infinity, mean: NaN, standardDeviation: NaN} (garbage out)
-//TODO: re: later: consider validation instead of garbage in/out
 };
 /*Unused shorter formula for mean:
 For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 which has no mean

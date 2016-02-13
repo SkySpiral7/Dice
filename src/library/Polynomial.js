@@ -10,6 +10,7 @@ function Polynomial(die)
    */
    this.multiply = function(otherPoly)
    {
+      //TODO: re: not null safe
       if(!(otherPoly instanceof Polynomial)) throw new Error('Expected: Polynomial. Got: ' + otherPoly.constructor.name);
       //copy out termArray so that this.addTerm can be used for the new terms
       var oldTermArray = termArray;
