@@ -52,8 +52,17 @@ Statistics.calculateAggregates = function(stats)
       //if it does exist (garbage in) it will only affect min/max (garbage out)
       if(stats[i].result < min) min = stats[i].result;
       if(stats[i].result > max) max = stats[i].result;
-      count += stats[i].frequency;
-      sum += (stats[i].result * stats[i].frequency);  //must be weighted since the ones that occur more often are more likely
+      if (undefined != stats[i].frequency)
+      {
+         //use frequency if possible because it has perfect precision
+         count += stats[i].frequency;
+         sum += (stats[i].result * stats[i].frequency);  //must be weighted since the ones that occur more often are more likely
+      }
+      else
+      {
+         count += stats[i].probability;
+         sum += (stats[i].result * stats[i].probability);
+      }
    }
    var deviationSquareSum = 0;
    var mean = sum / count;
@@ -61,7 +70,8 @@ Statistics.calculateAggregates = function(stats)
    {
       var dev = stats[i].result - mean;
       dev *= dev;  //squared
-      deviationSquareSum += (dev * stats[i].frequency);  //weighted
+      if(undefined != stats[i].frequency) deviationSquareSum += (dev * stats[i].frequency);  //weighted
+      else deviationSquareSum += (dev * stats[i].probability);
    }
    var standardDeviation = Math.sqrt(deviationSquareSum / count);
    return {
