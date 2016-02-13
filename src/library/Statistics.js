@@ -36,8 +36,22 @@ Statistics.usePolynomial = function()
 Statistics.useDroppingAlgorithm = function()
 {
 };
-Statistics.frequencyToProbability = function(stats)
+/**
+@param {object[]} stats created from a Statistics function that uses frequency
+@returns undefined. after: same object will also have probability
+*/
+Statistics.determineProbability = function(stats)
 {
+   var sum = 0;
+   for (var i = 0; i < stats.length; ++i)
+   {
+      sum += stats[i].frequency;
+   }
+   for (var i = 0; i < stats.length; ++i)
+   {
+      stats[i].probability = (stats[i].frequency / sum);
+      //delete stats[i].frequency;  //nah. leave it there since frequency has perfect precision
+   }
 };
 /**
 @param {object[]} stats created from a Statistics function
