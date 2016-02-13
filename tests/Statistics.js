@@ -1,13 +1,14 @@
 'use strict';
 Tester.Statistics = {};
-Tester.Statistics.determineProbability = function(isFirst)
+Tester.Statistics.usePolynomial = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
    try{
-   actual = [
+   actual = Statistics.usePolynomial(new DicePool('2d6'));
+   expected = [
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
       {result: 4, frequency: 3},
@@ -20,6 +21,19 @@ Tester.Statistics.determineProbability = function(isFirst)
       {result: 11, frequency: 2},
       {result: 12, frequency: 1}
    ];
+   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
+   } catch(e){testResults.push({Error: e, Description: '2d6'});}
+
+   TesterUtility.displayResults('Statistics Statistics.usePolynomial', testResults, isFirst);
+};
+Tester.Statistics.determineProbability = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, expected;
+
+   try{
+   actual = Statistics.usePolynomial(new DicePool('2d6'));
    Statistics.determineProbability(actual);
    expected = [
       {result: 2, frequency: 1, probability: (1/36)},
@@ -66,19 +80,7 @@ Tester.Statistics.calculateAggregates = function(isFirst)
    }
 
    try{
-   actual = Statistics.calculateAggregates([
-      {result: 2, frequency: 1},
-      {result: 3, frequency: 2},
-      {result: 4, frequency: 3},
-      {result: 5, frequency: 4},
-      {result: 6, frequency: 5},
-      {result: 7, frequency: 6},
-      {result: 8, frequency: 5},
-      {result: 9, frequency: 4},
-      {result: 10, frequency: 3},
-      {result: 11, frequency: 2},
-      {result: 12, frequency: 1}
-   ]);
+   actual = Statistics.calculateAggregates(Statistics.usePolynomial(new DicePool('2d6')));
    expected = {minimum: 2, maximum: 12, mean: 7, standardDeviation: Math.sqrt(210 / 36)};  //reduced: 35/6
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}

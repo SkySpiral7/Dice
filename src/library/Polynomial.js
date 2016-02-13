@@ -89,7 +89,7 @@ function Polynomial(die)
    };
    this._constructor();
 }
-/**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: Infinity.*/
+/**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: -Infinity.*/
 function exponentDescending(a,b){return (b.exponent - a.exponent);}  //TODO: re: put somewhere else
 /*Example API:
 new Polynomial('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from string

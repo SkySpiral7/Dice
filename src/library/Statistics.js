@@ -33,10 +33,31 @@ Statistics.useBruteForce = function()
 Statistics.usePolynomial = function(dicePool)
 {
    //assert: no dice explode or drop
-   /*var finishedPolys = [], diceArray = dicePool.toJSON().diceArray;
-   for(var i = 0; i < diceArray.length; ++i){finishedPolys.push(new Polynomial(diceArray[i], 0));}
-   return Polynomial.multiplyPolynomials(finishedPolys, poolGiven);*/
+   var workingPolynomial, pool = dicePool.toJSON().pool;
+   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
+   {
+      for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
+      {
+         //dice are immutable so it's ok to reuse the same one
+         var newPolynomial = new Polynomial(pool[dieIndex].die);
+         if(undefined === workingPolynomial) workingPolynomial = newPolynomial;
+         else workingPolynomial.multiply(newPolynomial);
+      }
+   }
+   var finalTerms = workingPolynomial.toJSON().terms;
+   var result = [];
+   for (var i = 0; i < finalTerms.length; ++i)
+   {
+      //rename them to something meaningful
+      result.push({result: finalTerms[i].exponent, frequency: finalTerms[i].coefficient});
+   }
+   result.sort(resultAscending);
+   return result;
 };
+//TODO: re: test all sort orders
+/**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
+function resultAscending(a,b){return (a.result - b.result);}
+//TODO: re: actually put these on: Number, Poly, and Stats
 Statistics.useDroppingAlgorithm = function()
 {
 };
