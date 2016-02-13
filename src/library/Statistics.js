@@ -51,13 +51,12 @@ Statistics.usePolynomial = function(dicePool)
       //rename them to something meaningful
       result.push({result: finalTerms[i].exponent, frequency: finalTerms[i].coefficient});
    }
-   result.sort(resultAscending);
+   result.sort(Statistics.resultAscending);
    return result;
 };
 //TODO: re: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
-function resultAscending(a,b){return (a.result - b.result);}
-//TODO: re: actually put these on: Number, Poly, and Stats
+Statistics.resultAscending = function(a,b){return (a.result - b.result);};
 Statistics.useDroppingAlgorithm = function()
 {
 };

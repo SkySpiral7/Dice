@@ -140,7 +140,7 @@ DicePool.dropKeepTypes = {
       The ones closes to -Infinity will be removed.*/
       perform: function(dropCount, diceResults)
       {
-         diceResults.sort(numericAscending);
+         diceResults.sort(Number.ascending);
          for(var i = dropCount; i > 0; --i){diceResults.shift();}
       }
    },
@@ -152,7 +152,7 @@ DicePool.dropKeepTypes = {
       The ones closes to Infinity will be removed.*/
       perform: function(dropCount, diceResults)
       {
-         diceResults.sort(numericAscending);
+         diceResults.sort(Number.ascending);
          diceResults.reverse();
          for(var i = dropCount; i > 0; --i){diceResults.shift();}
       }
@@ -183,5 +183,3 @@ DicePool.dropKeepTypes = {
    }
 };
 //ignore for now: min/max, sorting
-/**Pass this into Array.prototype.sort for the order to be from -Infinity to Infinity.*/
-function numericAscending(a,b){return (a - b);}  //TODO: re: put somewhere else

@@ -53,7 +53,7 @@ function Polynomial(die)
          }
       }
       termArray.push(term);
-      termArray.sort(exponentDescending);  //TODO: is this needed?
+      termArray.sort(Polynomial.exponentDescending);  //TODO: is this needed?
    };
    /**@returns an object with all Polynomial data elements in it*/
    this.toJSON = function()
@@ -83,14 +83,14 @@ function Polynomial(die)
          //coefficient: number of ways to roll it (always starts as 1 without explosions etc)
          termArray.push({exponent: currentValue, coefficient: 1});
       }
-      termArray.sort(exponentDescending);
+      termArray.sort(Polynomial.exponentDescending);
 
       die = undefined;  //no longer needed
    };
    this._constructor();
 }
 /**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: -Infinity.*/
-function exponentDescending(a,b){return (b.exponent - a.exponent);}  //TODO: re: put somewhere else
+Polynomial.exponentDescending = function(a,b){return (b.exponent - a.exponent);}
 /*Example API:
 new Polynomial('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from string
 [

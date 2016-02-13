@@ -85,6 +85,8 @@ if (undefined === Math.summation)
       return total;
    };
 }
+/**Pass this into Array.prototype.sort for the order to be from -Infinity to Infinity.*/
+if(undefined === Number.ascending){Number.ascending = function(a,b){return (a - b);};}
 /**
 Polyfill for ECMAScript 2015 (6th Edition, ECMA-262)
 @returns {!boolean} true if input is a whole number that isn't Infinity or NaN
