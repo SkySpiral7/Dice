@@ -14,7 +14,7 @@ new DicePool('PoolName', [  //PoolName is optional. You may pass in only a singl
    areDiceNegative: false
 }
 ]);
-new DicePool({name: 'PoolName', diceArray: [
+new DicePool({name: 'PoolName', pool: [
 {
    die: new Die(),  //will roll the same object twice
    dieCount: 2,
@@ -26,7 +26,7 @@ new DicePool({name: 'PoolName', diceArray: [
 */
 function DicePool(arg1, arg2)
 {
-   var name, diceArray;
+   var name, pool;
 
    /**@returns {!number} the sum of this.roll()*/
    this.sumRoll = function(randomSource){return Math.summation(this.roll(randomSource));};
@@ -34,16 +34,16 @@ function DicePool(arg1, arg2)
    this.roll = function(randomSource)
    {
       var results = [];
-      for (var groupIndex = 0; groupIndex < diceArray.length; ++groupIndex)
+      for (var groupIndex = 0; groupIndex < pool.length; ++groupIndex)
       {
          var groupResults = [];
-         for (var dieIndex = 0; dieIndex < diceArray[groupIndex].dieCount; ++dieIndex)
+         for (var dieIndex = 0; dieIndex < pool[groupIndex].dieCount; ++dieIndex)
          {
-            groupResults = groupResults.concat(diceArray[groupIndex].die.roll(randomSource));
+            groupResults = groupResults.concat(pool[groupIndex].die.roll(randomSource));
          }
-         if(undefined !== diceArray[groupIndex].dropKeepType) diceArray[groupIndex].dropKeepType.
-            perform(diceArray[groupIndex].dropKeepCount, groupResults);
-         if (diceArray[groupIndex].areDiceNegative)  //the only valid truthy value is true
+         if(undefined !== pool[groupIndex].dropKeepType) pool[groupIndex].dropKeepType.
+            perform(pool[groupIndex].dropKeepCount, groupResults);
+         if (pool[groupIndex].areDiceNegative)  //the only valid truthy value is true
          {
             for (var groupResultIndex = 0; groupResultIndex < groupResults.length; ++groupResultIndex)
             {
@@ -62,7 +62,7 @@ function DicePool(arg1, arg2)
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
          'instanceof': 'DicePool',  //this is for a JSON reviver
          name: name,
-         diceArray: diceArray
+         pool: pool
       };
    };
    /**@returns true if other is equal to this.*/
@@ -76,13 +76,13 @@ function DicePool(arg1, arg2)
    /**You can't call this function. It is only used internally to create a DicePool object.*/
    this._constructor = function()
    {
-      if(undefined !== diceArray) throw new Error('Illegal access');
+      if(undefined !== pool) throw new Error('Illegal access');
 
       if(arg1 instanceof String) arg1 = arg1.valueOf();
       if('string' === typeof(arg1) && undefined == arg2) arg2 = DicePool._parseString(arg1);
-      else if (undefined == arg2 && undefined != arg1.diceArray)
+      else if (undefined == arg2 && undefined != arg1.pool)
       {
-         arg2 = arg1.diceArray;
+         arg2 = arg1.pool;
          arg1 = arg1.name;
       }
       else if (undefined == arg2)
@@ -94,7 +94,7 @@ function DicePool(arg1, arg2)
       //DicePool._validate(arg2);
 
       name = arg1;
-      diceArray = arg2;  //TODO: re: should I do a defense copy? Also in toJSON
+      pool = arg2;  //TODO: re: should I do a defense copy? Also in toJSON
 
       arg1 = undefined;  //no longer needed
       arg2 = undefined;

@@ -43,7 +43,7 @@ Tester.DicePool._constructor = function(isFirst)
 
    try{
    returned = new DicePool(new String('2d4')).toJSON();
-   expected = {'instanceof': 'DicePool', name: '2d4', diceArray: [
+   expected = {'instanceof': 'DicePool', name: '2d4', pool: [
       {
          die: new Die(4),
          dieCount: 2
@@ -55,7 +55,7 @@ Tester.DicePool._constructor = function(isFirst)
    try{
    returned = new DicePool('2d4').toJSON();
    returned = new DicePool(returned).toJSON();
-   expected = {'instanceof': 'DicePool', name: '2d4', diceArray: [
+   expected = {'instanceof': 'DicePool', name: '2d4', pool: [
       {
          die: new Die(4),
          dieCount: 2
@@ -66,15 +66,15 @@ Tester.DicePool._constructor = function(isFirst)
 
    try{
    returned = new DicePool('2d4').toJSON();
-   returned = new DicePool(returned.diceArray).toJSON();
-   expected = {'instanceof': 'DicePool', name: 'DicePool', diceArray: [
+   returned = new DicePool(returned.pool).toJSON();
+   expected = {'instanceof': 'DicePool', name: 'DicePool', pool: [
       {
          die: new Die(4),
          dieCount: 2
       }
    ]};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Allows diceArray'});
-   } catch(e){testResults.push({Error: e, Description: 'Allows diceArray'});}
+   testResults.push({Expected: expected, Actual: returned, Description: 'Allows pool'});
+   } catch(e){testResults.push({Error: e, Description: 'Allows pool'});}
 
    try{
    new DicePool('2d4')._constructor();
