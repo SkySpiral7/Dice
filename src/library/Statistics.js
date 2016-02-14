@@ -71,6 +71,8 @@ Statistics.useDroppingAlgorithm = function()
 */
 Statistics.determineProbability = function(stats)
 {
+   //TODO: re: add null safe validate
+   if(undefined != stats[0].probability) return;  //already done
    var sum = 0;
    for (var i = 0; i < stats.length; ++i)
    {
