@@ -1,7 +1,8 @@
 'use strict';
 var Statistics = {};
-Statistics.analyze = function()
+Statistics.analyze = function(dicePool)
 {
+   return Statistics.usePolynomial(dicePool);
    //if(no drop) use poly
    //else use new way
    //if(new way not implemented || any gaps) use brute force

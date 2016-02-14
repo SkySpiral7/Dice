@@ -9,11 +9,7 @@ function NonRandomNumberGenerator(numberArray)  //TODO: re: test it
 }
 function convertNonRandomDie(sides, numberArray)
 {
-   for (var i = 0; i < numberArray.length; ++i)
-   {
-      numberArray[i] = (numberArray[i] - 1) / sides;
-   }
-   return new NonRandomNumberGenerator(numberArray).generate;
+   return new NonRandomNumberGenerator(convertDiceResults(sides, numberArray)).generate;
 }
 function convertDiceResults(sides, numberArray)
 {

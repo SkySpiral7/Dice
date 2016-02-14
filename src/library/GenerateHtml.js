@@ -6,8 +6,9 @@ var GenerateHtml = {};
 {result: 2, frequency: 1},  //will be in this order (result ascending)
 ]
 */
-GenerateHtml.statistics = function()
+GenerateHtml.statistics = function(stats)
 {
+   return '';
 };
 GenerateHtml.aggregates = function(aggregate)
 {
@@ -17,8 +18,6 @@ GenerateHtml.aggregates = function(aggregate)
    out += '<br />\nMean: ' + aggregate.mean.toFixed(2);
    out += '<br />\nStandard Deviation: ' + aggregate.standardDeviation.toFixed(3);
    return out;
-   //document.getElementById('graphResults').innerHTML += GenerateHtml.aggregates(Statistics.calculateAggregates(Statistics.usePolynomial(new DicePool('2d6'))));
-   //TODO: re: needs helpers. not sure how many
 };
 GenerateHtml.compareStatistics = function()
 {

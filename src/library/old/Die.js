@@ -29,23 +29,6 @@ function Die(diceStringGiven, nameArray){
        else if(!isFudgeDie && constantModifier < 0) dieString+=constantModifier;  //fudge has a -1 but don't show that since it would be wrong
        return dieString;
    };
-   this.equals = function(otherDie){
-       if(!(otherDie instanceof Die)) return false;
-       if(isDieNegative!=otherDie.isDieNegative) return false;
-       if(doesUseZero!=otherDie.doesUseZero) return false;
-       if(isFudgeDie!=otherDie.isFudgeDie) return false;
-       if(sideCount!=otherDie.sideCount) return false;
-       if(doesExplode!=otherDie.doesExplode) return false;
-       if(doesPenetrate!=otherDie.doesPenetrate) return false;
-       if(doesCompoundExplode!=otherDie.doesCompoundExplode) return false;
-       if(rerollCriteria!=otherDie.rerollCriteria) return false;
-       if(explodeValue!=otherDie.explodeValue) return false;
-       if(constantModifier!=otherDie.constantModifier) return false;
-       //if(dieName!=otherDie.dieName) return false;  //do not compare these
-       if(nameArray.length!=otherDie.nameArray.length) return false;
-       for(var i=0; i < nameArray.length; i++) if(nameArray[i]!=otherDie.nameArray[i]) return false;  //note that it ignores object type
-       return true;
-   };
    this.getMaxValue = function(){  //TODO redoc and note that it assumes the sum
        if(rerollCriteria!=undefined && rerollCriteria.startsWith('>') && doesCompoundExplode) return (Number((/\d+$/).exec(rerollCriteria)[0])+constantModifier);  //reroll caps the Infinity
        if(doesExplode || doesCompoundExplode) return Infinity;  //doesExplode includes doesPenetrate; Infinity is a number
