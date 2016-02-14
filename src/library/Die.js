@@ -104,12 +104,13 @@ You should have no use for it although it isn't harmful to call.
 */
 Die._parseString = function(inputString)
 {
+   inputString = '' + inputString;  //enforces string type and is null safe
    var jsonResult = {name: inputString};
    var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy so that parse errors can use inputString
 
-   if((/^1[^\d%]/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
-   else if((/^0[^\d%]/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');
-   else if((/^[\d%]/).test(workingString)) throw new Error(inputString + '\ndie count (if provided) must be 1 (or -1). Otherwise use DicePool');
+   if((/^1(?:[^\d%]|$)/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
+   else if((/^0(?:[^\d%]|$)/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');
+   else if((/^[\d%]/).test(workingString)) throw new Error(inputString + '\ndie count (if provided) must be 1. Otherwise use DicePool');
 
    jsonResult.constantModifier = 0;
    if((/^z/).test(workingString)) jsonResult.constantModifier = -1;

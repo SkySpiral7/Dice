@@ -113,6 +113,7 @@ DicePool._parseString = function(inputString)
    var jsonResult = [];
    var workingString = inputString.toLowerCase().replace(/-/g, '+-');  //make copy so that parse errors can use inputString
    var groupStringArray = workingString.split('+');
+   if('-' === inputString.trim()[0]) groupStringArray.shift();  //leading negative causes first element to be empty
    for (var groupIndex = 0; groupIndex < groupStringArray.length; ++groupIndex)
    {
       var groupObject = {};

@@ -123,6 +123,18 @@ Tester.DicePool._parseString = function(isFirst)
    testResults.push({Expected: expected, Actual: returned, Description: 'Negative: d8-3d16'});
    } catch(e){testResults.push({Error: e, Description: 'Negative: d8-3d16'});}
 
+   try{
+   returned = DicePool._parseString('-d4');
+   expected = [
+      {
+         die: new Die(4),
+         dieCount: 1,
+         areDiceNegative: true
+      }
+   ];
+   testResults.push({Expected: expected, Actual: returned, Description: 'Negative: -d4'});
+   } catch(e){testResults.push({Error: e, Description: 'Negative: -d4'});}
+
    TesterUtility.displayResults('DicePool DicePool._parseString', testResults, isFirst);
 };
 Tester.DicePool.dropKeepTypes = function(isFirst)

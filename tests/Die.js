@@ -137,7 +137,7 @@ Tester.Die._parseString = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('10d3\ndie count (if provided) must be 1 (or -1). Otherwise use DicePool'), Actual: e, Description: '10 dice'});
+       testResults.push({Expected: new Error('10d3\ndie count (if provided) must be 1. Otherwise use DicePool'), Actual: e, Description: '10 dice'});
    }
 
    try{
@@ -146,7 +146,7 @@ Tester.Die._parseString = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('%d3\ndie count (if provided) must be 1 (or -1). Otherwise use DicePool'), Actual: e, Description: 'Hundred dice'});
+       testResults.push({Expected: new Error('%d3\ndie count (if provided) must be 1. Otherwise use DicePool'), Actual: e, Description: 'Hundred dice'});
    }
 
    try{
@@ -155,7 +155,7 @@ Tester.Die._parseString = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('1%d3\ndie count (if provided) must be 1 (or -1). Otherwise use DicePool'), Actual: e, Description: 'Thousand dice'});
+       testResults.push({Expected: new Error('1%d3\ndie count (if provided) must be 1. Otherwise use DicePool'), Actual: e, Description: 'Thousand dice'});
    }
 
    try{
@@ -165,6 +165,33 @@ Tester.Die._parseString = function(isFirst)
    catch(e)
    {
        testResults.push({Expected: new Error('1h3\nexpected "d" or "z". Found: h3'), Actual: e, Description: 'Non dz type'});
+   }
+
+   try{
+   Die._parseString('1');
+   TesterUtility.failedToThrow(testResults, 'Not enough info');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('1\nexpected "d" or "z". Found: '), Actual: e, Description: 'Not enough info'});
+   }
+
+   try{
+   Die._parseString('');
+   TesterUtility.failedToThrow(testResults, 'Empty arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('\nexpected "d" or "z". Found: '), Actual: e, Description: 'Empty arg'});
+   }
+
+   try{
+   Die._parseString();
+   TesterUtility.failedToThrow(testResults, 'No arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('undefined\nexpected "d" or "z". Found: undefined'), Actual: e, Description: 'No arg'});
    }
 
    try{
