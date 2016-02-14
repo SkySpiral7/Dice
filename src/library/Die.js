@@ -49,7 +49,7 @@ function Die(arg1)
             valueArray.push(valueRolled);
          }
       } while(needsValue);
-       return valueArray;
+      return valueArray;
    };
    /**@returns an object with all Die data elements in it. It can be passed into new Die()*/
    this.toJSON = function()
@@ -406,7 +406,7 @@ if maximum then explode until done
 if reroll then reroll
 if penetrating subtract 1
 
-TODO: re: error or warn about reroll penetrating
+TODO: re: error or warn about reroll penetrating (checks reroll before -1) also in Polynomial
 
 Define fudge:
 1d3-2 without rerolling or exploding

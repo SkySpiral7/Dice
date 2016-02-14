@@ -1,6 +1,6 @@
 'use strict';
 //mx^a. m: coefficient, x: variable (I won't use), a: exponent (must be a natural number), mx^a: term
-function Polynomial(die)
+function Polynomial(die, explodeCount)
 {
    var termArray;
 
@@ -73,19 +73,53 @@ function Polynomial(die)
       //TODO: re: consider creating from JSON and other ways
       //TODO: re: make Polynomial._validate
       die = die.toJSON();  //this is the only thing I need the die for
+      if(undefined === die.explodeType) explodeCount = 0;
       var minValue = 1 + die.constantModifier;
       var maxValue = die.sideCount + die.constantModifier;
-      for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
+      var runningPossibilities = 1;
+      for (var explodeIndex = 0; explodeIndex <= explodeCount; ++explodeIndex)
       {
-         if(undefined !== die.rerollCriteria && eval('' + currentValue + die.rerollCriteria)) continue;  //exclude reroll values
-         //http://mathforum.org/library/drmath/view/52207.html
-         //exponent: a possible thing to roll (eg 1 to sideCount)
-         //coefficient: number of ways to roll it (always starts as 1 without explosions etc)
-         termArray.push({exponent: currentValue, coefficient: 1});
+         var sidesPossible = 0, thisExplodeValues = [];
+         for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
+         {
+            if (undefined !== die.explodeType && explodeIndex < explodeCount && currentValue === maxValue)
+            {
+               //value explodes so it isn't a possibility unless we reach the explode limit
+               ++sidesPossible;  //increment because this does affect the runningPossibilities
+               continue;
+            }
+            var actualValue = currentValue;
+            if(Die.explodeTypes.Compound === die.explodeType) actualValue += (maxValue * explodeIndex);  //first time adds 0
+               //check for compound explode must be before reroll check and the other explodes after
+            if(undefined !== die.rerollCriteria && eval('' + actualValue + die.rerollCriteria)) continue;  //exclude reroll values
+            ++sidesPossible;
+            if(Die.explodeTypes.Normal === die.explodeType) actualValue += (maxValue * explodeIndex);  //I only care about the sum
+            else if(Die.explodeTypes.Penetrating === die.explodeType) actualValue += ((maxValue - 1) * explodeIndex);
+               //for penetrating explode every die after the first is 1 less
+               //then +1 because the first explode has full value then -1 for the last roll (so no action needed)
+               //explodeIndex: 0 will add 0 which is correct since the first die has full value
+
+            //http://mathforum.org/library/drmath/view/52207.html
+            //exponent: a possible sum to roll (eg 1 to sideCount)
+            //coefficient: number of ways to roll it (non-explode always starts as 1)
+            if(undefined === die.explodeType) termArray.push({exponent: actualValue, coefficient: 1});
+            else thisExplodeValues.push(actualValue);
+         }
+         if (undefined !== die.explodeType)
+         {
+            if(0 !== sidesPossible) runningPossibilities *= sidesPossible;  //leave as integers to maintain precision
+              //edge case: 1d4!!r<=3 enforces 1 explode so leave runningPossibilities as 1
+            for (var i = 0; i < thisExplodeValues.length; ++i)
+            {
+               //coefficient: probability to roll the sum
+               termArray.push({exponent: thisExplodeValues[i], coefficient: (1 / runningPossibilities)});
+            }
+         }
       }
       termArray.sort(Polynomial.exponentDescending);
 
       die = undefined;  //no longer needed
+      explodeCount = undefined;
    };
    this._constructor();
 }

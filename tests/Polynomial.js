@@ -38,6 +38,61 @@ Tester.Polynomial._constructor = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'd6r3'});
    } catch(e){testResults.push({Error: e, Description: 'd6r3'});}
 
+   try{
+   actual = new Polynomial(new Die('1d4!r3'), 0).toJSON().terms;
+   expected = [
+      {coefficient: (1/3), exponent: 1},
+      {coefficient: (1/3), exponent: 2},
+      //no 3
+      {coefficient: (1/3), exponent: 4}  //doesn't explode due to explode count 0
+   ];
+   expected.reverse();
+   testResults.push({Expected: expected, Actual: actual, Description: '1d4!r3 explode: 0'});
+   } catch(e){testResults.push({Error: e, Description: '1d4!r3 explode: 0'});}
+
+   try{
+   actual = new Polynomial(new Die('1d4!pr3'), 1).toJSON().terms;
+   expected = [
+      {coefficient: (1/3), exponent: 1},
+      {coefficient: (1/3), exponent: 2},
+      //no 3 (reroll) or 4 (explode)
+      {coefficient: ((1/3) * (1/3)), exponent: (4+1-1)},
+      {coefficient: ((1/3) * (1/3)), exponent: (4+2-1)},
+      //no 4+3-1 due to reroll
+      {coefficient: ((1/3) * (1/3)), exponent: (4+4-1)}  //doesn't explode again
+   ];
+   expected.reverse();
+   testResults.push({Expected: expected, Actual: actual, Description: '1d4!pr3 explode: 1'});
+   } catch(e){testResults.push({Error: e, Description: '1d4!pr3 explode: 1'});}
+
+   try{
+   actual = new Polynomial(new Die('1d4!!r3'), 1).toJSON().terms;
+   expected = [
+      {coefficient: (1/3), exponent: 1},
+      {coefficient: (1/3), exponent: 2},
+      //no 3 (reroll) or 4 (explode)
+      {coefficient: ((1/3) * (1/4)), exponent: (4+1)},
+      {coefficient: ((1/3) * (1/4)), exponent: (4+2)},
+      {coefficient: ((1/3) * (1/4)), exponent: (4+3)},  //doesn't reroll due to compound
+      {coefficient: ((1/3) * (1/4)), exponent: (4+4)}  //doesn't explode again
+   ];
+   expected.reverse();
+   testResults.push({Expected: expected, Actual: actual, Description: '1d4!!r3 explode: 1'});
+   } catch(e){testResults.push({Error: e, Description: '1d4!!r3 explode: 1'});}
+
+   try{
+   actual = new Polynomial(new Die('1d4!!r<=3'), 1).toJSON().terms;
+   expected = [
+      //no 1-3 (reroll) or 4 (explode)
+      {coefficient: (1/4), exponent: (4+1)},
+      {coefficient: (1/4), exponent: (4+2)},
+      {coefficient: (1/4), exponent: (4+3)},
+      {coefficient: (1/4), exponent: (4+4)}  //doesn't explode again
+   ];
+   expected.reverse();
+   testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: minimum compound explodes'});
+   } catch(e){testResults.push({Error: e, Description: 'Edge case: minimum compound explodes'});}
+
    TesterUtility.displayResults('Polynomial new Polynomial()._constructor()', testResults, isFirst);
 };
 Tester.Polynomial.addTerm = function(isFirst)

@@ -50,24 +50,49 @@ Polynomial.createDiePolynomial = function(dieObject, explodeCount){
     /*estimation of drops: 4d6k2 get 7
     1-P(1 pair not 7)^6 where 6 is Combination(4 trials pick 2)
     */
-    /*actual probability with reroll: 2d4!r3
-    1: 1/3
-    2: 1/3
-    4+: 1/3
-    5: 1/3
-    6: 1/3
-    8+: 1/3
-    for regular (and pen) Math.pow((1/sidesPossible), (explodeIndex+1)) works fine
-
-    actual probability with reroll: 2d4!!r3
-    1: 1/3
-    2: 1/3
-    4+: 1/3
-    5: 1/4
-    6: 1/4
-    7: 1/4
-    8+: 1/4
-    for compound it isn't so simple... the number that exists in this explosion times running total chance
-    */
 }
+/*actual probability with reroll: 1d4!r3
+1: 1/3
+2: 1/3
+3: 0
+4+: 1/3
+(4+1=5): 1/3 * 1/3
+(4+2=6): 1/3 * 1/3
+(4+3=7): 0 due to reroll 3
+(4+4=8)+: 1/3 * 1/3
+for normal Math.pow((1/sidesPossible), (explodeIndex+1)) works fine
+
+actual probability with reroll: 1d4!pr3
+1: 1/3
+2: 1/3
+3: 0
+4+: 1/3
+(4+1-1=4): 1/3 * 1/3
+(4+2-1=5): 1/3 * 1/3
+(4+3-1=6): 0 due to reroll 3
+(4+4-1=7)+: 1/3 * 1/3
+penetrating is the same as normal
+
+actual probability with reroll: 1d4!!r3
+1: 1/3
+2: 1/3
+3: 0
+4+: 1/3
+(4+1=5): 1/3 * 1/4
+(4+2=6): 1/3 * 1/4
+(4+3=7): 1/3 * 1/4
+(4+4=8)+: 1/3 * 1/4
+for compound it isn't so simple... (the number of possibilities that exists in this explosion) * (running total chance)
+
+actual probability with reroll: 1d4!!r<=3
+1: 0
+2: 0
+3: 0
+4+: 1
+(4+1=5): 1 * 1/4
+(4+2=6): 1 * 1/4
+(4+3=7): 1 * 1/4
+(4+4=8)+: 1 * 1/4
+edge case: if(the number of possibilities that exists in this explosion is 0) then don't change the running chance
+*/
 //old Polynomial.multiplyPolynomials had min/max
