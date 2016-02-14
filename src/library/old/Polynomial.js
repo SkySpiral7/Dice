@@ -70,47 +70,4 @@ Polynomial.createDiePolynomial = function(dieObject, explodeCount){
     for compound it isn't so simple... the number that exists in this explosion times running total chance
     */
 }
-
-Polynomial.multiplyPolynomials = function(polyNomGiven, myPool){
-    if(myPool==undefined) myPool=new DicePool();  //empty pool
-    var polyNom=polyNomGiven.slice(0);  //clone to avoid changing original
-    var results=polyNom[0];
-    polyNom.shift();
-   while (polyNom.length!=0)
-   {
-       var newPoly=[];
-       var nextPoly=polyNom[0];
-
-       //if(poolInfo is drop/keep) then ignore lower of i or j only on first pass of each poly
-          //that's not true. the lowest depends on all dice and thus affects every final sum differently
-      for (var i=0; i < results.length; i++)
-      for (var j=0; j < nextPoly.length; j++)
-      {
-          var newValue=results[i][0]+nextPoly[j][0];  //Ax^B this is B
-          var newFreq=results[i][1]*nextPoly[j][1];  //Ax^B this is A
-          Polynomial.addPolynomials(newPoly, newValue, newFreq);
-      }
-       results=newPoly;
-       polyNom.shift();
-   }
-    //I do not need to sort since they are still in ascending order from creation to here
-    return combineResults(results, myPool);  //number array
-   function combineResults(results, myPool){
-       var newData=[];
-      for (var i=0; i < results.length; i++)
-      {
-          if(results[i][1]==0) continue;  //not possible to roll
-          var modifiedValue=(results[i][0]+myPool.getStats().constantModifier);
-          modifiedValue=myPool.getStats().outsource.minMaxDoing(modifiedValue);
-          Polynomial.addPolynomials(newData, modifiedValue, results[i][1]);  //[value, freq] need to use this in case of min/max
-      }
-       //now all the data has been updated with the totalModifier and min/max
-       return newData;
-   }
-}
-Polynomial.addPolynomials = function(poly, value, freq){
-   for(var i = 0; i < poly.length; i++){
-       if(poly[i][0] == value){poly[i][1]+=freq; return;}  //sum exists so increase freq
-   }
-    poly.push([value, freq]);  //sum is new. the sums are done in order ascending so that when pushed they are still in order
-}
+//old Polynomial.multiplyPolynomials had min/max

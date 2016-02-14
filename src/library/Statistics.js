@@ -12,14 +12,6 @@ Statistics.analyze('2d6'):  //I might not support a string argument
 [
 //will not include frequency: 0
 {result: 2, frequency: 1},  //will be in this order (result ascending)
-{result: 3, frequency: 2},
-{result: 4, frequency: 3},
-{result: 5, frequency: 4},
-{result: 6, frequency: 5},
-{result: 7, frequency: 6},
-{result: 8, frequency: 5},
-{result: 9, frequency: 4},
-{result: 10, frequency: 3},
 {result: 11, frequency: 2},
 {result: 12, frequency: 1}
 ] if possible, else:
@@ -126,6 +118,9 @@ Statistics.calculateAggregates = function(stats)
    return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
       minimum: min, maximum: max, mean: mean, standardDeviation: standardDeviation
    };
-};
 /*Unused shorter formula for mean:
 For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 which has no mean*/
+};
+Statistics.compareStatistics = function(stats1, stats2)
+{
+};

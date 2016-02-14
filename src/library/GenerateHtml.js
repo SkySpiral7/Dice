@@ -1,11 +1,5 @@
 'use strict';
 var GenerateHtml = {};
-/*
-[
-//will not include frequency: 0
-{result: 2, frequency: 1},  //will be in this order (result ascending)
-]
-*/
 GenerateHtml.statistics = function(stats, secondColumn)
 {
    //TODO: re: validate
@@ -14,13 +8,13 @@ GenerateHtml.statistics = function(stats, secondColumn)
    var maxProbability = -Infinity;
    var usesFreq = (undefined != stats[0].frequency);
 
-   for (var i = 0; i < stats.length; ++i)
+   for (var currentIndex = 0; currentIndex < stats.length; ++currentIndex)
    {
-      if(stats[i].probability > maxProbability) maxProbability = stats[i].probability;
+      if(stats[currentIndex].probability > maxProbability) maxProbability = stats[currentIndex].probability;
       var secondSum = 0;
-      for (var j = 0; j < stats.length; ++j)
+      for (var potentialIndex = 0; potentialIndex < stats.length; ++potentialIndex)
       {
-         if(eval('' + stats[j].result + secondColumn + stats[i].result)) secondSum += stats[j].probability;
+         if(eval('' + stats[potentialIndex].result + secondColumn + stats[currentIndex].result)) secondSum += stats[potentialIndex].probability;
       }
       if(secondSum > 1) secondSum = 1;  //correct rounding error: can't have more than 100%
       secondValues.push(secondSum);
@@ -60,6 +54,7 @@ GenerateHtml.aggregates = function(aggregate)
    out += '<br />\nStandard Deviation: ' + aggregate.standardDeviation.toFixed(3);
    return out;
 };
-GenerateHtml.compareStatistics = function()
+GenerateHtml.compareStatistics = function(diffStats)
 {
+   return '';
 };
