@@ -113,6 +113,8 @@ function Polynomial(die, explodeCount)
             {
                //coefficient: probability to roll the sum
                termArray.push({exponent: thisExplodeValues[i], coefficient: (1 / runningPossibilities)});
+               //formula for coefficient of non-compound explode: Math.pow((1/sidesPossible), (explodeIndex+1))
+                  //unused because the algorithm for compound works for all
             }
          }
       }

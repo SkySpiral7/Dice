@@ -183,3 +183,5 @@ DicePool.dropKeepTypes = {
    }
 };
 //ignore for now: min/max, sorting
+//old Polynomial.createDiePolynomial had negative and ScatterDie
+//old Polynomial.multiplyPolynomials had min/max
