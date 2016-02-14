@@ -79,6 +79,16 @@ Tester.Statistics.usePolynomial = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
+   try{
+   actual = Statistics.usePolynomial(new DicePool('-d3'));
+   expected = [
+      {result: -3, frequency: 1},
+      {result: -2, frequency: 1},
+      {result: -1, frequency: 1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
+   } catch(e){testResults.push({Error: e, Description: '-d3'});}
+
    TesterUtility.displayResults('Statistics Statistics.usePolynomial', testResults, isFirst);
 };
 Tester.Statistics.determineProbability = function(isFirst)

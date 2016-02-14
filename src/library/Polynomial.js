@@ -28,8 +28,11 @@ function Polynomial(die, explodeCount)
          }
       }
    };
-   this.negate = function()
+   /**All exponents are multiplied by -1. Doesn't change any coefficients.*/
+   this.negateExponents = function()
    {
+      for(var i = 0; i < termArray.length; ++i){termArray[i].exponent *= -1;}
+      termArray.reverse();  //works in this case
    };
    /**
    This function lets you add a term to this Polynomial (this Polynomial is mutated to be the result).

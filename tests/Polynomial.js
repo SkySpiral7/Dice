@@ -173,6 +173,27 @@ Tester.Polynomial.addTerm = function(isFirst)
 
    TesterUtility.displayResults('Polynomial new Polynomial().addTerm()', testResults, isFirst);
 };
+Tester.Polynomial.negateExponents = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], polynomial, actual, expected;
+
+   try{
+   polynomial = new Polynomial(new Die('d3'));
+   polynomial.addTerm({coefficient: 1, exponent: 2});
+   polynomial.negateExponents();
+   actual = polynomial.toJSON().terms;
+   expected = [
+      {coefficient: 1, exponent: -1},
+      {coefficient: 2, exponent: -2},
+      {coefficient: 1, exponent: -3}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Negate exponents of (d3 + x^2)'});
+   } catch(e){testResults.push({Error: e, Description: 'Negate exponents of (d3 + x^2)'});}
+
+   TesterUtility.displayResults('Polynomial new Polynomial().negateExponents()', testResults, isFirst);
+};
 Tester.Polynomial.multiply = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);

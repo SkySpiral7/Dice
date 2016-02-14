@@ -35,7 +35,7 @@ Statistics.useBruteForce = function()
 };
 /**
 Returns the statistics for a given DicePool using a Polynomial based algorithm.
-The algorithm is faster than brute force but doesn't support negative dice (yet) or drop/keep (ever).
+The algorithm is faster than brute force but can't support drop/keep.
 @param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
 */
 Statistics.usePolynomial = function(dicePool, explodeCount)
@@ -46,9 +46,12 @@ Statistics.usePolynomial = function(dicePool, explodeCount)
    {
       for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
       {
+         hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
+
          //dice are immutable so it's ok to reuse the same one
          var newPolynomial = new Polynomial(pool[dieIndex].die, explodeCount);
-         hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
+         if(pool[dieIndex].areDiceNegative) newPolynomial.negateExponents();
+
          if(undefined === workingPolynomial) workingPolynomial = newPolynomial;
          else workingPolynomial.multiply(newPolynomial);
       }
