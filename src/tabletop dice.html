@@ -362,13 +362,13 @@ alphaNumAscending(a, b), alphaNumDescending(a, b) and sumAscending(a,b)
     these are the functions used for sorting internally with alphaNumAscending being ascending and alphaNumDescending being descending
     alphaNumAscending and alphaNumDescending are used for some DicePool functions and for numberGroup sorting. sumAscending is used for drawing functions
     Array.sort(alphaNumAscending).reverse()!=Array.sort(alphaNumDescending) which is why there are separate functions. although sumAscending can be reversed correctly
-    <script>document.write(sumAscending);</script>  //entire code. [0] is the sum and [1] is the freq/chance. see Polynomial.createDiePolynomial for details
+    <script>/*document.write(sumAscending);*/</script>  //entire code. [0] is the sum and [1] is the freq/chance. see Polynomial.createDiePolynomial for details
     alphaNumAscending and alphaNumDescending split the array into 2 sections as described in the basic description sorting section
     the numbers are always first (in either ascending or descending order) which is why one is not the reverse of the other
     the numbers are subtracted and the others are compared with &lt; and &gt;
 
-<script>document.write(NamedDie);</script>  //alias/ short cut
-<script>document.write(NamedDicePool);</script>  //alias/ short cut
+<script>/*document.write(NamedDie);*/</script>  //alias/ short cut
+<script>/*document.write(NamedDicePool);*/</script>  //alias/ short cut
 
 rollDice(holder, nameArray) or rollDice(holder, firstName, secondName, ...)
     if there are more than 2 arguments it first converts the list of arguments into an array
@@ -379,16 +379,16 @@ silentRollDice(holder, nameArray) or silentRollDice(holder, firstName, secondNam
     then it returns the sum of a roll with the dice specified
     full code: return new DicePool(holder, argumentsToArray(arguments, 1)).sumRoll(Silent);
 
-<script>document.write(FudgeDie);</script>  //alias
-<script>document.write(StandardCoin);</script>  //alias
-<script>document.write(Coin);</script>
+<script>/*document.write(FudgeDie);*/</script>  //alias
+<script>/*document.write(StandardCoin);*/</script>  //alias
+<script>/*document.write(Coin);*/</script>
 Spinner = NamedDie;  //alias
 MagicEightBall()  //short cut
     returns a NamedDie with the 20 Magic Eight Ball answers (see above)
-<script>document.write(AskMagicEightBall);</script>  //shorthand
+<script>/*document.write(AskMagicEightBall);*/</script>  //shorthand
 TwisterSpinner()  //short cut
     returns a NamedDie with the 16 Twister Spinner choices (see above)
-<script>document.write(SpinTwisterSpinner);</script>  //shorthand. note: spin === roll
+<script>/*document.write(SpinTwisterSpinner);*/</script>  //shorthand. note: spin === roll
 ScatterDie(alwaysScatter)
     Scatter Dice have a 1/3 change to be a direct hit and otherwise will scatter in a random direction
     if alwaysScatter is true then the 1/3 change of direct hit is ignored and will always scatter in a random direction

@@ -30,6 +30,10 @@ Statistics.analyze('2d6'):  //I might not support a string argument
 Statistics.useBruteForce = function()
 {
 };
+/**
+Returns the statistics for a given DicePool using a Polynomial based algorithm.
+The algorithm is faster than brute force but doesn't support exploding (yet) or drop/keep (ever).
+*/
 Statistics.usePolynomial = function(dicePool)
 {
    //assert: no dice explode or drop
@@ -62,7 +66,7 @@ Statistics.useDroppingAlgorithm = function()
 };
 /**
 @param {object[]} stats created from a Statistics function that uses frequency
-@returns undefined. after: same object will also have probability
+@returns {undefined} after: stats will also have probability
 */
 Statistics.determineProbability = function(stats)
 {
@@ -121,5 +125,4 @@ Statistics.calculateAggregates = function(stats)
    };
 };
 /*Unused shorter formula for mean:
-For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 which has no mean
-*/
+For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 which has no mean*/
