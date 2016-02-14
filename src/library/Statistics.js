@@ -1,42 +1,54 @@
 'use strict';
 var Statistics = {};
+/**
+This function analyzes the dicePool given and returns the result of the best possible algorithm.
+@returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).
+It will not include frequency of 0 or probability of less than 0.00000 (5) and will be in result ascending order.
+*/
 Statistics.analyze = function(dicePool)
 {
-   return Statistics.usePolynomial(dicePool);
-   //if(no drop) use poly
-   //else use new way
-   //if(new way not implemented || any gaps) use brute force
+   var pool = dicePool.toJSON().pool, hasExplosions = false, hasDropKeep = false;
+   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
+   {
+      hasDropKeep |= (undefined !== pool[dieIndex].dropKeepType);
+      hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
+      if(hasExplosions && hasDropKeep) break;  //no more information to find
+   }
+   if(hasDropKeep) throw new Error('Drop/keep not yet supported');  //useBruteForce then useDroppingAlgorithm
+   //TODO: re: later optimize so that all non-drop usePolynomial drops useDroppingAlgorithm and combine results
+   if(!hasExplosions) return Statistics.usePolynomial(dicePool, 0);
+   //if(hasExplosions):
+   var stats = [], explodeCount = 0;
+   do
+   {
+      stats = Statistics.usePolynomial(dicePool, explodeCount);
+      ++explodeCount;
+      //the only way for stats to be empty is if the explodeCount < the minimum number of explodes enforced by reroll
+      //when the percent would be < 0.000% then stop
+   } while(0 === stats.length || 0 !== Number(stats.last().probability.toFixed(5)));
+   //TODO: re: this seems intensive for large pools. consider pushing 0% check down to Polynomial
+   return stats;
+   //if any gaps then useBruteForce
 };
-/*Example API:
-Statistics.analyze('2d6'):  //I might not support a string argument
-[
-//will not include frequency: 0
-{result: 2, frequency: 1},  //will be in this order (result ascending)
-{result: 11, frequency: 2},
-{result: 12, frequency: 1}
-] if possible, else:
-[
-//will not include probability of 0.0000 or less
-{result: 12, probability: (1/36)}
-]
-*/
 Statistics.useBruteForce = function()
 {
 };
 /**
 Returns the statistics for a given DicePool using a Polynomial based algorithm.
-The algorithm is faster than brute force but doesn't support exploding (yet) or drop/keep (ever).
+The algorithm is faster than brute force but doesn't support negative dice (yet) or drop/keep (ever).
+@param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
 */
-Statistics.usePolynomial = function(dicePool)
+Statistics.usePolynomial = function(dicePool, explodeCount)
 {
-   //assert: no dice explode or drop
-   var workingPolynomial, pool = dicePool.toJSON().pool;
+   //assert: no drop/keep
+   var workingPolynomial, pool = dicePool.toJSON().pool, hasExplosions = false;
    for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
    {
       for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
       {
          //dice are immutable so it's ok to reuse the same one
-         var newPolynomial = new Polynomial(pool[dieIndex].die);
+         var newPolynomial = new Polynomial(pool[dieIndex].die, explodeCount);
+         hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
          if(undefined === workingPolynomial) workingPolynomial = newPolynomial;
          else workingPolynomial.multiply(newPolynomial);
       }
@@ -46,7 +58,8 @@ Statistics.usePolynomial = function(dicePool)
    for (var i = 0; i < finalTerms.length; ++i)
    {
       //rename them to something meaningful
-      result.push({result: finalTerms[i].exponent, frequency: finalTerms[i].coefficient});
+      if(hasExplosions) result.push({result: finalTerms[i].exponent, probability: finalTerms[i].coefficient});
+      else result.push({result: finalTerms[i].exponent, frequency: finalTerms[i].coefficient});
    }
    result.sort(Statistics.resultAscending);
    return result;

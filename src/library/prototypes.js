@@ -4,6 +4,8 @@
 @returns {!boolean} true if the element exists in this array (using ===)
 */
 if(undefined === Array.prototype.contains){Array.prototype.contains = function(element){return (-1 !== this.indexOf(element));};}
+/**@returns the last element of this array or undefined if this array is empty*/
+if(undefined === Array.prototype.last){Array.prototype.last = function(){return this[this.length - 1];};}
 /**
 @param {!number} index at which the element is located that should be removed
 @returns the removed element

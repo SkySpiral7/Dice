@@ -12,6 +12,18 @@ Tester.prototypes.Array.contains = function(isFirst)
 
    TesterUtility.displayResults('prototypes Array.prototype.contains', testResults, isFirst);
 };
+Tester.prototypes.Array.last = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: 'c', Actual: ['a', 'b', 'c'].last(), Description: 'Happy path'});
+   testResults.push({Expected: undefined, Actual: [].last(), Description: 'Empty array'});
+   testResults.push({Expected: undefined, Actual: ['a', 'b', 'c',,,,].last(), Description: 'Last is undefined'});
+   //var a = []; a[-1] = 5; a.last() is undefined behavior
+
+   TesterUtility.displayResults('prototypes Array.prototype.last', testResults, isFirst);
+};
 Tester.prototypes.Array.removeByIndex = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);

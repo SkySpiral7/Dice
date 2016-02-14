@@ -1,5 +1,48 @@
 'use strict';
 Tester.Statistics = {};
+Tester.Statistics.analyze = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], dicePool, actual, expected;
+
+   try{
+   dicePool = new DicePool('2d6');
+   actual = Statistics.analyze(dicePool);
+   expected = Statistics.usePolynomial(dicePool, 0);
+   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
+   } catch(e){testResults.push({Error: e, Description: '2d6'});}
+
+   try{
+   //1d2! is the smallest output for explode
+   //also being a power of 2 means better accuracy (perfect until converting to base 10 string)
+   actual = Statistics.analyze(new DicePool('1d2!'));
+   expected = [
+      {result: 1, probability: (1/2)},
+      {result: 3, probability: Math.pow((1/2), 2)},
+      {result: 5, probability: Math.pow((1/2), 3)},
+      {result: 7, probability: Math.pow((1/2), 4)},
+      {result: 9, probability: Math.pow((1/2), 5)},
+      {result: 11, probability: Math.pow((1/2), 6)},
+      {result: 13, probability: Math.pow((1/2), 7)},
+      {result: 15, probability: Math.pow((1/2), 8)},
+      {result: 17, probability: Math.pow((1/2), 9)},
+      {result: 19, probability: Math.pow((1/2), 10)},
+      {result: 21, probability: Math.pow((1/2), 11)},
+      {result: 23, probability: Math.pow((1/2), 12)},
+      {result: 25, probability: Math.pow((1/2), 13)},
+      {result: 27, probability: Math.pow((1/2), 14)},
+      {result: 29, probability: Math.pow((1/2), 15)},
+      {result: 31, probability: Math.pow((1/2), 16)},  //0.0000152587890625
+      {result: 33, probability: Math.pow((1/2), 17)},  //toFixed rounds 0.00000762939453125 up to 0.00001
+      {result: 35, probability: Math.pow((1/2), 18)},  //this can't be the last one because it isn't divisible by 2
+      {result: 36, probability: Math.pow((1/2), 18)}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '1d2!'});
+   } catch(e){testResults.push({Error: e, Description: '1d2!'});}
+
+   TesterUtility.displayResults('Statistics Statistics.analyze', testResults, isFirst);
+};
 Tester.Statistics.usePolynomial = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -23,6 +66,18 @@ Tester.Statistics.usePolynomial = function(isFirst)
    ];
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
+
+   try{
+   actual = Statistics.usePolynomial(new DicePool('1d3!'), 1);
+   expected = [
+      {result: 1, probability: (1/3)},
+      {result: 2, probability: (1/3)},
+      {result: (3+1), probability: ((1/3) * (1/3))},
+      {result: (3+2), probability: ((1/3) * (1/3))},
+      {result: (3+3), probability: ((1/3) * (1/3))}  //doesn't explode again
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
+   } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
    TesterUtility.displayResults('Statistics Statistics.usePolynomial', testResults, isFirst);
 };
