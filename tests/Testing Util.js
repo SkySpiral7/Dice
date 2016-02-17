@@ -1,5 +1,5 @@
 'use strict';
-function convertDiceResults(sides, numberArray)
+function dieResultsToNonRandomArray(sides, numberArray)
 {
    for (var i = 0; i < numberArray.length; ++i)
    {
@@ -7,13 +7,13 @@ function convertDiceResults(sides, numberArray)
    }
    return numberArray;
 }
-function convertNonRandomDie(sides, numberArray)
+function dieResultsToNonRandomGenerator(sides, numberArray)
 {
-   return new NonRandomNumberGenerator(convertDiceResults(sides, numberArray)).generate;
+   return nonRandomNumberGenerator(dieResultsToNonRandomArray(sides, numberArray));
 }
-function NonRandomNumberGenerator(numberArray)  //TODO: re: test it
+function nonRandomNumberGenerator(numberArray)  //TODO: re: test it
 {
-   this.generate = function()
+   return function()
    {
       if(0 === numberArray.length) throw new Error('Ran out of numbers');
       return numberArray.shift();

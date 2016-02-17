@@ -19,24 +19,24 @@ Tester.Statistics.analyze = function(isFirst)
    actual = Statistics.analyze(new DicePool('1d2!'));
    expected = [
       {result: 1, probability: (1/2)},
-      {result: 3, probability: Math.pow((1/2), 2)},
-      {result: 5, probability: Math.pow((1/2), 3)},
-      {result: 7, probability: Math.pow((1/2), 4)},
-      {result: 9, probability: Math.pow((1/2), 5)},
-      {result: 11, probability: Math.pow((1/2), 6)},
-      {result: 13, probability: Math.pow((1/2), 7)},
-      {result: 15, probability: Math.pow((1/2), 8)},
-      {result: 17, probability: Math.pow((1/2), 9)},
-      {result: 19, probability: Math.pow((1/2), 10)},
-      {result: 21, probability: Math.pow((1/2), 11)},
-      {result: 23, probability: Math.pow((1/2), 12)},
-      {result: 25, probability: Math.pow((1/2), 13)},
-      {result: 27, probability: Math.pow((1/2), 14)},
-      {result: 29, probability: Math.pow((1/2), 15)},
-      {result: 31, probability: Math.pow((1/2), 16)},  //0.0000152587890625
-      {result: 33, probability: Math.pow((1/2), 17)},  //toFixed rounds 0.00000762939453125 up to 0.00001
-      {result: 35, probability: Math.pow((1/2), 18)},  //this can't be the last one because it isn't divisible by 2
-      {result: 36, probability: Math.pow((1/2), 18)}
+      {result: (2+1), probability: Math.pow((1/2), 2)},
+      {result: (2*2+1), probability: Math.pow((1/2), 3)},
+      {result: (2*3+1), probability: Math.pow((1/2), 4)},
+      {result: (2*4+1), probability: Math.pow((1/2), 5)},
+      {result: (2*5+1), probability: Math.pow((1/2), 6)},
+      {result: (2*6+1), probability: Math.pow((1/2), 7)},
+      {result: (2*7+1), probability: Math.pow((1/2), 8)},
+      {result: (2*8+1), probability: Math.pow((1/2), 9)},
+      {result: (2*9+1), probability: Math.pow((1/2), 10)},
+      {result: (2*10+1), probability: Math.pow((1/2), 11)},
+      {result: (2*11+1), probability: Math.pow((1/2), 12)},
+      {result: (2*12+1), probability: Math.pow((1/2), 13)},
+      {result: (2*13+1), probability: Math.pow((1/2), 14)},
+      {result: (2*14+1), probability: Math.pow((1/2), 15)},
+      {result: (2*15+1), probability: Math.pow((1/2), 16)},  //0.0000152587890625
+      {result: (2*16+1), probability: Math.pow((1/2), 17)},  //toFixed rounds 0.00000762939453125 up to 0.00001
+      {result: (2*17+1), probability: Math.pow((1/2), 18)},  //this can't be the last one because it isn't divisible by 2
+      {result: (2*18), probability: Math.pow((1/2), 18)}  //toFixed rounds 0.000003814697265625 down to 0.00000
    ];
    testResults.push({Expected: expected, Actual: actual, Description: '1d2!'});
    } catch(e){testResults.push({Error: e, Description: '1d2!'});}

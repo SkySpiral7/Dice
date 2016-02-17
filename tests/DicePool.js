@@ -7,21 +7,21 @@ Tester.DicePool.roll = function(isFirst)
    var testResults = [], actual, nonRandomNumbers;
 
    try{
-   nonRandomNumbers = convertDiceResults(8, [5, 8]);
-   nonRandomNumbers = nonRandomNumbers.concat(convertDiceResults(16, [12, 16]));
-   actual = new DicePool('2d8+2d16').roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
+   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
+   nonRandomNumbers = nonRandomNumbers.concat(dieResultsToNonRandomArray(16, [12, 16]));
+   actual = new DicePool('2d8+2d16').roll(nonRandomNumberGenerator(nonRandomNumbers));
    testResults.push({Expected: [5, 8, 12, 16], Actual: actual, Description: 'Happy path 2d8+2d16'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
 
    try{
-   nonRandomNumbers = convertDiceResults(8, [5, 8]);
-   nonRandomNumbers = nonRandomNumbers.concat(convertDiceResults(16, [12, 16]));
-   actual = new DicePool('2d8-2d16').roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
+   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
+   nonRandomNumbers = nonRandomNumbers.concat(dieResultsToNonRandomArray(16, [12, 16]));
+   actual = new DicePool('2d8-2d16').roll(nonRandomNumberGenerator(nonRandomNumbers));
    testResults.push({Expected: [5, 8, -12, -16], Actual: actual, Description: 'Negative 2d8-2d16'});
    } catch(e){testResults.push({Error: e, Description: 'Negative 2d8-2d16'});}
 
    try{
-   nonRandomNumbers = convertDiceResults(8, [5, 8]);
+   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
    actual = new DicePool('2d8d1', [
       {
          die: new Die(8),
@@ -29,7 +29,7 @@ Tester.DicePool.roll = function(isFirst)
          dropKeepType: DicePool.dropKeepTypes.DropLowest,
          dropKeepCount: 1
       }
-   ]).roll(new NonRandomNumberGenerator(nonRandomNumbers).generate);
+   ]).roll(nonRandomNumberGenerator(nonRandomNumbers));
    testResults.push({Expected: [8], Actual: actual, Description: 'Hooked up to drop/keep'});
    } catch(e){testResults.push({Error: e, Description: 'Hooked up to drop/keep'});}
 

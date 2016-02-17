@@ -107,7 +107,7 @@ function DicePool(arg1, arg2)
    this._constructor();
 }
 /**This is an enum and strategy pattern.*/
-DicePool.dropKeepTypes = {  //TODO: re: here and elsewhere. = doesn't need brace on same line
+DicePool.dropKeepTypes = {
    DropLowest:
    {
       toString: function(){return '{DropLowest}';},
