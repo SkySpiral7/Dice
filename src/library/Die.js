@@ -10,6 +10,13 @@ function Die(arg1)
 {
    var name, sideCount, constantModifier, isFudgeDie, rerollCriteria, explodeType;
 
+   /**@returns true if other is equal to this.*/
+   this.equals = function(other)
+   {
+      if(!(other instanceof Die)) return false;
+      if(this === other) return true;
+      return (JSON.stringify(this) === JSON.stringify(other));
+   };
    /**
    @param {?function} randomSource a function that returns a random number between 0 inclusive and 1 exclusive.
    If not provided Math.random will be used.
@@ -64,13 +71,6 @@ function Die(arg1)
          explodeType: explodeType
       };
    };
-   /**@returns true if other is equal to this.*/
-   this.equals = function(other)
-   {
-      if(!(other instanceof Die)) return false;
-      if(this === other) return true;
-      return (JSON.stringify(this) === JSON.stringify(other));
-   };
 
    /**You can't call this function. It is only used internally to create a Die object.*/
    this._constructor = function()
@@ -96,6 +96,54 @@ function Die(arg1)
    };
    this._constructor();
 }
+/**This is an enum since Symbols aren't well supported enough yet.*/
+Die.explodeTypes = {
+   Compound: {toString: function(){return '{Compound}';}, toJSON: function(){return '{Compound}';}},
+   Normal: {toString: function(){return '{Normal}';}, toJSON: function(){return '{Normal}';}},
+   Penetrating: {toString: function(){return '{Penetrating}';}, toJSON: function(){return '{Penetrating}';}}
+};
+/**
+This function is used in the constructor of Die. It modifies input to reduce or eliminate reroll without
+changing functionality. So that less rolls occur when calling die.roll().
+You should have no use for it although it isn't harmful to call. It assumes input has been validated.
+@param {!object} input which might be modified (anything except name and isFudgeDie may be touched)
+*/
+Die._optimizeReroll = function(input)
+{
+   var minValue = 1 + input.constantModifier;
+   var maxValue = input.sideCount + input.constantModifier;
+   var rerollValue = Number.parseInt((/-?\d+$/).exec(input.rerollCriteria)[0]);
+
+   if (input.rerollCriteria.startsWith('!=='))
+   {
+      //not much of a die anymore but this is what you asked for
+      //this is the most optimized of all
+      input.sideCount = 1;
+      delete input.explodeType;
+      delete input.rerollCriteria;
+
+      input.constantModifier = rerollValue - 1;  //-1 because the sideCount always adds 1
+      return;
+   }
+
+   if(undefined !== input.explodeType && input.rerollCriteria.startsWith('===')) return;  //TODO: re: might optimize later
+   if (('===' + minValue) === input.rerollCriteria)
+   {
+      --input.sideCount;
+      ++input.constantModifier;
+      delete input.rerollCriteria;
+      return;
+   }
+   if (('===' + maxValue) === input.rerollCriteria)
+   {
+      --input.sideCount;
+      delete input.rerollCriteria;
+      return;
+   }
+   if(input.rerollCriteria.startsWith('===')) return;  //otherwise only possible to optimize with a white list
+
+   //TODO: re: more _optimizeReroll. See old
+};
 /**
 This function is used in the constructor of Die. It parses the inputString into an object.
 You should have no use for it although it isn't harmful to call.
@@ -350,54 +398,6 @@ Die._validateReroll = function(input)
          rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier
       }));
    }
-};
-/**
-This function is used in the constructor of Die. It modifies input to reduce or eliminate reroll without
-changing functionality. So that less rolls occur when calling die.roll().
-You should have no use for it although it isn't harmful to call.
-@param {!object} input which might be modified (anything except name and isFudgeDie may be touched)
-*/
-Die._optimizeReroll = function(input)
-{
-   var minValue = 1 + input.constantModifier;
-   var maxValue = input.sideCount + input.constantModifier;
-   var rerollValue = Number.parseInt((/-?\d+$/).exec(input.rerollCriteria)[0]);
-
-   if (input.rerollCriteria.startsWith('!=='))
-   {
-      //not much of a die anymore but this is what you asked for
-      //this is the most optimized of all
-      input.sideCount = 1;
-      delete input.explodeType;
-      delete input.rerollCriteria;
-
-      input.constantModifier = rerollValue - 1;  //-1 because the sideCount always adds 1
-      return;
-   }
-
-   if(undefined !== input.explodeType && input.rerollCriteria.startsWith('===')) return;  //TODO: re: might optimize later
-   if (('===' + minValue) === input.rerollCriteria)
-   {
-      --input.sideCount;
-      ++input.constantModifier;
-      delete input.rerollCriteria;
-      return;
-   }
-   if (('===' + maxValue) === input.rerollCriteria)
-   {
-      --input.sideCount;
-      delete input.rerollCriteria;
-      return;
-   }
-   if(input.rerollCriteria.startsWith('===')) return;  //otherwise only possible to optimize with a white list
-
-   //TODO: re: more _optimizeReroll. See old
-};
-/**This is an enum since Symbols aren't well supported enough yet.*/
-Die.explodeTypes = {
-   Normal: {toString: function(){return '{Normal}';}, toJSON: function(){return '{Normal}';}},
-   Compound: {toString: function(){return '{Compound}';}, toJSON: function(){return '{Compound}';}},
-   Penetrating: {toString: function(){return '{Penetrating}';}, toJSON: function(){return '{Penetrating}';}}
 };
 /*
 Precedence:

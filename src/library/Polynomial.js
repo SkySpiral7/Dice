@@ -5,6 +5,30 @@ function Polynomial(die, explodeCount)
    var termArray;
 
    /**
+   This function lets you add a term to this Polynomial (this Polynomial is mutated to be the result).
+   If you have a Polynomial p then p.addTerm({coefficient: 3, exponent: 2}) is p + 3x^2.
+   */
+   this.addTerm = function(term)
+   {
+      if(term.coefficient instanceof Number) term.coefficient = term.coefficient.valueOf();
+      else if('number' !== typeof(term.coefficient)) throw new Error('term.coefficient must be a number but was: ' + typeof(term.coefficient));
+      if(term.exponent instanceof Number) term.exponent = term.exponent.valueOf();
+      else if('number' !== typeof(term.exponent)) throw new Error('term.exponent must be a number but was: ' + typeof(term.exponent));
+
+      if(0 === term.coefficient) return;  //fast path and to prevent adding it
+      for (var i = 0; i < termArray.length; ++i)
+      {
+         if (termArray[i].exponent === term.exponent)
+         {
+            termArray[i].coefficient += term.coefficient;
+            if(0 === termArray[i].coefficient) termArray.removeByIndex(i);
+            return;
+         }
+      }
+      termArray.push(term);
+      termArray.sort(Polynomial.exponentDescending);  //TODO: is this needed?
+   };
+   /**
    This function lets you multiply this Polynomial by otherPoly (this Polynomial is mutated to be the result).
    If this is 3x^2 + 1 then this.multiply(this) is 9x^4 + 6x^2 + 1.
    */
@@ -33,30 +57,6 @@ function Polynomial(die, explodeCount)
    {
       for(var i = 0; i < termArray.length; ++i){termArray[i].exponent *= -1;}
       termArray.reverse();  //works in this case
-   };
-   /**
-   This function lets you add a term to this Polynomial (this Polynomial is mutated to be the result).
-   If you have a Polynomial p then p.addTerm({coefficient: 3, exponent: 2}) is p + 3x^2.
-   */
-   this.addTerm = function(term)
-   {
-      if(term.coefficient instanceof Number) term.coefficient = term.coefficient.valueOf();
-      else if('number' !== typeof(term.coefficient)) throw new Error('term.coefficient must be a number but was: ' + typeof(term.coefficient));
-      if(term.exponent instanceof Number) term.exponent = term.exponent.valueOf();
-      else if('number' !== typeof(term.exponent)) throw new Error('term.exponent must be a number but was: ' + typeof(term.exponent));
-
-      if(0 === term.coefficient) return;  //fast path and to prevent adding it
-      for (var i = 0; i < termArray.length; ++i)
-      {
-         if (termArray[i].exponent === term.exponent)
-         {
-            termArray[i].coefficient += term.coefficient;
-            if(0 === termArray[i].coefficient) termArray.removeByIndex(i);
-            return;
-         }
-      }
-      termArray.push(term);
-      termArray.sort(Polynomial.exponentDescending);  //TODO: is this needed?
    };
    /**@returns an object with all Polynomial data elements in it*/
    this.toJSON = function()
@@ -139,3 +139,4 @@ new Polynomial('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from
 {coefficient: 2, exponent: 0}
 ]
 */
+//TODO: re: made a math readme which gives a quick overview and links that math forum and se

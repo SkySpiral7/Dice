@@ -30,68 +30,6 @@ Statistics.analyze = function(dicePool)
    return stats;
    //if any gaps then useBruteForce
 };
-Statistics.useBruteForce = function()
-{
-};
-/**
-Returns the statistics for a given DicePool using a Polynomial based algorithm.
-The algorithm is faster than brute force but can't support drop/keep.
-@param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
-*/
-Statistics.usePolynomial = function(dicePool, explodeCount)
-{
-   //assert: no drop/keep
-   var workingPolynomial, pool = dicePool.toJSON().pool, hasExplosions = false;
-   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
-   {
-      for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
-      {
-         hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
-
-         //dice are immutable so it's ok to reuse the same one
-         var newPolynomial = new Polynomial(pool[dieIndex].die, explodeCount);
-         if(pool[dieIndex].areDiceNegative) newPolynomial.negateExponents();
-
-         if(undefined === workingPolynomial) workingPolynomial = newPolynomial;
-         else workingPolynomial.multiply(newPolynomial);
-      }
-   }
-   var finalTerms = workingPolynomial.toJSON().terms;
-   var result = [];
-   for (var i = 0; i < finalTerms.length; ++i)
-   {
-      //rename them to something meaningful
-      if(hasExplosions) result.push({result: finalTerms[i].exponent, probability: finalTerms[i].coefficient});
-      else result.push({result: finalTerms[i].exponent, frequency: finalTerms[i].coefficient});
-   }
-   result.sort(Statistics.resultAscending);
-   return result;
-};
-//TODO: re: test all sort orders
-/**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
-Statistics.resultAscending = function(a,b){return (a.result - b.result);};
-Statistics.useDroppingAlgorithm = function()
-{
-};
-/**
-@param {object[]} stats created from a Statistics function that uses frequency
-@returns {undefined} after: stats will also have probability
-*/
-Statistics.determineProbability = function(stats)
-{
-   //TODO: re: add null safe validate
-   if(undefined != stats[0].probability) return;  //already done
-   var sum = 0;
-   for (var i = 0; i < stats.length; ++i)
-   {
-      sum += stats[i].frequency;
-   }
-   for (var i = 0; i < stats.length; ++i)
-   {
-      stats[i].probability = (stats[i].frequency / sum);
-      //delete stats[i].frequency;  //nah. leave it there since frequency has perfect precision
-   }
-};
 /**
 @param {object[]} stats created from a Statistics function
 @returns {object} with: minimum, maximum, mean, standardDeviation
@@ -139,4 +77,66 @@ For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 whi
 };
 Statistics.compareStatistics = function(stats1, stats2)
 {
+};
+/**
+@param {object[]} stats created from a Statistics function that uses frequency
+@returns {undefined} after: stats will also have probability
+*/
+Statistics.determineProbability = function(stats)
+{
+   //TODO: re: add null safe validate
+   if(undefined != stats[0].probability) return;  //already done
+   var sum = 0;
+   for (var i = 0; i < stats.length; ++i)
+   {
+      sum += stats[i].frequency;
+   }
+   for (var i = 0; i < stats.length; ++i)
+   {
+      stats[i].probability = (stats[i].frequency / sum);
+      //delete stats[i].frequency;  //nah. leave it there since frequency has perfect precision
+   }
+};
+//TODO: re: test all sort orders
+/**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
+Statistics.resultAscending = function(a,b){return (a.result - b.result);};
+Statistics.useBruteForce = function()
+{
+};
+Statistics.useDroppingAlgorithm = function()
+{
+};
+/**
+Returns the statistics for a given DicePool using a Polynomial based algorithm.
+The algorithm is faster than brute force but can't support drop/keep.
+@param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
+*/
+Statistics.usePolynomial = function(dicePool, explodeCount)
+{
+   //assert: no drop/keep
+   var workingPolynomial, pool = dicePool.toJSON().pool, hasExplosions = false;
+   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
+   {
+      for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
+      {
+         hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
+
+         //dice are immutable so it's ok to reuse the same one
+         var newPolynomial = new Polynomial(pool[dieIndex].die, explodeCount);
+         if(pool[dieIndex].areDiceNegative) newPolynomial.negateExponents();
+
+         if(undefined === workingPolynomial) workingPolynomial = newPolynomial;
+         else workingPolynomial.multiply(newPolynomial);
+      }
+   }
+   var finalTerms = workingPolynomial.toJSON().terms;
+   var result = [];
+   for (var i = 0; i < finalTerms.length; ++i)
+   {
+      //rename them to something meaningful
+      if(hasExplosions) result.push({result: finalTerms[i].exponent, probability: finalTerms[i].coefficient});
+      else result.push({result: finalTerms[i].exponent, frequency: finalTerms[i].coefficient});
+   }
+   result.sort(Statistics.resultAscending);
+   return result;
 };

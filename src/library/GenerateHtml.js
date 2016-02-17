@@ -1,5 +1,19 @@
 'use strict';
 var GenerateHtml = {};
+GenerateHtml.aggregates = function(aggregate)
+{
+   //TODO: re: validate
+   var out = '<b>Statistics</b>';
+   out += '<br />\nMin: ' + aggregate.minimum;
+   out += '<br />\nMax: ' + aggregate.maximum;
+   out += '<br />\nMean: ' + aggregate.mean.toFixed(2);
+   out += '<br />\nStandard Deviation: ' + aggregate.standardDeviation.toFixed(3);
+   return out;
+};
+GenerateHtml.compareStatistics = function(diffStats)
+{
+   return '';
+};
 GenerateHtml.statistics = function(stats, secondColumn)
 {
    //TODO: re: validate
@@ -43,18 +57,4 @@ GenerateHtml.statistics = function(stats, secondColumn)
    }
    out += '</table>\n';
    return out;
-};
-GenerateHtml.aggregates = function(aggregate)
-{
-   //TODO: re: validate
-   var out = '<b>Statistics</b>';
-   out += '<br />\nMin: ' + aggregate.minimum;
-   out += '<br />\nMax: ' + aggregate.maximum;
-   out += '<br />\nMean: ' + aggregate.mean.toFixed(2);
-   out += '<br />\nStandard Deviation: ' + aggregate.standardDeviation.toFixed(3);
-   return out;
-};
-GenerateHtml.compareStatistics = function(diffStats)
-{
-   return '';
 };

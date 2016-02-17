@@ -87,6 +87,50 @@ Tester.DicePool._constructor = function(isFirst)
 
    TesterUtility.displayResults('DicePool new DicePool()._constructor()', testResults, isFirst);
 };
+Tester.DicePool.dropKeepTypes = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], input;
+
+   try{
+   input = [2, 1, 3, 1];
+   DicePool.dropKeepTypes.DropLowest.perform(2, input);
+   testResults.push({Expected: [2, 3], Actual: input, Description: 'DropLowest'});
+   } catch(e){testResults.push({Error: e, Description: 'DropLowest'});}
+
+   try{
+   input = [2, 1, 3, 4];
+   DicePool.dropKeepTypes.DropHighest.perform(2, input);
+   testResults.push({Expected: [2, 1], Actual: input, Description: 'DropHighest'});
+   } catch(e){testResults.push({Error: e, Description: 'DropHighest'});}
+
+   try{
+   input = [2, 1, 3, 4];
+   DicePool.dropKeepTypes.KeepLowest.perform(2, input);
+   testResults.push({Expected: [2, 1], Actual: input, Description: 'KeepLowest'});
+   } catch(e){testResults.push({Error: e, Description: 'KeepLowest'});}
+
+   try{
+   input = [2, 1, 3, 4];
+   DicePool.dropKeepTypes.KeepLowest.perform(20, input);
+   testResults.push({Expected: [2, 1, 3, 4], Actual: input, Description: 'KeepLowest: all'});
+   } catch(e){testResults.push({Error: e, Description: 'KeepLowest: all'});}
+
+   try{
+   input = [2, 1, 3, 1];
+   DicePool.dropKeepTypes.KeepHighest.perform(2, input);
+   testResults.push({Expected: [2, 3], Actual: input, Description: 'KeepHighest'});
+   } catch(e){testResults.push({Error: e, Description: 'KeepHighest'});}
+
+   try{
+   input = [2, 1, 3, 1];
+   DicePool.dropKeepTypes.KeepHighest.perform(4, input);
+   testResults.push({Expected: [2, 1, 3, 1], Actual: input, Description: 'KeepHighest: all'});
+   } catch(e){testResults.push({Error: e, Description: 'KeepHighest: all'});}
+
+   TesterUtility.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', testResults, isFirst);
+};
 Tester.DicePool._parseString = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -136,48 +180,4 @@ Tester.DicePool._parseString = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Negative: -d4'});}
 
    TesterUtility.displayResults('DicePool DicePool._parseString', testResults, isFirst);
-};
-Tester.DicePool.dropKeepTypes = function(isFirst)
-{
-   TesterUtility.clearResults(isFirst);
-
-   var testResults = [], input;
-
-   try{
-   input = [2, 1, 3, 1];
-   DicePool.dropKeepTypes.DropLowest.perform(2, input);
-   testResults.push({Expected: [2, 3], Actual: input, Description: 'DropLowest'});
-   } catch(e){testResults.push({Error: e, Description: 'DropLowest'});}
-
-   try{
-   input = [2, 1, 3, 4];
-   DicePool.dropKeepTypes.DropHighest.perform(2, input);
-   testResults.push({Expected: [2, 1], Actual: input, Description: 'DropHighest'});
-   } catch(e){testResults.push({Error: e, Description: 'DropHighest'});}
-
-   try{
-   input = [2, 1, 3, 4];
-   DicePool.dropKeepTypes.KeepLowest.perform(2, input);
-   testResults.push({Expected: [2, 1], Actual: input, Description: 'KeepLowest'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepLowest'});}
-
-   try{
-   input = [2, 1, 3, 4];
-   DicePool.dropKeepTypes.KeepLowest.perform(20, input);
-   testResults.push({Expected: [2, 1, 3, 4], Actual: input, Description: 'KeepLowest: all'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepLowest: all'});}
-
-   try{
-   input = [2, 1, 3, 1];
-   DicePool.dropKeepTypes.KeepHighest.perform(2, input);
-   testResults.push({Expected: [2, 3], Actual: input, Description: 'KeepHighest'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepHighest'});}
-
-   try{
-   input = [2, 1, 3, 1];
-   DicePool.dropKeepTypes.KeepHighest.perform(4, input);
-   testResults.push({Expected: [2, 1, 3, 1], Actual: input, Description: 'KeepHighest: all'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepHighest: all'});}
-
-   TesterUtility.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', testResults, isFirst);
 };

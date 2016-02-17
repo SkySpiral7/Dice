@@ -103,6 +103,36 @@ Tester.Die._constructor = function(isFirst)
 
    TesterUtility.displayResults('Die new Die()._constructor', testResults, isFirst);
 };
+Tester.Die._optimizeReroll = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], input, expected;
+
+   try{
+   input = {name: '1d6', sideCount: 6, constantModifier: 1,
+      rerollCriteria: '!==4', explodeType: Die.explodeTypes.Normal};
+   expected = {name: '1d6', sideCount: 1, constantModifier: 3};
+   Die._optimizeReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: '!=='});
+   } catch(e){testResults.push({Error: e, Description: '!=='});}
+
+   try{
+   input = {name: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '===2'};
+   expected = {name: '1d6', sideCount: 5, constantModifier: 2};
+   Die._optimizeReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: '=== min'});
+   } catch(e){testResults.push({Error: e, Description: '=== min'});}
+
+   try{
+   input = {name: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '===7'};
+   expected = {name: '1d6', sideCount: 5, constantModifier: 1};
+   Die._optimizeReroll(input);
+   testResults.push({Expected: expected, Actual: input, Description: '=== max'});
+   } catch(e){testResults.push({Error: e, Description: '=== max'});}
+
+   TesterUtility.displayResults('Die Die._optimizeReroll', testResults, isFirst);
+};
 Tester.Die._parseString = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -611,34 +641,4 @@ Tester.Die._validateReroll = function(isFirst)
    }
 
    TesterUtility.displayResults('Die Die._validateReroll', testResults, isFirst);
-};
-Tester.Die._optimizeReroll = function(isFirst)
-{
-   TesterUtility.clearResults(isFirst);
-
-   var testResults = [], input, expected;
-
-   try{
-   input = {name: '1d6', sideCount: 6, constantModifier: 1,
-      rerollCriteria: '!==4', explodeType: Die.explodeTypes.Normal};
-   expected = {name: '1d6', sideCount: 1, constantModifier: 3};
-   Die._optimizeReroll(input);
-   testResults.push({Expected: expected, Actual: input, Description: '!=='});
-   } catch(e){testResults.push({Error: e, Description: '!=='});}
-
-   try{
-   input = {name: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '===2'};
-   expected = {name: '1d6', sideCount: 5, constantModifier: 2};
-   Die._optimizeReroll(input);
-   testResults.push({Expected: expected, Actual: input, Description: '=== min'});
-   } catch(e){testResults.push({Error: e, Description: '=== min'});}
-
-   try{
-   input = {name: '1d6', sideCount: 6, constantModifier: 1, rerollCriteria: '===7'};
-   expected = {name: '1d6', sideCount: 5, constantModifier: 1};
-   Die._optimizeReroll(input);
-   testResults.push({Expected: expected, Actual: input, Description: '=== max'});
-   } catch(e){testResults.push({Error: e, Description: '=== max'});}
-
-   TesterUtility.displayResults('Die Die._optimizeReroll', testResults, isFirst);
 };

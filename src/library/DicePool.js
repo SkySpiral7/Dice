@@ -28,9 +28,18 @@ function DicePool(arg1, arg2)
 {
    var name, pool;
 
-   /**@returns {!number} the sum of this.roll()*/
-   this.sumRoll = function(randomSource){return Math.summation(this.roll(randomSource));};
-   /**@returns {!number[]} an array of every die.roll() result.*/
+   /**@returns true if other is equal to this.*/
+   this.equals = function(other)
+   {
+      if(!(other instanceof DicePool)) return false;
+      if(this === other) return true;
+      return (JSON.stringify(this) === JSON.stringify(other));
+   };
+   /**
+   @param {?function} randomSource a function that returns a random number between 0 inclusive and 1 exclusive.
+   If not provided Math.random will be used.
+   @returns {!number[]} an array of every die.roll() result.
+   */
    this.roll = function(randomSource)
    {
       var results = [];
@@ -56,6 +65,8 @@ function DicePool(arg1, arg2)
       }
       return results;
    };
+   /**@returns {!number} the sum of this.roll()*/
+   this.sumRoll = function(randomSource){return Math.summation(this.roll(randomSource));};  //TODO: re: make a quick test
    //TODO: re: consider toDiceArray and creating from a dice array
    /**@returns an object with all DicePool data elements in it. It can be passed into new DicePool()*/
    this.toJSON = function()
@@ -65,13 +76,6 @@ function DicePool(arg1, arg2)
          name: name,
          pool: pool
       };
-   };
-   /**@returns true if other is equal to this.*/
-   this.equals = function(other)
-   {
-      if(!(other instanceof DicePool)) return false;
-      if(this === other) return true;
-      return (JSON.stringify(this) === JSON.stringify(other));
    };
 
    /**You can't call this function. It is only used internally to create a DicePool object.*/
@@ -102,37 +106,8 @@ function DicePool(arg1, arg2)
    };
    this._constructor();
 }
-/**
-This function is used in the constructor of DicePool. It parses the inputString into an object array.
-You should have no use for it although it isn't harmful to call.
-@param {!string} inputString
-@returns {!object[]} the object array needed to create a DicePool. Not optimized or validated.
-*/
-DicePool._parseString = function(inputString)
-{
-   var jsonResult = [];
-   var workingString = inputString.toLowerCase().replace(/-/g, '+-');  //make copy so that parse errors can use inputString
-   var groupStringArray = workingString.split('+');
-   if('-' === inputString.trim()[0]) groupStringArray.shift();  //leading negative causes first element to be empty
-   for (var groupIndex = 0; groupIndex < groupStringArray.length; ++groupIndex)
-   {
-      var groupObject = {};
-      workingString = groupStringArray[groupIndex].trim();
-      if('-' === workingString[0]){groupObject.areDiceNegative = true; workingString = workingString.substring(1);}
-      if ((/^\d/).test(workingString))
-      {
-         groupObject.dieCount = Number.parseInt(workingString);  //only parses leading integer
-         workingString = workingString.substring(groupObject.dieCount.toString().length);  //remove sideCount from workingString
-      }
-      else groupObject.dieCount = 1;
-      groupObject.die = new Die('1' + workingString);
-
-      jsonResult.push(groupObject);
-   }
-   return jsonResult;
-};
 /**This is an enum and strategy pattern.*/
-DicePool.dropKeepTypes = {
+DicePool.dropKeepTypes = {  //TODO: re: here and elsewhere. = doesn't need brace on same line
    DropLowest:
    {
       toString: function(){return '{DropLowest}';},
@@ -182,6 +157,35 @@ DicePool.dropKeepTypes = {
          if(dropCount > 0) DicePool.dropKeepTypes.DropLowest.perform(dropCount, diceResults);
       }
    }
+};
+/**
+This function is used in the constructor of DicePool. It parses the inputString into an object array.
+You should have no use for it although it isn't harmful to call.
+@param {!string} inputString
+@returns {!object[]} the object array needed to create a DicePool. Not optimized or validated.
+*/
+DicePool._parseString = function(inputString)
+{
+   var jsonResult = [];
+   var workingString = inputString.toLowerCase().replace(/-/g, '+-');  //make copy so that parse errors can use inputString
+   var groupStringArray = workingString.split('+');
+   if('-' === inputString.trim()[0]) groupStringArray.shift();  //leading negative causes first element to be empty
+   for (var groupIndex = 0; groupIndex < groupStringArray.length; ++groupIndex)
+   {
+      var groupObject = {};
+      workingString = groupStringArray[groupIndex].trim();
+      if('-' === workingString[0]){groupObject.areDiceNegative = true; workingString = workingString.substring(1);}
+      if ((/^\d/).test(workingString))  //TODO: re: currently doesn't support %d2
+      {
+         groupObject.dieCount = Number.parseInt(workingString);  //only parses leading integer
+         workingString = workingString.substring(groupObject.dieCount.toString().length);  //remove sideCount from workingString
+      }
+      else groupObject.dieCount = 1;
+      groupObject.die = new Die('1' + workingString);
+
+      jsonResult.push(groupObject);
+   }
+   return jsonResult;
 };
 //ignore for now: min/max, sorting
 //old Polynomial.createDiePolynomial had negative and ScatterDie
