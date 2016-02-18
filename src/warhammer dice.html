@@ -3,7 +3,8 @@
 <head>
 <title>Warhammer Dice</title>
 <meta charset="ASCII" />
-<script type="text/javaScript" src="library/main.js"></script>
+<script>var includePath = 'library/';</script>
+<script src="library/include.js"></script><!--the code to test-->
 <script type="text/javaScript">
 //this block is hacks for warhammer because the original API is lacking
 function WarhammerAttackUnit(diceCount, toHitValue, toWoundValue, saveValue, extraSaveValue){
@@ -111,98 +112,34 @@ Draw.WarhammerBellCurve = function(diceCount, toHitValue, toWoundValue, toSaveVa
        return results;
    }
 };
-Draw.generateBinomialTable = function(rollData, secondColumn){
-    if(rollData.length == 0) return '';
-    var results=[];  //pad the results to 2D so I can use Draw.generateDiceSumTable
-    for(var i=0; i < rollData.length; i++) results.push([i, rollData[i]]);
-
-    var output=Draw.generateDiceSumTable(results, secondColumn);
-    return output.replace('<th>Roll</th>', '<th>Wounds Inflicted</th>');
-}
-Draw.generateDiceSumTable = function(rollData, secondColumn){
-    if(rollData.length==0) return;  //nothing to report
-    if(secondColumn=='=') secondColumn='==';  //heh symmetry. adds an '=' so that eval can read it
-    var maxWounds=Number(document.getElementById('woundMax').value);
-    document.getElementById('woundMax').value=maxWounds;
-    if(maxWounds < 1) throw new Error('The maximum number of wounds must be at least 1');
-    if(maxWounds < rollData[0][0]) maxWounds=rollData[rollData.length-1][0];
-   while (rollData[rollData.length-1][0] > maxWounds)  //too many wounds
-   {
-       rollData[rollData.length-2][1]+=rollData[rollData.length-1][1];  //add the 2 freq
-       rollData.pop();  //then remove the top
-   }
-    var min, max, count=0, sum=0;
-   for (var i=0; i < rollData.length; i++)
-   {
-       if(rollData[i][1]==0) continue;  //freq is 0 means it can't be done (shouldn't exist)
-       if(min==undefined || rollData[i][0] < min) min = rollData[i][0];
-       if(max==undefined || max < rollData[i][0]) max = rollData[i][0];
-       count += rollData[i][1];
-       sum += (rollData[i][0] * rollData[i][1]);  //must be wieghted since the ones that occur more often are more likely
-   }
-    var deviationSquareSum = 0;
-    var avg = sum / count;
-   for (var i=0; i < rollData.length; i++)
-   {
-       //if(rollData[i][1]==0) continue;
-       var dev = rollData[i][0] - avg;
-       dev *= dev;  //squared
-       deviationSquareSum += (dev * rollData[i][1]);  //weighted
-   }
-    var standardDeviation = Math.sqrt(deviationSquareSum / count);
-
-    minResult.textContent=min;
-    maxResult.textContent=max;
-    avgResult.textContent=avg.toFixed(2);
-    devResult.textContent=standardDeviation.toFixed(3);
-
-    return genTable(rollData, secondColumn);
-   function genTable(rollData, secondColumn){
-       if(rollData.length == 0) return '';
-       var max = 0;
-       var totalFreq = 0;
-       var out = '';
-       var secondValues=[];
-
-      for (var i=0; i < rollData.length; i++) {
-          if(rollData[i][1]==0){secondValues.push(0); continue;}
-          if(max < rollData[i][1]) max = rollData[i][1];
-          totalFreq += rollData[i][1];
-          var secondSum=0;
-         for (var j=0; j < rollData.length; j++) {
-             if(eval(''+rollData[j][0]+secondColumn+rollData[i][0])) secondSum+=rollData[j][1];
-         }
-          secondValues.push(secondSum);
-      }
-
-       out = '<table border="1" cellpadding="0" cellspacing="2" width="100%">';
-       out += "\n";
-       out += '<tr><th>Roll</th>';
-       out += '<th>Chance</th><th>'+secondColumn.replace('>', '&gt;').replace('<', '&lt;')+'</th><th align="center">Bar</th></tr>';
-       out += "\n";
-
-      for (var i=0; i < rollData.length; i++) {
-          if(rollData[i][1]==0) continue;  //roll isn't possible
-          out += '<tr><td align="center" width="1%">' + rollData[i][0];  //roll
-          out += '</td><td align="right" width="1%">';
-          out += (100 * rollData[i][1] / totalFreq).toFixed(3);  //non-freq is weighted but might not be the probability
-          out += '%</td><td align="right" width="1%">';
-          out += (100 * secondValues[i] / totalFreq).toFixed(3);
-          out += '%</td><td valign="center">';
-          out += '<div style="background-color: ';
-          if(rollData[i][1] == max) out += 'green';  //not rounded
-          else out += 'blue';
-          out += '; width:' + (100 * rollData[i][1] / max).toFixed(3)+'%; height: 0.8em">&nbsp;</div>';
-          out += '</td></tr>';
-          out += "\n";
-      }
-       out += '</table>';
-       return out;
-   }
-}
 </script>
 <script type="text/javaScript">
-//this block needs to stay here as it is page specific
+//this block needs to stay here because it is page specific
+function processWoundMax(stats)
+{
+   var maxWounds = Number.parseInt(document.getElementById('woundMax').value);
+   document.getElementById('woundMax').value = maxWounds;
+   if(maxWounds < 1) throw new Error('The maximum number of wounds must be at least 1');
+   while (stats[stats.length-1].result > maxWounds && stats.length > 1)  //too many wounds
+   {
+      stats[stats.length-2].probability += stats[stats.length-1].probability;
+      stats.pop();  //then remove the last
+   }
+}
+Draw.generateBinomialTable = function(stats, secondColumn)
+{
+   if('=' === secondColumn) secondColumn = '==';
+   processWoundMax(stats);
+   var aggregates = Statistics.calculateAggregates(stats);
+
+   minResult.textContent = aggregates.minimum;
+   maxResult.textContent = aggregates.maximum;
+   avgResult.textContent = aggregates.mean.toFixed(2);
+   devResult.textContent = aggregates.standardDeviation.toFixed(3);
+
+   var output = GenerateHtml.statistics(stats, secondColumn);
+   return output.replace('<th>Roll</th>', '<th>Wounds Inflicted</th>');
+};
 function attack(){
     var diceCount=Number(document.getElementById("diceCount").value);
     document.getElementById("diceCount").value=diceCount;
@@ -234,7 +171,7 @@ function attack(){
        if(holder.length > 3) extraSaveResult.textContent=holder[3];
        Draw.WarhammerBellCurve(diceCount, toHitValue, toWoundValue, saveValue, extraSaveValue, customColumn);
    }
-    catch(error){alert("Error: "+error.message+"\n");}
+    catch(error){alert("Error: " + error.message); throw error;}
 };
 </script>
 <a>The random values are in order: number of enemies hit, number wounded, number that saved, and number that made the second save.</a>

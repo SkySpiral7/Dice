@@ -417,3 +417,5 @@ Draw.generateDiceCompareTable = function(name1, name2, rollData1, rollData2){
        return rollData;
    }
 }
+//key: rollData[i][0] is result and rollData[i][1] is frequency or prob
+//rollData[0][0] is the lowest result
