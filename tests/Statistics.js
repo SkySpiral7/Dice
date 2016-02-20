@@ -146,6 +146,19 @@ Tester.Statistics.useBruteForce = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2+d3'});
    } catch(e){testResults.push({Error: e, Description: '2d2+d3'});}
 
+   try{
+   actual = Statistics.useBruteForce(new DicePool('3d2!+1d4!'), 0);
+   expected = Statistics.useNonDroppingAlgorithm(new DicePool('3d2!+1d4!'), 0);
+   //useBruteForce is complicated. useNonDroppingAlgorithm is easy to prove correct for all cases
+   testResults.push({Expected: expected, Actual: actual, Description: '3d2!+1d4! explodeCount 0'});
+   } catch(e){testResults.push({Error: e, Description: '3d2!+1d4! explodeCount 0'});}
+
+   try{
+   actual = Statistics.useBruteForce(new DicePool('3d2!+1d4!'), 1);
+   expected = Statistics.useNonDroppingAlgorithm(new DicePool('3d2!+1d4!'), 1);
+   testResults.push({Expected: expected, Actual: actual, Description: '3d2!+1d4! explodeCount 1'});
+   } catch(e){testResults.push({Error: e, Description: '3d2!+1d4! explodeCount 1'});}
+
    TesterUtility.displayResults('Statistics Statistics.useBruteForce', testResults, isFirst);
 };
 Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)

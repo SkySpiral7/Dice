@@ -213,10 +213,10 @@ Tester.DiceExpression._constructor = function(isFirst)
    try{
    actual = new DiceExpression(new Die('1d4!r3'), 0).toJSON().terms;
    expected = [
-      {exponent: 1, coefficient: (1/3)},
-      {exponent: 2, coefficient: (1/3)},
+      {exponent: 1, coefficient: 1},
+      {exponent: 2, coefficient: 1},
       //no 3
-      {exponent: 4, coefficient: (1/3)}  //doesn't explode due to explode count 0
+      {exponent: 4, coefficient: 1}  //doesn't explode due to explode count 0
    ];
    expected.reverse();
    testResults.push({Expected: expected, Actual: actual, Description: '1d4!r3 explode: 0'});
