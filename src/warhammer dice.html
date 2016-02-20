@@ -6,56 +6,7 @@
 <script>var includePath = 'library/';</script>
 <script src="library/include.js"></script><!--the code to test-->
 <script type="text/javaScript">
-//this block is hacks for warhammer because the original API is lacking
-function WarhammerAttackUnit(diceCount, toHitValue, toWoundValue, saveValue, extraSaveValue){
-    if(typeof(diceCount)!=="number" || isNaN(diceCount)) throw new Error("WarhammerAttackUnit, diceCount ("+diceCount+") the must be a number type.");
-    if(typeof(toHitValue)!=="number" || isNaN(toHitValue)) throw new Error("WarhammerAttackUnit, toHitValue ("+toHitValue+") the must be a number type.");
-    if(toHitValue > 6) return ["Impossible"];
-    if(typeof(toWoundValue)!=="number" || isNaN(toWoundValue)) throw new Error("WarhammerAttackUnit, toWoundValue ("+toWoundValue+") the must be a number type.");
-    if(toWoundValue > 6) return ["-", "Impossible"];
-    if(typeof(extraSaveValue)!=="number" || isNaN(extraSaveValue)) extraSaveValue=7;
-    if(saveValue===undefined) saveValue=7;  //an impossible number
-    if(typeof(saveValue)!=="number" || isNaN(saveValue)) throw new Error("WarhammerAttackUnit, saveValue ("+saveValue+") the must be a string type.");
-
-    var attackRolled=new DicePool(diceCount+"d6").roll();
-    var successCount=0;
-    var output=[];
-   for (var i=0; i < attackRolled.length; i++)
-   {
-       if(attackRolled[i] >= toHitValue) successCount++;
-   }
-    if(successCount==0) return ['None hit'];
-
-    output.push(successCount);
-    attackRolled=new DicePool(successCount+"d6").roll();
-    successCount=0;
-   for (var i=0; i < attackRolled.length; i++)
-   {
-       if(attackRolled[i] >= toWoundValue) successCount++;
-   }
-    if(successCount==0){output.push('None wounded'); return output;}
-
-    output.push(successCount);
-    attackRolled=new DicePool(successCount+"d6").roll();
-    successCount=0;
-   for (var i=0; i < attackRolled.length; i++)
-   {
-       if(attackRolled[i] < saveValue) successCount++;
-   }
-    if(successCount==0){output.push('All Saved'); return output;}
-    output.push(successCount);
-    if(extraSaveValue > 6) return output;
-    //else:
-    attackRolled=new DicePool(successCount+"d6").roll();
-    successCount=0;
-   for (var i=0; i < attackRolled.length; i++)
-   {
-       if(attackRolled[i] < extraSaveValue) successCount++;
-   }
-    if(successCount==0){output.push('All Saved'); return output;}
-    output.push(successCount);
-    return output;
-};
+//this script block is hacks for warhammer because the original API is lacking
 Draw.WarhammerBellCurve = function(diceCount, toHitValue, toWoundValue, toSaveValue, extraSave, secondColumn){
     if(secondColumn==undefined) secondColumn='>=';
     var out = '';
@@ -114,7 +65,7 @@ Draw.WarhammerBellCurve = function(diceCount, toHitValue, toWoundValue, toSaveVa
 };
 </script>
 <script type="text/javaScript">
-//this block needs to stay here because it is page specific
+//this script block needs to stay here because it is page specific
 function processWoundMax(stats)
 {
    var maxWounds = Number.parseInt(document.getElementById('woundMax').value);
@@ -141,80 +92,81 @@ Draw.generateBinomialTable = function(stats, secondColumn)
    return output.replace('<th>Roll</th>', '<th>Wounds Inflicted</th>');
 };
 function attack(){
-    var diceCount=Number(document.getElementById("diceCount").value);
-    document.getElementById("diceCount").value=diceCount;
-    var toHitValue=Number(document.getElementById("toHitValue").value);
-    document.getElementById("toHitValue").value=toHitValue;
-    var toWoundValue=Number(document.getElementById("toWoundValue").value);
-    document.getElementById("toWoundValue").value=toWoundValue;
-    var saveValue=Number(document.getElementById("saveValue").value);
-    document.getElementById("saveValue").value=saveValue;
-    var extraSaveValue=Number(document.getElementById("extraSaveValue").value);
-    document.getElementById("extraSaveValue").value=extraSaveValue;
-    var customColumn=document.getElementById("customColumn").value;
+    var input = {};
+    input.diceCount = Number.parseInt(document.getElementById('diceCount').value);
+    document.getElementById('diceCount').value = input.diceCount;
+    input.maxWounds = Number.parseInt(document.getElementById('woundMax').value);
+    document.getElementById('woundMax').value = input.maxWounds;
+    input.toHitValue = Number.parseInt(document.getElementById('toHitValue').value);
+    document.getElementById('toHitValue').value = input.toHitValue;
+    input.toWoundValue = Number.parseInt(document.getElementById('toWoundValue').value);
+    document.getElementById('toWoundValue').value = input.toWoundValue;
+    input.saveValue = Number.parseInt(document.getElementById('saveValue').value);
+    document.getElementById('saveValue').value = input.saveValue;
+    input.reanimateOrNoPainValue = Number.parseInt(document.getElementById('reanimateOrNoPainValue').value);
+    document.getElementById('reanimateOrNoPainValue').value = input.reanimateOrNoPainValue;
+    var customColumn = document.getElementById('customColumn').value;
 
-    document.getElementById("graphResults").textContent="";
-    toHitResult.textContent='-';
-    toWoundResult.textContent='-';
-    toSaveResult.textContent='-';
-    extraSaveResult.textContent='-';
-    minResult.textContent='-';
-    maxResult.textContent='-';
-    avgResult.textContent='-';
-    devResult.textContent='-';
+    document.getElementById('graphResults').textContent = '';
+    hitResult.textContent = '-';
+    woundedResult.textContent = '-';
+    unsaveWoundsResult.textContent = '-';
+    minResult.textContent = '-';
+    maxResult.textContent = '-';
+    avgResult.textContent = '-';
+    devResult.textContent = '-';
    try{
-       var holder=WarhammerAttackUnit(diceCount, toHitValue, toWoundValue, saveValue, extraSaveValue);
+       var output = Prebuilt.WarhammerAttackUnit(input);
        //this is done before drawing in case of error
-       toHitResult.textContent=holder[0];  //always exists
-       if(holder.length > 1) toWoundResult.textContent=holder[1];
-       if(holder.length > 2) toSaveResult.textContent=holder[2];
-       if(holder.length > 3) extraSaveResult.textContent=holder[3];
-       Draw.WarhammerBellCurve(diceCount, toHitValue, toWoundValue, saveValue, extraSaveValue, customColumn);
+       hitResult.textContent = output.hit;  //always exists
+       if(undefined !== output.wounded) woundedResult.textContent = output.wounded;
+       if(undefined !== output.unsavedWounds) unsaveWoundsResult.textContent = output.unsavedWounds;
+       Draw.WarhammerBellCurve(input.diceCount, input.toHitValue, input.toWoundValue, input.saveValue, input.reanimateOrNoPainValue, customColumn);
    }
-    catch(error){alert("Error: " + error.message); throw error;}
+    catch(error){alert('Error: ' + error.message); throw error;}
 };
 </script>
-<a>The random values are in order: number of enemies hit, number wounded, number that saved, and number that made the second save.</a>
+<a>The random values are in order: number of enemies hit, number wounded, number of unsaved wounds.</a>
 <form action="javascript:attack();">
 <table>
    <tr>
-      <td style='text-align:right;'>Number of Dice: </td>
-      <td><input type="text" value="15" size='5' id='diceCount' /></td>
+      <td style="text-align:right;">Number of Dice: </td>
+      <td><input type="text" value="15" size="5" id="diceCount" /></td>
       <td>Random Values</td>
       <td>Statistics</td>
    </tr>
    <tr>
-      <td style='text-align:right;'>Number of Wounds Possible: </td>
-      <td><input type="text" value="15" size='5' id='woundMax' /></td>
+      <td style="text-align:right;">Number of Wounds Possible: </td>
+      <td><input type="text" value="15" size="5" id="woundMax" /></td>
       <td />
    </tr>
    <tr>
-      <td style='text-align:right;'>To Hit Value: </td>
-      <td><input type="text" value="3" size='5' id='toHitValue' /></td>
-      <td id='toHitResult' style='text-align:center;'>-</td>
-      <td><b>Min:</b> <span id='minResult' style='text-align:center;'>-</span></td>
+      <td style="text-align:right;">To Hit Value: </td>
+      <td><input type="text" value="3" size="5" id="toHitValue" /></td>
+      <td id="hitResult" style="text-align:center;">-</td>
+      <td><b>Min:</b> <span id="minResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style='text-align:right;'>To Wound Value: </td>
-      <td><input type="text" value="3" size='5' id='toWoundValue' /></td>
-      <td id='toWoundResult' style='text-align:center;'>-</td>
-      <td><b>Max:</b> <span id='maxResult' style='text-align:center;'>-</span></td>
+      <td style="text-align:right;">To Wound Value: </td>
+      <td><input type="text" value="3" size="5" id="toWoundValue" /></td>
+      <td id="woundedResult" style="text-align:center;">-</td>
+      <td><b>Max:</b> <span id="maxResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style='text-align:right;'>To Save Value: </td>
-      <td><input type="text" value="4" size='5' id='saveValue' /></td>
-      <td id='toSaveResult' style='text-align:center;'>-</td>
-      <td><b>Avg:</b> <span id='avgResult' style='text-align:center;'>-</span></td>
+      <td style="text-align:right;">To Save Value: </td>
+      <td><input type="text" value="4" size="5" id="saveValue" /></td>
+      <td />
+      <td><b>Avg:</b> <span id="avgResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style='text-align:right;'>Reanimation or Feel No Pain: </td>
-      <td><input type="text" value="7" size='5' id='extraSaveValue' /></td>
-      <td id='extraSaveResult' style='text-align:center;'>-</td>
-      <td><b>Std Dev:</b> <span id='devResult' style='text-align:center;'>-</span></td>
+      <td style="text-align:right;">Reanimation or Feel No Pain: </td>
+      <td><input type="text" value="7" size="5" id="reanimateOrNoPainValue" /></td>
+      <td id="unsaveWoundsResult" style="text-align:center;">-</td>
+      <td><b>Std Dev:</b> <span id="devResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style='text-align:right;'>Custom Column: </td>
-      <td><input type="text" value=">=" size='5' id='customColumn' /></td>
+      <td style="text-align:right;">Custom Column: </td>
+      <td><input type="text" value=">=" size="5" id="customColumn" /></td>
       <td /><td />
    </tr>
    <tr><td /><td><input type="submit" value="Attack" /></td><td /><td /></tr>
