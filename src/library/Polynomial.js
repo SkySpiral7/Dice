@@ -1,5 +1,7 @@
 'use strict';
-//mx^a. m: coefficient, x: variable (I won't use), a: exponent (must be a natural number), mx^a: term
+//mx^a. m: coefficient, x: indeterminate, a: exponent (must be a natural number), mx^a: term
+//is actually a Expression > Algebraic Expression > Rational Expression.
+//TODO: re: rename to Statistics.useNonDroppingAlgorithm.DiceExpression (file name: DiceExpression)
 function Polynomial(die, explodeCount)
 {
    var termArray;

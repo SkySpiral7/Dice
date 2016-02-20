@@ -31,6 +31,13 @@ Statistics.analyze = function(dicePool)
    //if any gaps then useBruteForce
 };
 /**
+Note that a single die (that doesn't explode) has no mean or standardDeviation for the same
+reason that a single item has no average. There's no way for this function to detect a single die
+however the results will be meaningless (and min/max pointless).
+
+Also note that maximum is the highest of the results given even though exploding
+dice have no actual maximum (unless enforced externally).
+
 @param {object[]} stats created from a Statistics function
 @returns {object} with: minimum, maximum, mean, standardDeviation
 */
@@ -111,6 +118,7 @@ Returns the statistics for a given DicePool using a Polynomial based algorithm.
 The algorithm is faster than brute force but can't support drop/keep.
 @param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
 */
+//TODO: re: rename to Statistics.useNonDroppingAlgorithm
 Statistics.usePolynomial = function(dicePool, explodeCount)
 {
    //assert: no drop/keep
