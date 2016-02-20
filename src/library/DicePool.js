@@ -26,7 +26,7 @@ new DicePool({name: 'PoolName', pool: [
 */
 function DicePool(arg1, arg2)
 {
-   var name, pool;
+   var name, pool, hasDropKeep, hasExplosions;
 
    /**@returns true if other is equal to this.*/
    this.equals = function(other)
@@ -74,6 +74,8 @@ function DicePool(arg1, arg2)
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
          'instanceof': 'DicePool',  //this is for a JSON reviver
          name: name,
+         hasDropKeep: hasDropKeep,
+         hasExplosions: hasExplosions,
          pool: pool
       };
    };
@@ -100,6 +102,14 @@ function DicePool(arg1, arg2)
 
       name = arg1;
       pool = arg2;  //TODO: re: should I do a defense copy? Also in toJSON
+
+      hasDropKeep = false, hasExplosions = false;
+      for (var i = 0; i < pool.length; ++i)
+      {
+         hasDropKeep = hasDropKeep || (undefined !== pool[i].dropKeepType);
+         hasExplosions = hasExplosions || (undefined !== pool[i].die.toJSON().explodeType);
+         if(hasDropKeep && hasExplosions) break;  //no more information to find
+      }
 
       arg1 = undefined;  //no longer needed
       arg2 = undefined;

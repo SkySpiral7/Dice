@@ -7,17 +7,11 @@ It will not include frequency of 0 or probability of less than 0.00000 (5) and w
 */
 Statistics.analyze = function(dicePool)
 {
-   var pool = dicePool.toJSON().pool, hasExplosions = false, hasDropKeep = false;
-   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
-   {
-      hasDropKeep |= (undefined !== pool[dieIndex].dropKeepType);
-      hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
-      if(hasExplosions && hasDropKeep) break;  //no more information to find
-   }
-   if(hasDropKeep) throw new Error('Drop/keep not yet supported');  //useBruteForce then useDroppingAlgorithm
+   var json = dicePool.toJSON();
+   if(json.hasDropKeep) throw new Error('Drop/keep not yet supported');  //useBruteForce then useDroppingAlgorithm
    //TODO: re: later optimize so that all non-drop useNonDroppingAlgorithm drops useDroppingAlgorithm and combine results
-   if(!hasExplosions) return Statistics.useNonDroppingAlgorithm(dicePool, 0);
-   //if(hasExplosions):
+   if(!json.hasExplosions) return Statistics.useNonDroppingAlgorithm(dicePool, 0);
+   //if(json.hasExplosions):
    var stats = [], explodeCount = 0;
    do
    {
@@ -121,14 +115,12 @@ The algorithm is faster than brute force but can't support drop/keep.
 Statistics.useNonDroppingAlgorithm = function(dicePool, explodeCount)
 {
    //assert: no drop/keep
-   var workingExpression, pool = dicePool.toJSON().pool, hasExplosions = false;
+   var workingExpression, pool = dicePool.toJSON().pool;
    for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
    {
       for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
       {
          //TODO: re: make DicePool.iterator
-         hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
-
          //dice are immutable so it's ok to reuse the same one
          var newExpression = new DiceExpression(pool[dieIndex].die, explodeCount);
          if(pool[dieIndex].areDiceNegative) newExpression.negateExponents();
@@ -139,4 +131,3 @@ Statistics.useNonDroppingAlgorithm = function(dicePool, explodeCount)
    }
    return workingExpression.toDiceResults();
 };
-//TODO: re: add to DicePool: hasExplosions, hasDropKeep

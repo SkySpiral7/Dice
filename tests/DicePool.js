@@ -43,7 +43,7 @@ Tester.DicePool._constructor = function(isFirst)
 
    try{
    returned = new DicePool(new String('2d4')).toJSON();
-   expected = {'instanceof': 'DicePool', name: '2d4', pool: [
+   expected = {'instanceof': 'DicePool', name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
          dieCount: 2
@@ -55,7 +55,7 @@ Tester.DicePool._constructor = function(isFirst)
    try{
    returned = new DicePool('2d4').toJSON();
    returned = new DicePool(returned).toJSON();
-   expected = {'instanceof': 'DicePool', name: '2d4', pool: [
+   expected = {'instanceof': 'DicePool', name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
          dieCount: 2
@@ -67,7 +67,7 @@ Tester.DicePool._constructor = function(isFirst)
    try{
    returned = new DicePool('2d4').toJSON();
    returned = new DicePool(returned.pool).toJSON();
-   expected = {'instanceof': 'DicePool', name: 'DicePool', pool: [
+   expected = {'instanceof': 'DicePool', name: 'DicePool', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
          dieCount: 2
@@ -84,6 +84,27 @@ Tester.DicePool._constructor = function(isFirst)
    {
        testResults.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
    }
+
+   try{
+   returned = new DicePool('d6+2d2dl', [
+      {
+         die: new Die(),
+         dieCount: 1
+      },
+      {
+         die: new Die(2),
+         dieCount: 2,
+         dropKeepType: DicePool.dropKeepTypes.DropLowest,
+         dropKeepCount: 1
+      }
+   ]).toJSON().hasDropKeep;
+   testResults.push({Expected: true, Actual: returned, Description: 'hasDropKeep'});
+   } catch(e){testResults.push({Error: e, Description: 'hasDropKeep'});}
+
+   try{
+   returned = new DicePool('d2+d4!-d3').toJSON().hasExplosions;
+   testResults.push({Expected: true, Actual: returned, Description: 'hasExplosions'});
+   } catch(e){testResults.push({Error: e, Description: 'hasExplosions'});}
 
    TesterUtility.displayResults('DicePool new DicePool()._constructor()', testResults, isFirst);
 };
