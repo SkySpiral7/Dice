@@ -1,14 +1,14 @@
 'use strict';
-Tester.Polynomial = {};
-Tester.Polynomial.addTerm = function(isFirst)
+Tester.DiceExpression = {};
+Tester.DiceExpression.addTerm = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], polynomial, actual, expected;
+   var testResults = [], expression, actual, expected;
 
    try{
-   polynomial = new Polynomial(new Die('dF'));
-   polynomial.addTerm({coefficient: 'sd', exponent: 0});
+   expression = new DiceExpression(new Die('dF'));
+   expression.addTerm({coefficient: 'sd', exponent: 0});
    TesterUtility.failedToThrow(testResults, 'Invalid coefficient');
    }
    catch(e)
@@ -18,8 +18,8 @@ Tester.Polynomial.addTerm = function(isFirst)
    }
 
    try{
-   polynomial = new Polynomial(new Die('dF'));
-   polynomial.addTerm({coefficient: 2, exponent: 'sd'});
+   expression = new DiceExpression(new Die('dF'));
+   expression.addTerm({coefficient: 2, exponent: 'sd'});
    TesterUtility.failedToThrow(testResults, 'Invalid exponent');
    }
    catch(e)
@@ -29,9 +29,9 @@ Tester.Polynomial.addTerm = function(isFirst)
    }
 
    try{
-   polynomial = new Polynomial(new Die('dF'));
-   polynomial.addTerm({coefficient: new Number(2), exponent: new Number(0)});
-   actual = polynomial.toJSON().terms;
+   expression = new DiceExpression(new Die('dF'));
+   expression.addTerm({coefficient: new Number(2), exponent: new Number(0)});
+   actual = expression.toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 3, exponent: 0},
@@ -41,9 +41,9 @@ Tester.Polynomial.addTerm = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Existing term'});}
 
    try{
-   polynomial = new Polynomial(new Die('dF'));
-   polynomial.addTerm({coefficient: 2, exponent: 5});
-   actual = polynomial.toJSON().terms;
+   expression = new DiceExpression(new Die('dF'));
+   expression.addTerm({coefficient: 2, exponent: 5});
+   actual = expression.toJSON().terms;
    expected = [
       {coefficient: 2, exponent: 5},
       {coefficient: 1, exponent: 1},
@@ -54,9 +54,9 @@ Tester.Polynomial.addTerm = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'New term'});}
 
    try{
-   polynomial = new Polynomial(new Die('dF'));
-   polynomial.addTerm({coefficient: -1, exponent: 0});
-   actual = polynomial.toJSON().terms;
+   expression = new DiceExpression(new Die('dF'));
+   expression.addTerm({coefficient: -1, exponent: 0});
+   actual = expression.toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: -1}
@@ -65,9 +65,9 @@ Tester.Polynomial.addTerm = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Remove 0 coefficients'});}
 
    try{
-   polynomial = new Polynomial(new Die('dF'));
-   polynomial.addTerm({coefficient: 0, exponent: 2});
-   actual = polynomial.toJSON().terms;
+   expression = new DiceExpression(new Die('dF'));
+   expression.addTerm({coefficient: 0, exponent: 2});
+   actual = expression.toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: 0},
@@ -76,18 +76,18 @@ Tester.Polynomial.addTerm = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Don\'t add 0 coefficients'});
    } catch(e){testResults.push({Error: e, Description: 'Don\'t add 0 coefficients'});}
 
-   TesterUtility.displayResults('Polynomial new Polynomial().addTerm()', testResults, isFirst);
+   TesterUtility.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, isFirst);
 };
-Tester.Polynomial.multiply = function(isFirst)
+Tester.DiceExpression.multiply = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], polynomial, actual, expected;
+   var testResults = [], expression, actual, expected;
 
    try{
-   polynomial = new Polynomial(new Die('dF'));
-   polynomial.multiply(new Polynomial(new Die('dF')));
-   actual = polynomial.toJSON().terms;
+   expression = new DiceExpression(new Die('dF'));
+   expression.multiply(new DiceExpression(new Die('dF')));
+   actual = expression.toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 2},
       {coefficient: 2, exponent: 1},
@@ -99,28 +99,28 @@ Tester.Polynomial.multiply = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2dF'});}
 
    try{
-   new Polynomial(new Die()).multiply(2);
+   new DiceExpression(new Die()).multiply(2);
    TesterUtility.failedToThrow(testResults, 'Illegal arg');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('Expected: Polynomial. Got: Number'),
+       testResults.push({Expected: new Error('Expected: DiceExpression. Got: Number'),
          Actual: e, Description: 'Illegal arg'});
    }
 
-   TesterUtility.displayResults('Polynomial new Polynomial().multiply()', testResults, isFirst);
+   TesterUtility.displayResults('DiceExpression new DiceExpression().multiply()', testResults, isFirst);
 };
-Tester.Polynomial.negateExponents = function(isFirst)
+Tester.DiceExpression.negateExponents = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], polynomial, actual, expected;
+   var testResults = [], expression, actual, expected;
 
    try{
-   polynomial = new Polynomial(new Die('d3'));
-   polynomial.addTerm({coefficient: 1, exponent: 2});
-   polynomial.negateExponents();
-   actual = polynomial.toJSON().terms;
+   expression = new DiceExpression(new Die('d3'));
+   expression.addTerm({coefficient: 1, exponent: 2});
+   expression.negateExponents();
+   actual = expression.toJSON().terms;
    expected = [
       {coefficient: 1, exponent: -1},
       {coefficient: 2, exponent: -2},
@@ -129,16 +129,16 @@ Tester.Polynomial.negateExponents = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Negate exponents of (d3 + x^2)'});
    } catch(e){testResults.push({Error: e, Description: 'Negate exponents of (d3 + x^2)'});}
 
-   TesterUtility.displayResults('Polynomial new Polynomial().negateExponents()', testResults, isFirst);
+   TesterUtility.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
 };
-Tester.Polynomial._constructor = function(isFirst)
+Tester.DiceExpression._constructor = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
    try{
-   actual = new Polynomial(new Die('dF')).toJSON().terms;
+   actual = new DiceExpression(new Die('dF')).toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: 0},
@@ -148,7 +148,7 @@ Tester.Polynomial._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Happy fudge die'});}
 
    try{
-   new Polynomial(new Die())._constructor();
+   new DiceExpression(new Die())._constructor();
    TesterUtility.failedToThrow(testResults, 'Call _constructor');
    }
    catch(e)
@@ -157,7 +157,7 @@ Tester.Polynomial._constructor = function(isFirst)
    }
 
    try{
-   actual = new Polynomial(new Die('d6r3')).toJSON().terms;
+   actual = new DiceExpression(new Die('d6r3')).toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 6},
       {coefficient: 1, exponent: 5},
@@ -170,7 +170,7 @@ Tester.Polynomial._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'd6r3'});}
 
    try{
-   actual = new Polynomial(new Die('1d4!r3'), 0).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!r3'), 0).toJSON().terms;
    expected = [
       {exponent: 1, coefficient: (1/3)},
       {exponent: 2, coefficient: (1/3)},
@@ -182,7 +182,7 @@ Tester.Polynomial._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d4!r3 explode: 0'});}
 
    try{
-   actual = new Polynomial(new Die('1d4!pr3'), 1).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!pr3'), 1).toJSON().terms;
    expected = [
       {exponent: 1, coefficient: (1/3)},
       {exponent: 2, coefficient: (1/3)},
@@ -197,7 +197,7 @@ Tester.Polynomial._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d4!pr3 explode: 1'});}
 
    try{
-   actual = new Polynomial(new Die('1d4!!r3'), 1).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!!r3'), 1).toJSON().terms;
    expected = [
       {exponent: 1, coefficient: (1/3)},
       {exponent: 2, coefficient: (1/3)},
@@ -212,7 +212,7 @@ Tester.Polynomial._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d4!!r3 explode: 1'});}
 
    try{
-   actual = new Polynomial(new Die('1d4!!r<=3'), 1).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!!r<=3'), 1).toJSON().terms;
    expected = [
       //no 1-3 (reroll) or 4 (explode)
       {exponent: (4+1), coefficient: (1/4)},
@@ -224,5 +224,5 @@ Tester.Polynomial._constructor = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: minimum compound explodes'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: minimum compound explodes'});}
 
-   TesterUtility.displayResults('Polynomial new Polynomial()._constructor()', testResults, isFirst);
+   TesterUtility.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, isFirst);
 };

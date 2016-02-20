@@ -15,18 +15,18 @@ Statistics.analyze = function(dicePool)
       if(hasExplosions && hasDropKeep) break;  //no more information to find
    }
    if(hasDropKeep) throw new Error('Drop/keep not yet supported');  //useBruteForce then useDroppingAlgorithm
-   //TODO: re: later optimize so that all non-drop usePolynomial drops useDroppingAlgorithm and combine results
-   if(!hasExplosions) return Statistics.usePolynomial(dicePool, 0);
+   //TODO: re: later optimize so that all non-drop useNonDroppingAlgorithm drops useDroppingAlgorithm and combine results
+   if(!hasExplosions) return Statistics.useNonDroppingAlgorithm(dicePool, 0);
    //if(hasExplosions):
    var stats = [], explodeCount = 0;
    do
    {
-      stats = Statistics.usePolynomial(dicePool, explodeCount);
+      stats = Statistics.useNonDroppingAlgorithm(dicePool, explodeCount);
       ++explodeCount;
       //the only way for stats to be empty is if the explodeCount < the minimum number of explodes enforced by reroll
       //when the percent would be < 0.000% then stop
    } while(0 === stats.length || 0 !== Number(stats.last().probability.toFixed(5)));
-   //TODO: re: this seems intensive for large pools. consider pushing 0% check down to Polynomial
+   //TODO: re: this seems intensive for large pools. consider pushing 0% check down to DiceExpression
    return stats;
    //if any gaps then useBruteForce
 };
@@ -107,7 +107,7 @@ Statistics.determineProbability = function(stats)
 //TODO: re: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
-Statistics.useBruteForce = function()
+Statistics.useBruteForce = function(dicePool, explodeCount)
 {
 };
 Statistics.useDroppingAlgorithm = function()
@@ -118,26 +118,26 @@ Returns the statistics for a given DicePool using a Polynomial based algorithm.
 The algorithm is faster than brute force but can't support drop/keep.
 @param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
 */
-//TODO: re: rename to Statistics.useNonDroppingAlgorithm
-Statistics.usePolynomial = function(dicePool, explodeCount)
+Statistics.useNonDroppingAlgorithm = function(dicePool, explodeCount)
 {
    //assert: no drop/keep
-   var workingPolynomial, pool = dicePool.toJSON().pool, hasExplosions = false;
+   var workingExpression, pool = dicePool.toJSON().pool, hasExplosions = false;
    for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
    {
       for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
       {
+         //TODO: re: make DicePool.iterator
          hasExplosions |= (undefined !== pool[dieIndex].die.toJSON().explodeType);
 
          //dice are immutable so it's ok to reuse the same one
-         var newPolynomial = new Polynomial(pool[dieIndex].die, explodeCount);
-         if(pool[dieIndex].areDiceNegative) newPolynomial.negateExponents();
+         var newExpression = new DiceExpression(pool[dieIndex].die, explodeCount);
+         if(pool[dieIndex].areDiceNegative) newExpression.negateExponents();
 
-         if(undefined === workingPolynomial) workingPolynomial = newPolynomial;
-         else workingPolynomial.multiply(newPolynomial);
+         if(undefined === workingExpression) workingExpression = newExpression;
+         else workingExpression.multiply(newExpression);
       }
    }
-   var finalTerms = workingPolynomial.toJSON().terms;
+   var finalTerms = workingExpression.toJSON().terms;
    var result = [];
    for (var i = 0; i < finalTerms.length; ++i)
    {

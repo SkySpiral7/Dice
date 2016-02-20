@@ -1,6 +1,6 @@
 'use strict';
 
-var fileNames = ['DicePool', 'Die', 'GenerateHtml', 'Polynomial', 'Prebuilt', 'prototypes', 'Statistics', 'Testing Util'];
+var fileNames = ['DicePool', 'Die', 'GenerateHtml', 'Prebuilt', 'prototypes', 'Statistics', 'Testing Util', 'DiceExpression'];
 if(undefined === this['includePath']) this.includePath = '';
 
 for (var i = 0; i < fileNames.length; ++i)

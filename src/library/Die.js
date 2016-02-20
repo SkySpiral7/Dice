@@ -407,7 +407,7 @@ if maximum then explode until done
 if reroll then reroll
 if penetrating subtract 1
 
-TODO: re: error or warn about reroll penetrating (checks reroll before -1) also in Polynomial
+TODO: re: error or warn about reroll penetrating (checks reroll before -1) also in DiceExpression
 
 Define fudge:
 1d3-2 without rerolling or exploding

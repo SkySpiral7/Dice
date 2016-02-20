@@ -1,14 +1,13 @@
 'use strict';
 //mx^a. m: coefficient, x: indeterminate, a: exponent (must be a natural number), mx^a: term
 //is actually a Expression > Algebraic Expression > Rational Expression.
-//TODO: re: rename to Statistics.useNonDroppingAlgorithm.DiceExpression (file name: DiceExpression)
-function Polynomial(die, explodeCount)
+function DiceExpression(die, explodeCount)
 {
    var termArray;
 
    /**
-   This function lets you add a term to this Polynomial (this Polynomial is mutated to be the result).
-   If you have a Polynomial p then p.addTerm({coefficient: 3, exponent: 2}) is p + 3x^2.
+   This function lets you add a term to this Expression (this Expression is mutated to be the result).
+   If you have a Expression e then e.addTerm({coefficient: 3, exponent: 2}) is e + 3x^2.
    */
    this.addTerm = function(term)
    {
@@ -28,20 +27,20 @@ function Polynomial(die, explodeCount)
          }
       }
       termArray.push(term);
-      termArray.sort(Polynomial.exponentDescending);  //TODO: is this needed?
+      termArray.sort(DiceExpression.exponentDescending);  //TODO: is this needed?
    };
    /**
-   This function lets you multiply this Polynomial by otherPoly (this Polynomial is mutated to be the result).
+   This function lets you multiply this Expression by otherExpression (this Expression is mutated to be the result).
    If this is 3x^2 + 1 then this.multiply(this) is 9x^4 + 6x^2 + 1.
    */
-   this.multiply = function(otherPoly)
+   this.multiply = function(otherExpression)
    {
       //TODO: re: not null safe
-      if(!(otherPoly instanceof Polynomial)) throw new Error('Expected: Polynomial. Got: ' + otherPoly.constructor.name);
+      if(!(otherExpression instanceof DiceExpression)) throw new Error('Expected: DiceExpression. Got: ' + otherExpression.constructor.name);
       //copy out termArray so that this.addTerm can be used for the new terms
       var oldTermArray = termArray;
       termArray = [];
-      var otherTerms = otherPoly.toJSON().terms;
+      var otherTerms = otherExpression.toJSON().terms;
       while (0 !== oldTermArray.length)
       {
          var currentTerm = oldTermArray.shift();
@@ -60,23 +59,23 @@ function Polynomial(die, explodeCount)
       for(var i = 0; i < termArray.length; ++i){termArray[i].exponent *= -1;}
       termArray.reverse();  //works in this case
    };
-   /**@returns an object with all Polynomial data elements in it*/
+   /**@returns an object with all DiceExpression data elements in it*/
    this.toJSON = function()
    {
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
-         'instanceof': 'Polynomial',  //this is for a JSON reviver
+         'instanceof': 'DiceExpression',  //this is for a JSON reviver
          terms: termArray  //TODO: re: consider defensive copy
       };
    };
 
-   /**You can't call this function. It is only used internally to create a Polynomial object.*/
+   /**You can't call this function. It is only used internally to create a DiceExpression object.*/
    this._constructor = function()
    {
       if(undefined !== termArray) throw new Error('Illegal access');
       termArray = [];
 
       //TODO: re: consider creating from JSON and other ways
-      //TODO: re: make Polynomial._validate
+      //TODO: re: make DiceExpression._validate
       die = die.toJSON();  //this is the only thing I need the die for
       if(undefined === die.explodeType) explodeCount = 0;
       var minValue = 1 + die.constantModifier;
@@ -123,7 +122,7 @@ function Polynomial(die, explodeCount)
             }
          }
       }
-      termArray.sort(Polynomial.exponentDescending);
+      termArray.sort(DiceExpression.exponentDescending);
 
       die = undefined;  //no longer needed
       explodeCount = undefined;
@@ -131,9 +130,9 @@ function Polynomial(die, explodeCount)
    this._constructor();
 }
 /**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: -Infinity.*/
-Polynomial.exponentDescending = function(a,b){return (b.exponent - a.exponent);}
+DiceExpression.exponentDescending = function(a,b){return (b.exponent - a.exponent);}
 /*Example API:
-new Polynomial('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from string
+new DiceExpression('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from string
 [
 {coefficient: 7, exponent: 4},  //will be in this order (exponent descending)
 {coefficient: 6, exponent: 3},

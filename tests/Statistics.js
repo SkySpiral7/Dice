@@ -9,7 +9,7 @@ Tester.Statistics.analyze = function(isFirst)
    try{
    dicePool = new DicePool('2d6');
    actual = Statistics.analyze(dicePool);
-   expected = Statistics.usePolynomial(dicePool, 0);
+   expected = Statistics.useNonDroppingAlgorithm(dicePool, 0);
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
@@ -70,7 +70,7 @@ Tester.Statistics.calculateAggregates = function(isFirst)
    }
 
    try{
-   actual = Statistics.calculateAggregates(Statistics.usePolynomial(new DicePool('2d6')));
+   actual = Statistics.calculateAggregates(Statistics.useNonDroppingAlgorithm(new DicePool('2d6')));
    expected = {minimum: 2, maximum: 12, mean: 7, standardDeviation: Math.sqrt(210 / 36)};  //reduced: 35/6
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
@@ -85,7 +85,7 @@ Tester.Statistics.determineProbability = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   actual = Statistics.usePolynomial(new DicePool('2d6'));
+   actual = Statistics.useNonDroppingAlgorithm(new DicePool('2d6'));
    Statistics.determineProbability(actual);
    expected = [
       {result: 2, frequency: 1, probability: (1/36)},
@@ -105,14 +105,14 @@ Tester.Statistics.determineProbability = function(isFirst)
 
    TesterUtility.displayResults('Statistics Statistics.determineProbability', testResults, isFirst);
 };
-Tester.Statistics.usePolynomial = function(isFirst)
+Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
    try{
-   actual = Statistics.usePolynomial(new DicePool('2d6'));
+   actual = Statistics.useNonDroppingAlgorithm(new DicePool('2d6'));
    expected = [
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
@@ -130,7 +130,7 @@ Tester.Statistics.usePolynomial = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
-   actual = Statistics.usePolynomial(new DicePool('1d3!'), 1);
+   actual = Statistics.useNonDroppingAlgorithm(new DicePool('1d3!'), 1);
    expected = [
       {result: 1, probability: (1/3)},
       {result: 2, probability: (1/3)},
@@ -142,7 +142,7 @@ Tester.Statistics.usePolynomial = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
    try{
-   actual = Statistics.usePolynomial(new DicePool('-d3'));
+   actual = Statistics.useNonDroppingAlgorithm(new DicePool('-d3'));
    expected = [
       {result: -3, frequency: 1},
       {result: -2, frequency: 1},
@@ -151,5 +151,5 @@ Tester.Statistics.usePolynomial = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
    } catch(e){testResults.push({Error: e, Description: '-d3'});}
 
-   TesterUtility.displayResults('Statistics Statistics.usePolynomial', testResults, isFirst);
+   TesterUtility.displayResults('Statistics Statistics.useNonDroppingAlgorithm', testResults, isFirst);
 };
