@@ -3,7 +3,7 @@
 //is actually a Expression > Algebraic Expression > Rational Expression.
 function DiceExpression(die, explodeCount)
 {
-   var termArray;
+   var termArray, hasExplosions;
 
    /**
    This function lets you add a term to this Expression (this Expression is mutated to be the result).
@@ -59,6 +59,19 @@ function DiceExpression(die, explodeCount)
       for(var i = 0; i < termArray.length; ++i){termArray[i].exponent *= -1;}
       termArray.reverse();  //works in this case
    };
+   /**@returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).*/
+   this.toDiceResults = function()
+   {
+      var result = [];
+      for (var i = 0; i < termArray.length; ++i)
+      {
+         //rename them to something meaningful
+         if(hasExplosions) result.push({result: termArray[i].exponent, probability: termArray[i].coefficient});
+         else result.push({result: termArray[i].exponent, frequency: termArray[i].coefficient});
+      }
+      result.reverse();  //works in this case
+      return result;
+   };
    /**@returns an object with all DiceExpression data elements in it*/
    this.toJSON = function()
    {
@@ -77,7 +90,8 @@ function DiceExpression(die, explodeCount)
       //TODO: re: consider creating from JSON and other ways
       //TODO: re: make DiceExpression._validate
       die = die.toJSON();  //this is the only thing I need the die for
-      if(undefined === die.explodeType) explodeCount = 0;
+      hasExplosions = (undefined !== die.explodeType);
+      if(!hasExplosions) explodeCount = 0;
       var minValue = 1 + die.constantModifier;
       var maxValue = die.sideCount + die.constantModifier;
       var runningPossibilities = 1;
@@ -86,7 +100,7 @@ function DiceExpression(die, explodeCount)
          var sidesPossible = 0, thisExplodeValues = [];
          for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
          {
-            if (undefined !== die.explodeType && explodeIndex < explodeCount && currentValue === maxValue)
+            if (hasExplosions && explodeIndex < explodeCount && currentValue === maxValue)
             {
                //value explodes so it isn't a possibility unless we reach the explode limit
                ++sidesPossible;  //increment because this does affect the runningPossibilities
@@ -106,10 +120,10 @@ function DiceExpression(die, explodeCount)
             //http://mathforum.org/library/drmath/view/52207.html
             //exponent: a possible sum to roll (eg 1 to sideCount)
             //coefficient: number of ways to roll it (non-explode always starts as 1)
-            if(undefined === die.explodeType) termArray.push({exponent: actualValue, coefficient: 1});
+            if(!hasExplosions) termArray.push({exponent: actualValue, coefficient: 1});
             else thisExplodeValues.push(actualValue);
          }
-         if (undefined !== die.explodeType)
+         if (hasExplosions)
          {
             if(0 !== sidesPossible) runningPossibilities *= sidesPossible;  //leave as integers to maintain precision
               //edge case: 1d4!!r<=3 enforces 1 explode so leave runningPossibilities as 1

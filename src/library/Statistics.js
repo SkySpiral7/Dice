@@ -137,14 +137,6 @@ Statistics.useNonDroppingAlgorithm = function(dicePool, explodeCount)
          else workingExpression.multiply(newExpression);
       }
    }
-   var finalTerms = workingExpression.toJSON().terms;
-   var result = [];
-   for (var i = 0; i < finalTerms.length; ++i)
-   {
-      //rename them to something meaningful
-      if(hasExplosions) result.push({result: finalTerms[i].exponent, probability: finalTerms[i].coefficient});
-      else result.push({result: finalTerms[i].exponent, frequency: finalTerms[i].coefficient});
-   }
-   result.sort(Statistics.resultAscending);
-   return result;
+   return workingExpression.toDiceResults();
 };
+//TODO: re: add to DicePool: hasExplosions, hasDropKeep

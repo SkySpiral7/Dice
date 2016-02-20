@@ -131,6 +131,36 @@ Tester.DiceExpression.negateExponents = function(isFirst)
 
    TesterUtility.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
 };
+Tester.DiceExpression.toDiceResults = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, expected;
+
+   try{
+   actual = new DiceExpression(new Die('dF')).toDiceResults();
+   expected = [
+      {result: -1, frequency: 1},
+      {result: 0, frequency: 1},
+      {result: 1, frequency: 1},
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'dF'});
+   } catch(e){testResults.push({Error: e, Description: 'dF'});}
+
+   try{
+   actual = new DiceExpression(new Die('1d3!'), 1).toDiceResults();
+   expected = [
+      {result: 1, probability: (1/3)},
+      {result: 2, probability: (1/3)},
+      {result: (3+1), probability: ((1/3) * (1/3))},
+      {result: (3+2), probability: ((1/3) * (1/3))},
+      {result: (3+3), probability: ((1/3) * (1/3))}  //doesn't explode again
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
+   } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
+
+   TesterUtility.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, isFirst);
+};
 Tester.DiceExpression._constructor = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
