@@ -187,6 +187,17 @@ Tester.DiceExpression._constructor = function(isFirst)
    }
 
    try{
+   actual = new DiceExpression(new Die('dF')).toJSON().terms;
+   actual = new DiceExpression(actual).toJSON().terms;
+   expected = [
+      {coefficient: 1, exponent: 1},
+      {coefficient: 1, exponent: 0},
+      {coefficient: 1, exponent: -1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Accepts json'});
+   } catch(e){testResults.push({Error: e, Description: 'Accepts json'});}
+
+   try{
    actual = new DiceExpression(new Die('d6r3')).toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 6},

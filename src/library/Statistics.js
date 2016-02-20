@@ -103,7 +103,67 @@ Statistics.determineProbability = function(stats)
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
 Statistics.useBruteForce = function(dicePool, explodeCount)
 {
+   //assert: no drop/keep, explode
+   var everyValue = [], pool = dicePool.toJSON().pool;
+   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
+   {
+      for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
+      {
+         var newExpression = new DiceExpression(pool[dieIndex].die, explodeCount);
+         if(pool[dieIndex].areDiceNegative) newExpression.negateExponents();
+         everyValue.push(newExpression.toJSON().terms);
+      }
+      //TODO: re: do drop/keep for each result. old 2d6dl + 1d6 would do 3d6dl
+      //to fix do drop/keep here for this group
+   }
+   var everyCombination = [];
+   //assert: everyValue.length > 0 because DicePool should prevent that case
+   if(1 === everyValue.length) return new DiceExpression(everyValue[0]).toDiceResults();
+   everyCombination = cartesianProduct(everyValue[0], everyValue[1]);
+   for (var i = 2; i < everyValue.length; ++i)
+   {
+      everyCombination = nextCartesianProduct(everyCombination, everyValue[i]);
+   }
+   var everySum = [];
+   for (var resultIndex = 0; resultIndex < everyCombination.length; ++resultIndex)
+   {
+      var exponentSum = 0;
+      for (var dieIndex = 0; dieIndex < everyCombination[resultIndex].length; ++dieIndex)
+      {
+         exponentSum += everyCombination[resultIndex][dieIndex].exponent;
+      }
+      everySum.push({exponent: exponentSum, coefficient: 1});
+      //TODO: re: explode not handled?
+   }
+   var finalExpression = new DiceExpression([everySum[0]]);
+   for (var i = 1; i < everySum.length; ++i)
+   {
+      finalExpression.addTerm(everySum[i]);
+   }
+
+   return finalExpression.toDiceResults();
 };
+//TODO: re: test cartesianProduct and nextCartesianProduct. move them somewhere. combine them
+function cartesianProduct(array1, array2)
+{
+   var results = [];
+   for (var i = 0; i < array1.length; ++i)
+   for (var j = 0; j < array2.length; ++j)
+      results.push([array1[i], array2[j]]);
+   return results;
+}
+function nextCartesianProduct(array1, array2)
+{
+   var results = [];
+   for (var i = 0; i < array1.length; ++i)
+   for (var j = 0; j < array2.length; ++j)
+   {
+      var thisRow = array1[i].slice();  //copy array
+      thisRow.push(array2[j]);  //the difference is here: array2[j] is added to a copy of array1[i] so that it will be on the same level
+      results.push(thisRow);
+   }
+   return results;
+}
 Statistics.useDroppingAlgorithm = function()
 {
 };
@@ -120,7 +180,6 @@ Statistics.useNonDroppingAlgorithm = function(dicePool, explodeCount)
    {
       for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
       {
-         //TODO: re: make DicePool.iterator
          //dice are immutable so it's ok to reuse the same one
          var newExpression = new DiceExpression(pool[dieIndex].die, explodeCount);
          if(pool[dieIndex].areDiceNegative) newExpression.negateExponents();

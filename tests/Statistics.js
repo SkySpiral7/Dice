@@ -105,6 +105,49 @@ Tester.Statistics.determineProbability = function(isFirst)
 
    TesterUtility.displayResults('Statistics Statistics.determineProbability', testResults, isFirst);
 };
+Tester.Statistics.useBruteForce = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, expected;
+
+   try{
+   actual = Statistics.useBruteForce(new DicePool('2d6'));
+   expected = [
+      {result: 2, frequency: 1},
+      {result: 3, frequency: 2},
+      {result: 4, frequency: 3},
+      {result: 5, frequency: 4},
+      {result: 6, frequency: 5},
+      {result: 7, frequency: 6},
+      {result: 8, frequency: 5},
+      {result: 9, frequency: 4},
+      {result: 10, frequency: 3},
+      {result: 11, frequency: 2},
+      {result: 12, frequency: 1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
+   } catch(e){testResults.push({Error: e, Description: '2d6'});}
+
+   try{
+   actual = Statistics.useBruteForce(new DicePool('-d3'));
+   expected = [
+      {result: -3, frequency: 1},
+      {result: -2, frequency: 1},
+      {result: -1, frequency: 1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
+   } catch(e){testResults.push({Error: e, Description: '-d3'});}
+
+   try{
+   actual = Statistics.useBruteForce(new DicePool('2d2+d3'));
+   expected = Statistics.useNonDroppingAlgorithm(new DicePool('2d2+d3'));
+   //need to test more than 2 dice for useBruteForce. trust useNonDroppingAlgorithm for this because 2+ isn't special to it
+   testResults.push({Expected: expected, Actual: actual, Description: '2d2+d3'});
+   } catch(e){testResults.push({Error: e, Description: '2d2+d3'});}
+
+   TesterUtility.displayResults('Statistics Statistics.useBruteForce', testResults, isFirst);
+};
 Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);

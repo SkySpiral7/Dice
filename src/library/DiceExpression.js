@@ -85,9 +85,9 @@ function DiceExpression(die, explodeCount)
    this._constructor = function()
    {
       if(undefined !== termArray) throw new Error('Illegal access');
+      if(die instanceof Array){termArray = die; die = undefined; return;}  //TODO: re: needs defensive copy? And validation
       termArray = [];
 
-      //TODO: re: consider creating from JSON and other ways
       //TODO: re: make DiceExpression._validate
       die = die.toJSON();  //this is the only thing I need the die for
       hasExplosions = (undefined !== die.explodeType);

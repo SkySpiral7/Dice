@@ -28,7 +28,7 @@ function DicePool(arg1, arg2)
 {
    var name, pool, hasDropKeep, hasExplosions;
 
-   /**@returns true if other is equal to this.*/
+   /**@returns {!boolean} true if other is equal to this.*/
    this.equals = function(other)
    {
       if(!(other instanceof DicePool)) return false;
