@@ -96,53 +96,10 @@ function DiceExpression(die, explodeCount)
       termArray = [];
 
       //TODO: re: make DiceExpression._validate
-      die = die.toJSON();  //this is the only thing I need the die for
-      hasExplosions = hasExplosions && (undefined !== die.explodeType);
+      hasExplosions = hasExplosions && (undefined !== die.toJSON().explodeType);
       if(!hasExplosions) explodeCount = 0;
-      var minValue = 1 + die.constantModifier;
-      var maxValue = die.sideCount + die.constantModifier;
-      var runningPossibilities = 1;
-      for (var explodeIndex = 0; explodeIndex <= explodeCount; ++explodeIndex)
-      {
-         var sidesPossible = 0, thisExplodeValues = [];
-         for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
-         {
-            if (hasExplosions && explodeIndex < explodeCount && currentValue === maxValue)
-            {
-               //value explodes so it isn't a possibility unless we reach the explode limit
-               ++sidesPossible;  //increment because this does affect the runningPossibilities
-               continue;
-            }
-            var actualValue = currentValue;
-            if(Die.explodeTypes.Compound === die.explodeType) actualValue += (maxValue * explodeIndex);  //first time adds 0
-               //check for compound explode must be before reroll check and the other explodes after
-            if(undefined !== die.rerollCriteria && eval('' + actualValue + die.rerollCriteria)) continue;  //exclude reroll values
-            ++sidesPossible;
-            if(Die.explodeTypes.Normal === die.explodeType) actualValue += (maxValue * explodeIndex);  //I only care about the sum
-            else if(Die.explodeTypes.Penetrating === die.explodeType) actualValue += ((maxValue - 1) * explodeIndex);
-               //for penetrating explode every die after the first is 1 less
-               //then +1 because the first explode has full value then -1 for the last roll (so no action needed)
-               //explodeIndex: 0 will add 0 which is correct since the first die has full value
-
-            //http://mathforum.org/library/drmath/view/52207.html
-            //exponent: a possible sum to roll (eg 1 to sideCount)
-            //coefficient: number of ways to roll it (non-explode always starts as 1)
-            if(!hasExplosions) termArray.push({exponent: actualValue, coefficient: 1});
-            else thisExplodeValues.push(actualValue);
-         }
-         if (hasExplosions)
-         {
-            if(0 !== sidesPossible) runningPossibilities *= sidesPossible;  //leave as integers to maintain precision
-              //edge case: 1d4!!r<=3 enforces 1 explode so leave runningPossibilities as 1
-            for (var i = 0; i < thisExplodeValues.length; ++i)
-            {
-               //coefficient: probability to roll the sum
-               termArray.push({exponent: thisExplodeValues[i], coefficient: (1 / runningPossibilities)});
-               //formula for coefficient of non-compound explode: Math.pow((1/sidesPossible), (explodeIndex+1))
-                  //unused because the algorithm for compound works for all
-            }
-         }
-      }
+      termArray = DiceExpression.everyValue(die, explodeCount);
+      DiceExpression.combineValues(termArray);
       termArray.sort(DiceExpression.exponentDescending);
 
       die = undefined;  //no longer needed
@@ -150,6 +107,73 @@ function DiceExpression(die, explodeCount)
    };
    this._constructor();
 }
+//TODO: re: doc and test DiceExpression.combineValues
+//before: [{[1]: 1/2}, {[1,2]: 1/4}, {[2,2]: 1/4}]
+//after: [{1: 1/2}, {3: 1/4}, {4: 1/4}]
+DiceExpression.combineValues = function(everyValue)
+{
+   for (var i = 0; i < everyValue.length; ++i)
+   {
+      everyValue[i].exponent = Math.summation(everyValue[i].exponent);
+   }
+};
+//TODO: re: doc DiceExpression.everyValue and move some tests
+DiceExpression.everyValue = function(die, explodeCount)
+{
+   die = die.toJSON();  //this is the only thing I need the die for
+   var hasExplosions = (explodeCount > 0);
+   var minValue = 1 + die.constantModifier;
+   var maxValue = die.sideCount + die.constantModifier;
+   var runningPossibilities = 1;
+   var result = [];
+   for (var explodeIndex = 0; explodeIndex <= explodeCount; ++explodeIndex)
+   {
+      var sidesPossible = 0, thisExplodeValues = [];
+      for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
+      {
+         if (hasExplosions && explodeIndex < explodeCount && currentValue === maxValue)
+         {
+            //value explodes so it isn't a possibility unless we reach the explode limit
+            ++sidesPossible;  //increment because this does affect the runningPossibilities
+            continue;
+         }
+         var actualValue = currentValue;
+         if(Die.explodeTypes.Compound === die.explodeType) actualValue += (maxValue * explodeIndex);  //first time adds 0
+            //check for compound explode must be before reroll check and the other explodes after
+         if(undefined !== die.rerollCriteria && eval('' + actualValue + die.rerollCriteria)) continue;  //exclude reroll values
+         ++sidesPossible;
+         actualValue = [actualValue];
+         if(Die.explodeTypes.Normal === die.explodeType) actualValue = actualValue.concat(new Array(explodeIndex).fill(maxValue));
+         else if (Die.explodeTypes.Penetrating === die.explodeType && 0 !== explodeIndex)
+         {
+            var explodesRemaining = explodeIndex;
+            actualValue = [maxValue];  //only the first has the full value
+            --explodesRemaining;
+            actualValue = actualValue.concat(new Array(explodesRemaining).fill((maxValue - 1)));
+            actualValue.push((currentValue - 1));
+         }
+
+         //http://mathforum.org/library/drmath/view/52207.html
+         //exponent: a possible sum to roll (eg 1 to sideCount)
+         //coefficient: number of ways to roll it (non-explode always starts as 1)
+         if(!hasExplosions) result.push({exponent: actualValue, coefficient: 1});
+         else thisExplodeValues.push(actualValue);
+      }
+      if (hasExplosions)
+      {
+         if(0 !== sidesPossible) runningPossibilities *= sidesPossible;  //leave as integers to maintain precision
+           //edge case: 1d4!!r<=3 enforces 1 explode so leave runningPossibilities as 1
+         for (var i = 0; i < thisExplodeValues.length; ++i)
+         {
+            //coefficient: probability to roll the sum
+            result.push({exponent: thisExplodeValues[i], coefficient: (1 / runningPossibilities)});
+            //formula for coefficient of non-compound explode: Math.pow((1/sidesPossible), (explodeIndex+1))
+               //unused because the algorithm for compound works for all
+         }
+      }
+   }
+   return result;
+};
 /**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: -Infinity.*/
 DiceExpression.exponentDescending = function(a,b){return (b.exponent - a.exponent);}
 /*Example API:
