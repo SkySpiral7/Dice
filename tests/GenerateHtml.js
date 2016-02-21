@@ -26,7 +26,7 @@ Tester.GenerateHtml.statistics = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   actual = GenerateHtml.statistics(Statistics.analyze(new DicePool('2d6')), '>=');
+   actual = GenerateHtml.statistics(Statistics.calculateDiceSums(new DicePool('2d6')), '>=');
    //don't modify expected just rerecord it
    expected = '<table border="1" cellpadding="0" cellspacing="2" width="100%">\n';
    expected += '<tr><th>Roll</th><th>Freq</th><th>Chance</th><th>&gt;=</th><th align="center">Bar</th></tr>\n';

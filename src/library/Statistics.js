@@ -1,27 +1,27 @@
 'use strict';
 var Statistics = {};
 /**
-This function analyzes the dicePool given and returns the result of the best possible algorithm.
+This function analyzes the diceGroup given and returns the result of the best possible algorithm.
+@param {object} diceGroup an element of DicePool.toJSON().pool
 @returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).
 It will not include frequency of 0 or probability of less than 0.00000 (5) and will be in result ascending order.
 */
-Statistics.analyze = function(dicePool)
+Statistics.analyze = function(diceGroup)
 {
-   var json = dicePool.toJSON();
-   if(json.hasDropKeep) throw new Error('Drop/keep not yet supported');  //useBruteForce then useDroppingAlgorithm
+   if(undefined !== diceGroup.dropKeepType) throw new Error('Drop/keep not yet supported');  //useBruteForce then useDroppingAlgorithm
    //TODO: re: later optimize so that all non-drop useNonDroppingAlgorithm drops useDroppingAlgorithm and combine results
-   if(!json.hasExplosions) return Statistics.useNonDroppingAlgorithm(dicePool, 0);
-   //if(json.hasExplosions):
+   if(undefined === diceGroup.die.toJSON().explodeType) return Statistics.useNonDroppingAlgorithm(diceGroup, 0);
+   //if(does explode):
    var stats = [], explodeCount = 0;
    do
    {
-      stats = Statistics.useNonDroppingAlgorithm(dicePool, explodeCount);
+      stats = Statistics.useNonDroppingAlgorithm(diceGroup, explodeCount);
       if(0 === explodeCount) Statistics.determineProbability(stats);
       ++explodeCount;
       //the only way for stats to be empty is if the explodeCount < the minimum number of explodes enforced by reroll
       //when the percent would be < 0.000% then stop
    } while(0 === stats.length || 0 !== Number(stats.last().probability.toFixed(5)));
-   //TODO: re: this seems intensive for large pools. consider pushing 0% check down to DiceExpression
+   //TODO: re: consider pushing 0% check down to DiceExpression
    return stats;
    //if any gaps then useBruteForce
 };
@@ -83,7 +83,7 @@ Statistics.calculateDiceSums = function(dicePool)
    var results = [], useProbability = dicePool.toJSON().hasExplosions;
    for (var i = 0; i < pool.length; ++i)
    {
-      var stats = Statistics.analyze(pool[i]);  //TODO: re: currently this throws. Need to change all of them to take a pool
+      var stats = Statistics.analyze(pool[i]);  //TODO: re: test
       if(useProbability) Statistics.determineProbability(stats);  //if any of them have probability then they all need it
       results.push(stats);
    }

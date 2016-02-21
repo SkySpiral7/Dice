@@ -4,19 +4,19 @@ Tester.Statistics.analyze = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], dicePool, actual, expected;
+   var testResults = [], diceGroup, actual, expected;
 
    try{
-   dicePool = new DicePool('2d6');
-   actual = Statistics.analyze(dicePool);
-   expected = Statistics.useNonDroppingAlgorithm(dicePool, 0);
+   diceGroup = new DicePool('2d6').toJSON().pool[0];
+   actual = Statistics.analyze(diceGroup);
+   expected = Statistics.useNonDroppingAlgorithm(diceGroup, 0);
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
    //1d2! is the smallest output for explode
    //also being a power of 2 means better accuracy (perfect until converting to base 10 string)
-   actual = Statistics.analyze(new DicePool('1d2!'));
+   actual = Statistics.analyze(new DicePool('1d2!').toJSON().pool[0]);
    expected = [
       {result: 1, probability: (1/2)},
       {result: (2+1), probability: Math.pow((1/2), 2)},
@@ -70,7 +70,7 @@ Tester.Statistics.calculateAggregates = function(isFirst)
    }
 
    try{
-   actual = Statistics.calculateAggregates(Statistics.useNonDroppingAlgorithm(new DicePool('2d6')));
+   actual = Statistics.calculateAggregates(Statistics.calculateDiceSums(new DicePool('2d6')));
    expected = {minimum: 2, maximum: 12, mean: 7, standardDeviation: Math.sqrt(210 / 36)};  //reduced: 35/6
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
@@ -85,7 +85,7 @@ Tester.Statistics.combineResults = function(isFirst)
    var testResults = [], actual, expected, stats, input;
 
    try{
-   stats = Statistics.analyze(new DicePool('1d2'));
+   stats = Statistics.calculateDiceSums(new DicePool('1d2'));
    //Statistics.determineProbability(stats);  //no need. see DiceExpression for more tests
    actual = Statistics.combineResults([stats, JSON.clone(stats)], false);
    expected = [
@@ -117,7 +117,7 @@ Tester.Statistics.combineResults = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Custom results probability'});}
 
    try{
-   input = [Statistics.analyze(new DicePool('1d2')), Statistics.analyze(new DicePool('1d2')), Statistics.analyze(new DicePool('1d2'))];
+   input = [Statistics.calculateDiceSums(new DicePool('1d2')), Statistics.calculateDiceSums(new DicePool('1d2')), Statistics.calculateDiceSums(new DicePool('1d2'))];
    actual = Statistics.combineResults(input, false);
    expected = [
       {result: 3, frequency: 1},
@@ -137,7 +137,7 @@ Tester.Statistics.determineProbability = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   actual = Statistics.useNonDroppingAlgorithm(new DicePool('2d6'));
+   actual = Statistics.calculateDiceSums(new DicePool('2d6'));
    Statistics.determineProbability(actual);
    expected = [
       {result: 2, frequency: 1, probability: (1/36)},
