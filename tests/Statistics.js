@@ -164,7 +164,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   actual = Statistics.useBruteForce(new DicePool('2d6'));
+   actual = Statistics.useBruteForce(new DicePool('2d6').toJSON().pool[0]);
    expected = [
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
@@ -182,7 +182,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
-   actual = Statistics.useBruteForce(new DicePool('-d3'));
+   actual = Statistics.useBruteForce(new DicePool('-d3').toJSON().pool[0]);
    expected = [
       {result: -3, frequency: 1},
       {result: -2, frequency: 1},
@@ -192,24 +192,24 @@ Tester.Statistics.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '-d3'});}
 
    try{
-   actual = Statistics.useBruteForce(new DicePool('2d2+d3'));
-   expected = Statistics.useNonDroppingAlgorithm(new DicePool('2d2+d3'));
+   actual = Statistics.useBruteForce(new DicePool('3d2').toJSON().pool[0]);
+   expected = Statistics.useNonDroppingAlgorithm(new DicePool('3d2').toJSON().pool[0]);
    //need to test more than 2 dice for useBruteForce. trust useNonDroppingAlgorithm for this because 2+ isn't special to it
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2+d3'});
-   } catch(e){testResults.push({Error: e, Description: '2d2+d3'});}
+   testResults.push({Expected: expected, Actual: actual, Description: '3d2'});
+   } catch(e){testResults.push({Error: e, Description: '3d2'});}
 
    try{
-   actual = Statistics.useBruteForce(new DicePool('3d2!+1d4!'), 0);
-   expected = Statistics.useNonDroppingAlgorithm(new DicePool('3d2!+1d4!'), 0);
+   actual = Statistics.useBruteForce(new DicePool('2d2!').toJSON().pool[0], 0);
+   expected = Statistics.useNonDroppingAlgorithm(new DicePool('2d2!').toJSON().pool[0], 0);
    //useBruteForce is complicated. useNonDroppingAlgorithm is easy to prove correct for all cases
-   testResults.push({Expected: expected, Actual: actual, Description: '3d2!+1d4! explodeCount 0'});
-   } catch(e){testResults.push({Error: e, Description: '3d2!+1d4! explodeCount 0'});}
+   testResults.push({Expected: expected, Actual: actual, Description: '2d2! explodeCount 0'});
+   } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 0'});}
 
    try{
-   actual = Statistics.useBruteForce(new DicePool('3d2!+1d4!'), 1);
-   expected = Statistics.useNonDroppingAlgorithm(new DicePool('3d2!+1d4!'), 1);
-   testResults.push({Expected: expected, Actual: actual, Description: '3d2!+1d4! explodeCount 1'});
-   } catch(e){testResults.push({Error: e, Description: '3d2!+1d4! explodeCount 1'});}
+   actual = Statistics.useBruteForce(new DicePool('2d2!').toJSON().pool[0], 1);
+   expected = Statistics.useNonDroppingAlgorithm(new DicePool('2d2!').toJSON().pool[0], 1);
+   testResults.push({Expected: expected, Actual: actual, Description: '2d2! explodeCount 1'});
+   } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 1'});}
 
    TesterUtility.displayResults('Statistics Statistics.useBruteForce', testResults, isFirst);
 };

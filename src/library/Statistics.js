@@ -124,40 +124,30 @@ Statistics.determineProbability = function(stats)
 //TODO: re: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
-Statistics.useBruteForce = function(dicePool, explodeCount)
+Statistics.useBruteForce = function(diceGroup, explodeCount)
 {
    //assert: no drop/keep
-   if(!dicePool.toJSON().hasExplosions) explodeCount = 0;
-   var everyValue = [], pool = dicePool.toJSON().pool;
-   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
+   if(undefined === diceGroup.die.toJSON().explodeType) explodeCount = 0;
+   var everyValue = [];
+   for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
-      for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
-      {
-         var newExpression = new DiceExpression(pool[dieIndex].die, explodeCount);
-         //TODO: re: consider having DiceExpression and DiceExpression.everyValue take isNegative
-         if(pool[dieIndex].areDiceNegative) newExpression.negateExponents();
+      var newExpression = new DiceExpression(diceGroup.die, explodeCount);
+      //TODO: re: consider having DiceExpression and DiceExpression.everyValue take isNegative
+      if(diceGroup.areDiceNegative) newExpression.negateExponents();
 
-         var stats = newExpression.toDiceResults();
-         if(0 !== explodeCount) Statistics.determineProbability(stats);
-         everyValue.push(stats);
-      }
-      //TODO: re: do drop/keep for each result. old 2d6dl + 1d6 would do 3d6dl
-      //to fix do drop/keep here for this group:
-      //var stats = DiceExpression.everyValue(pool[dieIndex].die, explodeCount);
-      //then all the combinations for this group
-      //copy the array of numbers and pass into Math.summation(pool[dieIndex].dropKeepType.perform());
-      //frequency 1 or multiply all the probability together and use the above sum
-      //combine terms
-      //add to an array of groups
-      //every combination between the groups
-      //combine down to the final result
-
-      //This is painful. I  should be able to make a generic bruteForce between 2 things that I can reuse.
-      //And if I do the above I might as well useNonDroppingAlgorithm for the other groups
+      var stats = newExpression.toDiceResults();
+      if(0 !== explodeCount) Statistics.determineProbability(stats);
+      everyValue.push(stats);  //TODO: re: could just JSON.clone this in a loop
    }
+
    //assert: everyValue.length > 0 because DicePool should prevent that case
    if(1 === everyValue.length) return everyValue[0];
    var everyCombination = cartesianProduct(everyValue);
+   //TODO: re: do drop/keep for each result. old 2d6dl + 1d6 would do 3d6dl
+   //to fix do drop/keep here for this group:
+   //copy the array of numbers and pass into Math.summation(pool[dieIndex].dropKeepType.perform());
+   //frequency 1 or multiply all the probability together and use the above sum
+
    var everySum = [];
    for (var resultIndex = 0; resultIndex < everyCombination.length; ++resultIndex)
    {
@@ -170,6 +160,7 @@ Statistics.useBruteForce = function(dicePool, explodeCount)
       if(0 === explodeCount) everySum.push({exponent: exponentSum, coefficient: 1});
       else everySum.push({exponent: exponentSum, coefficient: probability});
    }
+
    var finalExpression = new DiceExpression([everySum[0]], (0 !== explodeCount));
    for (var i = 1; i < everySum.length; ++i)
    {
