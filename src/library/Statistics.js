@@ -214,25 +214,23 @@ Statistics.useDroppingAlgorithm = function()
 {
 };
 /**
-Returns the statistics for a given DicePool using a Polynomial based algorithm.
+Returns the statistics for a given element of DicePool.toJSON().pool using a Polynomial based algorithm.
 The algorithm is faster than brute force but can't support drop/keep.
+@param {object} diceGroup
 @param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
+@returns {object[]} the dice results
 */
-Statistics.useNonDroppingAlgorithm = function(dicePool, explodeCount)
+Statistics.useNonDroppingAlgorithm = function(diceGroup, explodeCount)
 {
    //assert: no drop/keep
-   var workingExpression, pool = dicePool.toJSON().pool;
-   for (var dieIndex = 0; dieIndex < pool.length; ++dieIndex)
+   var workingExpression = new DiceExpression(diceGroup.die, explodeCount);
+   if(diceGroup.areDiceNegative) workingExpression.negateExponents();
+   for (var dieCount = 1; dieCount < diceGroup.dieCount; ++dieCount)
    {
-      for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
-      {
-         //dice are immutable so it's ok to reuse the same one
-         var newExpression = new DiceExpression(pool[dieIndex].die, explodeCount);
-         if(pool[dieIndex].areDiceNegative) newExpression.negateExponents();
-
-         if(undefined === workingExpression) workingExpression = newExpression;
-         else workingExpression.multiply(newExpression);
-      }
+      //dice are immutable so it's ok to reuse the same one
+      var newExpression = new DiceExpression(diceGroup.die, explodeCount);
+      if(diceGroup.areDiceNegative) newExpression.negateExponents();
+      workingExpression.multiply(newExpression);
    }
    return workingExpression.toDiceResults();
 };

@@ -220,8 +220,8 @@ Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   actual = Statistics.useNonDroppingAlgorithm(new DicePool('2d6'));
-   expected = [
+   actual = Statistics.useNonDroppingAlgorithm(new DicePool('2d6').toJSON().pool[0]);
+   expected = [  //I used 2d6 because the results are well known
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
       {result: 4, frequency: 3},
@@ -238,7 +238,7 @@ Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
-   actual = Statistics.useNonDroppingAlgorithm(new DicePool('1d3!'), 1);
+   actual = Statistics.useNonDroppingAlgorithm(new DicePool('1d3!').toJSON().pool[0], 1);
    expected = [
       {result: 1, probability: (1/3)},
       {result: 2, probability: (1/3)},
@@ -250,7 +250,7 @@ Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
    try{
-   actual = Statistics.useNonDroppingAlgorithm(new DicePool('-d3'));
+   actual = Statistics.useNonDroppingAlgorithm(new DicePool('-d3').toJSON().pool[0]);
    expected = [
       {result: -3, frequency: 1},
       {result: -2, frequency: 1},
