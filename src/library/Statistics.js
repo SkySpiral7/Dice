@@ -77,6 +77,28 @@ Statistics.calculateAggregates = function(stats)
 /*Unused shorter formula for mean:
 For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 which has no mean*/
 };
+Statistics.calculateDiceSums = function(dicePool)
+{
+   var pool = dicePool.toJSON().pool;
+   var results = [], useProbability = dicePool.toJSON().hasExplosions;
+   for (var i = 0; i < pool.length; ++i)
+   {
+      var stats = Statistics.analyze(pool[i]);  //TODO: re: currently this throws. Need to change all of them to take a pool
+      if(useProbability) Statistics.determineProbability(stats);  //if any of them have probability then they all need it
+      results.push(stats);
+   }
+   return Statistics.combineResults(results, useProbability);
+};
+Statistics.combineResults = function(statsArray, useProbability)
+{
+   //uses the non dropping algorithm (see Statistics.useNonDroppingAlgorithm)
+   var workingExpression = new DiceExpression(statsArray[0], useProbability);
+   for (var i = 1; i < statsArray.length; ++i)
+   {
+      workingExpression.multiply(new DiceExpression(statsArray[i], useProbability));
+   }
+   return workingExpression.toDiceResults();
+};
 Statistics.compareStatistics = function(stats1, stats2)
 {
 };
@@ -112,6 +134,7 @@ Statistics.useBruteForce = function(dicePool, explodeCount)
       for (var dieCount = 0; dieCount < pool[dieIndex].dieCount; ++dieCount)
       {
          var newExpression = new DiceExpression(pool[dieIndex].die, explodeCount);
+         //TODO: re: consider having DiceExpression and DiceExpression.everyValue take isNegative
          if(pool[dieIndex].areDiceNegative) newExpression.negateExponents();
 
          var stats = newExpression.toDiceResults();
@@ -119,7 +142,18 @@ Statistics.useBruteForce = function(dicePool, explodeCount)
          everyValue.push(stats);
       }
       //TODO: re: do drop/keep for each result. old 2d6dl + 1d6 would do 3d6dl
-      //to fix do drop/keep here for this group
+      //to fix do drop/keep here for this group:
+      //var stats = DiceExpression.everyValue(pool[dieIndex].die, explodeCount);
+      //then all the combinations for this group
+      //copy the array of numbers and pass into Math.summation(pool[dieIndex].dropKeepType.perform());
+      //frequency 1 or multiply all the probability together and use the above sum
+      //combine terms
+      //add to an array of groups
+      //every combination between the groups
+      //combine down to the final result
+
+      //This is painful. I  should be able to make a generic bruteForce between 2 things that I can reuse.
+      //And if I do the above I might as well useNonDroppingAlgorithm for the other groups
    }
    //assert: everyValue.length > 0 because DicePool should prevent that case
    if(1 === everyValue.length) return everyValue[0];
@@ -136,7 +170,7 @@ Statistics.useBruteForce = function(dicePool, explodeCount)
       if(0 === explodeCount) everySum.push({exponent: exponentSum, coefficient: 1});
       else everySum.push({exponent: exponentSum, coefficient: probability});
    }
-   var finalExpression = new DiceExpression([everySum[0]], explodeCount);
+   var finalExpression = new DiceExpression([everySum[0]], (0 !== explodeCount));
    for (var i = 1; i < everySum.length; ++i)
    {
       finalExpression.addTerm(everySum[i]);

@@ -78,6 +78,58 @@ Tester.Statistics.calculateAggregates = function(isFirst)
 
    TesterUtility.displayResults('Statistics Statistics.calculateAggregates', testResults, isFirst);
 };
+Tester.Statistics.combineResults = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, expected, stats, input;
+
+   try{
+   stats = Statistics.analyze(new DicePool('1d2'));
+   //Statistics.determineProbability(stats);  //no need. see DiceExpression for more tests
+   actual = Statistics.combineResults([stats, JSON.clone(stats)], false);
+   expected = [
+      {result: 2, frequency: 1},
+      {result: 3, frequency: 2},
+      {result: 4, frequency: 1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: 2d2 false'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path: 2d2 false'});}
+
+   try{
+   stats = [
+      {result: 1, probability: (1/4)},  //unfair die
+      {result: 2, probability: (3/4)}
+   ];
+   input = [stats];
+   stats = [
+      {result: 1, probability: (1/2)},  //fair die
+      {result: 2, probability: (1/2)}
+   ];
+   input.push(stats);
+   actual = Statistics.combineResults(input, true);
+   expected = [
+      {result: 2, probability: ((1/4)*(1/2))},
+      {result: 3, probability: ((1/4)*(1/2) + (3/4)*(1/2))},  //1+2 or 2+1
+      {result: 4, probability: ((3/4)*(1/2))}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Custom results probability'});
+   } catch(e){testResults.push({Error: e, Description: 'Custom results probability'});}
+
+   try{
+   input = [Statistics.analyze(new DicePool('1d2')), Statistics.analyze(new DicePool('1d2')), Statistics.analyze(new DicePool('1d2'))];
+   actual = Statistics.combineResults(input, false);
+   expected = [
+      {result: 3, frequency: 1},
+      {result: 4, frequency: 3},  //1+1+2, 1+2+1, 2+1+1
+      {result: 5, frequency: 3},  //1+2+2, 2+1+2, 2+2+1
+      {result: 6, frequency: 1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '3d2 false'});
+   } catch(e){testResults.push({Error: e, Description: '3d2 false'});}
+
+   TesterUtility.displayResults('Statistics Statistics.combineResults', testResults, isFirst);
+};
 Tester.Statistics.determineProbability = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
