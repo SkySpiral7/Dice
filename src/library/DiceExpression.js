@@ -1,9 +1,9 @@
 'use strict';
 //mx^a. m: coefficient, x: indeterminate, a: exponent (must be a natural number), mx^a: term
 //is actually a Expression > Algebraic Expression > Rational Expression.
-function DiceExpression(die, explodeCount)
+function DiceExpression(arg1, arg2)
 {
-   var termArray, hasExplosions;
+   var termArray, useProbability;
 
    /**
    This function lets you add a term to this Expression (this Expression is mutated to be the result).
@@ -66,7 +66,7 @@ function DiceExpression(die, explodeCount)
       for (var i = 0; i < termArray.length; ++i)
       {
          //rename them to something meaningful
-         if(hasExplosions) result.push({result: termArray[i].exponent, probability: termArray[i].coefficient});
+         if(useProbability) result.push({result: termArray[i].exponent, probability: termArray[i].coefficient});
          else result.push({result: termArray[i].exponent, frequency: termArray[i].coefficient});
       }
       result.reverse();  //works in this case
@@ -85,25 +85,41 @@ function DiceExpression(die, explodeCount)
    this._constructor = function()
    {
       if(undefined !== termArray) throw new Error('Illegal access');
-      hasExplosions = (undefined !== explodeCount && explodeCount > 0);
-      if (die instanceof Array)
+      if (arg1 instanceof Array)
       {
-         termArray = die;  //TODO: re: needs defensive copy? And validation
-         die = undefined;
-         explodeCount = undefined;
+         useProbability = arg2;
+         if (undefined !== arg1[0].result)
+         {
+            //convert arg1 from result array to term array
+            for (var i = 0; i < arg1.length; ++i)
+            {
+               //TODO: re: validation: useProbability requires probability else requires frequency
+               if(useProbability) arg1[i] = {exponent: arg1[i].result, coefficient: arg1[i].probability};
+               else arg1[i] = {exponent: arg1[i].result, coefficient: arg1[i].frequency};
+            }
+         }
+         termArray = arg1;  //TODO: re: needs defensive copy? And validation
+         termArray.sort(DiceExpression.exponentDescending);
+         arg1 = undefined;
+         arg2 = undefined;
          return;
       }
       termArray = [];
 
       //TODO: re: make DiceExpression._validate
+      var die = arg1;
+      var explodeCount = arg2;
+      var hasExplosions = (undefined !== explodeCount && explodeCount > 0);
+      //notice how an exploding die with explodeCount 0 uses frequency
       hasExplosions = hasExplosions && (undefined !== die.toJSON().explodeType);
       if(!hasExplosions) explodeCount = 0;
+      useProbability = hasExplosions;
       termArray = DiceExpression.everyValue(die, explodeCount);
       DiceExpression.combineValues(termArray);
       termArray.sort(DiceExpression.exponentDescending);
 
-      die = undefined;  //no longer needed
-      explodeCount = undefined;
+      arg1 = undefined;  //no longer needed
+      arg2 = undefined;
    };
    this._constructor();
 }

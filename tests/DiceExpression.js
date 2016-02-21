@@ -198,6 +198,30 @@ Tester.DiceExpression._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Accepts json'});}
 
    try{
+   actual = new DiceExpression(new Die('dF')).toDiceResults();
+   Statistics.determineProbability(actual);
+   actual = new DiceExpression(actual, false).toJSON().terms;
+   expected = [
+      {coefficient: 1, exponent: 1},
+      {coefficient: 1, exponent: 0},
+      {coefficient: 1, exponent: -1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Accepts frequency dice results'});
+   } catch(e){testResults.push({Error: e, Description: 'Accepts frequency dice results'});}
+
+   try{
+   actual = new DiceExpression(new Die('dF')).toDiceResults();
+   Statistics.determineProbability(actual);
+   actual = new DiceExpression(actual, true).toJSON().terms;
+   expected = [
+      {coefficient: (1/3), exponent: 1},
+      {coefficient: (1/3), exponent: 0},
+      {coefficient: (1/3), exponent: -1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Accepts probability dice results'});
+   } catch(e){testResults.push({Error: e, Description: 'Accepts probability dice results'});}
+
+   try{
    actual = new DiceExpression(new Die('d6r3')).toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 6},
