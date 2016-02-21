@@ -38,9 +38,9 @@ if (undefined === Array.prototype.removeElement)
 }
 /**
 @returns a copy of the input according to JSON.stringify. Objects with toJSON defined will stay that way
-because JSON.parse is not given a reviver (say goodbye to dates and dice).
+unless the reviver arg transforms them (see JsonReviver.instanceof for dice).
 */
-if(undefined === JSON.clone){JSON.clone = function(input){return JSON.parse(JSON.stringify(input));};}
+if(undefined === JSON.clone){JSON.clone = function(input, reviver){return JSON.parse(JSON.stringify(input), reviver);};}
 /**
 Factorial is defined as the multiplication of all positive integers less than and equal to the input.
 Except 0 and 1 which return 1. This function does not use recursion.
@@ -111,3 +111,14 @@ if(undefined === Number.isNatural){Number.isNatural = function(input){return (Nu
 @returns {!boolean} true if this string contains the substring
 */
 if(undefined === String.prototype.contains){String.prototype.contains = function(substring){return (-1 !== this.indexOf(substring));};}
+
+var JsonReviver = {};
+//TODO: re: put somewhere. consider {instanceof: 'Date', value: '1995-12-17T03:24:00'};
+/**A reviver for JSON.parse. If the parsed object has a property instanceof then that object will be recreated.
+This function assumes that obj instanceof X is true and new X(obj.toJSON()) is possible where obj.toJSON().instanceof = 'X';
+Note that the o in instanceof is lowercase in order to match the keyword (as annoying as that is).*/
+JsonReviver.instanceof = function(key, value)
+{
+   if('string' === typeof(value.instanceof)) return new window[value.instanceof](value);
+   return value;
+};

@@ -223,11 +223,21 @@ Tester.prototypes.String.contains = function(isFirst)
    TesterUtility.clearResults(isFirst);
 
    var testResults = [];
-   testResults.push({Expected: true, Actual: 'me pop you'.contains('pop'), Description: 'Happy path: middle'});
-   testResults.push({Expected: true, Actual: 'me pop you'.contains('me pop you'), Description: 'Entire string'});
-   testResults.push({Expected: false, Actual: 'me pop you'.contains('POP'), Description: 'Case sensitive'});
+   testResults.push({Expected: true, Actual: 'me and you'.contains('and'), Description: 'Happy path: middle'});
+   testResults.push({Expected: true, Actual: 'me and you'.contains('me and you'), Description: 'Entire string'});
+   testResults.push({Expected: false, Actual: 'me and you'.contains('AND'), Description: 'Case sensitive'});
    //testResults.push({Expected: false, Actual: 'me 2 you'.contains(2), Description: 'Type strict'}); undefined behavior
    //testResults.push({Expected: false, Actual: 'me undefined you'.contains(), Description: 'No arg'}); undefined behavior
 
    TesterUtility.displayResults('prototypes String.prototype.contains', testResults, isFirst);
+};
+Tester.prototypes.JSON.instanceofReviver = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [];
+   testResults.push({Expected: new Die(2), Actual: JSON.clone(new Die(2), JsonReviver.instanceof), Description: 'Revives Die'});
+   testResults.push({Expected: new DicePool('2d3'), Actual: JSON.clone(new DicePool('2d3'), JsonReviver.instanceof), Description: 'Revives DicePool'});
+
+   TesterUtility.displayResults('prototypes JsonReviver.instanceof', testResults, isFirst);
 };
