@@ -129,6 +129,22 @@ Tester.DiceExpression.negateExponents = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Negate exponents of (d3 + x^2)'});
    } catch(e){testResults.push({Error: e, Description: 'Negate exponents of (d3 + x^2)'});}
 
+   try{
+   expression = new DiceExpression([
+      {coefficient: 1, exponent: [1, 5]},
+      {coefficient: 2, exponent: [2, 6]},
+      {coefficient: 1, exponent: [3, 7]}
+   ], false);
+   expression.negateExponents();
+   actual = expression.toJSON().terms;
+   expected = [
+      {coefficient: 1, exponent: [-1, -5]},
+      {coefficient: 2, exponent: [-2, -6]},
+      {coefficient: 1, exponent: [-3, -7]}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Negate array exponents'});
+   } catch(e){testResults.push({Error: e, Description: 'Negate array exponents'});}
+
    TesterUtility.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
 };
 Tester.DiceExpression.toDiceResults = function(isFirst)

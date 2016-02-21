@@ -56,7 +56,18 @@ function DiceExpression(arg1, arg2)
    /**All exponents are multiplied by -1. Doesn't change any coefficients.*/
    this.negateExponents = function()
    {
-      for(var i = 0; i < termArray.length; ++i){termArray[i].exponent *= -1;}
+      for (var termIndex = 0; termIndex < termArray.length; ++termIndex)
+      {
+         if('number' === typeof(termArray[termIndex].exponent)) termArray[termIndex].exponent *= -1;
+         else  //instance of Array
+         {
+            for (var exponentIndex = 0; exponentIndex < termArray[termIndex].exponent.length; ++exponentIndex)
+            {
+               termArray[termIndex].exponent[exponentIndex] *= -1;
+               //TODO: re: this is only fine if all functions allow exponent array
+            }
+         }
+      }
       termArray.reverse();  //works in this case
    };
    /**@returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).*/
@@ -191,7 +202,12 @@ DiceExpression.everyValue = function(die, explodeCount)
    return result;
 };
 /**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: -Infinity.*/
-DiceExpression.exponentDescending = function(a,b){return (b.exponent - a.exponent);}
+DiceExpression.exponentDescending = function(a,b)
+{
+   if('number' === typeof(a.exponent)) return (b.exponent - a.exponent);
+   //else is an array
+   return (Math.summation(b.exponent) - Math.summation(a.exponent));
+}
 /*Example API:
 new DiceExpression('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from string
 [

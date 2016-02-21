@@ -8,14 +8,17 @@ It will not include frequency of 0 or probability of less than 0.00000 (5) and w
 */
 Statistics.analyze = function(diceGroup)
 {
-   if(undefined !== diceGroup.dropKeepType) throw new Error('Drop/keep not yet supported');  //useBruteForce then useDroppingAlgorithm
-   //TODO: re: later optimize so that all non-drop useNonDroppingAlgorithm drops useDroppingAlgorithm and combine results
-   if(undefined === diceGroup.die.toJSON().explodeType) return Statistics.useNonDroppingAlgorithm(diceGroup, 0);
+   var algorithm;
+   if(undefined === diceGroup.dropKeepType) algorithm = Statistics.useNonDroppingAlgorithm;
+   //later useDroppingAlgorithm
+   else algorithm = Statistics.useBruteForce;  //if any gaps then useBruteForce
+
+   if(undefined === diceGroup.die.toJSON().explodeType) return algorithm(diceGroup, 0);
    //if(does explode):
    var stats = [], explodeCount = 0;
    do
    {
-      stats = Statistics.useNonDroppingAlgorithm(diceGroup, explodeCount);
+      stats = algorithm(diceGroup, explodeCount);
       if(0 === explodeCount) Statistics.determineProbability(stats);
       ++explodeCount;
       //the only way for stats to be empty is if the explodeCount < the minimum number of explodes enforced by reroll
@@ -23,7 +26,6 @@ Statistics.analyze = function(diceGroup)
    } while(0 === stats.length || 0 !== Number(stats.last().probability.toFixed(5)));
    //TODO: re: consider pushing 0% check down to DiceExpression
    return stats;
-   //if any gaps then useBruteForce
 };
 /**
 Note that a single die (that doesn't explode) has no mean or standardDeviation for the same
@@ -109,7 +111,7 @@ Statistics.compareStatistics = function(stats1, stats2)
 Statistics.determineProbability = function(stats)
 {
    //TODO: re: add null safe validate
-   if(undefined != stats[0].probability) return;  //already done
+   if(undefined !== stats[0].probability) return;  //already done
    var sum = 0;
    for (var i = 0; i < stats.length; ++i)
    {
@@ -126,41 +128,46 @@ Statistics.determineProbability = function(stats)
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
 Statistics.useBruteForce = function(diceGroup, explodeCount)
 {
-   //assert: no drop/keep
    if(undefined === diceGroup.die.toJSON().explodeType) explodeCount = 0;
    var everyValue = [];
    for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
-      var newExpression = new DiceExpression(diceGroup.die, explodeCount);
+      var everyDieValue = DiceExpression.everyValue(diceGroup.die, explodeCount);
+      var newExpression = new DiceExpression(everyDieValue, (0 !== explodeCount));
       //TODO: re: consider having DiceExpression and DiceExpression.everyValue take isNegative
       if(diceGroup.areDiceNegative) newExpression.negateExponents();
 
       var stats = newExpression.toDiceResults();
-      if(0 !== explodeCount) Statistics.determineProbability(stats);
+      if(0 !== explodeCount) Statistics.determineProbability(stats);  //safe because it doesn't touch results
       everyValue.push(stats);  //TODO: re: could just JSON.clone this in a loop
    }
+   // everyValue = new Array(diceGroup.dieCount).fill(stats);  //need to prove this is safe or use JSON.clone
 
    //assert: everyValue.length > 0 because DicePool should prevent that case
-   if(1 === everyValue.length) return everyValue[0];
+   if (1 === everyValue.length)
+   {
+      var terms = new DiceExpression(everyValue[0], (0 !== explodeCount)).toJSON().terms;
+      DiceExpression.combineValues(terms);  //TODO: re: obviously needs refactoring
+      return new DiceExpression(terms, (0 !== explodeCount)).toDiceResults();
+   }
    var everyCombination = cartesianProduct(everyValue);
-   //TODO: re: do drop/keep for each result. old 2d6dl + 1d6 would do 3d6dl
-   //to fix do drop/keep here for this group:
-   //copy the array of numbers and pass into Math.summation(pool[dieIndex].dropKeepType.perform());
-   //frequency 1 or multiply all the probability together and use the above sum
 
    var everySum = [];
    for (var resultIndex = 0; resultIndex < everyCombination.length; ++resultIndex)
    {
-      var exponentSum = 0, probability = 1;
+      var everyResult = [], probability = 1;
       for (var dieIndex = 0; dieIndex < everyCombination[resultIndex].length; ++dieIndex)
       {
-         exponentSum += everyCombination[resultIndex][dieIndex].result;
+         everyResult = everyResult.concat(everyCombination[resultIndex][dieIndex].result);  //concat shallow copies array
          if(0 !== explodeCount) probability *= everyCombination[resultIndex][dieIndex].probability;
       }
-      if(0 === explodeCount) everySum.push({exponent: exponentSum, coefficient: 1});
-      else everySum.push({exponent: exponentSum, coefficient: probability});
+      if(undefined !== diceGroup.dropKeepType) diceGroup.dropKeepType.perform(diceGroup.dropKeepCount, everyResult);
+      //the probability is the product of all of the probability but only some dice are used for the result sum
+      if(0 === explodeCount) everySum.push({exponent: Math.summation(everyResult), coefficient: 1});
+      else everySum.push({exponent: Math.summation(everyResult), coefficient: probability});
    }
 
+   //combine matching sums:
    var finalExpression = new DiceExpression([everySum[0]], (0 !== explodeCount));
    for (var i = 1; i < everySum.length; ++i)
    {
@@ -172,7 +179,7 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
 //TODO: re: test, move it somewhere, and doc
 function cartesianProduct(superArray)
 {
-   if(1 === superArray.length) return superArray[0];
+   if(1 === superArray.length) return superArray;
    var results = firstCartesianProduct(superArray[0], superArray[1]);
    for (var i = 2; i < superArray.length; ++i)
    {
