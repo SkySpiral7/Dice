@@ -15,7 +15,8 @@ Statistics.analyze = function(diceGroup)
 
    if(undefined === diceGroup.die.toJSON().explodeType) return algorithm(diceGroup, 0);
    //if(does explode):
-   var stats = [], explodeCount = 0;
+   var stats = [], explodeCount = 0;  //200,001 sided die is the smallest that will end with 0 explodes
+   //TODO: re: should be math for predicting # explodes
    do
    {
       stats = algorithm(diceGroup, explodeCount);
