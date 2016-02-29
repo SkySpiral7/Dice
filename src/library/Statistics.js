@@ -127,6 +127,8 @@ Statistics.determineProbability = function(stats)
 //TODO: re: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
+//TODO: re: make a brute force for every combination and also for every sum (currently only sum)
+//TODO: re: use brute every combination for pass/fail. which are -1, 0, 1
 Statistics.useBruteForce = function(diceGroup, explodeCount)
 {
    if(undefined === diceGroup.die.toJSON().explodeType) explodeCount = 0;

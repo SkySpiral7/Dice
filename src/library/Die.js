@@ -77,7 +77,7 @@ function Die(arg1)
       if(undefined !== sideCount) throw new Error('Illegal access');
 
       if(undefined == arg1) arg1 = {name: '1d6', sideCount: 6};
-      if('number' === typeof(arg1)) arg1 = {name: '1d' + arg1, sideCount: arg1};
+      else if('number' === typeof(arg1)) arg1 = {name: '1d' + arg1, sideCount: arg1};
       else if('string' === typeof(arg1)) arg1 = Die._parseString(arg1);
 
       Die._validate(arg1);

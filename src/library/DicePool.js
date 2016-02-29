@@ -196,6 +196,7 @@ DicePool._parseString = function(inputString)
    }
    return jsonResult;
 };
+//TODO: re: I'm thinking DicePool._parseString does everything and there is no Die._parseString
 //ignore for now: min/max, sorting
 //old Polynomial.createDiePolynomial had negative and ScatterDie
 //old Polynomial.multiplyPolynomials had min/max
