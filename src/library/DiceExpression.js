@@ -11,10 +11,9 @@ function DiceExpression(arg1, arg2)
    */
    this.addTerm = function(term)
    {
-      if(term.coefficient instanceof Number) term.coefficient = term.coefficient.valueOf();
-      else if('number' !== typeof(term.coefficient)) throw new Error('term.coefficient must be a number but was: ' + typeof(term.coefficient));
-      if(term.exponent instanceof Number) term.exponent = term.exponent.valueOf();
-      else if('number' !== typeof(term.exponent)) throw new Error('term.exponent must be a number but was: ' + typeof(term.exponent));
+      //TODO: re: should I unbox parameters?
+      requireTypeOf('number', term.coefficient);  //allow NaN and Infinity
+      requireTypeOf('number', term.exponent);
 
       if(0 === term.coefficient) return;  //fast path and to prevent adding it
       for (var i = 0; i < termArray.length; ++i)
@@ -35,8 +34,7 @@ function DiceExpression(arg1, arg2)
    */
    this.multiply = function(otherExpression)
    {
-      //TODO: re: not null safe
-      if(!(otherExpression instanceof DiceExpression)) throw new Error('Expected: DiceExpression. Got: ' + otherExpression.constructor.name);
+      requireInstanceOf(DiceExpression, otherExpression);
       //copy out termArray so that this.addTerm can be used for the new terms
       var oldTermArray = termArray;
       termArray = [];

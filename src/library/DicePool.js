@@ -85,7 +85,6 @@ function DicePool(arg1, arg2)
    {
       if(undefined !== pool) throw new Error('Illegal access');
 
-      if(arg1 instanceof String) arg1 = arg1.valueOf();
       if('string' === typeof(arg1) && undefined == arg2) arg2 = DicePool._parseString(arg1);
       else if (undefined == arg2 && undefined != arg1.pool)
       {

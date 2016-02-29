@@ -42,7 +42,7 @@ dice have no actual maximum (unless enforced externally).
 Statistics.calculateAggregates = function(stats)
 {
    var min = Infinity, max = -Infinity, count = 0, sum = 0;
-   if(!(stats instanceof Array)) throw new Error('stats must be an array but was: ' + typeof(stats));
+   requireInstanceOf(Array, stats);
    if(0 === stats.length) throw new Error('stats must not be an empty array');
    //an empty array would return {minimum: Infinity, maximum: -Infinity, mean: NaN, standardDeviation: NaN}
    for (var i = 0; i < stats.length; ++i)
@@ -177,38 +177,6 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
 
    return finalExpression.toDiceResults();
 };
-//TODO: re: test, move it somewhere, and doc
-function cartesianProduct(superArray)
-{
-   if(1 === superArray.length) return superArray;
-   var results = firstCartesianProduct(superArray[0], superArray[1]);
-   for (var i = 2; i < superArray.length; ++i)
-   {
-      results = nextCartesianProduct(results, superArray[i]);
-   }
-   return results;
-
-   function firstCartesianProduct(array1, array2)
-   {
-      var results = [];
-      for (var i = 0; i < array1.length; ++i)
-      for (var j = 0; j < array2.length; ++j)
-         results.push([array1[i], array2[j]]);
-      return results;
-   }
-   function nextCartesianProduct(array1, array2)
-   {
-      var results = [];
-      for (var i = 0; i < array1.length; ++i)
-      for (var j = 0; j < array2.length; ++j)
-      {
-         var thisRow = array1[i].slice();  //copy array
-         thisRow.push(array2[j]);  //the difference is here: array2[j] is added to a copy of array1[i] so that it will be on the same level
-         results.push(thisRow);
-      }
-      return results;
-   }
-}
 Statistics.useDroppingAlgorithm = function()
 {
 };

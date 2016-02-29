@@ -11,16 +11,16 @@ Output's wounded and unsavedWounds might not be present.
 */
 Prebuilt.WarhammerAttackUnit = function(input)
 {
-   //TODO: re: make helpers assertTypeOf(obj, type) and assertInstanceOf(obj, instance)
-   if(typeof(input.diceCount)!=="number" || isNaN(input.diceCount)) throw new Error("WarhammerAttackUnit, input.diceCount ("+input.diceCount+") the must be a number type.");
-   if(typeof(input.toHitValue)!=="number" || isNaN(input.toHitValue)) throw new Error("WarhammerAttackUnit, input.toHitValue ("+input.toHitValue+") the must be a number type.");
-   if(typeof(input.toWoundValue)!=="number" || isNaN(input.toWoundValue)) throw new Error("WarhammerAttackUnit, input.toWoundValue ("+input.toWoundValue+") the must be a number type.");
+   //TODO: re: test validation
+   requireNaturalNumber(input.diceCount);
+   requireNaturalNumber(input.maxWounds);
+   requireNaturalNumber(input.toHitValue);
+   requireNaturalNumber(input.toWoundValue);
    if(undefined === input.saveValue) input.saveValue = 7;  //an impossible number
-   if(typeof(input.saveValue)!=="number" || isNaN(input.saveValue)) throw new Error("WarhammerAttackUnit, input.saveValue ("+input.saveValue+") the must be a number type.");
+   requireNaturalNumber(input.saveValue);
    if(undefined === input.reanimateOrNoPainValue) input.reanimateOrNoPainValue = 7;
-   if(typeof(input.reanimateOrNoPainValue)!=="number" || isNaN(input.reanimateOrNoPainValue)) throw new Error("WarhammerAttackUnit, input.reanimateOrNoPainValue ("+input.reanimateOrNoPainValue+") the must be a number type.");
-   //TODO: re: more validation and test them:
-   //also: all must be natural numbers. and validate maxWounds (but not randomSource)
+   requireNaturalNumber(input.reanimateOrNoPainValue);
+   //randomSource not validated. die will validate it
 
    var attackRolled = new DicePool(input.diceCount + 'd6').roll(input.randomSource);
    var output = {hit: 0};

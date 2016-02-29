@@ -95,7 +95,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('Illegal index type: undefined'), Actual: e, Description: 'No arg'});
+       testResults.push({Expected: getError(requireTypeOf, ['number', undefined]), Actual: e, Description: 'No arg'});
    }
 
    try{
@@ -104,7 +104,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('Illegal index type: string'), Actual: e, Description: 'Type strict'});
+       testResults.push({Expected: getError(requireTypeOf, ['number', '1']), Actual: e, Description: 'Type strict'});
    }
 
    TesterUtility.displayResults('prototypes Array.prototype.removeByIndex', testResults, isFirst);
@@ -178,7 +178,7 @@ Tester.prototypes.Math.summation = function(isFirst)
    TesterUtility.clearResults(isFirst);
 
    var testResults = [];
-   testResults.push({Expected: 5, Actual: Math.summation([1, 2, new Number(5), -3]), Description: 'Happy path'});
+   testResults.push({Expected: 5, Actual: Math.summation([1, 2, 5, -3]), Description: 'Happy path'});
    testResults.push({Expected: 0, Actual: Math.summation([]), Description: 'Empty'});
    testResults.push({Expected: -5, Actual: Math.summation(['1', true, -5]), Description: 'Ignore non-numbers'});
    testResults.push({Expected: Infinity, Actual: Math.summation([Infinity]), Description: 'Infinity'});

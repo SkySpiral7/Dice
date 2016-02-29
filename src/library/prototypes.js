@@ -15,8 +15,7 @@ if (undefined === Array.prototype.removeByIndex)
 {
    Array.prototype.removeByIndex = function(index)
    {
-      if(index instanceof Number) index = index.valueOf();
-      if('number' !== typeof(index)) throw new Error('Illegal index type: ' + typeof(index));
+      requireTypeOf('number', index);  //NaN and Infinity will be detected below
       if(Number.isNaN(index) || index < 0 || Math.floor(index) !== index) throw new Error('Illegal index: ' + index);
       if(index >= this.length) throw new Error('Illegal index: ' + index + '. length=' + this.length);
       return this.splice(index, 1)[0];
@@ -57,7 +56,6 @@ if (undefined === Math.factorial)
 {
    Math.factorial = function(input)
    {
-      if(input instanceof Number) input = input.valueOf();
       if('number' !== typeof(input) || Number.isNaN(input)) return NaN;
       if(input < 0 || Math.floor(input) !== input) return undefined;
       //factorial is actually defined for both of these cases but I do not know how to calculate them
@@ -81,7 +79,6 @@ if (undefined === Math.summation)
       for (var i = 0; i < array.length; ++i)
       {
          var thisValue = array[i];  //stored so that array[i] is not mutated
-         if(thisValue instanceof Number) thisValue = thisValue.valueOf();
          if('number' === typeof(thisValue)) total += thisValue;
       }
       return total;

@@ -17,7 +17,7 @@ Tester.Die.roll = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('1d6\nrandomSource must be a function but was a number with toString: 5'),
+      testResults.push({Expected: getError(requireTypeOf, ['function', 5]),
          Actual: e, Description: 'randomSource wrong type'});
    }
 
@@ -88,7 +88,7 @@ Tester.Die._constructor = function(isFirst)
    }
 
    try{
-   die = new Die(new Number(3));
+   die = new Die(3);
    expected = {name: '1d3', sideCount: 3, constantModifier: 0, isFudgeDie: false,
       rerollCriteria: undefined, explodeType: undefined, 'instanceof': 'Die'};
    testResults.push({Expected: expected, Actual: die.toJSON(), Description: 'Number arg'});
@@ -355,16 +355,6 @@ Tester.Die._validate = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Happy path: fudge'});}
 
    try{
-   input = {name: new String('1d6'), sideCount: new Number(6),
-      constantModifier: new Number(0), rerollCriteria: new String('=1')};
-   //expected.rerollCriteria = '==1';  //somehow causes Happy path to fail
-   expected = {name: '1d6', sideCount: 6, constantModifier: 0, isFudgeDie: false,
-      rerollCriteria: '===1'};
-   Die._validate(input);
-   testResults.push({Expected: expected, Actual: input, Description: 'Unbox all'});
-   } catch(e){testResults.push({Error: e, Description: 'Unbox all'});}
-
-   try{
    input = {sideCount: 6};
    expected = {name: JSON.stringify(input), sideCount: 6, constantModifier: 0, isFudgeDie: false};
    Die._validate(input);
@@ -377,7 +367,7 @@ Tester.Die._validate = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('2\nname must be a string but was: number'), Actual: e, Description: 'name invalid'});
+       testResults.push({Expected: getError(requireTypeOf, ['string', 2]), Actual: e, Description: 'name invalid'});
    }
 
    try{
@@ -406,6 +396,18 @@ Tester.Die._validate = function(isFirst)
    {
        testResults.push({Expected: new Error('1d6\nconstantModifier must be an integer but was: 2.5'), Actual: e, Description: 'invalid constantModifier'});
    }
+
+   try{
+   input = {name: '1d6', sideCount: 6, rerollCriteria: '=1'};
+   Die._validate(input);
+   testResults.push({Expected: '===1', Actual: input.rerollCriteria, Description: 'Correct rerollCriteria ='});
+   } catch(e){testResults.push({Error: e, Description: 'Correct rerollCriteria ='});}
+
+   try{
+   input = {name: '1d6', sideCount: 6, rerollCriteria: '==1'};
+   Die._validate(input);
+   testResults.push({Expected: '===1', Actual: input.rerollCriteria, Description: 'Normalize rerollCriteria =='});
+   } catch(e){testResults.push({Error: e, Description: 'Normalize rerollCriteria =='});}
 
    try{
    Die._validate({name: '1d6', sideCount: 6, rerollCriteria: '!2'});

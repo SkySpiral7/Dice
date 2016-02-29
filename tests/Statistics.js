@@ -63,12 +63,12 @@ Tester.Statistics.calculateAggregates = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   Statistics.calculateAggregates({});
+   Statistics.calculateAggregates(5);
    TesterUtility.failedToThrow(testResults, 'Wrong type arg');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('stats must be an array but was: object'),
+      testResults.push({Expected: getError(requireInstanceOf, [Array, 5]),
          Actual: e, Description: 'Wrong type arg'});
    }
 

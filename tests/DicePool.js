@@ -42,7 +42,7 @@ Tester.DicePool._constructor = function(isFirst)
    var testResults = [], returned, expected;
 
    try{
-   returned = new DicePool(new String('2d4')).toJSON();
+   returned = new DicePool('2d4').toJSON();
    expected = {'instanceof': 'DicePool', name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),

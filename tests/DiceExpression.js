@@ -13,24 +13,24 @@ Tester.DiceExpression.addTerm = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('term.coefficient must be a number but was: string'),
+       testResults.push({Expected: getError(requireTypeOf, ['number', 'sd']),
          Actual: e, Description: 'Invalid coefficient'});
    }
 
    try{
    expression = new DiceExpression(new Die('dF'));
-   expression.addTerm({coefficient: 2, exponent: 'sd'});
+   expression.addTerm({coefficient: 2, exponent: 'sd2'});
    TesterUtility.failedToThrow(testResults, 'Invalid exponent');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('term.exponent must be a number but was: string'),
+       testResults.push({Expected: getError(requireTypeOf, ['number', 'sd2']),
          Actual: e, Description: 'Invalid exponent'});
    }
 
    try{
    expression = new DiceExpression(new Die('dF'));
-   expression.addTerm({coefficient: new Number(2), exponent: new Number(0)});
+   expression.addTerm({coefficient: 2, exponent: 0});
    actual = expression.toJSON().terms;
    expected = [
       {coefficient: 1, exponent: 1},
@@ -104,7 +104,7 @@ Tester.DiceExpression.multiply = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('Expected: DiceExpression. Got: Number'),
+       testResults.push({Expected: getError(requireInstanceOf, [DiceExpression, 2]),
          Actual: e, Description: 'Illegal arg'});
    }
 

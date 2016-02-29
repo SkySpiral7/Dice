@@ -25,8 +25,7 @@ function Die(arg1)
    this.roll = function(randomSource)
    {
       if(undefined == randomSource) randomSource = Math.random;
-      if('function' !== typeof(randomSource)) throw new Error(name +
-         '\nrandomSource must be a function but was a ' + typeof(randomSource) + ' with toString: ' + randomSource);
+      requireTypeOf('function', randomSource);
       //TODO: re: consider moving randomSource into Die's data
 
       var valueArray = [];
@@ -78,7 +77,6 @@ function Die(arg1)
       if(undefined !== sideCount) throw new Error('Illegal access');
 
       if(undefined == arg1) arg1 = {name: '1d6', sideCount: 6};
-      else if(arg1 instanceof Number || arg1 instanceof String) arg1 = arg1.valueOf();
       if('number' === typeof(arg1)) arg1 = {name: '1d' + arg1, sideCount: arg1};
       else if('string' === typeof(arg1)) arg1 = Die._parseString(arg1);
 
@@ -285,20 +283,16 @@ Die._validate = function(input)
    //don't bother checking typeof(input) is object. sideCount required will throw anyway
 
    //(undefined == x) is the same as (undefined === x || null === x) unlike (!x) which detects falsy values
-   if(input.name instanceof String) input.name = input.name.valueOf();
-   else if (undefined == input.name)
+   if (undefined == input.name)
    {
       input.name = undefined;  //in case it was null
       input.name = JSON.stringify(input);  //this is safe because JSON.stringify ignores undefined values
    }
-   else if('string' !== typeof(input.name)) throw new Error(input.name +
-      '\nname must be a string but was: ' + typeof(input.name));
+   else requireTypeOf('string', input.name);
 
-   if(input.sideCount instanceof Number) input.sideCount = input.sideCount.valueOf();  //unbox so that === behaves as expected
    if(undefined == input.sideCount) throw new Error(input.name + '\nsideCount is required');
    if(!Number.isNatural(input.sideCount)) throw new Error(input.name + '\ninvalid sideCount: ' + input.sideCount);
 
-   if(input.constantModifier instanceof Number) input.constantModifier = input.constantModifier.valueOf();
    if(undefined == input.constantModifier) input.constantModifier = 0;
    else if(!Number.isInteger(input.constantModifier)) throw new Error(input.name +
       '\nconstantModifier must be an integer but was: ' + input.constantModifier);
