@@ -16,6 +16,7 @@ GenerateHtml.compareStatistics = function(diffStats)
 };
 GenerateHtml.statistics = function(stats, secondColumn)
 {
+   if(undefined === secondColumn) secondColumn = '>=';
    //TODO: re: validate
    Statistics.determineProbability(stats);
    var secondValues = [];
@@ -30,10 +31,12 @@ GenerateHtml.statistics = function(stats, secondColumn)
       {
          if(eval('' + stats[potentialIndex].result + secondColumn + stats[currentIndex].result)) secondSum += stats[potentialIndex].probability;
       }
+      //TODO: re: is untested unless I can figure out math to prove it
+      //if the total freq is above perfect accuracy that should work
+      //or if multiple prob rounds up
       if(secondSum > 1) secondSum = 1;  //correct rounding error: can't have more than 100%
       secondValues.push(secondSum);
    }
-   //TODO: re: more tests
 
    var out = '<table border="1" cellpadding="0" cellspacing="2" width="100%">\n';
    out += '<tr><th>Roll</th>';
@@ -43,9 +46,7 @@ GenerateHtml.statistics = function(stats, secondColumn)
    for (var i = 0; i < stats.length; ++i)
    {
       out += '<tr><td align="center" width="1%">' + stats[i].result + '</td>';
-      //not allowed to have more than 5 digits so use scientific:
-      if(usesFreq && stats[i].frequency > 1e7) out += '<td align="center" width="1%">' + stats[i].frequency.toPrecision(5) + '</td>';
-      else if(usesFreq) out += '<td align="center" width="1%">' + stats[i].frequency + '</td>';
+      if(usesFreq) out += '<td align="center" width="1%">' + stats[i].frequency + '</td>';
       out += '<td align="right" width="1%">' + (100 * stats[i].probability).toFixed(3) + '%</td>';
       out += '<td align="right" width="1%">' + (100 * secondValues[i]).toFixed(3) + '%</td>';
       out += '<td valign="center">';

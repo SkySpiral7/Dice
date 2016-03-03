@@ -35,6 +35,21 @@ Tester.DicePool.roll = function(isFirst)
 
    TesterUtility.displayResults('DicePool new DicePool().roll()', testResults, isFirst);
 };
+Tester.DicePool.sumRoll = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, nonRandomNumbers;
+
+   try{
+   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
+   nonRandomNumbers = nonRandomNumbers.concat(dieResultsToNonRandomArray(16, [12, 16]));
+   actual = new DicePool('2d8+2d16').sumRoll(nonRandomNumberGenerator(nonRandomNumbers));
+   testResults.push({Expected: 41, Actual: actual, Description: 'Happy path 2d8+2d16'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
+
+   TesterUtility.displayResults('DicePool new DicePool().sumRoll()', testResults, isFirst);
+};
 Tester.DicePool._constructor = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);

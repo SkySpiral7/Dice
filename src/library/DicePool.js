@@ -66,7 +66,7 @@ function DicePool(arg1, arg2)
       return results;
    };
    /**@returns {!number} the sum of this.roll()*/
-   this.sumRoll = function(randomSource){return Math.summation(this.roll(randomSource));};  //TODO: re: make a quick test
+   this.sumRoll = function(randomSource){return Math.summation(this.roll(randomSource));};
    //TODO: re: consider toDiceArray and creating from a dice array
    /**@returns an object with all DicePool data elements in it. It can be passed into new DicePool()*/
    this.toJSON = function()
