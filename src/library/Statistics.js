@@ -136,7 +136,7 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
    for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
       var everyDieValue = DiceExpression.everyValue(diceGroup.die, explodeCount);
-      var newExpression = new DiceExpression(everyDieValue, (0 !== explodeCount));
+      var newExpression = new DiceExpression(everyDieValue, (0 !== explodeCount));  //TODO: re: consider explodeCount 0 to use prob
       //TODO: re: consider having DiceExpression and DiceExpression.everyValue take isNegative
       if(diceGroup.areDiceNegative) newExpression.negateExponents();
 

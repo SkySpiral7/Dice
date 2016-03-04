@@ -199,6 +199,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    try{
    actual = Statistics.useBruteForce(new DicePool('3d2').toJSON().pool[0]);
    expected = Statistics.useNonDroppingAlgorithm(new DicePool('3d2').toJSON().pool[0]);
+   //TODO: re: move tests so that BruteForce is the one directly tested for all and used by others
    //need to test more than 2 dice for useBruteForce. trust useNonDroppingAlgorithm for this because 2+ isn't special to it
    testResults.push({Expected: expected, Actual: actual, Description: '3d2'});
    } catch(e){testResults.push({Error: e, Description: '3d2'});}
