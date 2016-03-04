@@ -215,4 +215,4 @@ new DiceExpression('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation 
 {coefficient: 2, exponent: 0}
 ]
 */
-//TODO: re: made a math readme which gives a quick overview and links that math forum and se
+//TODO: re: make a math readme doc which gives a quick overview and links that math forum and se

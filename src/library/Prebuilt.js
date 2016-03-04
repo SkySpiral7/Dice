@@ -11,16 +11,20 @@ Output's wounded and unsavedWounds might not be present.
 */
 Prebuilt.WarhammerAttackUnit = function(input)
 {
-   //TODO: re: test validation
    requireNaturalNumber(input.diceCount);
    requireNaturalNumber(input.maxWounds);
    requireNaturalNumber(input.toHitValue);
    requireNaturalNumber(input.toWoundValue);
+
+   //saveValue is optional because some attacks ignore saves
    if(undefined === input.saveValue) input.saveValue = 7;  //an impossible number
    requireNaturalNumber(input.saveValue);
+
+   //Reanimation Protocol states that if the unit also has Feel No Pain then you must choose only 1 of them
+   //but most units have neither
    if(undefined === input.reanimateOrNoPainValue) input.reanimateOrNoPainValue = 7;
    requireNaturalNumber(input.reanimateOrNoPainValue);
-   //randomSource not validated. die will validate it
+   //randomSource not validated because die will validate it
 
    var d6 = new Die();
    function rollD6Pool(name, count){return new DicePool(name, [{die: d6, dieCount: count}]).roll(input.randomSource);}

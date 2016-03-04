@@ -18,6 +18,72 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
+   input = {diceCount: -1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
+   Prebuilt.WarhammerAttackUnit(input);
+   TesterUtility.failedToThrow(testResults, 'Invalid diceCount');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.diceCount]),
+         Actual: e, Description: 'Invalid diceCount'});
+   }
+
+   try{
+   input = {diceCount: 1, maxWounds: -1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
+   Prebuilt.WarhammerAttackUnit(input);
+   TesterUtility.failedToThrow(testResults, 'Invalid maxWounds');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.maxWounds]),
+         Actual: e, Description: 'Invalid maxWounds'});
+   }
+
+   try{
+   input = {diceCount: 1, maxWounds: 1, toHitValue: -3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
+   Prebuilt.WarhammerAttackUnit(input);
+   TesterUtility.failedToThrow(testResults, 'Invalid toHitValue');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.toHitValue]),
+         Actual: e, Description: 'Invalid toHitValue'});
+   }
+
+   try{
+   input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: -3, saveValue: 4, reanimateOrNoPainValue: 6};
+   Prebuilt.WarhammerAttackUnit(input);
+   TesterUtility.failedToThrow(testResults, 'Invalid toWoundValue');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.toWoundValue]),
+         Actual: e, Description: 'Invalid toWoundValue'});
+   }
+
+   try{
+   input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: -4, reanimateOrNoPainValue: 6};
+   Prebuilt.WarhammerAttackUnit(input);
+   TesterUtility.failedToThrow(testResults, 'Invalid saveValue');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.saveValue]),
+         Actual: e, Description: 'Invalid saveValue'});
+   }
+
+   try{
+   input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: -6};
+   Prebuilt.WarhammerAttackUnit(input);
+   TesterUtility.failedToThrow(testResults, 'Invalid reanimateOrNoPainValue');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.reanimateOrNoPainValue]),
+         Actual: e, Description: 'Invalid reanimateOrNoPainValue'});
+   }
+
+   try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
    input.randomSource = dieResultsToNonRandomGenerator(6, [1]);
    actual = Prebuilt.WarhammerAttackUnit(input);
