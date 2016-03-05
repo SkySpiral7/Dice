@@ -176,11 +176,11 @@ Tester.DicePool._parseString = function(isFirst)
    returned = DicePool._parseString('2d8+2d16');
    expected = [
       {
-         die: new Die(8),
+         die: Die._parseString('1d8'),
          dieCount: 2
       },
       {
-         die: new Die(16),
+         die: Die._parseString('1d16'),
          dieCount: 2
       }
    ];
@@ -191,11 +191,11 @@ Tester.DicePool._parseString = function(isFirst)
    returned = DicePool._parseString('d8-3d16');
    expected = [
       {
-         die: new Die(8),
+         die: Die._parseString('1d8'),
          dieCount: 1
       },
       {
-         die: new Die(16),
+         die: Die._parseString('1d16'),
          dieCount: 3,
          areDiceNegative: true
       }
@@ -207,7 +207,7 @@ Tester.DicePool._parseString = function(isFirst)
    returned = DicePool._parseString('-d4');
    expected = [
       {
-         die: new Die(4),
+         die: Die._parseString('1d4'),
          dieCount: 1,
          areDiceNegative: true
       }

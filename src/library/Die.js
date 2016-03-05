@@ -82,7 +82,7 @@ function Die(arg1)
 
       if(undefined == arg1) arg1 = {name: '1d6', sideCount: 6};
       else if('number' === typeof(arg1)) arg1 = {name: '1d' + arg1, sideCount: arg1};
-      else if('string' === typeof(arg1)) arg1 = Die._parseString(arg1);
+      else if('string' === typeof(arg1)) arg1 = DicePool._parseString(arg1)[0].die;
 
       Die._validate(arg1);
       if(undefined !== arg1.rerollCriteria) Die._optimizeReroll(arg1);
@@ -147,136 +147,6 @@ Die._optimizeReroll = function(input)
    //TODO: re: more _optimizeReroll. See old
 };
 /**
-This function is used in the constructor of Die. It parses the inputString into an object.
-You should have no use for it although it isn't harmful to call.
-@param {!string} inputString
-@returns {!object} the object needed to create a Die. Not optimized or validated.
-*/
-Die._parseString = function(inputString)
-{
-   inputString = '' + inputString;  //enforces string type and is null safe
-   var jsonResult = {name: inputString};
-   var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy so that parse errors can use inputString
-
-   if((/^1(?:[^\d%]|$)/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
-   else if((/^0(?:[^\d%]|$)/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');
-   else if((/^[\d%]/).test(workingString)) throw new Error(inputString + '\ndie count (if provided) must be 1. Otherwise use DicePool');
-
-   jsonResult.constantModifier = 0;
-   if((/^z/).test(workingString)) jsonResult.constantModifier = -1;
-   if(!(/^[zd]/).test(workingString)) throw new Error(inputString + '\nexpected "d" or "z". Found: ' + workingString);
-   workingString = workingString.substring(1);  //chop off 'd' or 'z'
-   if((/^%/).test(workingString)) workingString = workingString.replace(/%/, '100');  //replace first % with 100
-   workingString = workingString.replace(/%/g, '00');  //replace all other % with 2 more zeros
-
-   if ('f' === workingString[0])
-   {
-      //isFudgeDie is defined in validate
-      jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
-      jsonResult.sideCount = 3;
-      workingString = workingString.substring(1);  //chop off 'f'
-      if('' !== workingString) throw new Error(inputString + '\nFudge/Fate dice don\'t explode or reroll. Illegal: ' + workingString);
-      return jsonResult;
-   }
-   else if ((/^\d+/).test(workingString))
-   {
-      jsonResult.sideCount = Number.parseInt(workingString);  //only parses leading integer
-      workingString = workingString.substring(jsonResult.sideCount.toString().length);  //remove sideCount from workingString
-   }
-   else throw new Error(inputString + '\nexpected sideCount. Found: ' + workingString);
-
-   //shorthand must come before longhand
-   while (workingString.length > 0)
-   {
-      if ('!' === workingString[0])
-      {
-         if(undefined !== jsonResult.explodeType) throw new Error(inputString + '\nmultiple explosions found. Max is 1');
-         workingString = workingString.substring(1);  //chop off '!'
-         if ('!' === workingString[0])  //if it had '!!'
-         {
-            workingString = workingString.substring(1);
-            jsonResult.explodeType = Die.explodeTypes.Compound;
-         }
-         else if ('p' === workingString[0])
-         {
-            workingString = workingString.substring(1);  //chop off 'p'
-            jsonResult.explodeType = Die.explodeTypes.Penetrating;
-         }
-         else jsonResult.explodeType = Die.explodeTypes.Normal;
-      }
-      else if ((/^r(?:[<>]=?|[!=]?==?)?-?\d+/).test(workingString))
-      {
-         if(undefined !== jsonResult.rerollCriteria) throw new Error(inputString + '\nmultiple reroll criteria found. Max is 1');
-            //could theoretically be an array of criteria but throw for now
-         workingString = workingString.substring(1);  //chop off 'r'
-         if((/^-?\d+/).test(workingString)) workingString = '==' + workingString;  //default
-         jsonResult.rerollCriteria = (/^.=?=?-?\d+/).exec(workingString)[0];
-         workingString = workingString.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from workingString
-         if('=' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';  //must be double equal signs for eval
-      }
-      else break;
-   }
-   //TODO: re: figure out how to make DRY while still enforcing shorthand then longhand
-   while (workingString.length > 0)  //longhand loop
-   {
-      //as per the robustness principle I don't care about English grammar as long as the meaning is clear
-      if ((/^(?: penetrat(?:ing|e)| compound(?:ing)?)? explo(?:sions?|ding|de)(?: dic?e)?/).test(workingString))
-      {
-         if(undefined !== jsonResult.explodeType) throw new Error(inputString + '\nmultiple explosions found. Max is 1');
-         if (workingString.startsWith(' compound'))
-         {
-            workingString = workingString.replace(/ compound(?:ing)?/, '');  //remove word
-            jsonResult.explodeType = Die.explodeTypes.Compound;
-         }
-         else if (workingString.startsWith(" penetrat"))
-         {
-            workingString = workingString.replace(/ penetrat(?:ing|e)/, '');  //remove word
-            jsonResult.explodeType = Die.explodeTypes.Penetrating;
-         }
-         else jsonResult.explodeType = Die.explodeTypes.Normal;
-         workingString = workingString.replace(/ explo(?:sions?|ding|de)(?: dic?e)?/, '');  //remove word(s)
-      }
-      else if ((/^ reroll (?:dic?e (?:that are )?)?(?:(?:greater|less) than(?: or equal(?: to)?)? |(?:not )?equal(?: to)? )?-?\d+/).test(workingString))
-      {
-         if(undefined !== jsonResult.rerollCriteria) throw new Error(inputString + '\nmultiple reroll criteria found. Max is 1');
-            //could theoretically be an array of criteria but throw for now
-         workingString = workingString.replace(/^ reroll (?:dic?e (?:that are )?)?/, '');  //remove word(s)
-         if ((/^greater than (?:or )?/).test(workingString))
-         {
-            jsonResult.rerollCriteria = '>';
-            workingString = workingString.replace(/^greater than (?:or )?/, '');
-         }
-         else if ((/^less than (?:or )?/).test(workingString))
-         {
-            jsonResult.rerollCriteria = '<';
-            workingString = workingString.replace(/^less than (?:or )?/, '');
-         }
-         else if ((/^not /).test(workingString))
-         {
-            jsonResult.rerollCriteria = '!';
-            workingString = workingString.replace(/^not /, '');
-         }
-         else jsonResult.rerollCriteria = '';
-
-         if ((/^equal(?: to)? /).test(workingString))
-         {
-            jsonResult.rerollCriteria += '=';
-            workingString = workingString.replace(/^equal(?: to)? /, '');
-         }
-         if('=' === jsonResult.rerollCriteria || '' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';
-           //first is if 'equal' and the other is default
-         jsonResult.rerollCriteria += Number.parseInt(workingString);  //grab number
-         workingString = workingString.replace(/^-?\d+/, '');  //remove
-      }
-      else break;
-   }
-   //for now keep constantModifier internal only
-   //if((/^ *[-+] *\d+$/).test(workingString)){jsonResult.constantModifier=Number(workingString); workingString='';}
-   if('' !== workingString) throw new Error(inputString + '\nUnparsable: ' + workingString);
-
-   return jsonResult;
-};
-/**
 This function is used in the constructor of Die. It throws if there is anything invalid about the input.
 It also normalizes the input and defines isFudgeDie (ignoring old value).
 You should have no use for it although it isn't harmful to call.
@@ -285,6 +155,7 @@ You should have no use for it although it isn't harmful to call.
 Die._validate = function(input)
 {
    //don't bother checking typeof(input) is object. sideCount required will throw anyway
+   //TODO: re: validate that no DicePool stuff exists
 
    //(undefined == x) is the same as (undefined === x || null === x) unlike (!x) which detects falsy values
    if (undefined == input.name)

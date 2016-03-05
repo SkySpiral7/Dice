@@ -96,7 +96,7 @@ Tester.Die._constructor = function(isFirst)
 
    try{
    die = new Die('d4');
-   expected = {name: 'd4', sideCount: 4, constantModifier: 0, isFudgeDie: false,
+   expected = {name: '1d4', sideCount: 4, constantModifier: 0, isFudgeDie: false,
       rerollCriteria: undefined, explodeType: undefined};
    testResults.push({Expected: expected, Actual: die.toJSON().value, Description: 'String arg'});
    } catch(e){testResults.push({Error: e, Description: 'String arg'});}
