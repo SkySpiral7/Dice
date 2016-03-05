@@ -114,13 +114,42 @@ var JsonReviver = {};
 /**A reviver for JSON.parse. If the parsed object has properties reviveWith and value then that object will be revived.
 This function returns new X(value.value) if(value.useNew) where value.reviveWith = 'X';
 if(!value.useNew) returns X(value.value)
+Note that value.reviveWith may contain dots so that name spaces can be used.
+console.warn will be used if value.reviveWith exists but couldn't (or won't) be revived.
 @param key is ignored
 */
 JsonReviver.reviveWith = function(key, value)
 {
-   if('string' !== typeof(value.reviveWith) || undefined == value.value) return value;
-   //TODO: re: add support for reviveWith using dots since I expect dots.
-   //I'll allow typeof(useNew) !== 'boolean' even though it should be either true or false
-   if(value.useNew) return new window[value.reviveWith](value.value);
-   return window[value.reviveWith](value.value);
+   if('string' !== typeof(value.reviveWith)) return value;
+   //TODO: re: (Reviver) should these be warnings or throw? What about non-string reviveWith?
+
+   if(!(/^[\w.]+$/).test(value.reviveWith))  //eval safety
+   {
+      console.warn('evil code detected', key, value);
+      return value;
+   }
+   var reviveWith;
+   try{reviveWith = eval(value.reviveWith);}
+   catch(e)
+   {
+      console.warn('Could not revive', key, value, e);  //ReferenceError: reviveWith is not defined
+      return value;
+   }
+   if ('function' !== typeof(reviveWith))
+   {
+      console.warn('Not a function', key, value);
+      return value;
+   }
+
+   try
+   {
+      //I'll allow typeof(useNew) !== 'boolean' even though it should be either true or false
+      if(value.useNew) return new reviveWith(value.value);
+      return reviveWith(value.value);
+   }
+   catch(e)
+   {
+      console.warn('Could not revive', key, value, e);
+      return value;
+   }
 };
