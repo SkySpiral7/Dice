@@ -110,12 +110,17 @@ if(undefined === Number.isNatural){Number.isNatural = function(input){return (Nu
 if(undefined === String.prototype.contains){String.prototype.contains = function(substring){return (-1 !== this.indexOf(substring));};}
 
 var JsonReviver = {};
-//TODO: re: put somewhere. consider {instanceof: 'Date', value: '1995-12-17T03:24:00'};
-/**A reviver for JSON.parse. If the parsed object has a property instanceof then that object will be recreated.
-This function assumes that obj instanceof X is true and new X(obj.toJSON()) is possible where obj.toJSON().instanceof = 'X';
-Note that the o in instanceof is lowercase in order to match the keyword (as annoying as that is).*/
-JsonReviver.instanceof = function(key, value)
+//TODO: re: put somewhere
+/**A reviver for JSON.parse. If the parsed object has properties reviveWith and value then that object will be revived.
+This function returns new X(value.value) if(value.useNew) where value.reviveWith = 'X';
+if(!value.useNew) returns X(value.value)
+@param key is ignored
+*/
+JsonReviver.reviveWith = function(key, value)
 {
-   if('string' === typeof(value.instanceof)) return new window[value.instanceof](value);
-   return value;
+   if('string' !== typeof(value.reviveWith) || undefined == value.value) return value;
+   //TODO: re: add support for reviveWith using dots since I expect dots.
+   //I'll allow typeof(useNew) !== 'boolean' even though it should be either true or false
+   if(value.useNew) return new window[value.reviveWith](value.value);
+   return window[value.reviveWith](value.value);
 };
