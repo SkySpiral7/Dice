@@ -1,6 +1,5 @@
 'use strict';
-//TODO: re: die names are used primarily for debugging. Should they exist?
-//a DicePool name, on the other hand, is displayed when drawing bell curves
+//TODO: re: should DicePool name exist or generate a string? (used for drawing bell curves)
 /**
 An object than represents a collection of die objects.
 It can be created in the following ways:
@@ -212,7 +211,7 @@ You should have no use for it although it isn't harmful to call.
 Die._parseString = function(inputString)
 {
    inputString = '' + inputString;  //enforces string type and is null safe
-   var jsonResult = {name: inputString};
+   var jsonResult = {};
    var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy so that parse errors can use inputString
 
    if((/^1(?:[^\d%]|$)/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
@@ -266,10 +265,10 @@ Die._parseString = function(inputString)
          if(undefined !== jsonResult.rerollCriteria) throw new Error(inputString + '\nmultiple reroll criteria found. Max is 1');
             //could theoretically be an array of criteria but throw for now
          workingString = workingString.substring(1);  //chop off 'r'
-         if((/^-?\d+/).test(workingString)) workingString = '==' + workingString;  //default
+         //TODO: re: move this default into validate:
+         if((/^-?\d+/).test(workingString)) workingString = '===' + workingString;  //default
          jsonResult.rerollCriteria = (/^.=?=?-?\d+/).exec(workingString)[0];
          workingString = workingString.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from workingString
-         if('=' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';  //must be double equal signs for eval
       }
       else break;
    }

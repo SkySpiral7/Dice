@@ -4,11 +4,11 @@ A single die object (for multiple dice see DicePool). It can be created in the f
 new Die() for a 1d6
 new Die(20) for a 1d20
 new Die('d10!!')
-new Die({name: 'My die', sideCount: 6, constantModifier: -1, rerollCriteria: '===1', explodeType: Die.explodeTypes.Normal})
+new Die({sideCount: 6, constantModifier: -1, rerollCriteria: '===1', explodeType: Die.explodeTypes.Normal})
 */
 function Die(arg1)
 {
-   var name, sideCount, constantModifier, isFudgeDie, rerollCriteria, explodeType;
+   var sideCount, constantModifier, isFudgeDie, rerollCriteria, explodeType;
 
    /**@returns true if other is equal to this.*/
    this.equals = function(other)
@@ -65,7 +65,6 @@ function Die(arg1)
          useNew: true,
          value:
          {
-            name: name,  //yes I realize that name might be JSON of the same thing: it's not infinite and it's the best I can do
             sideCount: sideCount,
             constantModifier: constantModifier,
             isFudgeDie: isFudgeDie,
@@ -80,14 +79,20 @@ function Die(arg1)
    {
       if(undefined !== sideCount) throw new Error('Illegal access');
 
-      if(undefined == arg1) arg1 = {name: '1d6', sideCount: 6};
-      else if('number' === typeof(arg1)) arg1 = {name: '1d' + arg1, sideCount: arg1};
-      else if('string' === typeof(arg1)) arg1 = DicePool._parseString(arg1)[0].die;
+      var debugName = 'internal error';  //should never be seen because there shouldn't be an error thrown
+      if(undefined == arg1) arg1 = {sideCount: 6};
+      else if('number' === typeof(arg1)) arg1 = {sideCount: arg1};
+      else if ('string' === typeof(arg1))
+      {
+         debugName = arg1;
+         //TODO: re: validate that no DicePool stuff exists
+         arg1 = DicePool._parseString(arg1)[0].die;
+      }
+      else if('object' === typeof(arg1)) debugName = JSON.stringify(arg1);
 
-      Die._validate(arg1);
+      Die._validate(debugName, arg1);
       if(undefined !== arg1.rerollCriteria) Die._optimizeReroll(arg1);
 
-      name = arg1.name;
       sideCount = arg1.sideCount;
       constantModifier = arg1.constantModifier;
       isFudgeDie = arg1.isFudgeDie;
@@ -108,7 +113,7 @@ Die.explodeTypes = {
 This function is used in the constructor of Die. It modifies input to reduce or eliminate reroll without
 changing functionality. So that less rolls occur when calling die.roll().
 You should have no use for it although it isn't harmful to call. It assumes input has been validated.
-@param {!object} input which might be modified (anything except name and isFudgeDie may be touched)
+@param {!object} input which might be modified (anything except isFudgeDie may be touched)
 */
 Die._optimizeReroll = function(input)
 {
@@ -150,32 +155,26 @@ Die._optimizeReroll = function(input)
 This function is used in the constructor of Die. It throws if there is anything invalid about the input.
 It also normalizes the input and defines isFudgeDie (ignoring old value).
 You should have no use for it although it isn't harmful to call.
+@param {!string} debugName prepended to any error message thrown
 @param {!object} input which may be slightly modified (ie gaining default values)
 */
-Die._validate = function(input)
+Die._validate = function(debugName, input)
 {
    //don't bother checking typeof(input) is object. sideCount required will throw anyway
-   //TODO: re: validate that no DicePool stuff exists
+   //don't bother checking typeof(debugName) is string. that should never happen
 
    //(undefined == x) is the same as (undefined === x || null === x) unlike (!x) which detects falsy values
-   if (undefined == input.name)
-   {
-      input.name = undefined;  //in case it was null
-      input.name = JSON.stringify(input);  //this is safe because JSON.stringify ignores undefined values
-   }
-   else requireTypeOf('string', input.name);
-
-   if(undefined == input.sideCount) throw new Error(input.name + '\nsideCount is required');
-   if(!Number.isNatural(input.sideCount)) throw new Error(input.name + '\ninvalid sideCount: ' + input.sideCount);
+   if(undefined == input.sideCount) throw new Error(debugName + '\nsideCount is required');
+   if(!Number.isNatural(input.sideCount)) throw new Error(debugName + '\ninvalid sideCount: ' + input.sideCount);
 
    if(undefined == input.constantModifier) input.constantModifier = 0;
-   else if(!Number.isInteger(input.constantModifier)) throw new Error(input.name +
+   else if(!Number.isInteger(input.constantModifier)) throw new Error(debugName +
       '\nconstantModifier must be an integer but was: ' + input.constantModifier);
 
    if (undefined != input.rerollCriteria)
    {
       input.rerollCriteria = input.rerollCriteria.toString();  //unboxes or converts
-      if(!(/^(?:[<>]=?|[!=]?==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(input.name +
+      if(!(/^(?:[<>]=?|[!=]?==?)-?\d+$/).test(input.rerollCriteria)) throw new Error(debugName +
          '\ninvalid rerollCriteria: ' + input.rerollCriteria);
       input.rerollCriteria = input.rerollCriteria.replace(/^([!=])=*/, '$1==');  //forces !== and ===
    }
@@ -184,7 +183,7 @@ Die._validate = function(input)
    if (undefined != input.explodeType)
    {
       if(Die.explodeTypes.Normal !== input.explodeType && Die.explodeTypes.Compound !== input.explodeType && Die.explodeTypes.Penetrating !== input.explodeType)
-         throw new Error(input.name + '\ninvalid explodeType: ' + input.explodeType);
+         throw new Error(debugName + '\ninvalid explodeType: ' + input.explodeType);
    }
    else delete input.explodeType;
 
@@ -193,16 +192,17 @@ Die._validate = function(input)
 
    //all fields are valid when alone. Now validate combinations
 
-   if(1 === input.sideCount && undefined != input.explodeType) throw new Error(input.name + '\nInfinite exploding. sideCount: 1');
+   if(1 === input.sideCount && undefined != input.explodeType) throw new Error(debugName + '\nInfinite exploding. sideCount: 1');
 
-   if(undefined !== input.rerollCriteria) Die._validateReroll(input);
+   if(undefined !== input.rerollCriteria) Die._validateReroll(debugName, input);
 };
 /**
 This function is called by Die._validate. It throws if there is anything invalid about rerolling.
 You should have no use for it although it isn't harmful to call.
+@param {!string} debugName prepended to any error message thrown
 @param {!object} input which won't be modified
 */
-Die._validateReroll = function(input)
+Die._validateReroll = function(debugName, input)
 {
    var minValue = 1 + input.constantModifier;
    var maxValue = input.sideCount + input.constantModifier;
@@ -224,7 +224,7 @@ Die._validateReroll = function(input)
    else possibleToReroll = true;
 
    if(!possibleToReroll)
-      throw new Error(input.name + '\nimpossible to reroll:\n' + JSON.stringify({
+      throw new Error(debugName + '\nimpossible to reroll:\n' + JSON.stringify({
          rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
          explodeType: input.explodeType
       }));
@@ -237,7 +237,7 @@ Die._validateReroll = function(input)
       if (rerollExplodeValue)
       {
          if(input.rerollCriteria.startsWith('!==') || input.rerollCriteria.startsWith('==='))
-            throw new Error(input.name + '\nambiguous: does value ' + rerollValue + ' reroll or explode?\n' +
+            throw new Error(debugName + '\nambiguous: does value ' + rerollValue + ' reroll or explode?\n' +
                JSON.stringify({
                   rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
                   explodeType: input.explodeType
@@ -247,7 +247,7 @@ Die._validateReroll = function(input)
       }
    }
    else if (undefined !== input.explodeType && eval('' + maxValue + input.rerollCriteria))
-      throw new Error(input.name + '\nambiguous: does value ' + maxValue + ' reroll or explode?\n' + JSON.stringify({
+      throw new Error(debugName + '\nambiguous: does value ' + maxValue + ' reroll or explode?\n' + JSON.stringify({
          rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
          explodeType: input.explodeType
       }));
@@ -263,7 +263,7 @@ Die._validateReroll = function(input)
          //you can only have 1 reroll criteria: you can't 1d6r=1r=6
          //therefore if both min and max are rerolled then they all are
 
-      if(infiniteReroll) throw new Error(input.name + '\nInfinite rerolling:\n' + JSON.stringify({
+      if(infiniteReroll) throw new Error(debugName + '\nInfinite rerolling:\n' + JSON.stringify({
          rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier
       }));
    }
