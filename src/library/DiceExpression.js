@@ -28,6 +28,13 @@ function DiceExpression(arg1, arg2)
       termArray.push(term);
       termArray.sort(DiceExpression.exponentDescending);  //TODO: is this needed?
    };
+   /**@returns true if other is equal to this.*/
+   this.equals = function(other)
+   {
+      if(!(other instanceof DiceExpression)) return false;
+      if(this === other) return true;
+      return (JSON.stringify(this) === JSON.stringify(other));
+   };
    /**
    This function lets you multiply this Expression by otherExpression (this Expression is mutated to be the result).
    If this is 3x^2 + 1 then this.multiply(this) is 9x^4 + 6x^2 + 1.
@@ -38,7 +45,7 @@ function DiceExpression(arg1, arg2)
       //copy out termArray so that this.addTerm can be used for the new terms
       var oldTermArray = termArray;
       termArray = [];
-      var otherTerms = otherExpression.toJSON().terms;
+      var otherTerms = otherExpression.toJSON().value;
       while (0 !== oldTermArray.length)
       {
          var currentTerm = oldTermArray.shift();
@@ -81,12 +88,14 @@ function DiceExpression(arg1, arg2)
       result.reverse();  //works in this case
       return result;
    };
-   /**@returns an object with all DiceExpression data elements in it*/
+   //TODO: re: make function this.getTerms()
+   /**@returns an object formatted for JsonReviver.reviveWith(). return.value has this DiceExpression's termArray*/
    this.toJSON = function()
    {
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
-         'instanceof': 'DiceExpression',  //this is for a JSON reviver
-         terms: termArray  //TODO: re: consider defensive copy
+         reviveWith: 'DiceExpression',
+         useNew: true,
+         value: termArray  //TODO: re: consider defensive copy
       };
    };
 
@@ -120,7 +129,7 @@ function DiceExpression(arg1, arg2)
       var explodeCount = arg2;
       var hasExplosions = (undefined !== explodeCount && explodeCount > 0);
       //notice how an exploding die with explodeCount 0 uses frequency
-      hasExplosions = hasExplosions && (undefined !== die.toJSON().explodeType);
+      hasExplosions = hasExplosions && (undefined !== die.toJSON().value.explodeType);
       if(!hasExplosions) explodeCount = 0;
       useProbability = hasExplosions;
       termArray = DiceExpression.everyValue(die, explodeCount);
@@ -145,7 +154,7 @@ DiceExpression.combineValues = function(everyValue)
 //TODO: re: doc DiceExpression.everyValue and move some tests
 DiceExpression.everyValue = function(die, explodeCount)
 {
-   die = die.toJSON();  //this is the only thing I need the die for
+   die = die.toJSON().value;  //this is the only thing I need the die for
    var hasExplosions = (explodeCount > 0);
    var minValue = 1 + die.constantModifier;
    var maxValue = die.sideCount + die.constantModifier;
@@ -207,7 +216,7 @@ DiceExpression.exponentDescending = function(a,b)
    return (Math.summation(b.exponent) - Math.summation(a.exponent));
 }
 /*Example API:
-new DiceExpression('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation from string
+new DiceExpression('7x^4 - x + 6x^3 + 2').toJSON().value:  //I won't support creation from string
 [
 {coefficient: 7, exponent: 4},  //will be in this order (exponent descending)
 {coefficient: 6, exponent: 3},

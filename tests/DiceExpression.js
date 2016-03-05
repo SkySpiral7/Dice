@@ -31,7 +31,7 @@ Tester.DiceExpression.addTerm = function(isFirst)
    try{
    expression = new DiceExpression(new Die('dF'));
    expression.addTerm({coefficient: 2, exponent: 0});
-   actual = expression.toJSON().terms;
+   actual = expression.toJSON().value;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 3, exponent: 0},
@@ -43,7 +43,7 @@ Tester.DiceExpression.addTerm = function(isFirst)
    try{
    expression = new DiceExpression(new Die('dF'));
    expression.addTerm({coefficient: 2, exponent: 5});
-   actual = expression.toJSON().terms;
+   actual = expression.toJSON().value;
    expected = [
       {coefficient: 2, exponent: 5},
       {coefficient: 1, exponent: 1},
@@ -56,7 +56,7 @@ Tester.DiceExpression.addTerm = function(isFirst)
    try{
    expression = new DiceExpression(new Die('dF'));
    expression.addTerm({coefficient: -1, exponent: 0});
-   actual = expression.toJSON().terms;
+   actual = expression.toJSON().value;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: -1}
@@ -67,7 +67,7 @@ Tester.DiceExpression.addTerm = function(isFirst)
    try{
    expression = new DiceExpression(new Die('dF'));
    expression.addTerm({coefficient: 0, exponent: 2});
-   actual = expression.toJSON().terms;
+   actual = expression.toJSON().value;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: 0},
@@ -87,7 +87,7 @@ Tester.DiceExpression.multiply = function(isFirst)
    try{
    expression = new DiceExpression(new Die('dF'));
    expression.multiply(new DiceExpression(new Die('dF')));
-   actual = expression.toJSON().terms;
+   actual = expression.toJSON().value;
    expected = [
       {coefficient: 1, exponent: 2},
       {coefficient: 2, exponent: 1},
@@ -120,7 +120,7 @@ Tester.DiceExpression.negateExponents = function(isFirst)
    expression = new DiceExpression(new Die('d3'));
    expression.addTerm({coefficient: 1, exponent: 2});
    expression.negateExponents();
-   actual = expression.toJSON().terms;
+   actual = expression.toJSON().value;
    expected = [
       {coefficient: 1, exponent: -1},
       {coefficient: 2, exponent: -2},
@@ -136,7 +136,7 @@ Tester.DiceExpression.negateExponents = function(isFirst)
       {coefficient: 1, exponent: [3, 7]}
    ], false);
    expression.negateExponents();
-   actual = expression.toJSON().terms;
+   actual = expression.toJSON().value;
    expected = [
       {coefficient: 1, exponent: [-1, -5]},
       {coefficient: 2, exponent: [-2, -6]},
@@ -184,7 +184,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   actual = new DiceExpression(new Die('dF')).toJSON().terms;
+   actual = new DiceExpression(new Die('dF')).toJSON().value;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: 0},
@@ -203,8 +203,8 @@ Tester.DiceExpression._constructor = function(isFirst)
    }
 
    try{
-   actual = new DiceExpression(new Die('dF')).toJSON().terms;
-   actual = new DiceExpression(actual).toJSON().terms;
+   actual = new DiceExpression(new Die('dF')).toJSON().value;
+   actual = new DiceExpression(actual).toJSON().value;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: 0},
@@ -216,7 +216,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    try{
    actual = new DiceExpression(new Die('dF')).toDiceResults();
    Statistics.determineProbability(actual);
-   actual = new DiceExpression(actual, false).toJSON().terms;
+   actual = new DiceExpression(actual, false).toJSON().value;
    expected = [
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: 0},
@@ -228,7 +228,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    try{
    actual = new DiceExpression(new Die('dF')).toDiceResults();
    Statistics.determineProbability(actual);
-   actual = new DiceExpression(actual, true).toJSON().terms;
+   actual = new DiceExpression(actual, true).toJSON().value;
    expected = [
       {coefficient: (1/3), exponent: 1},
       {coefficient: (1/3), exponent: 0},
@@ -238,7 +238,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Accepts probability dice results'});}
 
    try{
-   actual = new DiceExpression(new Die('d6r3')).toJSON().terms;
+   actual = new DiceExpression(new Die('d6r3')).toJSON().value;
    expected = [
       {coefficient: 1, exponent: 6},
       {coefficient: 1, exponent: 5},
@@ -251,7 +251,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'd6r3'});}
 
    try{
-   actual = new DiceExpression(new Die('1d4!r3'), 0).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!r3'), 0).toJSON().value;
    expected = [
       {exponent: 1, coefficient: 1},
       {exponent: 2, coefficient: 1},
@@ -263,7 +263,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d4!r3 explode: 0'});}
 
    try{
-   actual = new DiceExpression(new Die('1d4!pr3'), 1).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!pr3'), 1).toJSON().value;
    expected = [
       {exponent: 1, coefficient: (1/3)},
       {exponent: 2, coefficient: (1/3)},
@@ -278,7 +278,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d4!pr3 explode: 1'});}
 
    try{
-   actual = new DiceExpression(new Die('1d4!!r3'), 1).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!!r3'), 1).toJSON().value;
    expected = [
       {exponent: 1, coefficient: (1/3)},
       {exponent: 2, coefficient: (1/3)},
@@ -293,7 +293,7 @@ Tester.DiceExpression._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d4!!r3 explode: 1'});}
 
    try{
-   actual = new DiceExpression(new Die('1d4!!r<=3'), 1).toJSON().terms;
+   actual = new DiceExpression(new Die('1d4!!r<=3'), 1).toJSON().value;
    expected = [
       //no 1-3 (reroll) or 4 (explode)
       {exponent: (4+1), coefficient: (1/4)},

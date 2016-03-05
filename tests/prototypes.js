@@ -235,26 +235,31 @@ Tester.prototypes.JSON.reviveWith = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], input;
+   var testResults = [], input, expected;
 
    input = {reviveWith: 'Die', useNew: true, value: 2};
    testResults.push({Expected: new Die(2), Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Revives Die'});
    input = {reviveWith: 'DicePool', useNew: true, value: '2d3'};
    testResults.push({Expected: new DicePool('2d3'), Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Revives DicePool'});
+   input = {reviveWith: 'DiceExpression', useNew: true, value: [{exponent: 2, coefficient: 1}, {exponent:1, coefficient: 1}]};
+   expected = new DiceExpression(new Die(2));
+   testResults.push({Expected: expected, Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Revives DiceExpression'});
    input = {reviveWith: 'Date', useNew: true, value: '2016-03-04T02:37:18.163Z'};
    testResults.push({Expected: new Date('2016-03-04T02:37:18.163Z'), Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Revives Date'});
    input = {reviveWith: 'parseInt', value: '15'};
    testResults.push({Expected: 15, Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Doesn\'t use new'});
 
-   //testResults.push({Expected: new Die(2), Actual: JSON.clone(new Die(2), JsonReviver.instanceof), Description: 'Clones Die'});
-   //testResults.push({Expected: new DicePool('2d3'), Actual: JSON.clone(new DicePool('2d3'), JsonReviver.instanceof), Description: 'Clones DicePool'});
+   testResults.push({Expected: new Die(2), Actual: JSON.clone(new Die(2), JsonReviver.reviveWith), Description: 'Clones Die'});
+   expected = input = new DicePool('2d3');
+   testResults.push({Expected: expected, Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Clones DicePool'});
+   expected = input = new DiceExpression(new Die(2));
+   testResults.push({Expected: expected, Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Clones DiceExpression'});
 
    testResults.push({Expected: 45, Actual: JSON.clone(45, JsonReviver.reviveWith), Description: 'No revival'});
 
    input = {reviveWith: 'parseInt', value: '15'};
    testResults.push({Expected: 15, Actual: JsonReviver.reviveWith(null, input), Description: 'Direct: Doesn\'t use new'});
    testResults.push({Expected: [1,2,3], Actual: JsonReviver.reviveWith(null, [1,2,3]), Description: 'Direct: No revival'});
-   //TODO: re: use new JSON format
 
    TesterUtility.displayResults('prototypes JsonReviver.reviveWith', testResults, isFirst);
 };

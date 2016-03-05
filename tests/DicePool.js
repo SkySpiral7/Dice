@@ -57,8 +57,8 @@ Tester.DicePool._constructor = function(isFirst)
    var testResults = [], returned, expected;
 
    try{
-   returned = new DicePool('2d4').toJSON();
-   expected = {'instanceof': 'DicePool', name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
+   returned = new DicePool('2d4').toJSON().value;
+   expected = {name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
          dieCount: 2
@@ -68,21 +68,21 @@ Tester.DicePool._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Calls _parseString'});}
 
    try{
-   returned = new DicePool('2d4').toJSON();
-   returned = new DicePool(returned).toJSON();
-   expected = {'instanceof': 'DicePool', name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
+   returned = new DicePool('2d4').toJSON().value;
+   returned = new DicePool(returned).toJSON().value;
+   expected = {name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
          dieCount: 2
       }
    ]};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Allows result of toJSON'});
-   } catch(e){testResults.push({Error: e, Description: 'Allows result of toJSON'});}
+   testResults.push({Expected: expected, Actual: returned, Description: 'Allows value of toJSON'});
+   } catch(e){testResults.push({Error: e, Description: 'Allows value of toJSON'});}
 
    try{
-   returned = new DicePool('2d4').toJSON();
-   returned = new DicePool(returned.pool).toJSON();
-   expected = {'instanceof': 'DicePool', name: 'DicePool', hasDropKeep: false, hasExplosions: false, pool: [
+   returned = new DicePool('2d4').toJSON().value;
+   returned = new DicePool(returned.pool).toJSON().value;
+   expected = {name: 'DicePool', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
          dieCount: 2
@@ -112,12 +112,12 @@ Tester.DicePool._constructor = function(isFirst)
          dropKeepType: DicePool.dropKeepTypes.DropLowest,
          dropKeepCount: 1
       }
-   ]).toJSON().hasDropKeep;
+   ]).toJSON().value.hasDropKeep;
    testResults.push({Expected: true, Actual: returned, Description: 'hasDropKeep'});
    } catch(e){testResults.push({Error: e, Description: 'hasDropKeep'});}
 
    try{
-   returned = new DicePool('d2+d4!-d3').toJSON().hasExplosions;
+   returned = new DicePool('d2+d4!-d3').toJSON().value.hasExplosions;
    testResults.push({Expected: true, Actual: returned, Description: 'hasExplosions'});
    } catch(e){testResults.push({Error: e, Description: 'hasExplosions'});}
 

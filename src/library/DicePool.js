@@ -68,15 +68,20 @@ function DicePool(arg1, arg2)
    /**@returns {!number} the sum of this.roll()*/
    this.sumRoll = function(randomSource){return Math.summation(this.roll(randomSource));};
    //TODO: re: consider toDiceArray and creating from a dice array
-   /**@returns an object with all DicePool data elements in it. It can be passed into new DicePool()*/
+   //TODO: re: make function this.getPool(). rename that to groups
+   /**@returns an object formatted for JsonReviver.reviveWith(). return.value has all of this DicePool's data elements in it*/
    this.toJSON = function()
    {
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
-         'instanceof': 'DicePool',  //this is for a JSON reviver
-         name: name,
-         hasDropKeep: hasDropKeep,
-         hasExplosions: hasExplosions,
-         pool: pool
+         reviveWith: 'DicePool',
+         useNew: true,
+         value:
+         {
+            name: name,
+            hasDropKeep: hasDropKeep,
+            hasExplosions: hasExplosions,
+            pool: pool
+         }
       };
    };
 
@@ -106,7 +111,7 @@ function DicePool(arg1, arg2)
       for (var i = 0; i < pool.length; ++i)
       {
          hasDropKeep = hasDropKeep || (undefined !== pool[i].dropKeepType);
-         hasExplosions = hasExplosions || (undefined !== pool[i].die.toJSON().explodeType);
+         hasExplosions = hasExplosions || (undefined !== pool[i].die.toJSON().value.explodeType);
          if(hasDropKeep && hasExplosions) break;  //no more information to find
       }
 
