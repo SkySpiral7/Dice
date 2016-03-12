@@ -110,6 +110,37 @@ Tester.Die._constructor = function(isFirst)
        testResults.push({Expected: new Error('10d3\ndie count (if provided) must be 1. Use DicePool for 2+'), Actual: e, Description: '10 dice'});
    }
 
+   try{
+   new Die('d3+d2');
+   TesterUtility.failedToThrow(testResults, '2 dice groups');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d3+d2\ndie count (if provided) must be 1. Use DicePool for 2+'), Actual: e, Description: '2 dice groups'});
+   }
+
+   if(false){  //TODO: re: currently untestable because Parser doesn't handle drop/keep
+   try{
+   new Die('d3! drop highest');
+   TesterUtility.failedToThrow(testResults, 'Drop dice');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d3! drop highest\ndrop/keep only applies to dice groups. Use DicePool instead'),
+         Actual: e, Description: 'Drop dice'});
+   }
+   }
+
+   try{
+   new Die('-d3');
+   TesterUtility.failedToThrow(testResults, 'Negative die');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('-d3\nonly DicePool can subtract groups. Alternatively adjust constantModifier.'),
+         Actual: e, Description: 'Negative die'});
+   }
+
    TesterUtility.displayResults('Die new Die()._constructor', testResults, isFirst);
 };
 Tester.Die._optimizeReroll = function(isFirst)

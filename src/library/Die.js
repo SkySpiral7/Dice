@@ -86,9 +86,18 @@ function Die(arg1)
       {
          debugName = arg1;
          var poolResult = Parser.diceGroup(arg1);
-         //TODO: re: validate that no DicePool stuff exists
-         if(poolResult.length > 1 || poolResult[0].dieCount > 1) throw new Error(debugName + '\ndie count (if provided) must be 1. Use DicePool for 2+');
-         arg1 = poolResult[0].die;
+         //validate that no DicePool stuff exists:
+         if(poolResult.length > 1 || poolResult[0].dieCount > 1) throw new Error(debugName + '\ndie count (if provided) '+
+            'must be 1. Use DicePool for 2+');
+         var groupResult = poolResult[0];
+         if(undefined !== groupResult.dropKeepType || undefined !== groupResult.dropKeepCount) throw new Error(debugName +
+            '\ndrop/keep only applies to dice groups. Use DicePool instead');
+            //yes I know a single exploding die can return multiple values but for simplicity use DicePool instead
+         if(groupResult.areDiceNegative) throw new Error(debugName + '\nonly DicePool can subtract groups. ' +
+            'Alternatively adjust constantModifier.');
+            //also for simplicity (yes I know new DicePool('-d2') subtracts from 0)
+            //I won't auto adjust constantModifier because it messes up reroll criteria
+         arg1 = groupResult.die;  //defensive copy not needed
       }
       else if('object' === typeof(arg1)) debugName = JSON.stringify(arg1);
 

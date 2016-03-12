@@ -77,7 +77,7 @@ function DicePool(arg1, arg2)
          value:
          {
             name: name,
-            hasDropKeep: hasDropKeep,
+            hasDropKeep: hasDropKeep,  //these are informational, they will be ignored by _constructor
             hasExplosions: hasExplosions,
             pool: pool  //TODO: re: needs defense copy
          }
@@ -102,6 +102,7 @@ function DicePool(arg1, arg2)
       }
 
       //DicePool._validate(arg2);  //TODO: re: DicePool._validate and others
+      //make sure you can't drop all the values or more
 
       name = arg1;
       pool = arg2;
