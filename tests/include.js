@@ -1,8 +1,7 @@
 'use strict';
 
-var fileNames = ['DiceExpression', 'DicePool', 'Die', 'GenerateHtml', 'Prebuilt', 'prototypes', 'Statistics', 'Stringifier', 'Testing Util'];
-//includePath was defined in src/library/include.js but I need tests/
-includePath = includePath.replace('src/library', 'tests');
+var fileNames = ['DiceExpression', 'DicePool', 'Die', 'GenerateHtml', 'Parser', 'Prebuilt', 'prototypes', 'Statistics', 'Stringifier', 'Testing Util'];
+//includePath was defined in src/library/include.js
 
 for (var i = 0; i < fileNames.length; ++i)
 {
