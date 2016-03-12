@@ -200,6 +200,15 @@ Tester.Parser._diceGroup = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Short long'});}
 
    try{
+   group = {};
+   string = 'd3r2k1!';
+   Parser._diceGroup(string, string, group);
+   testResults.push({Expected: '===2', Actual: group.die.rerollCriteria, Description: 'Jagged (group between dice): reroll'});
+   testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'Jagged (group between dice): dropKeepCount'});
+   testResults.push({Expected: Die.explodeTypes.Normal, Actual: group.die.explodeType, Description: 'Jagged (group between dice): explode'});
+   } catch(e){testResults.push({Error: e, Description: 'Jagged (group between dice)'});}
+
+   try{
    string = 'd3! explode';
    Parser._diceGroup(string, string, {});
    TesterUtility.failedToThrow(testResults, '2 explode');
@@ -303,6 +312,56 @@ Tester.Parser._shortHand = function(isFirst)
        testResults.push({Expected: new Error('r1r2\nmultiple reroll criteria found. Max is 1'), Actual: e, Description: '2 reroll'});
    }
 
+   try{
+   group = {die: {}};
+   string = 'dl2';
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.DropLowest, Actual: group.dropKeepType, Description: 'DropLowest 2: dropKeepType'});
+   testResults.push({Expected: 2, Actual: group.dropKeepCount, Description: 'DropLowest 2: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'DropLowest 2'});}
+
+   try{
+   group = {die: {}};
+   string = 'dh';
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.DropHighest, Actual: group.dropKeepType, Description: 'DropHighest: dropKeepType'});
+   testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'DropHighest: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'DropHighest'});}
+
+   try{
+   group = {die: {}};
+   string = 'd3';
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.DropLowest, Actual: group.dropKeepType, Description: 'Drop 3: dropKeepType'});
+   testResults.push({Expected: 3, Actual: group.dropKeepCount, Description: 'Drop 3: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'Drop 3'});}
+
+   try{
+   group = {die: {}};
+   string = 'k';
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.KeepHighest, Actual: group.dropKeepType, Description: 'Keep: dropKeepType'});
+   testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'Keep: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'Keep'});}
+
+   try{
+   group = {die: {}};
+   string = 'kl';
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.KeepLowest, Actual: group.dropKeepType, Description: 'KeepLowest: dropKeepType'});
+   testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'KeepLowest: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'KeepLowest'});}
+
+   try{
+   string = 'd1k1';
+   Parser._shortHand(string, string, {die: {}});
+   TesterUtility.failedToThrow(testResults, '2 dropKeep');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('d1k1\nmultiple drop/keep criteria found. Max is 1'), Actual: e, Description: '2 dropKeep'});
+   }
+
    TesterUtility.displayResults('Parser Parser._shortHand', testResults, isFirst);
 };
 Tester.Parser._longHand = function(isFirst)
@@ -384,6 +443,65 @@ Tester.Parser._longHand = function(isFirst)
    {
        testResults.push({Expected: new Error(' reroll 2 reroll 3\nmultiple reroll criteria found. Max is 1'), Actual: e, Description: '2 reroll'});
    }
+
+   try{
+   group = {die: {}};
+   string = ' drop the lowest 2';
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.DropLowest, Actual: group.dropKeepType, Description: 'DropLowest 2: dropKeepType'});
+   testResults.push({Expected: 2, Actual: group.dropKeepCount, Description: 'DropLowest 2: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'DropLowest 2'});}
+
+   try{
+   group = {die: {}};
+   string = ' dropping highest';
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.DropHighest, Actual: group.dropKeepType, Description: 'DropHighest: dropKeepType'});
+   testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'DropHighest: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'DropHighest'});}
+
+   try{
+   group = {die: {}};
+   string = ' ignore 3';
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.DropLowest, Actual: group.dropKeepType, Description: 'Drop 3: dropKeepType'});
+   testResults.push({Expected: 3, Actual: group.dropKeepCount, Description: 'Drop 3: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'Drop 3'});}
+
+   try{
+   group = {die: {}};
+   string = ' keep 1';
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.KeepHighest, Actual: group.dropKeepType, Description: 'Keep 1: dropKeepType'});
+   testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'Keep 1: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'Keep 1'});}
+
+   try{
+   group = {die: {}};
+   string = ' keep lowest';
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: DicePool.dropKeepTypes.KeepLowest, Actual: group.dropKeepType, Description: 'KeepLowest: dropKeepType'});
+   testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'KeepLowest: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'KeepLowest'});}
+
+   try{
+   string = ' remove highest keep lowest';
+   Parser._longHand(string, string, {die: {}});
+   TesterUtility.failedToThrow(testResults, '2 dropKeep');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error(' remove highest keep lowest\nmultiple drop/keep criteria found. Max is 1'), Actual: e, Description: '2 dropKeep'});
+   }
+
+   try{
+   group = {die: {}};
+   string = ' keep';
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: undefined, Actual: group.dropKeepType, Description: 'Ignore keep alone: dropKeepType'});
+   testResults.push({Expected: undefined, Actual: group.dropKeepCount, Description: 'Ignore keep alone: dropKeepCount'});
+   testResults.push({Expected: string, Actual: returned, Description: 'Ignore keep alone: dropKeepCount'});
+   } catch(e){testResults.push({Error: e, Description: 'Ignore keep alone'});}
 
    TesterUtility.displayResults('Parser Parser._longHand', testResults, isFirst);
 };

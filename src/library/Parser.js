@@ -21,7 +21,7 @@ Parser.dicePool = function(inputString)
       if ((/^\d/).test(workingString))
       {
          groupObject.dieCount = Number.parseInt(workingString);  //only parses leading integer
-         if(0 === groupObject.dieCount) throw new Error(inputString + '\ninvalid dieCount: 0');
+         if(0 === groupObject.dieCount) throw new Error(inputString + '\ninvalid dieCount: 0');  //TODO: re: move to DicePool validation?
          workingString = workingString.substring(groupObject.dieCount.toString().length);  //remove sideCount from workingString
       }
       else groupObject.dieCount = 1;
@@ -114,6 +114,23 @@ Parser._shortHand = function(debugName, workingString, group)
          group.die.rerollCriteria = (/^.=?=?-?\d+/).exec(workingString)[0];
          workingString = workingString.substring(group.die.rerollCriteria.length);  //remove rerollCriteria from workingString
       }
+      else if ((/^[dk][hl]?\d*/).test(workingString))
+      {
+         if(undefined !== group.dropKeepType) throw new Error(debugName + '\nmultiple drop/keep criteria found. Max is 1');
+
+         if(workingString.startsWith('dh')) group.dropKeepType = DicePool.dropKeepTypes.DropHighest;
+         else if('d' === workingString[0]) group.dropKeepType = DicePool.dropKeepTypes.DropLowest;
+         else if(workingString.startsWith('kl')) group.dropKeepType = DicePool.dropKeepTypes.KeepLowest;
+         else /*if('k' === workingString[0])*/ group.dropKeepType = DicePool.dropKeepTypes.KeepHighest;
+         workingString = workingString.replace(/^[dk][hl]?/, '');
+
+         if ((/^\d+/).test(workingString))
+         {
+            group.dropKeepCount = Number.parseInt(workingString);  //only parses leading integer
+            workingString = workingString.substring(group.dropKeepCount.toString().length);  //remove dropKeepCount from workingString
+         }
+         else group.dropKeepCount = 1;
+      }
       else break;
    }
 
@@ -182,6 +199,25 @@ Parser._longHand = function(debugName, workingString, group)
            //first is if 'equal' and the other is default
          group.die.rerollCriteria += Number.parseInt(workingString);  //grab number
          workingString = workingString.replace(/^-?\d+/, '');  //remove
+      }
+      //allow: ' keep 1', ' keep lowest', ' keep lowest 1'. reject: ' keep'
+      else if ((/^ (?:drop(?:ping)?|remov(?:e|ing)|ignor(?:e|ing)|keep(?:ping)?) (?:the )?(?:(?:low|high)est(?: \d+)?|\d+)/).test(workingString))
+      {
+         if(undefined !== group.dropKeepType) throw new Error(debugName + '\nmultiple drop/keep criteria found. Max is 1');
+         workingString = workingString.replace(/^ (?:drop(?:ping)?|remov(?:e|ing)|ignor(?:e|ing))/, ' drop');  //simplify
+
+         if((/^ drop(?: the)? high/).test(workingString)) group.dropKeepType = DicePool.dropKeepTypes.DropHighest;
+         else if(workingString.startsWith(' drop')) group.dropKeepType = DicePool.dropKeepTypes.DropLowest;
+         else if((/^ keep(?:ping)?(?: the)? low/).test(workingString)) group.dropKeepType = DicePool.dropKeepTypes.KeepLowest;
+         else /*if(workingString.startsWith(' keep'))*/ group.dropKeepType = DicePool.dropKeepTypes.KeepHighest;
+         workingString = workingString.replace(/^ (?:drop|keep(?:ping)?)(?: the)?(?: (?:low|high)est)?/, '');
+
+         if ((/^ \d+/).test(workingString))
+         {
+            group.dropKeepCount = Number.parseInt(workingString);  //only parses leading integer and allows a leading space
+            workingString = workingString.substring(group.dropKeepCount.toString().length + 1);  //remove dropKeepCount +1 for space
+         }
+         else group.dropKeepCount = 1;
       }
       else break;
    }

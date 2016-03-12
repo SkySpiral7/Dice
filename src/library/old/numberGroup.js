@@ -33,33 +33,6 @@ function numberGroup(diceStringGiven){  //TODO: rename. maybe add successes late
        else if(minMaxSwitch=="Max" && total > minMaxValue) return minMaxValue;  //exceeded max
        return total;
    };
-   function dropCounting(holder, maxDrop){  //doesn't need to know this
-       //first replace shorthand
-       if(dropKeepValue!=0) throw new Error("More than one drop/keep criteria specified. This is not possible, instead add the numbers for a single criteria.");
-      if (DicePool.dropKeepRegexShortHand.test(holder))
-      {
-          var replaceString=" ";
-          if(holder.startsWith("d")) replaceString+="drop ";  //replace with words so I can use same code
-          else replaceString+="keep ";
-          if((/^[dk]h/).test(holder)) replaceString+="highest ";  //explict must be checked first
-          else if((/^[dk]l/).test(holder)) replaceString+="lowest ";
-          else if(holder.startsWith("d")) replaceString+="lowest ";  //defaults
-          else replaceString+="highest ";
-          if(!(/^[dk][hl]?\d+/).test(holder)) replaceString=" "+replaceString.trim();  //chop off trailing space unless it needs it for a #
-          holder=holder.replace(/^[dk][hl]?/, replaceString);
-      }
-       if(holder.startsWith(' keep')) dropKeepSwitch='Keep';  //the word keep is the only way to keep drop on the other hands has synonyms
-       else dropKeepSwitch='Drop';
-       holder=holder.replace(combineRegex(DicePool.dropKeepRegexStart, /\s(?:the\s)?/), "");  //chop off
-       if(holder.startsWith('low')) lowHighSwitch='Low';
-       else lowHighSwitch='High';
-       holder=holder.replace(/^(?:low|high)est/, "");  //will have one of those due to pre-processing checking (in main)
-       if((/^\s\d+/).test(holder)) dropKeepValue=parseInt(holder);
-       else dropKeepValue=1;
-       if(dropKeepValue==0){dropKeepSwitch="None"; lowHighSwitch="None";}  //just ignore it
-       holder=holder.replace(/^\s\d+/, "");  //delete
-       return holder;
-   };
    this.dropDoing = function(everyRoll){
        /*rolledValues.everyRoll=everyRoll;  //set for dropKeepValue==0. otherwise reset later
        rolledValues.droppedRolls=[];  //reset*/

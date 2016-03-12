@@ -14,13 +14,7 @@ Tester.Statistics.analyze = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
-   diceGroup = {
-      die: new Die(2),
-      dieCount: 2,
-      dropKeepType: DicePool.dropKeepTypes.DropLowest,
-      dropKeepCount: 1,
-      areDiceNegative: false
-   };
+   diceGroup = new DicePool('2d2 drop 1').toJSON().value.pool[0];
    actual = Statistics.analyze(diceGroup, 0);
    expected = Statistics.useBruteForce(diceGroup, 0);
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 DropLowest 1'});
@@ -218,13 +212,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 1'});}
 
    try{
-   actual = Statistics.useBruteForce({
-      die: new Die(2),
-      dieCount: 2,
-      dropKeepType: DicePool.dropKeepTypes.DropLowest,
-      dropKeepCount: 1,
-      areDiceNegative: false
-   }, 0);
+   actual = Statistics.useBruteForce(new DicePool('2d2 drop 1').toJSON().value.pool[0], 0);
    expected = [
       {result: 1, frequency: 1},  //1+1
       {result: 2, frequency: 3}  //1+2 or 2+1 or 2+2
@@ -233,13 +221,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2 DropLowest 1'});}
 
    try{
-   actual = Statistics.useBruteForce({
-      die: new Die('d2!!'),
-      dieCount: 2,
-      dropKeepType: DicePool.dropKeepTypes.DropLowest,
-      dropKeepCount: 1,
-      areDiceNegative: false
-   }, 1);
+   actual = Statistics.useBruteForce(new DicePool('2d2!! drop 1').toJSON().value.pool[0], 1);
    expected = [
       //all: 1+1, 1+3, 1+4, 3+1, 3+3, 3+4, 4+1, 4+3, 4+4
       //note that 1 is 1/2 and 3 and 4 are (1/2)*(1/2)=(1/4)
@@ -252,13 +234,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2!! DropLowest 1 explodeCount 1'});}
 
    try{
-   actual = Statistics.useBruteForce({
-      die: new Die('d2!'),
-      dieCount: 2,
-      dropKeepType: DicePool.dropKeepTypes.DropLowest,
-      dropKeepCount: 1,
-      areDiceNegative: false
-   }, 1);
+   actual = Statistics.useBruteForce(new DicePool('2d2! drop 1').toJSON().value.pool[0], 1);
    expected = [
       //all: 1+1, 1+(2+1), 1+(2+2), (2+1)+1, (2+1)+(2+1), (2+1)+(2+2), (2+2)+1, (2+2)+(2+1), (2+2)+(2+2)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -271,13 +247,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2! DropLowest 1 explodeCount 1'});}
 
    try{
-   actual = Statistics.useBruteForce({
-      die: new Die('d2!p'),
-      dieCount: 2,
-      dropKeepType: DicePool.dropKeepTypes.DropLowest,
-      dropKeepCount: 1,
-      areDiceNegative: false
-   }, 1);
+   actual = Statistics.useBruteForce(new DicePool('2d2!p drop 1').toJSON().value.pool[0], 1);
    expected = [
       //all: 1+1, 1+(2+0), 1+(2+1), (2+0)+1, (2+0)+(2+0), (2+0)+(2+1), (2+1)+1, (2+1)+(2+0), (2+1)+(2+1)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -289,13 +259,7 @@ Tester.Statistics.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2!p DropLowest 1 explodeCount 1'});}
 
    try{
-   actual = Statistics.useBruteForce({
-      die: new Die('d2!'),
-      dieCount: 2,
-      dropKeepType: DicePool.dropKeepTypes.KeepHighest,
-      dropKeepCount: 1,
-      areDiceNegative: false
-   }, 1);
+   actual = Statistics.useBruteForce(new DicePool('2d2! keep 1').toJSON().value.pool[0], 1);
    expected = [
       //all: 1+1, 1+(2+1), 1+(2+2), (2+1)+1, (2+1)+(2+1), (2+1)+(2+2), (2+2)+1, (2+2)+(2+1), (2+2)+(2+2)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1

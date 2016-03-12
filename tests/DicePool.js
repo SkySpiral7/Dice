@@ -22,14 +22,7 @@ Tester.DicePool.roll = function(isFirst)
 
    try{
    nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
-   actual = new DicePool('2d8d1', [
-      {
-         die: new Die(8),
-         dieCount: 2,
-         dropKeepType: DicePool.dropKeepTypes.DropLowest,
-         dropKeepCount: 1
-      }
-   ]).roll(nonRandomNumberGenerator(nonRandomNumbers));
+   actual = new DicePool('2d8d1').roll(nonRandomNumberGenerator(nonRandomNumbers));
    testResults.push({Expected: [8], Actual: actual, Description: 'Hooked up to drop/keep'});
    } catch(e){testResults.push({Error: e, Description: 'Hooked up to drop/keep'});}
 
@@ -101,18 +94,7 @@ Tester.DicePool._constructor = function(isFirst)
    }
 
    try{
-   returned = new DicePool('d6+2d2dl', [
-      {
-         die: new Die(),
-         dieCount: 1
-      },
-      {
-         die: new Die(2),
-         dieCount: 2,
-         dropKeepType: DicePool.dropKeepTypes.DropLowest,
-         dropKeepCount: 1
-      }
-   ]).toJSON().value.hasDropKeep;
+   returned = new DicePool('d6+2d2dl').toJSON().value.hasDropKeep;
    testResults.push({Expected: true, Actual: returned, Description: 'hasDropKeep'});
    } catch(e){testResults.push({Error: e, Description: 'hasDropKeep'});}
 

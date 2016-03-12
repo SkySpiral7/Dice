@@ -396,5 +396,3 @@ function DicePool(diceStringGiven, nameArray){
 };
 //static:
 DicePool.minMaxRegexStart = /^\s(?:with\s)?(?:a\s)?(?:min|max)(?:imum)?\s(?:of\s)?/;
-DicePool.dropKeepRegexShortHand = /^[dk][hl]?\d*/;
-DicePool.dropKeepRegexStart = /^\s(?:drop(?:ping)?|remov(?:e|ing)|ignor(?:e|ing)|keep(?:ping)?)/;
