@@ -181,22 +181,25 @@ You should have no use for it although it isn't harmful to call.
 */
 DicePool._parseString = function(inputString)
 {
+   //TODO: re: make DicePool._parseString have everything
+   inputString = '' + inputString;  //enforces string type and is null safe
    var jsonResult = [];
-   var workingString = inputString.toLowerCase().replace(/-/g, '+-');  //make copy so that parse errors can use inputString
+   var workingString = inputString.toLowerCase().replace(/\s+/g, ' ').replace(/-/g, '+-');  //make copy so that parse errors can use inputString
    var groupStringArray = workingString.split('+');
    if('-' === inputString.trim()[0]) groupStringArray.shift();  //leading negative causes first element to be empty
    for (var groupIndex = 0; groupIndex < groupStringArray.length; ++groupIndex)
    {
       var groupObject = {};
       workingString = groupStringArray[groupIndex].trim();
-      if('-' === workingString[0]){groupObject.areDiceNegative = true; workingString = workingString.substring(1);}
+      if('-' === workingString[0]){groupObject.areDiceNegative = true; workingString = workingString.substring(1).trim();}
       if ((/^\d/).test(workingString))
       {
          groupObject.dieCount = Number.parseInt(workingString);  //only parses leading integer
+         if(0 === groupObject.dieCount) throw new Error(inputString + '\ninvalid dieCount: 0');
          workingString = workingString.substring(groupObject.dieCount.toString().length);  //remove sideCount from workingString
       }
       else groupObject.dieCount = 1;
-      groupObject.die = Die._parseString('1' + workingString);
+      groupObject.die = Die._parseString(workingString);
 
       jsonResult.push(groupObject);
    }
@@ -210,13 +213,8 @@ You should have no use for it although it isn't harmful to call.
 */
 Die._parseString = function(inputString)
 {
-   inputString = '' + inputString;  //enforces string type and is null safe
    var jsonResult = {};
-   var workingString = inputString.trim().toLowerCase().replace(/\s+/g, ' ');  //make copy so that parse errors can use inputString
-
-   if((/^1(?:[^\d%]|$)/).test(workingString)) workingString = workingString.substring(1);  //chop off 1
-   else if((/^0(?:[^\d%]|$)/).test(workingString)) throw new Error(inputString + '\ninvalid dieCount: 0');
-   else if((/^[\d%]/).test(workingString)) throw new Error(inputString + '\ndie count (if provided) must be 1. Otherwise use DicePool');
+   var workingString = inputString;  //new variable so that parse errors can use inputString
 
    jsonResult.constantModifier = 0;
    if('z' === workingString[0]) jsonResult.constantModifier = -1;
@@ -227,7 +225,7 @@ Die._parseString = function(inputString)
 
    if ('f' === workingString[0])
    {
-      //isFudgeDie is defined in validate
+      //isFudgeDie is defined in validate  //TODO: re: define in both
       jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
       jsonResult.sideCount = 3;
       workingString = workingString.substring(1);  //chop off 'f'
@@ -242,6 +240,18 @@ Die._parseString = function(inputString)
    else throw new Error(inputString + '\nexpected sideCount. Found: ' + workingString);
 
    //shorthand must come before longhand
+   workingString = Die._parseShortHand(inputString, workingString, jsonResult);
+   workingString = Die._parseLongHand(inputString, workingString, jsonResult);
+
+   //if((/^[-+] ?\d+/).test(workingString))  //for now constantModifier isn't in string because ambiguous (add to group or die? which group?)
+   //also no string support because why would you need it?
+   //constantModifier is used internally and can be used via object construction because not ambiguous
+   if('' !== workingString) throw new Error(inputString + '\nUnparsable: ' + workingString);
+
+   return jsonResult;
+};
+Die._parseShortHand = function(inputString, workingString, jsonResult)
+{
    while (workingString.length > 0)
    {
       if ('!' === workingString[0])
@@ -272,6 +282,11 @@ Die._parseString = function(inputString)
       }
       else break;
    }
+
+   return workingString;
+};
+Die._parseLongHand = function(inputString, workingString, jsonResult)
+{
    //TODO: re: figure out how to make DRY while still enforcing shorthand then longhand
    while (workingString.length > 0)  //longhand loop
    {
@@ -326,13 +341,9 @@ Die._parseString = function(inputString)
       }
       else break;
    }
-   //for now keep constantModifier internal only
-   //if((/^ *[-+] *\d+$/).test(workingString)){jsonResult.constantModifier=Number(workingString); workingString='';}
-   if('' !== workingString) throw new Error(inputString + '\nUnparsable: ' + workingString);
 
-   return jsonResult;
+   return workingString;
 };
-//TODO: re: DicePool._parseString does everything
 //ignore for now: min/max, sorting
 //old Polynomial.createDiePolynomial had negative and ScatterDie
 //old Polynomial.multiplyPolynomials had min/max

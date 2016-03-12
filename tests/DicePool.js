@@ -176,11 +176,11 @@ Tester.DicePool._parseString = function(isFirst)
    returned = DicePool._parseString('2d8+2d16');
    expected = [
       {
-         die: Die._parseString('1d8'),
+         die: Die._parseString('d8'),
          dieCount: 2
       },
       {
-         die: Die._parseString('1d16'),
+         die: Die._parseString('d16'),
          dieCount: 2
       }
    ];
@@ -188,14 +188,45 @@ Tester.DicePool._parseString = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Happy path: 2d8+2d16'});}
 
    try{
-   returned = DicePool._parseString('d8-3d16');
+   DicePool._parseString();
+   TesterUtility.failedToThrow(testResults, 'No arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('undefined\nexpected "d" or "z". Found: undefined'), Actual: e, Description: 'No arg'});
+   }
+
+   try{
+   name = '\n  D8    -     Z16\t ';
+   returned = DicePool._parseString(name);
    expected = [
       {
-         die: Die._parseString('1d8'),
+         die: Die._parseString('d8'),
          dieCount: 1
       },
       {
-         die: Die._parseString('1d16'),
+         die: Die._parseString('z16'),
+         dieCount: 1,
+         areDiceNegative: true
+      }
+   ];
+   testResults.push({Expected: expected, Actual: returned, Description: 'Trim lower: d8-z16'});
+   } catch(e){testResults.push({Error: e, Description: 'Trim lower'});}
+
+   try{
+   returned = DicePool._parseString('d3 reroll dice    less\t\rthan 3');
+   testResults.push({Expected: '<3', Actual: returned[0].die.rerollCriteria, Description: 'Replace all whitespace with 1 space'});
+   } catch(e){testResults.push({Error: e, Description: 'Replace all whitespace with 1 space'});}
+
+   try{
+   returned = DicePool._parseString('d8-3d16');
+   expected = [
+      {
+         die: Die._parseString('d8'),
+         dieCount: 1
+      },
+      {
+         die: Die._parseString('d16'),
          dieCount: 3,
          areDiceNegative: true
       }
@@ -207,13 +238,22 @@ Tester.DicePool._parseString = function(isFirst)
    returned = DicePool._parseString('-d4');
    expected = [
       {
-         die: Die._parseString('1d4'),
+         die: Die._parseString('d4'),
          dieCount: 1,
          areDiceNegative: true
       }
    ];
    testResults.push({Expected: expected, Actual: returned, Description: 'Negative: -d4'});
    } catch(e){testResults.push({Error: e, Description: 'Negative: -d4'});}
+
+   try{
+   DicePool._parseString('0d3');
+   TesterUtility.failedToThrow(testResults, '0 dice');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('0d3\ninvalid dieCount: 0'), Actual: e, Description: '0 dice'});
+   }
 
    TesterUtility.displayResults('DicePool DicePool._parseString', testResults, isFirst);
 };

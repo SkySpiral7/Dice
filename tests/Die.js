@@ -101,6 +101,15 @@ Tester.Die._constructor = function(isFirst)
    testResults.push({Expected: expected, Actual: die.toJSON().value, Description: 'String arg'});
    } catch(e){testResults.push({Error: e, Description: 'String arg'});}
 
+   try{
+   new Die('10d3');
+   TesterUtility.failedToThrow(testResults, '10 dice');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('10d3\ndie count (if provided) must be 1. Use DicePool for 2+'), Actual: e, Description: '10 dice'});
+   }
+
    TesterUtility.displayResults('Die new Die()._constructor', testResults, isFirst);
 };
 Tester.Die._optimizeReroll = function(isFirst)
@@ -139,71 +148,26 @@ Tester.Die._parseString = function(isFirst)
 
    var testResults = [], returned, expected, name;
    try{
-   name = '1d6';
+   name = 'd6';
    returned = Die._parseString(name, name);
    expected = {constantModifier: 0, sideCount: 6};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 1d6'});
+   testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: d6'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
-   name = '\n  Z5\t ';
+   name = 'z5';
    returned = Die._parseString(name, name);
    expected = {constantModifier: -1, sideCount: 5};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Trim lower: z5'});
-   } catch(e){testResults.push({Error: e, Description: 'Trim lower'});}
+   testResults.push({Expected: expected, Actual: returned, Description: 'z5'});
+   } catch(e){testResults.push({Error: e, Description: 'z5'});}
 
    try{
-   Die._parseString('0d3');
-   TesterUtility.failedToThrow(testResults, '0 dice');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('0d3\ninvalid dieCount: 0'), Actual: e, Description: '0 dice'});
-   }
-
-   try{
-   Die._parseString('10d3');
-   TesterUtility.failedToThrow(testResults, '10 dice');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('10d3\ndie count (if provided) must be 1. Otherwise use DicePool'), Actual: e, Description: '10 dice'});
-   }
-
-   try{
-   Die._parseString('%d3');
-   TesterUtility.failedToThrow(testResults, 'Hundred dice');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('%d3\ndie count (if provided) must be 1. Otherwise use DicePool'), Actual: e, Description: 'Hundred dice'});
-   }
-
-   try{
-   Die._parseString('1%d3');
-   TesterUtility.failedToThrow(testResults, 'Thousand dice');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('1%d3\ndie count (if provided) must be 1. Otherwise use DicePool'), Actual: e, Description: 'Thousand dice'});
-   }
-
-   try{
-   Die._parseString('1h3');
+   Die._parseString('h3');
    TesterUtility.failedToThrow(testResults, 'Non dz type');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('1h3\nexpected "d" or "z". Found: h3'), Actual: e, Description: 'Non dz type'});
-   }
-
-   try{
-   Die._parseString('1');
-   TesterUtility.failedToThrow(testResults, 'Not enough info');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('1\nexpected "d" or "z". Found: '), Actual: e, Description: 'Not enough info'});
+       testResults.push({Expected: new Error('h3\nexpected "d" or "z". Found: h3'), Actual: e, Description: 'Non dz type'});
    }
 
    try{
@@ -213,15 +177,6 @@ Tester.Die._parseString = function(isFirst)
    catch(e)
    {
        testResults.push({Expected: new Error('\nexpected "d" or "z". Found: '), Actual: e, Description: 'Empty arg'});
-   }
-
-   try{
-   Die._parseString();
-   TesterUtility.failedToThrow(testResults, 'No arg');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('undefined\nexpected "d" or "z". Found: undefined'), Actual: e, Description: 'No arg'});
    }
 
    try{
@@ -240,7 +195,7 @@ Tester.Die._parseString = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Other % to 00'});}
 
    try{
-   name = '1dF';
+   name = 'df';
    returned = Die._parseString(name);
    expected = {constantModifier: -2, sideCount: 3};
    testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: happy'});
@@ -279,8 +234,7 @@ Tester.Die._parseString = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2 short'});}
 
    try{
-   //also tests: inputString.replace(/\s+/g, ' ');
-   returned = Die._parseString('d3 reroll dice less\t\rthan 3 compound explode die');
+   returned = Die._parseString('d3 reroll dice less than 3 compound explode die');
    testResults.push({Expected: Die.explodeTypes.Compound, Actual: returned.explodeType, Description: '2 long: explode'});
    testResults.push({Expected: '<3', Actual: returned.rerollCriteria, Description: '2 long: reroll'});
    } catch(e){testResults.push({Error: e, Description: '2 long'});}
