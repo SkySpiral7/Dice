@@ -89,7 +89,7 @@ function DicePool(arg1, arg2)
    {
       if(undefined !== pool) throw new Error('Illegal access');
 
-      if('string' === typeof(arg1) && undefined == arg2) arg2 = Parser.diceGroup(arg1);
+      if('string' === typeof(arg1) && undefined == arg2) arg2 = Parser.dicePool(arg1);
       else if (undefined == arg2 && undefined != arg1.pool)
       {
          arg2 = arg1.pool;

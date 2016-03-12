@@ -1,6 +1,6 @@
 'use strict';
 Tester.Parser = {};
-Tester.Parser.diceGroup = function(isFirst)
+Tester.Parser.dicePool = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
@@ -8,14 +8,14 @@ Tester.Parser.diceGroup = function(isFirst)
 
    try{
    string = '2d8+2d16';
-   returned = Parser.diceGroup(string);
+   returned = Parser.dicePool(string);
    expected = [
       {
-         die: Parser._die(string, 'd8'),
+         die: {sideCount: 8, constantModifier: 0},
          dieCount: 2
       },
       {
-         die: Parser._die(string, 'd16'),
+         die: {sideCount: 16, constantModifier: 0},
          dieCount: 2
       }
    ];
@@ -23,7 +23,7 @@ Tester.Parser.diceGroup = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Happy path: 2d8+2d16'});}
 
    try{
-   Parser.diceGroup();
+   Parser.dicePool();
    TesterUtility.failedToThrow(testResults, 'No arg');
    }
    catch(e)
@@ -33,14 +33,14 @@ Tester.Parser.diceGroup = function(isFirst)
 
    try{
    string = '\n  D8    -     z16\t ';
-   returned = Parser.diceGroup(string);
+   returned = Parser.dicePool(string);
    expected = [
       {
-         die: Parser._die(string, 'd8'),
+         die: {sideCount: 8, constantModifier: 0},
          dieCount: 1
       },
       {
-         die: Parser._die(string, 'z16'),
+         die: {sideCount: 16, constantModifier: -1},
          dieCount: 1,
          areDiceNegative: true
       }
@@ -49,20 +49,20 @@ Tester.Parser.diceGroup = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Trim lower'});}
 
    try{
-   returned = Parser.diceGroup('d3 reroll dice    less\t\rthan 3');
+   returned = Parser.dicePool('d3 reroll dice    less\t\rthan 3');
    testResults.push({Expected: '<3', Actual: returned[0].die.rerollCriteria, Description: 'Replace all whitespace with 1 space'});
    } catch(e){testResults.push({Error: e, Description: 'Replace all whitespace with 1 space'});}
 
    try{
    string = 'd8-3d16';
-   returned = Parser.diceGroup(string);
+   returned = Parser.dicePool(string);
    expected = [
       {
-         die: Parser._die(string, 'd8'),
+         die: {sideCount: 8, constantModifier: 0},
          dieCount: 1
       },
       {
-         die: Parser._die(string, 'd16'),
+         die: {sideCount: 16, constantModifier: 0},
          dieCount: 3,
          areDiceNegative: true
       }
@@ -71,10 +71,10 @@ Tester.Parser.diceGroup = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Negative: d8-3d16'});}
 
    try{
-   returned = Parser.diceGroup('-d4');
+   returned = Parser.dicePool('-d4');
    expected = [
       {
-         die: Parser._die('-d4', 'd4'),
+         die: {sideCount: 4, constantModifier: 0},
          dieCount: 1,
          areDiceNegative: true
       }
@@ -83,7 +83,7 @@ Tester.Parser.diceGroup = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Negative: -d4'});}
 
    try{
-   Parser.diceGroup('0d3');
+   Parser.dicePool('0d3');
    TesterUtility.failedToThrow(testResults, '0 dice');
    }
    catch(e)
@@ -91,30 +91,32 @@ Tester.Parser.diceGroup = function(isFirst)
        testResults.push({Expected: new Error('0d3\ninvalid dieCount: 0'), Actual: e, Description: '0 dice'});
    }
 
-   TesterUtility.displayResults('Parser Parser.diceGroup', testResults, isFirst);
+   TesterUtility.displayResults('Parser Parser.dicePool', testResults, isFirst);
 };
-Tester.Parser._die = function(isFirst)
+Tester.Parser._diceGroup = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], returned, expected, string;
+   var testResults = [], expected, string, group;
 
    try{
+   group = {};
    string = 'd6';
-   returned = Parser._die(string, string);
+   Parser._diceGroup(string, string, group);
    expected = {constantModifier: 0, sideCount: 6};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: d6'});
+   testResults.push({Expected: expected, Actual: group.die, Description: 'Happy path: d6'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
+   group = {};
    string = 'z5';
-   returned = Parser._die(string, string);
+   Parser._diceGroup(string, string, group);
    expected = {constantModifier: -1, sideCount: 5};
-   testResults.push({Expected: expected, Actual: returned, Description: 'z5'});
+   testResults.push({Expected: expected, Actual: group.die, Description: 'z5'});
    } catch(e){testResults.push({Error: e, Description: 'z5'});}
 
    try{
-   Parser._die('d6+h3', 'h3');
+   Parser._diceGroup('d6+h3', 'h3', {});
    TesterUtility.failedToThrow(testResults, 'Non dz type');
    }
    catch(e)
@@ -123,7 +125,7 @@ Tester.Parser._die = function(isFirst)
    }
 
    try{
-   Parser._die('d6+', '');
+   Parser._diceGroup('d6+', '', {});
    TesterUtility.failedToThrow(testResults, 'Empty arg');
    }
    catch(e)
@@ -132,40 +134,45 @@ Tester.Parser._die = function(isFirst)
    }
 
    try{
+   group = {};
    string = 'd%2';
-   returned = Parser._die(string, string);
-   testResults.push({Expected: 1002, Actual: returned.sideCount, Description: 'Leading % to 100'});
+   Parser._diceGroup(string, string, group);
+   testResults.push({Expected: 1002, Actual: group.die.sideCount, Description: 'Leading % to 100'});
    } catch(e){testResults.push({Error: e, Description: 'Leading % to 100'});}
 
    try{
+   group = {};
    string = 'd2%';
-   returned = Parser._die(string, string);
-   testResults.push({Expected: 200, Actual: returned.sideCount, Description: 'Non-leading first % to 00'});
+   Parser._diceGroup(string, string, group);
+   testResults.push({Expected: 200, Actual: group.die.sideCount, Description: 'Non-leading first % to 00'});
    } catch(e){testResults.push({Error: e, Description: 'Non-leading first % to 00'});}
 
    try{
+   group = {};
    string = 'd%%';
-   returned = Parser._die(string, string);
-   testResults.push({Expected: 10000, Actual: returned.sideCount, Description: 'Other % to 00'});
+   Parser._diceGroup(string, string, group);
+   testResults.push({Expected: 10000, Actual: group.die.sideCount, Description: 'Other % to 00'});
    } catch(e){testResults.push({Error: e, Description: 'Other % to 00'});}
 
    try{
+   group = {};
    string = 'df';
-   returned = Parser._die(string, string);
+   Parser._diceGroup(string, string, group);
    expected = {constantModifier: -2, sideCount: 3};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: happy'});
+   testResults.push({Expected: expected, Actual: group.die, Description: 'Fudge die: happy'});
    } catch(e){testResults.push({Error: e, Description: 'Fudge die: happy'});}
 
    try{
+   group = {};
    string = 'zf';
-   returned = Parser._die(string, string);
+   Parser._diceGroup(string, string, group);
    expected = {constantModifier: -2, sideCount: 3};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Fudge die: zeroed'});
+   testResults.push({Expected: expected, Actual: group.die, Description: 'Fudge die: zeroed'});
    } catch(e){testResults.push({Error: e, Description: 'Fudge die: zeroed'});}
 
    try{
    string = 'df!';
-   Parser._die(string, string);
+   Parser._diceGroup(string, string, {});
    TesterUtility.failedToThrow(testResults, 'Fudge die: illegal');
    }
    catch(e)
@@ -176,7 +183,7 @@ Tester.Parser._die = function(isFirst)
 
    try{
    string = 'd!';
-   Parser._die(string, string);
+   Parser._diceGroup(string, string, {});
    TesterUtility.failedToThrow(testResults, 'No sideCount');
    }
    catch(e)
@@ -185,15 +192,16 @@ Tester.Parser._die = function(isFirst)
    }
 
    try{
+   group = {};
    string = 'd3r>=2 penetrating exploding dice';
-   returned = Parser._die(string, string);
-   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: returned.explodeType, Description: 'Short long: explode'});
-   testResults.push({Expected: '>=2', Actual: returned.rerollCriteria, Description: 'Short long: reroll'});
+   Parser._diceGroup(string, string, group);
+   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: group.die.explodeType, Description: 'Short long: explode'});
+   testResults.push({Expected: '>=2', Actual: group.die.rerollCriteria, Description: 'Short long: reroll'});
    } catch(e){testResults.push({Error: e, Description: 'Short long'});}
 
    try{
    string = 'd3! explode';
-   Parser._die(string, string);
+   Parser._diceGroup(string, string, {});
    TesterUtility.failedToThrow(testResults, '2 explode');
    }
    catch(e)
@@ -203,7 +211,7 @@ Tester.Parser._die = function(isFirst)
 
    try{
    string = 'd3r-1 reroll 0';
-   Parser._die(string, string);
+   Parser._diceGroup(string, string, {});
    TesterUtility.failedToThrow(testResults, '2 reroll');
    }
    catch(e)
@@ -213,7 +221,7 @@ Tester.Parser._die = function(isFirst)
 
    try{
    string = 'd3! reroll 1 reroll rocks';
-   Parser._die(string, string);
+   Parser._diceGroup(string, string, {});
    TesterUtility.failedToThrow(testResults, 'Unparsable');
    }
    catch(e)
@@ -223,7 +231,7 @@ Tester.Parser._die = function(isFirst)
 
    try{
    string = 'd3 reroll 1!';
-   Parser._die(string, string);
+   Parser._diceGroup(string, string, {});
    TesterUtility.failedToThrow(testResults, 'Illegal: Long then short');
    }
    catch(e)
@@ -231,54 +239,53 @@ Tester.Parser._die = function(isFirst)
        testResults.push({Expected: new Error('d3 reroll 1!\nUnparsable: !'), Actual: e, Description: 'Illegal: Long then short'});
    }
 
-   TesterUtility.displayResults('Parser Parser._die', testResults, isFirst);
+   TesterUtility.displayResults('Parser Parser._diceGroup', testResults, isFirst);
 };
 Tester.Parser._shortHand = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], returned, expected, string, inputJson;
+   var testResults = [], returned, expected, string, group;
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = 'r>1';
-   returned = Parser._shortHand(string, string, inputJson);
-   testResults.push({Expected: undefined, Actual: inputJson.explodeType, Description: 'r>1: explode'});
-   testResults.push({Expected: '>1', Actual: inputJson.rerollCriteria, Description: 'r>1: reroll'});
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: undefined, Actual: group.die.explodeType, Description: 'r>1: explode'});
+   testResults.push({Expected: '>1', Actual: group.die.rerollCriteria, Description: 'r>1: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'r>1: returned'});
    } catch(e){testResults.push({Error: e, Description: 'r>1'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = 'r1! remainder';
-   returned = Parser._shortHand(string, string, inputJson);
-   testResults.push({Expected: Die.explodeTypes.Normal, Actual: inputJson.explodeType, Description: 'Normal r1: explode'});
-   testResults.push({Expected: '===1', Actual: inputJson.rerollCriteria, Description: 'Normal r1: reroll'});
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: Die.explodeTypes.Normal, Actual: group.die.explodeType, Description: 'Normal r1: explode'});
+   testResults.push({Expected: '===1', Actual: group.die.rerollCriteria, Description: 'Normal r1: reroll'});
    testResults.push({Expected: ' remainder', Actual: returned, Description: 'Normal r1: returned'});
    } catch(e){testResults.push({Error: e, Description: 'Normal r1'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = '!pr=2';
-   returned = Parser._shortHand(string, string, inputJson);
-   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: inputJson.explodeType, Description: 'Penetrating r=2: explode'});
-   testResults.push({Expected: '=2', Actual: inputJson.rerollCriteria, Description: 'Penetrating r=2: reroll'});
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: group.die.explodeType, Description: 'Penetrating r=2: explode'});
+   testResults.push({Expected: '=2', Actual: group.die.rerollCriteria, Description: 'Penetrating r=2: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'Penetrating r=2: returned'});
    } catch(e){testResults.push({Error: e, Description: 'Penetrating r=2'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = 'r!==-2!!reroll 1';
-   returned = Parser._shortHand(string, string, inputJson);
-   testResults.push({Expected: Die.explodeTypes.Compound, Actual: inputJson.explodeType, Description: 'Compound r!==-2: explode'});
-   testResults.push({Expected: '!==-2', Actual: inputJson.rerollCriteria, Description: 'Compound r!==-2: reroll'});
+   returned = Parser._shortHand(string, string, group);
+   testResults.push({Expected: Die.explodeTypes.Compound, Actual: group.die.explodeType, Description: 'Compound r!==-2: explode'});
+   testResults.push({Expected: '!==-2', Actual: group.die.rerollCriteria, Description: 'Compound r!==-2: reroll'});
    testResults.push({Expected: 'reroll 1', Actual: returned, Description: 'Compound r!==-2: returned'});
    } catch(e){testResults.push({Error: e, Description: 'Compound r!==-2'});}
 
    try{
-   inputJson = {};
    string = '!!!';  //Compound then regular
-   Parser._shortHand(string, string, inputJson);
+   Parser._shortHand(string, string, {die: {}});
    TesterUtility.failedToThrow(testResults, '2 explode');
    }
    catch(e)
@@ -287,9 +294,8 @@ Tester.Parser._shortHand = function(isFirst)
    }
 
    try{
-   inputJson = {};
    string = 'r1r2';
-   Parser._shortHand(string, string, inputJson);
+   Parser._shortHand(string, string, {die: {}});
    TesterUtility.failedToThrow(testResults, '2 reroll');
    }
    catch(e)
@@ -303,66 +309,65 @@ Tester.Parser._longHand = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
 
-   var testResults = [], returned, expected, string, inputJson;
+   var testResults = [], returned, expected, string, group;
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = ' exploding ducks';
-   returned = Parser._longHand(string, string, inputJson);
-   testResults.push({Expected: Die.explodeTypes.Normal, Actual: inputJson.explodeType, Description: 'Simple: explode'});
-   testResults.push({Expected: undefined, Actual: inputJson.rerollCriteria, Description: 'Simple: reroll'});
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: Die.explodeTypes.Normal, Actual: group.die.explodeType, Description: 'Simple: explode'});
+   testResults.push({Expected: undefined, Actual: group.die.rerollCriteria, Description: 'Simple: reroll'});
    testResults.push({Expected: ' ducks', Actual: returned, Description: 'Simple: returned'});
    } catch(e){testResults.push({Error: e, Description: 'Simple'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = ' compound explode die reroll dice that are not equal to 5';
-   returned = Parser._longHand(string, string, inputJson);
-   testResults.push({Expected: Die.explodeTypes.Compound, Actual: inputJson.explodeType, Description: 'Compound r!=5: explode'});
-   testResults.push({Expected: '!=5', Actual: inputJson.rerollCriteria, Description: 'Compound r!=5: reroll'});
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: Die.explodeTypes.Compound, Actual: group.die.explodeType, Description: 'Compound r!=5: explode'});
+   testResults.push({Expected: '!=5', Actual: group.die.rerollCriteria, Description: 'Compound r!=5: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'Compound r!=5: returned'});
    } catch(e){testResults.push({Error: e, Description: 'Compound r!=5'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = ' penetrate explode reroll greater than or equal 3';
-   returned = Parser._longHand(string, string, inputJson);
-   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: inputJson.explodeType, Description: 'Penetrating r>=3: explode'});
-   testResults.push({Expected: '>=3', Actual: inputJson.rerollCriteria, Description: 'Penetrating r>=3: reroll'});
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: Die.explodeTypes.Penetrating, Actual: group.die.explodeType, Description: 'Penetrating r>=3: explode'});
+   testResults.push({Expected: '>=3', Actual: group.die.rerollCriteria, Description: 'Penetrating r>=3: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'Penetrating r>=3: returned'});
    } catch(e){testResults.push({Error: e, Description: 'Penetrating r>=3'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = ' reroll equal 2';
-   returned = Parser._longHand(string, string, inputJson);
-   testResults.push({Expected: undefined, Actual: inputJson.explodeType, Description: 'r=2: explode'});
-   testResults.push({Expected: '==2', Actual: inputJson.rerollCriteria, Description: 'r=2: reroll'});
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: undefined, Actual: group.die.explodeType, Description: 'r=2: explode'});
+   testResults.push({Expected: '==2', Actual: group.die.rerollCriteria, Description: 'r=2: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'r=2: returned'});
    } catch(e){testResults.push({Error: e, Description: 'r=2'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = ' reroll less than 1';
-   returned = Parser._longHand(string, string, inputJson);
-   testResults.push({Expected: undefined, Actual: inputJson.explodeType, Description: 'r<1: explode'});
-   testResults.push({Expected: '<1', Actual: inputJson.rerollCriteria, Description: 'r<1: reroll'});
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: undefined, Actual: group.die.explodeType, Description: 'r<1: explode'});
+   testResults.push({Expected: '<1', Actual: group.die.rerollCriteria, Description: 'r<1: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'r<1: returned'});
    } catch(e){testResults.push({Error: e, Description: 'r<1'});}
 
    try{
-   inputJson = {};
+   group = {die: {}};
    string = ' rerolling 8';
-   returned = Parser._longHand(string, string, inputJson);
-   testResults.push({Expected: undefined, Actual: inputJson.explodeType, Description: 'r8: explode'});
-   testResults.push({Expected: '==8', Actual: inputJson.rerollCriteria, Description: 'r8: reroll'});
+   returned = Parser._longHand(string, string, group);
+   testResults.push({Expected: undefined, Actual: group.die.explodeType, Description: 'r8: explode'});
+   testResults.push({Expected: '==8', Actual: group.die.rerollCriteria, Description: 'r8: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'r8: returned'});
    } catch(e){testResults.push({Error: e, Description: 'r8'});}
 
    try{
-   inputJson = {};
    string = ' explode explode';
-   Parser._longHand(string, string, inputJson);
+   Parser._longHand(string, string, {die: {}});
    TesterUtility.failedToThrow(testResults, '2 explode');
    }
    catch(e)
@@ -371,9 +376,8 @@ Tester.Parser._longHand = function(isFirst)
    }
 
    try{
-   inputJson = {};
    string = ' reroll 2 reroll 3';
-   Parser._longHand(string, string, inputJson);
+   Parser._longHand(string, string, {die: {}});
    TesterUtility.failedToThrow(testResults, '2 reroll');
    }
    catch(e)

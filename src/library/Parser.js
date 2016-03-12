@@ -6,7 +6,7 @@ You should have no use for it although it isn't harmful to call.
 @param {string} inputString
 @returns {!object[]} the object array needed to create a DicePool. Not optimized or validated.
 */
-Parser.diceGroup = function(inputString)
+Parser.dicePool = function(inputString)
 {
    inputString = '' + inputString;  //enforces string type and is null safe
    var jsonResult = [];
@@ -25,25 +25,25 @@ Parser.diceGroup = function(inputString)
          workingString = workingString.substring(groupObject.dieCount.toString().length);  //remove sideCount from workingString
       }
       else groupObject.dieCount = 1;
-      groupObject.die = Parser._die(inputString, workingString);
+      Parser._diceGroup(inputString, workingString, groupObject);
 
       jsonResult.push(groupObject);
    }
    return jsonResult;
 };
 /**
-This function is used by Parser.diceGroup. It parses the workingString into an object used to create a Die.
+This function is used by Parser.dicePool. It parses the workingString populating group.
 You should have no use for it although it isn't harmful to call.
 Because this is an internal function it makes certain assumptions that won't give error messages if violated.
 @param {!string} debugName prepended to error messages
 @param {!string} workingString
-@returns {!object} the object needed to create a Die. Not optimized or validated.
+@param {!object} group an element of DicePool's pool array. Not optimized or validated.
 */
-Parser._die = function(debugName, workingString)
+Parser._diceGroup = function(debugName, workingString, group)
 {
-   var jsonResult = {constantModifier: 0};
+   group.die = {constantModifier: 0};
 
-   if('z' === workingString[0]) jsonResult.constantModifier = -1;
+   if('z' === workingString[0]) group.die.constantModifier = -1;
    if(!(/^[zd]/).test(workingString)) throw new Error(debugName + '\nexpected "d" or "z". Found: ' + workingString);
    workingString = workingString.substring(1);  //chop off 'd' or 'z'
    if('%' === workingString[0]) workingString = workingString.replace(/%/, '100');  //replace first % with 100
@@ -52,69 +52,67 @@ Parser._die = function(debugName, workingString)
    if ('f' === workingString[0])
    {
       //isFudgeDie is defined in validate  //TODO: re: define in both
-      jsonResult.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
-      jsonResult.sideCount = 3;
+      group.die.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
+      group.die.sideCount = 3;
       workingString = workingString.substring(1);  //chop off 'f'
       if('' !== workingString) throw new Error(debugName + '\nFudge/Fate dice don\'t explode or reroll. Illegal: ' + workingString);
-      return jsonResult;
+      return;
    }
    else if ((/^\d+/).test(workingString))
    {
-      jsonResult.sideCount = Number.parseInt(workingString);  //only parses leading integer
-      workingString = workingString.substring(jsonResult.sideCount.toString().length);  //remove sideCount from workingString
+      group.die.sideCount = Number.parseInt(workingString);  //only parses leading integer
+      workingString = workingString.substring(group.die.sideCount.toString().length);  //remove sideCount from workingString
    }
    else throw new Error(debugName + '\nexpected sideCount. Found: ' + workingString);
 
    //shorthand must come before longhand
-   workingString = Parser._shortHand(debugName, workingString, jsonResult);
-   workingString = Parser._longHand(debugName, workingString, jsonResult);
+   workingString = Parser._shortHand(debugName, workingString, group);
+   workingString = Parser._longHand(debugName, workingString, group);
 
    //if((/^[-+] ?\d+/).test(workingString))  //for now constantModifier isn't in string because ambiguous (add to group or die? which group?)
    //also no string support because why would you need it?
    //constantModifier is used internally and can be used via object construction because not ambiguous
    if('' !== workingString) throw new Error(debugName + '\nUnparsable: ' + workingString);
-
-   return jsonResult;
 };
 /**
-This function is used by Parser._die. It parses the workingString populating jsonResult.
+This function is used by Parser._diceGroup. It parses the workingString populating group.
 This function handles the short hand reroll and explode syntax for a Die (eg: '!r1').
 You should have no use for it although it isn't harmful to call.
 Because this is an internal function it makes certain assumptions that won't give error messages if violated.
 @param {!string} debugName prepended to error messages
 @param {!string} workingString
-@param {!object} jsonResult
+@param {!object} group
 @returns {!string} the unparsed workingString that remains
 */
-Parser._shortHand = function(debugName, workingString, jsonResult)
+Parser._shortHand = function(debugName, workingString, group)
 {
    while (workingString.length > 0)
    {
       if ('!' === workingString[0])
       {
-         if(undefined !== jsonResult.explodeType) throw new Error(debugName + '\nmultiple explosions found. Max is 1');
+         if(undefined !== group.die.explodeType) throw new Error(debugName + '\nmultiple explosions found. Max is 1');
          workingString = workingString.substring(1);  //chop off '!'
          if ('!' === workingString[0])  //if it had '!!'
          {
             workingString = workingString.substring(1);
-            jsonResult.explodeType = Die.explodeTypes.Compound;
+            group.die.explodeType = Die.explodeTypes.Compound;
          }
          else if ('p' === workingString[0])
          {
             workingString = workingString.substring(1);  //chop off 'p'
-            jsonResult.explodeType = Die.explodeTypes.Penetrating;
+            group.die.explodeType = Die.explodeTypes.Penetrating;
          }
-         else jsonResult.explodeType = Die.explodeTypes.Normal;
+         else group.die.explodeType = Die.explodeTypes.Normal;
       }
       else if ((/^r(?:[<>]=?|[!=]?==?)?-?\d+/).test(workingString))
       {
-         if(undefined !== jsonResult.rerollCriteria) throw new Error(debugName + '\nmultiple reroll criteria found. Max is 1');
+         if(undefined !== group.die.rerollCriteria) throw new Error(debugName + '\nmultiple reroll criteria found. Max is 1');
             //could theoretically be an array of criteria but throw for now
          workingString = workingString.substring(1);  //chop off 'r'
          //TODO: re: move this default into Die.validate:
          if((/^-?\d+/).test(workingString)) workingString = '===' + workingString;  //default
-         jsonResult.rerollCriteria = (/^.=?=?-?\d+/).exec(workingString)[0];
-         workingString = workingString.substring(jsonResult.rerollCriteria.length);  //remove rerollCriteria from workingString
+         group.die.rerollCriteria = (/^.=?=?-?\d+/).exec(workingString)[0];
+         workingString = workingString.substring(group.die.rerollCriteria.length);  //remove rerollCriteria from workingString
       }
       else break;
    }
@@ -122,16 +120,16 @@ Parser._shortHand = function(debugName, workingString, jsonResult)
    return workingString;
 };
 /**
-This function is used by Parser._die. It parses the workingString populating jsonResult.
+This function is used by Parser._diceGroup. It parses the workingString populating group.
 This function handles the long hand reroll and explode syntax for a Die (eg: ' explode reroll 1').
 You should have no use for it although it isn't harmful to call.
 Because this is an internal function it makes certain assumptions that won't give error messages if violated.
 @param {!string} debugName prepended to error messages
 @param {!string} workingString
-@param {!object} jsonResult
+@param {!object} group
 @returns {!string} the unparsed workingString that remains
 */
-Parser._longHand = function(debugName, workingString, jsonResult)
+Parser._longHand = function(debugName, workingString, group)
 {
    //TODO: re: figure out how to make DRY while still enforcing shorthand then longhand
    while (workingString.length > 0)  //longhand loop
@@ -139,50 +137,50 @@ Parser._longHand = function(debugName, workingString, jsonResult)
       //as per the robustness principle I don't care about English grammar as long as the meaning is clear
       if ((/^(?: penetrat(?:ing|e)| compound(?:ing)?)? explo(?:sions?|ding|de)(?: dic?e)?/).test(workingString))
       {
-         if(undefined !== jsonResult.explodeType) throw new Error(debugName + '\nmultiple explosions found. Max is 1');
+         if(undefined !== group.die.explodeType) throw new Error(debugName + '\nmultiple explosions found. Max is 1');
          if (workingString.startsWith(' compound'))
          {
             workingString = workingString.replace(/ compound(?:ing)?/, '');  //remove word
-            jsonResult.explodeType = Die.explodeTypes.Compound;
+            group.die.explodeType = Die.explodeTypes.Compound;
          }
          else if (workingString.startsWith(' penetrat'))
          {
             workingString = workingString.replace(/ penetrat(?:ing|e)/, '');  //remove word
-            jsonResult.explodeType = Die.explodeTypes.Penetrating;
+            group.die.explodeType = Die.explodeTypes.Penetrating;
          }
-         else jsonResult.explodeType = Die.explodeTypes.Normal;
+         else group.die.explodeType = Die.explodeTypes.Normal;
          workingString = workingString.replace(/ explo(?:sions?|ding|de)(?: dic?e)?/, '');  //remove word(s)
       }
       else if ((/^ reroll(?:ing)? (?:dic?e (?:that are )?)?(?:(?:greater|less) than(?: or equal(?: to)?)? |(?:not )?equal(?: to)? )?-?\d+/).test(workingString))
       {
-         if(undefined !== jsonResult.rerollCriteria) throw new Error(debugName + '\nmultiple reroll criteria found. Max is 1');
+         if(undefined !== group.die.rerollCriteria) throw new Error(debugName + '\nmultiple reroll criteria found. Max is 1');
             //could theoretically be an array of criteria but throw for now
          workingString = workingString.replace(/^ reroll(?:ing)? (?:dic?e (?:that are )?)?/, '');  //remove word(s)
          if ((/^greater than (?:or )?/).test(workingString))
          {
-            jsonResult.rerollCriteria = '>';
+            group.die.rerollCriteria = '>';
             workingString = workingString.replace(/^greater than (?:or )?/, '');
          }
          else if ((/^less than (?:or )?/).test(workingString))
          {
-            jsonResult.rerollCriteria = '<';
+            group.die.rerollCriteria = '<';
             workingString = workingString.replace(/^less than (?:or )?/, '');
          }
          else if ((/^not /).test(workingString))
          {
-            jsonResult.rerollCriteria = '!';
+            group.die.rerollCriteria = '!';
             workingString = workingString.replace(/^not /, '');
          }
-         else jsonResult.rerollCriteria = '';
+         else group.die.rerollCriteria = '';
 
          if ((/^equal(?: to)? /).test(workingString))
          {
-            jsonResult.rerollCriteria += '=';
+            group.die.rerollCriteria += '=';
             workingString = workingString.replace(/^equal(?: to)? /, '');
          }
-         if('=' === jsonResult.rerollCriteria || '' === jsonResult.rerollCriteria) jsonResult.rerollCriteria = '==';
+         if('=' === group.die.rerollCriteria || '' === group.die.rerollCriteria) group.die.rerollCriteria = '==';
            //first is if 'equal' and the other is default
-         jsonResult.rerollCriteria += Number.parseInt(workingString);  //grab number
+         group.die.rerollCriteria += Number.parseInt(workingString);  //grab number
          workingString = workingString.replace(/^-?\d+/, '');  //remove
       }
       else break;

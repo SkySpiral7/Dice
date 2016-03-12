@@ -85,7 +85,7 @@ function Die(arg1)
       else if ('string' === typeof(arg1))
       {
          debugName = arg1;
-         var poolResult = Parser.diceGroup(arg1);
+         var poolResult = Parser.dicePool(arg1);
          //validate that no DicePool stuff exists:
          if(poolResult.length > 1 || poolResult[0].dieCount > 1) throw new Error(debugName + '\ndie count (if provided) '+
             'must be 1. Use DicePool for 2+');
