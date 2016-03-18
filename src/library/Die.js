@@ -87,7 +87,7 @@ function Die(arg1)
          debugName = arg1;
          var poolResult = Parser.dicePool(arg1);
          //validate that no DicePool stuff exists:
-         if(poolResult.length > 1 || poolResult[0].dieCount > 1) throw new Error(debugName + '\ndie count (if provided) '+
+         if(poolResult.length > 1 || poolResult[0].dieCount !== 1) throw new Error(debugName + '\ndie count (if provided) '+
             'must be 1. Use DicePool for 2+');
          var groupResult = poolResult[0];
          if(undefined !== groupResult.dropKeepType || undefined !== groupResult.dropKeepCount) throw new Error(debugName +

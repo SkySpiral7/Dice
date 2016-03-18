@@ -12,11 +12,13 @@ Tester.Parser.dicePool = function(isFirst)
    expected = [
       {
          die: {sideCount: 8, constantModifier: 0},
-         dieCount: 2
+         dieCount: 2,
+         areDiceNegative: false
       },
       {
          die: {sideCount: 16, constantModifier: 0},
-         dieCount: 2
+         dieCount: 2,
+         areDiceNegative: false
       }
    ];
    testResults.push({Expected: expected, Actual: returned, Description: 'Happy path: 2d8+2d16'});
@@ -37,7 +39,8 @@ Tester.Parser.dicePool = function(isFirst)
    expected = [
       {
          die: {sideCount: 8, constantModifier: 0},
-         dieCount: 1
+         dieCount: 1,
+         areDiceNegative: false
       },
       {
          die: {sideCount: 16, constantModifier: -1},
@@ -59,7 +62,8 @@ Tester.Parser.dicePool = function(isFirst)
    expected = [
       {
          die: {sideCount: 8, constantModifier: 0},
-         dieCount: 1
+         dieCount: 1,
+         areDiceNegative: false
       },
       {
          die: {sideCount: 16, constantModifier: 0},
@@ -81,15 +85,6 @@ Tester.Parser.dicePool = function(isFirst)
    ];
    testResults.push({Expected: expected, Actual: returned, Description: 'Negative: -d4'});
    } catch(e){testResults.push({Error: e, Description: 'Negative: -d4'});}
-
-   try{
-   Parser.dicePool('0d3');
-   TesterUtility.failedToThrow(testResults, '0 dice');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('0d3\ninvalid dieCount: 0'), Actual: e, Description: '0 dice'});
-   }
 
    TesterUtility.displayResults('Parser Parser.dicePool', testResults, isFirst);
 };

@@ -11,22 +11,25 @@ Parser.dicePool = function(inputString)
    inputString = '' + inputString;  //enforces string type and is null safe
    var jsonResult = [];
    var workingString = inputString.toLowerCase().replace(/\s+/g, ' ').replace(/-/g, '+-');  //make copy so that parse errors can use inputString
+
    var groupStringArray = workingString.split('+');
    if('-' === inputString.trim()[0]) groupStringArray.shift();  //leading negative causes first element to be empty
+
    for (var groupIndex = 0; groupIndex < groupStringArray.length; ++groupIndex)
    {
       var groupObject = {};
       workingString = groupStringArray[groupIndex].trim();
       if('-' === workingString[0]){groupObject.areDiceNegative = true; workingString = workingString.substring(1).trim();}
-      if ((/^\d/).test(workingString))
+      else groupObject.areDiceNegative = false;
+
+      if ((/^\d+/).test(workingString))
       {
          groupObject.dieCount = Number.parseInt(workingString);  //only parses leading integer
-         if(0 === groupObject.dieCount) throw new Error(inputString + '\ninvalid dieCount: 0');  //TODO: re: move to DicePool validation?
          workingString = workingString.substring(groupObject.dieCount.toString().length);  //remove sideCount from workingString
       }
       else groupObject.dieCount = 1;
-      Parser._diceGroup(inputString, workingString, groupObject);
 
+      Parser._diceGroup(inputString, workingString, groupObject);
       jsonResult.push(groupObject);
    }
    return jsonResult;

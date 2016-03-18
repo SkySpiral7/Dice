@@ -66,7 +66,8 @@ function requireInstanceOf(constructor, actualObject)
 /**@throws Error if actualObject is not a natural number. See Number.isNatural.*/
 function requireNaturalNumber(actualObject)
 {
-   if(!Number.isNatural(actualObject)) throw new Error('Was type: ' + typeof(actualObject) + ' with toString: ' + actualObject);
+   if(!Number.isNatural(actualObject)) throw new Error('Expected Natural Number. Got type: ' + typeof(actualObject) +
+      ' with toString: ' + actualObject);
 }
 /**@returns the error that is thrown by functionToCall when passed args. Note that functionToCall can't reference the this pointer.*/
 function getError(functionToCall, args)

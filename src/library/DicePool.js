@@ -101,8 +101,8 @@ function DicePool(arg1, arg2)
          arg1 = 'DicePool';
       }
 
-      //DicePool._validate(arg2);  //TODO: re: DicePool._validate and others
-      //make sure you can't drop all the values or more
+      DicePool._validate(arg1, arg2);
+      //array of dice is allowed  //TODO: re: optimize the groups together
 
       name = arg1;
       pool = arg2;
@@ -111,7 +111,6 @@ function DicePool(arg1, arg2)
       hasDropKeep = false, hasExplosions = false;
       for (var i = 0; i < pool.length; ++i)
       {
-         if(!(pool[i].die instanceof Die)) pool[i].die = new Die(pool[i].die);
          hasDropKeep = hasDropKeep || (undefined !== pool[i].dropKeepType);
          hasExplosions = hasExplosions || (undefined !== pool[i].die.toJSON().value.explodeType);
          if(hasDropKeep && hasExplosions) break;  //no more information to find
@@ -129,10 +128,12 @@ DicePool.dropKeepTypes = {
       toString: function(){return '{DropLowest}';},
       toJSON: function(){return '{DropLowest}';},
       /**diceResults will have dropCount number of elements removed.
-      The ones closes to -Infinity will be removed.*/
+      The ones closes to -Infinity will be removed.
+      All of them will be removed if dropCount >= diceResults.length.*/
       perform: function(dropCount, diceResults)
       {
          diceResults.sort(Number.ascending);
+         if(dropCount > diceResults.length) dropCount = diceResults.length;
          for(var i = dropCount; i > 0; --i){diceResults.shift();}
       }
    },
@@ -141,11 +142,13 @@ DicePool.dropKeepTypes = {
       toString: function(){return '{DropHighest}';},
       toJSON: function(){return '{DropHighest}';},
       /**diceResults will have dropCount number of elements removed.
-      The ones closes to Infinity will be removed.*/
+      The ones closes to Infinity will be removed.
+      All of them will be removed if dropCount >= diceResults.length.*/
       perform: function(dropCount, diceResults)
       {
          diceResults.sort(Number.ascending);
          diceResults.reverse();
+         if(dropCount > diceResults.length) dropCount = diceResults.length;
          for(var i = dropCount; i > 0; --i){diceResults.shift();}
       }
    },
@@ -154,7 +157,8 @@ DicePool.dropKeepTypes = {
       toString: function(){return '{KeepLowest}';},
       toJSON: function(){return '{KeepLowest}';},
       /**diceResults will have all but dropCount number of elements removed.
-      The ones closes to -Infinity will be kept (possibly all of them).*/
+      The ones closes to -Infinity will be kept.
+      Nothing happens if keepCount > diceResults.length.*/
       perform: function(keepCount, diceResults)
       {
          var dropCount = (diceResults.length - keepCount);
@@ -166,12 +170,54 @@ DicePool.dropKeepTypes = {
       toString: function(){return '{KeepHighest}';},
       toJSON: function(){return '{KeepHighest}';},
       /**diceResults will have all but dropCount number of elements removed.
-      The ones closes to Infinity will be kept (possibly all of them).*/
+      The ones closes to Infinity will be kept.
+      Nothing happens if keepCount > diceResults.length.*/
       perform: function(keepCount, diceResults)
       {
          var dropCount = (diceResults.length - keepCount);
          if(dropCount > 0) DicePool.dropKeepTypes.DropLowest.perform(dropCount, diceResults);
       }
+   }
+};
+/**
+This function is used in the constructor of DicePool. It throws if there is anything invalid about the input.
+It also normalizes the input.
+You should have no use for it although it isn't harmful to call.
+@param {!string} debugName prepended to any error message thrown
+@param {!object} pool which may be slightly modified (ie gaining default values)
+*/
+DicePool._validate = function(debugName, pool)
+{
+   //TODO: re: improve error messages (include i value)
+   requireTypeOf('string', debugName);
+   requireInstanceOf(Array, pool);
+   if(0 === pool.length) throw new Error(debugName + '\npool must not be empty');
+   for (var i = 0; i < pool.length; ++i)
+   {
+      //if(!(pool[i].die instanceof Die) && 'object' !== typeof(pool[i].die)) throw new Error(debugName + '\ninvalid die: ' + pool[i].die);
+      if(!(pool[i].die instanceof Die)) pool[i].die = new Die(pool[i].die);  //die required: throws if can't create
+
+      if(undefined == pool[i].dieCount) pool[i].dieCount = 1;
+      else if(!Number.isNatural(pool[i].dieCount)) throw new Error(debugName + '\ninvalid dieCount: ' + pool[i].dieCount);
+
+      if (undefined != pool[i].dropKeepType || undefined != pool[i].dropKeepCount)
+      {
+         if(undefined == pool[i].dropKeepCount) pool[i].dropKeepCount = 1;
+         if(!Number.isNatural(pool[i].dropKeepCount)) throw new Error(debugName + '\ninvalid dropKeepCount: ' + pool[i].dropKeepCount);
+         var explodeType = pool[i].die.toJSON().value.explodeType;
+         var hasFiniteDiceCount = (undefined === explodeType || Die.explodeTypes.Compound === explodeType);
+         if(hasFiniteDiceCount && pool[i].dropKeepCount >= pool[i].dieCount) throw new Error(debugName + '\ndropKeepCount ('
+            + pool[i].dropKeepCount + ') is too large. dieCount=' + pool[i].dieCount);
+         //'3d3! drop 5' is allowed but stupid
+
+         if(DicePool.dropKeepTypes.DropLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.DropHighest !== pool[i].dropKeepType
+            && DicePool.dropKeepTypes.KeepLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.KeepHighest !== pool[i].dropKeepType)
+            throw new Error(debugName + '\ninvalid dropKeepType: ' + pool[i].dropKeepType);
+      }
+      else{delete pool[i].dropKeepType; delete pool[i].dropKeepCount;}
+
+      if(undefined == pool[i].areDiceNegative) pool[i].areDiceNegative = false;
+      else if('boolean' !== typeof(pool[i].areDiceNegative)) throw new Error(debugName + '\ninvalid areDiceNegative: ' + pool[i].areDiceNegative);
    }
 };
 //ignore for now: sorting

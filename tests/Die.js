@@ -111,6 +111,15 @@ Tester.Die._constructor = function(isFirst)
    }
 
    try{
+   new Die('0d3');
+   TesterUtility.failedToThrow(testResults, '0 dice');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('0d3\ndie count (if provided) must be 1. Use DicePool for 2+'), Actual: e, Description: '0 dice'});
+   }
+
+   try{
    new Die('d3+d2');
    TesterUtility.failedToThrow(testResults, '2 dice groups');
    }
