@@ -107,14 +107,12 @@ Parser._shortHand = function(debugName, workingString, group)
          }
          else group.die.explodeType = Die.explodeTypes.Normal;
       }
-      else if ((/^r(?:[<>]=?|[!=]?==?)?-?\d+/).test(workingString))
+      else if ((/^r(?:.=?=?)?-?\d+/).test(workingString))
       {
          if(undefined !== group.die.rerollCriteria) throw new Error(debugName + '\nmultiple reroll criteria found. Max is 1');
             //could theoretically be an array of criteria but throw for now
          workingString = workingString.substring(1);  //chop off 'r'
-         //TODO: re: move this default into Die.validate:
-         if((/^-?\d+/).test(workingString)) workingString = '===' + workingString;  //default
-         group.die.rerollCriteria = (/^.=?=?-?\d+/).exec(workingString)[0];
+         group.die.rerollCriteria = (/^(?:.=?=?)?-?\d+/).exec(workingString)[0];
          workingString = workingString.substring(group.die.rerollCriteria.length);  //remove rerollCriteria from workingString
       }
       else if ((/^[dk][hl]?\d*/).test(workingString))

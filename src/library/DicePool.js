@@ -107,6 +107,7 @@ function DicePool(arg1, arg2)
       name = arg1;
       pool = arg2;
       //pool = JSON.clone(arg2, JsonReviver.reviveWith);  //defense copy and creates the Die objects
+      //TODO: re: needs defense copy
 
       hasDropKeep = false, hasExplosions = false;
       for (var i = 0; i < pool.length; ++i)
@@ -210,6 +211,7 @@ DicePool._validate = function(debugName, pool)
             + pool[i].dropKeepCount + ') is too large. dieCount=' + pool[i].dieCount);
          //'3d3! drop 5' is allowed but stupid
 
+         //TODO: re: also allow the strings so that JSON.clone is possible
          if(DicePool.dropKeepTypes.DropLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.DropHighest !== pool[i].dropKeepType
             && DicePool.dropKeepTypes.KeepLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.KeepHighest !== pool[i].dropKeepType)
             throw new Error(debugName + '\ninvalid dropKeepType: ' + pool[i].dropKeepType);

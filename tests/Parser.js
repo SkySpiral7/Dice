@@ -198,7 +198,7 @@ Tester.Parser._diceGroup = function(isFirst)
    group = {};
    string = 'd3r2k1!';
    Parser._diceGroup(string, string, group);
-   testResults.push({Expected: '===2', Actual: group.die.rerollCriteria, Description: 'Jagged (group between dice): reroll'});
+   testResults.push({Expected: '2', Actual: group.die.rerollCriteria, Description: 'Jagged (group between dice): reroll'});
    testResults.push({Expected: 1, Actual: group.dropKeepCount, Description: 'Jagged (group between dice): dropKeepCount'});
    testResults.push({Expected: Die.explodeTypes.Normal, Actual: group.die.explodeType, Description: 'Jagged (group between dice): explode'});
    } catch(e){testResults.push({Error: e, Description: 'Jagged (group between dice)'});}
@@ -265,7 +265,7 @@ Tester.Parser._shortHand = function(isFirst)
    string = 'r1! remainder';
    returned = Parser._shortHand(string, string, group);
    testResults.push({Expected: Die.explodeTypes.Normal, Actual: group.die.explodeType, Description: 'Normal r1: explode'});
-   testResults.push({Expected: '===1', Actual: group.die.rerollCriteria, Description: 'Normal r1: reroll'});
+   testResults.push({Expected: '1', Actual: group.die.rerollCriteria, Description: 'Normal r1: reroll'});
    testResults.push({Expected: ' remainder', Actual: returned, Description: 'Normal r1: returned'});
    } catch(e){testResults.push({Error: e, Description: 'Normal r1'});}
 

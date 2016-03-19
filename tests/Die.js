@@ -237,16 +237,22 @@ Tester.Die._validate = function(isFirst)
    }
 
    try{
+   input = {sideCount: 6, rerollCriteria: '1'};
+   Die._validate('1d6', input);
+   testResults.push({Expected: '===1', Actual: input.rerollCriteria, Description: 'Default rerollCriteria 1'});
+   } catch(e){testResults.push({Error: e, Description: 'Default rerollCriteria 1'});}
+
+   try{
    input = {sideCount: 6, rerollCriteria: '=1'};
    Die._validate('1d6', input);
    testResults.push({Expected: '===1', Actual: input.rerollCriteria, Description: 'Correct rerollCriteria ='});
    } catch(e){testResults.push({Error: e, Description: 'Correct rerollCriteria ='});}
 
    try{
-   input = {sideCount: 6, rerollCriteria: '==1'};
+   input = {sideCount: 6, rerollCriteria: '!=1'};
    Die._validate('1d6', input);
-   testResults.push({Expected: '===1', Actual: input.rerollCriteria, Description: 'Normalize rerollCriteria =='});
-   } catch(e){testResults.push({Error: e, Description: 'Normalize rerollCriteria =='});}
+   testResults.push({Expected: '!==1', Actual: input.rerollCriteria, Description: 'Normalize rerollCriteria !='});
+   } catch(e){testResults.push({Error: e, Description: 'Normalize rerollCriteria !='});}
 
    try{
    Die._validate('1d6', {sideCount: 6, rerollCriteria: '!2'});

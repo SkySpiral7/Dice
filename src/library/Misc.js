@@ -45,12 +45,11 @@ function cartesianProduct(superArray)
       return results;
    }
 }
-/**@throws Error if actualObject doesn't have type expectedType.*/
-function requireTypeOf(expectedType, actualObject)
+/**@returns the error that is thrown by functionToCall when passed args. Note that functionToCall can't reference the this pointer.*/
+function getError(functionToCall, args)
 {
-   if('string' !== typeof(expectedType)) throw new Error('Programming error. expectedType is type ' + typeof(constructor));
-   if(expectedType !== typeof(actualObject)) throw new Error('Expected: ' + expectedType + '. Got: ' + typeof(actualObject)
-      + ' with toString: ' + actualObject);
+   try{functionToCall.apply(undefined, args);}
+   catch(e){return e;}
 }
 /**@throws Error if actualObject is not an instanceof constructor.*/
 function requireInstanceOf(constructor, actualObject)
@@ -69,9 +68,10 @@ function requireNaturalNumber(actualObject)
    if(!Number.isNatural(actualObject)) throw new Error('Expected Natural Number. Got type: ' + typeof(actualObject) +
       ' with toString: ' + actualObject);
 }
-/**@returns the error that is thrown by functionToCall when passed args. Note that functionToCall can't reference the this pointer.*/
-function getError(functionToCall, args)
+/**@throws Error if actualObject doesn't have type expectedType.*/
+function requireTypeOf(expectedType, actualObject)
 {
-   try{functionToCall.apply(undefined, args);}
-   catch(e){return e;}
+   if('string' !== typeof(expectedType)) throw new Error('Programming error. expectedType is type ' + typeof(constructor));
+   if(expectedType !== typeof(actualObject)) throw new Error('Expected: ' + expectedType + '. Got: ' + typeof(actualObject)
+      + ' with toString: ' + actualObject);
 }
