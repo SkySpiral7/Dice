@@ -2,7 +2,7 @@
 
 var fileNames = ['DiceExpression', 'DicePool', 'Die', 'GenerateHtml', 'JsonReviver', 'Parser', 'Prebuilt', 'prototypes',
    'Statistics', 'Stringifier',
-   'Testing Util'];  //must be last
+   'Misc', 'Testing Util'];  //must be last
 //includePath was defined in src/library/include.js
 
 for (var i = 0; i < fileNames.length; ++i)

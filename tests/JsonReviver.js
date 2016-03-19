@@ -7,6 +7,11 @@ Tester.JsonReviver.reviveWith = function(isFirst)
    var testResults = [], input, expected;
 
    try{
+   input = {reviveWith: 'getProperty', useNew: false, value: 'Math.PI'};
+   testResults.push({Expected: Math.PI, Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Happy path'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
    input = {reviveWith: 'Die', useNew: true, value: 2};
    testResults.push({Expected: new Die(2), Actual: JSON.clone(input, JsonReviver.reviveWith), Description: 'Revives Die'});
    } catch(e){testResults.push({Error: e, Description: 'Revives Die'});}
@@ -62,15 +67,9 @@ Tester.JsonReviver.reviveWith = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Direct'});}
 
    try{
-   JsonReviver.reviveWith(null, {reviveWith: 'startKeyLogger()', useNew: false, value: 15});
-   TesterUtility.failedToThrow(testResults, 'evil safety');  //Description is not a typo
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('evil code detected. key:null, value:{"reviveWith":"startKeyLogger()",' +
-         '"useNew":false,"value":15}'),
-         Actual: e, Description: 'eval safety'});
-   }
+   var returned = JsonReviver.reviveWith(null, {reviveWith: '(2+3).constructor.parseInt', value: '15'});
+   testResults.push({Expected: 15, Actual: returned, Description: 'Allows evil'});
+   } catch(e){testResults.push({Error: e, Description: 'Allows evil'});}
 
    try{
    JsonReviver.reviveWith(null, {reviveWith: 'easyAs123', useNew: false, value: 'ABC'});
@@ -106,4 +105,31 @@ Tester.JsonReviver.reviveWith = function(isFirst)
    }
 
    TesterUtility.displayResults('JsonReviver JsonReviver.reviveWith', testResults, isFirst);
+};
+Tester.JsonReviver.eval = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], input, expected;
+
+   try{
+   input = {all: {eval: '2+2'}};
+   testResults.push({Expected: {all: 4}, Actual: JSON.clone(input, JsonReviver.eval), Description: '2+2'});
+   } catch(e){testResults.push({Error: e, Description: '2+2'});}
+
+   try{
+   input = {birthDate: {eval: 'new Date(0)'}};
+   testResults.push({Expected: {birthDate: new Date(0)}, Actual: JSON.clone(input, JsonReviver.eval), Description: 'new Date(0)'});
+   } catch(e){testResults.push({Error: e, Description: 'new Date(0)'});}
+
+   try{
+   JsonReviver.eval(null, {eval: 'easyAs123'});
+   TesterUtility.failedToThrow(testResults, 'not found');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new ReferenceError('easyAs123 is not defined'), Actual: e, Description: 'not found'});
+   }
+
+   TesterUtility.displayResults('JsonReviver JsonReviver.eval', testResults, isFirst);
 };
