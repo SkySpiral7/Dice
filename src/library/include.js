@@ -1,6 +1,6 @@
 'use strict';
 
-var fileNames = ['DiceExpression', 'DicePool', 'Die', 'Draw', 'GenerateHtml', 'JsonReviver', 'Parser', 'Prebuilt',
+var fileNames = ['DiceExpression', 'DicePool', 'Die', 'Draw', 'GenerateHtml', 'Parser', 'Prebuilt',
    'prototypes', 'Statistics', 'Stringifier',
    'Misc'];  //must be last
 var includePath;  //this doesn't delete a pre-existing value.

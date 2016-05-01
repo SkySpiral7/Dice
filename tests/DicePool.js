@@ -43,6 +43,42 @@ Tester.DicePool.sumRoll = function(isFirst)
 
    TesterUtility.displayResults('DicePool new DicePool().sumRoll()', testResults, isFirst);
 };
+Tester.DicePool.toJSON = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], expected;
+
+   try{
+   //the tested pool needs explode and drop to make sure they are both fine after copy
+   var dicePool = new DicePool('2d2!d');
+   dicePool.toJSON().pool[0].dieCount = 5;
+
+   expected = {name: '2d2!d', hasDropKeep: true, hasExplosions: true, pool: [
+      {
+         die: new Die('d2!'),
+         dieCount: 2,
+         areDiceNegative: false,
+         dropKeepType: DicePool.dropKeepTypes.DropLowest,
+         dropKeepCount: 1
+      }
+   ]};
+   testResults.push({Expected: expected, Actual: dicePool.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
+
+   try{
+   var input = {name: '1d2', pool: [
+      {
+         die: {sideCount: 2}
+      }
+   ]};
+   var actual = new DicePool(input);
+   expected = new DicePool('1d2');
+   testResults.push({Expected: expected, Actual: actual, Description: 'Bug check: order of properties normalized'});
+   } catch(e){testResults.push({Error: e, Description: 'Bug check: order of properties normalized'});}
+
+   TesterUtility.displayResults('DicePool new DicePool().toJSON()', testResults, isFirst);
+};
 Tester.DicePool._constructor = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -55,7 +91,9 @@ Tester.DicePool._constructor = function(isFirst)
       {
          die: new Die(4),
          dieCount: 2,
-         areDiceNegative: false
+         areDiceNegative: false,
+         dropKeepType: undefined,
+         dropKeepCount: undefined
       }
    ]};
    testResults.push({Expected: expected, Actual: returned, Description: 'Calls _parseString'});
@@ -68,7 +106,9 @@ Tester.DicePool._constructor = function(isFirst)
       {
          die: new Die(4),
          dieCount: 2,
-         areDiceNegative: false
+         areDiceNegative: false,
+         dropKeepType: undefined,
+         dropKeepCount: undefined
       }
    ]};
    testResults.push({Expected: expected, Actual: returned, Description: 'Allows value of toJSON'});
@@ -81,7 +121,9 @@ Tester.DicePool._constructor = function(isFirst)
       {
          die: new Die(4),
          dieCount: 2,
-         areDiceNegative: false
+         areDiceNegative: false,
+         dropKeepType: undefined,
+         dropKeepCount: undefined
       }
    ]};
    testResults.push({Expected: expected, Actual: returned, Description: 'Allows pool'});
@@ -104,6 +146,32 @@ Tester.DicePool._constructor = function(isFirst)
    {
        testResults.push({Expected: true, Actual: true, Description: 'Calls _validate'});  //see validate tests
    }
+
+   try{
+   //the tested pool needs explode and drop to make sure they are both fine after copy
+   var input = {name: '2d2!d', pool: [
+      {
+         die: new Die('d2!'),
+         dieCount: 2,
+         areDiceNegative: false,
+         dropKeepType: DicePool.dropKeepTypes.DropLowest,
+         dropKeepCount: 1
+      }
+   ]};
+   var dicePool = new DicePool(input);
+   input.pool[0].dieCount = 5;
+
+   expected = {name: '2d2!d', hasDropKeep: true, hasExplosions: true, pool: [
+      {
+         die: new Die('d2!'),
+         dieCount: 2,
+         areDiceNegative: false,
+         dropKeepType: DicePool.dropKeepTypes.DropLowest,
+         dropKeepCount: 1
+      }
+   ]};
+   testResults.push({Expected: expected, Actual: dicePool.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
 
    try{
    returned = new DicePool('d6+2d2dl').toJSON().hasDropKeep;
@@ -209,7 +277,9 @@ Tester.DicePool._validate = function(isFirst)
       {
          die: d6,
          dieCount: 1,
-         areDiceNegative: false
+         areDiceNegative: false,
+         dropKeepType: undefined,
+         dropKeepCount: undefined
       }
    ];
    DicePool._validate('1d6', input);
@@ -243,6 +313,21 @@ Tester.DicePool._validate = function(isFirst)
    {
        testResults.push({Expected: new Error('empty\npool must not be empty'), Actual: e, Description: 'Empty pool'});
    }
+
+   try{
+   input = [{die: {sideCount: 6}}];
+   expected = [
+      {
+         die: d6,
+         dieCount: 1,
+         areDiceNegative: false,
+         dropKeepType: undefined,
+         dropKeepCount: undefined
+      }
+   ];
+   DicePool._validate('1d6', input);
+   testResults.push({Expected: expected, Actual: input, Description: 'Auto create Die'});
+   } catch(e){testResults.push({Error: e, Description: 'Auto create Die'});}
 
    try{
    input = [{die: d6, dieCount: 'soup'}];
@@ -380,12 +465,14 @@ Tester.DicePool._validate = function(isFirst)
       {
          die: d6,
          dieCount: 1,
-         areDiceNegative: false
+         areDiceNegative: false,
+         dropKeepType: undefined,
+         dropKeepCount: undefined
       }
    ];
    DicePool._validate('1d6', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'delete null dropKeep'});
-   } catch(e){testResults.push({Error: e, Description: 'delete null dropKeep'});}
+   testResults.push({Expected: expected, Actual: input, Description: 'null dropKeep become undefined'});
+   } catch(e){testResults.push({Error: e, Description: 'null dropKeep become undefined'});}
 
    try{
    input = [

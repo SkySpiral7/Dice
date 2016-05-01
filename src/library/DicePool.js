@@ -75,7 +75,7 @@ function DicePool(arg1, arg2)
          name: name,
          hasDropKeep: hasDropKeep,  //these are informational, they will be ignored by _constructor
          hasExplosions: hasExplosions,
-         pool: pool  //TODO: re: needs defense copy
+         pool: DicePool._defensiveCopier(pool)
       };
    };
 
@@ -100,9 +100,7 @@ function DicePool(arg1, arg2)
       //array of dice is allowed  //TODO: re: optimize the groups together
 
       name = arg1;
-      pool = arg2;
-      //pool = JSON.clone(arg2, JsonReviver.reviveWith);  //defense copy and creates the Die objects
-      //TODO: re: needs defense copy
+      pool = DicePool._defensiveCopier(arg2);
 
       hasDropKeep = false, hasExplosions = false;
       for (var i = 0; i < pool.length; ++i)
@@ -176,6 +174,28 @@ DicePool.dropKeepTypes = {
    }
 };
 /**
+This function is used internally by DicePool. It makes a defensive copy of pool
+in order to maintain the immutability of DicePool.
+You should have no use for it although it isn't harmful to call.
+@param {!object[]} originalPool which will be copied and not modified
+@return {!object[]} a new array with new objects with all the same values
+*/
+DicePool._defensiveCopier = function(originalPool)
+{
+   var poolCopy = [];  //don't use JSON.clone(originalPool) because that will mess up the order of the properties
+   for (var i = 0; i < originalPool.length; ++i)
+   {
+      poolCopy.push({
+         die: originalPool[i].die,  //dice are immutable so I can use the same object
+         dieCount: originalPool[i].dieCount,
+         areDiceNegative: originalPool[i].areDiceNegative,
+         dropKeepType: originalPool[i].dropKeepType,
+         dropKeepCount: originalPool[i].dropKeepCount
+      });
+   }
+   return poolCopy;
+};
+/**
 This function is used in the constructor of DicePool. It throws if there is anything invalid about the input.
 It also normalizes the input.
 You should have no use for it although it isn't harmful to call.
@@ -190,7 +210,9 @@ DicePool._validate = function(debugName, pool)
    if(0 === pool.length) throw new Error(debugName + '\npool must not be empty');
    for (var i = 0; i < pool.length; ++i)
    {
-      //if(!(pool[i].die instanceof Die) && 'object' !== typeof(pool[i].die)) throw new Error(debugName + '\ninvalid die: ' + pool[i].die);
+      //if(!(pool[i].die instanceof Die) && 'object' !== typeof(pool[i].die) && 'string' !== typeof(pool[i].die))
+         //throw new Error(debugName + '\ninvalid die: ' + pool[i].die);
+         //don't both since Die will throw anyway. I decided to allow die: 2 which works but is confusing
       if(!(pool[i].die instanceof Die)) pool[i].die = new Die(pool[i].die);  //die required: throws if can't create
 
       if(undefined == pool[i].dieCount) pool[i].dieCount = 1;
@@ -206,12 +228,13 @@ DicePool._validate = function(debugName, pool)
             + pool[i].dropKeepCount + ') is too large. dieCount=' + pool[i].dieCount);
          //'3d3! drop 5' is allowed but stupid
 
-         //TODO: re: also allow the strings so that JSON.clone is possible
          if(DicePool.dropKeepTypes.DropLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.DropHighest !== pool[i].dropKeepType
             && DicePool.dropKeepTypes.KeepLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.KeepHighest !== pool[i].dropKeepType)
             throw new Error(debugName + '\ninvalid dropKeepType: ' + pool[i].dropKeepType);
       }
-      else{delete pool[i].dropKeepType; delete pool[i].dropKeepCount;}
+      else pool[i].dropKeepType = pool[i].dropKeepCount = undefined;
+      //these aren't deleted so that DicePool._defensiveCopier will always produce the same number of keys
+      //this makes production code easier at the cost of complicating tests (correct priority). both costs are small.
 
       if(undefined == pool[i].areDiceNegative) pool[i].areDiceNegative = false;
       else if('boolean' !== typeof(pool[i].areDiceNegative)) throw new Error(debugName + '\ninvalid areDiceNegative: ' + pool[i].areDiceNegative);

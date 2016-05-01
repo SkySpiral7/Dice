@@ -177,6 +177,24 @@ Tester.DiceExpression.toDiceResults = function(isFirst)
 
    TesterUtility.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, isFirst);
 };
+Tester.DiceExpression.toJSON = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, expected;
+
+   try{
+   var diceExpression = new DiceExpression(new Die(2));
+   diceExpression.toJSON()[0].coefficient = 5;
+   expected = [
+      {exponent: 2, coefficient: 1},
+      {exponent: 1, coefficient: 1}
+   ];
+   testResults.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
+
+   TesterUtility.displayResults('DiceExpression new DiceExpression().toJSON()', testResults, isFirst);
+};
 Tester.DiceExpression._constructor = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
@@ -236,6 +254,20 @@ Tester.DiceExpression._constructor = function(isFirst)
    ];
    testResults.push({Expected: expected, Actual: actual, Description: 'Accepts probability dice results'});
    } catch(e){testResults.push({Error: e, Description: 'Accepts probability dice results'});}
+
+   try{
+   var input = new DiceExpression(new Die('dF')).toDiceResults();
+   Statistics.determineProbability(input);
+   var diceExpression = new DiceExpression(input, false);
+   input[0].coefficient = 5;
+
+   expected = [
+      {coefficient: 1, exponent: 1},
+      {coefficient: 1, exponent: 0},
+      {coefficient: 1, exponent: -1}
+   ];
+   testResults.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
 
    try{
    actual = new DiceExpression(new Die('d6r3')).toJSON();

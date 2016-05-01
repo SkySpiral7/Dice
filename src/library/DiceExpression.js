@@ -88,11 +88,10 @@ function DiceExpression(arg1, arg2)
       result.reverse();  //works in this case
       return result;
    };
-   //TODO: re: make function this.getTerms()
    /**@returns an object formatted for JsonReviver.reviveWith(). return.value has this DiceExpression's termArray*/
    this.toJSON = function()
    {
-      return termArray;  //TODO: re: consider defensive copy
+      return JSON.clone(termArray);  //defensive copy
    };
 
    /**You can't call this function. It is only used internally to create a DiceExpression object.*/
@@ -112,7 +111,7 @@ function DiceExpression(arg1, arg2)
                else arg1[i] = {exponent: arg1[i].result, coefficient: arg1[i].frequency};
             }
          }
-         termArray = arg1;  //TODO: re: needs defensive copy? And validation
+         termArray = JSON.clone(arg1);  //defensive copy
          termArray.sort(DiceExpression.exponentDescending);
          arg1 = undefined;
          arg2 = undefined;
