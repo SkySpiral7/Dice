@@ -61,16 +61,11 @@ function Die(arg1)
    this.toJSON = function()
    {
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
-         reviveWith: 'Die',
-         useNew: true,
-         value:
-         {
-            sideCount: sideCount,
-            constantModifier: constantModifier,
-            isFudgeDie: isFudgeDie,
-            rerollCriteria: rerollCriteria,
-            explodeType: explodeType
-         }
+         sideCount: sideCount,
+         constantModifier: constantModifier,
+         isFudgeDie: isFudgeDie,
+         rerollCriteria: rerollCriteria,
+         explodeType: explodeType
       };
    };
 

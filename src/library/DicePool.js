@@ -72,15 +72,10 @@ function DicePool(arg1, arg2)
    this.toJSON = function()
    {
       return {  //brace required to be on this line because the semi-colon predictor otherwise assumes I want dead code because it's insane
-         reviveWith: 'DicePool',
-         useNew: true,
-         value:
-         {
-            name: name,
-            hasDropKeep: hasDropKeep,  //these are informational, they will be ignored by _constructor
-            hasExplosions: hasExplosions,
-            pool: pool  //TODO: re: needs defense copy
-         }
+         name: name,
+         hasDropKeep: hasDropKeep,  //these are informational, they will be ignored by _constructor
+         hasExplosions: hasExplosions,
+         pool: pool  //TODO: re: needs defense copy
       };
    };
 
@@ -113,7 +108,7 @@ function DicePool(arg1, arg2)
       for (var i = 0; i < pool.length; ++i)
       {
          hasDropKeep = hasDropKeep || (undefined !== pool[i].dropKeepType);
-         hasExplosions = hasExplosions || (undefined !== pool[i].die.toJSON().value.explodeType);
+         hasExplosions = hasExplosions || (undefined !== pool[i].die.toJSON().explodeType);
          if(hasDropKeep && hasExplosions) break;  //no more information to find
       }
 
@@ -205,7 +200,7 @@ DicePool._validate = function(debugName, pool)
       {
          if(undefined == pool[i].dropKeepCount) pool[i].dropKeepCount = 1;
          if(!Number.isNatural(pool[i].dropKeepCount)) throw new Error(debugName + '\ninvalid dropKeepCount: ' + pool[i].dropKeepCount);
-         var explodeType = pool[i].die.toJSON().value.explodeType;
+         var explodeType = pool[i].die.toJSON().explodeType;
          var hasFiniteDiceCount = (undefined === explodeType || Die.explodeTypes.Compound === explodeType);
          if(hasFiniteDiceCount && pool[i].dropKeepCount >= pool[i].dieCount) throw new Error(debugName + '\ndropKeepCount ('
             + pool[i].dropKeepCount + ') is too large. dieCount=' + pool[i].dieCount);

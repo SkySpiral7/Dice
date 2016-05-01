@@ -2,7 +2,7 @@
 var Statistics = {};
 /**
 This function analyzes the diceGroup given and returns the result of the best possible algorithm.
-@param {object} diceGroup an element of DicePool.toJSON().value.pool
+@param {object} diceGroup an element of DicePool.toJSON().pool
 @returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).
 It will not include frequency of 0 or probability of less than 0.00000 (5) and will be in result ascending order.
 */
@@ -13,7 +13,7 @@ Statistics.analyze = function(diceGroup)
    //later useDroppingAlgorithm
    else algorithm = Statistics.useBruteForce;  //if any gaps then useBruteForce
 
-   if(undefined === diceGroup.die.toJSON().value.explodeType) return algorithm(diceGroup, 0);
+   if(undefined === diceGroup.die.toJSON().explodeType) return algorithm(diceGroup, 0);
    //if(does explode):
    var stats = [], explodeCount = 0;  //200,001 sided die is the smallest that will end with 0 explodes
    //TODO: re: should be math for predicting # explodes
@@ -82,8 +82,8 @@ For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 whi
 };
 Statistics.calculateDiceSums = function(dicePool)
 {
-   var pool = dicePool.toJSON().value.pool;
-   var results = [], useProbability = dicePool.toJSON().value.hasExplosions;
+   var pool = dicePool.toJSON().pool;
+   var results = [], useProbability = dicePool.toJSON().hasExplosions;
    for (var i = 0; i < pool.length; ++i)
    {
       var stats = Statistics.analyze(pool[i]);  //TODO: re: test
@@ -131,7 +131,7 @@ Statistics.resultAscending = function(a,b){return (a.result - b.result);};
 //TODO: re: use brute every combination for pass/fail. which are -1, 0, 1
 Statistics.useBruteForce = function(diceGroup, explodeCount)
 {
-   if(undefined === diceGroup.die.toJSON().value.explodeType) explodeCount = 0;
+   if(undefined === diceGroup.die.toJSON().explodeType) explodeCount = 0;
    var everyValue = [];
    for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
@@ -149,7 +149,7 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
    //assert: everyValue.length > 0 because DicePool should prevent that case
    if (1 === everyValue.length)
    {
-      var terms = new DiceExpression(everyValue[0], (0 !== explodeCount)).toJSON().value;
+      var terms = new DiceExpression(everyValue[0], (0 !== explodeCount)).toJSON();
       DiceExpression.combineValues(terms);  //TODO: re: obviously needs refactoring
       return new DiceExpression(terms, (0 !== explodeCount)).toDiceResults();
    }
@@ -183,7 +183,7 @@ Statistics.useDroppingAlgorithm = function()
 {
 };
 /**
-Returns the statistics for a given element of DicePool.toJSON().value.pool using a Polynomial based algorithm.
+Returns the statistics for a given element of DicePool.toJSON().pool using a Polynomial based algorithm.
 The algorithm is faster than brute force but can't support drop/keep.
 @param {object} diceGroup
 @param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)

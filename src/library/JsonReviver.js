@@ -4,12 +4,13 @@ var JsonReviver = {};
 The keys die and dicePool will pass the value into a new Die and DicePool respectively.
 @throws Error if the constructors of Die or DicePool threw then console.warn will be called followed by rethrowing.
 */
-JsonReviver.dicePool = function(key, value)  //TODO: re: have them use this
+JsonReviver.dicePool = function(key, value)
 {
    try
    {
       if('die' === key && !(value instanceof Die)) return new Die(value);
       if('dicePool' === key && !(value instanceof DicePool)) return new DicePool(value);
+      //no current support for: DiceExpression, Die.explodeTypes, DicePool.dropKeepTypes
    }
    catch(e)
    {

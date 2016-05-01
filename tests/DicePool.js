@@ -50,7 +50,7 @@ Tester.DicePool._constructor = function(isFirst)
    var testResults = [], returned, expected;
 
    try{
-   returned = new DicePool('2d4').toJSON().value;
+   returned = new DicePool('2d4').toJSON();
    expected = {name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
@@ -62,8 +62,8 @@ Tester.DicePool._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Calls _parseString'});}
 
    try{
-   returned = new DicePool('2d4').toJSON().value;
-   returned = new DicePool(returned).toJSON().value;
+   returned = new DicePool('2d4').toJSON();
+   returned = new DicePool(returned).toJSON();
    expected = {name: '2d4', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
@@ -75,8 +75,8 @@ Tester.DicePool._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Allows value of toJSON'});}
 
    try{
-   returned = new DicePool('2d4').toJSON().value;
-   returned = new DicePool(returned.pool).toJSON().value;
+   returned = new DicePool('2d4').toJSON();
+   returned = new DicePool(returned.pool).toJSON();
    expected = {name: 'DicePool', hasDropKeep: false, hasExplosions: false, pool: [
       {
          die: new Die(4),
@@ -106,12 +106,12 @@ Tester.DicePool._constructor = function(isFirst)
    }
 
    try{
-   returned = new DicePool('d6+2d2dl').toJSON().value.hasDropKeep;
+   returned = new DicePool('d6+2d2dl').toJSON().hasDropKeep;
    testResults.push({Expected: true, Actual: returned, Description: 'hasDropKeep'});
    } catch(e){testResults.push({Error: e, Description: 'hasDropKeep'});}
 
    try{
-   returned = new DicePool('d2+d4!-d3').toJSON().value.hasExplosions;
+   returned = new DicePool('d2+d4!-d3').toJSON().hasExplosions;
    testResults.push({Expected: true, Actual: returned, Description: 'hasExplosions'});
    } catch(e){testResults.push({Error: e, Description: 'hasExplosions'});}
 

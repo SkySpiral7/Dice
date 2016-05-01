@@ -75,7 +75,7 @@ Tester.Die._constructor = function(isFirst)
    die = new Die();
    expected = {sideCount: 6, constantModifier: 0, isFudgeDie: false,
       rerollCriteria: undefined, explodeType: undefined};
-   testResults.push({Expected: expected, Actual: die.toJSON().value, Description: 'No arg'});
+   testResults.push({Expected: expected, Actual: die.toJSON(), Description: 'No arg'});
    } catch(e){testResults.push({Error: e, Description: 'No arg'});}
 
    try{
@@ -91,14 +91,14 @@ Tester.Die._constructor = function(isFirst)
    die = new Die(3);
    expected = {sideCount: 3, constantModifier: 0, isFudgeDie: false,
       rerollCriteria: undefined, explodeType: undefined};
-   testResults.push({Expected: expected, Actual: die.toJSON().value, Description: 'Number arg'});
+   testResults.push({Expected: expected, Actual: die.toJSON(), Description: 'Number arg'});
    } catch(e){testResults.push({Error: e, Description: 'Number arg'});}
 
    try{
    die = new Die('d4');
    expected = {sideCount: 4, constantModifier: 0, isFudgeDie: false,
       rerollCriteria: undefined, explodeType: undefined};
-   testResults.push({Expected: expected, Actual: die.toJSON().value, Description: 'String arg'});
+   testResults.push({Expected: expected, Actual: die.toJSON(), Description: 'String arg'});
    } catch(e){testResults.push({Error: e, Description: 'String arg'});}
 
    try{
