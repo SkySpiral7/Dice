@@ -16,4 +16,4 @@ Draw.diceBellCurve = function(dicePool, secondColumn)
    out += GenerateHtml.statistics(stats, secondColumn);
    document.getElementById('graphResults').innerHTML = out;
 };
-//TODO: re: make 2 simple tests that prove don't throw
+//TODO: make 2 simple tests that prove don't throw

@@ -26,7 +26,7 @@ function Die(arg1)
    {
       if(undefined == randomSource) randomSource = Math.random;
       requireTypeOf('function', randomSource);
-      //TODO: re: consider moving randomSource into Die's data
+      //TODO: consider moving randomSource into Die's data
 
       var valueArray = [];
       var maxValue = sideCount + constantModifier;
@@ -35,7 +35,7 @@ function Die(arg1)
       {
          valueRolled = Math.floor(randomSource() * sideCount) + 1;  //+1 for a min of 1 and a max of sideCount
             //can't use Math.ceil because exactly 0 wouldn't become 1
-            //TODO: re: consider forcing constantModifier to have the +1 instead
+            //TODO: consider forcing constantModifier to have the +1 instead
          valueRolled += constantModifier;
          needsValue = false;
 
@@ -139,7 +139,7 @@ Die._optimizeReroll = function(input)
       return;
    }
 
-   if(undefined !== input.explodeType && input.rerollCriteria.startsWith('===')) return;  //TODO: re: might optimize later
+   if(undefined !== input.explodeType && input.rerollCriteria.startsWith('===')) return;  //TODO: might optimize later
    if (('===' + minValue) === input.rerollCriteria)
    {
       --input.sideCount;
@@ -155,7 +155,7 @@ Die._optimizeReroll = function(input)
    }
    if(input.rerollCriteria.startsWith('===')) return;  //otherwise only possible to optimize with a white list
 
-   //TODO: re: more _optimizeReroll. See old
+   //TODO: more _optimizeReroll. See old
 };
 /**
 This function is used in the constructor of Die. It throws if there is anything invalid about the input.
@@ -258,7 +258,7 @@ Die._validateReroll = function(debugName, input)
          rerollCriteria: input.rerollCriteria, sideCount: input.sideCount, constantModifier: input.constantModifier,
          explodeType: input.explodeType
       }));
-   //TODO: re: detect infinite reroll for 1d10!r<=9 optimization required
+   //TODO: detect infinite reroll for 1d10!r<=9 optimization required
 
    //infinite rerolling check doesn't apply to explode because of the above ambiguous checks
    if (undefined === input.explodeType)
@@ -283,7 +283,7 @@ if maximum then explode until done
 if reroll then reroll
 if penetrating subtract 1
 
-TODO: re: error or warn about reroll penetrating (checks reroll before -1) also in DiceExpression
+TODO: error or warn about reroll penetrating (checks reroll before -1) also in DiceExpression
 
 Define fudge:
 1d3-2 without rerolling or exploding

@@ -103,7 +103,7 @@ Die._optimizeReroll = function()
           //isDieNegative=false;  //unchanged
           doesExplode=false;  //doesn't explode due to explodeValue being impossible to roll (ditto for compound)
           doesPenetrate=false;
-          if(sideCount > newSideCount) doesCompoundExplode=false;  //TODO: confirm this
+          if(sideCount > newSideCount) doesCompoundExplode=false;  //TODO confirm this
           explodeValue=undefined;
           //doesUseZero=false;  //unchanged
           newSideCount-=constantModifier;  //thus shows what would need to be rolled before constantModifier for the highest possible
@@ -124,7 +124,7 @@ Die._optimizeReroll = function()
       {
           var rerollCount=Number((/\d+$/).exec(rerollCriteria)[0]);
           if(!rerollCriteria.startsWith("<=")) rerollCount--;  //exclude a side
-          sideCount-=rerollCount;  //TODO: I think this causes a conflict with explosions (explodeValue)
+          sideCount-=rerollCount;  //TODO I think this causes a conflict with explosions (explodeValue)
           constantModifier+=rerollCount;
           rerollCriteria=undefined;
       }

@@ -18,7 +18,7 @@ http://www.pryderockindustries.com/downloads/gameaids/tables_bt_bmrr_tw_grey.pdf
 http://www.sarna.net/wiki/CBT_Tables
 ? http://mwomercs.com/forums/topic/5855-internal-structure-and-critical-hits/
 */
-function OneRollEngine(numberOfDice){  //TODO: more dice: Expert, hard, wiggle, Awesome, trump
+function OneRollEngine(numberOfDice){  //TODO more dice: Expert, hard, wiggle, Awesome, trump
     //http://en.wikipedia.org/wiki/One-Roll_Engine for details on other dice types
     if(typeof(numberOfDice)!="number") throw new Error("OneRollEngine("+numberOfDice+") parameter must be a number type");
     var diceResults=new DicePool(numberOfDice+"d10sa").roll();  //sorted ascending

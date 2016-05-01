@@ -54,7 +54,7 @@ Parser._diceGroup = function(debugName, workingString, group)
 
    if ('f' === workingString[0])
    {
-      //isFudgeDie is defined in validate  //TODO: re: define in both
+      //isFudgeDie is defined in validate  //TODO: define in both
       group.die.constantModifier = -2;  //1df and 1zf are the same thing so ignore current value of constantModifier
       group.die.sideCount = 3;
       workingString = workingString.substring(1);  //chop off 'f'
@@ -149,7 +149,7 @@ Because this is an internal function it makes certain assumptions that won't giv
 */
 Parser._longHand = function(debugName, workingString, group)
 {
-   //TODO: re: figure out how to make DRY while still enforcing shorthand then longhand
+   //TODO: figure out how to make DRY while still enforcing shorthand then longhand
    while (workingString.length > 0)  //longhand loop
    {
       //as per the robustness principle I don't care about English grammar as long as the meaning is clear

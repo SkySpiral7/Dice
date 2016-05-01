@@ -2,7 +2,7 @@
 var GenerateHtml = {};
 GenerateHtml.aggregates = function(aggregate)
 {
-   //TODO: re: validate
+   //TODO: validate
    var out = '<b>Statistics</b>';
    out += '<br />\nMin: ' + aggregate.minimum;
    out += '<br />\nMax: ' + aggregate.maximum;
@@ -17,7 +17,7 @@ GenerateHtml.compareStatistics = function(diffStats)
 GenerateHtml.statistics = function(stats, secondColumn)
 {
    if(undefined === secondColumn) secondColumn = '>=';
-   //TODO: re: validate
+   //TODO: validate
    Statistics.determineProbability(stats);
    var secondValues = [];
    var maxProbability = -Infinity;
@@ -31,7 +31,7 @@ GenerateHtml.statistics = function(stats, secondColumn)
       {
          if(eval('' + stats[potentialIndex].result + secondColumn + stats[currentIndex].result)) secondSum += stats[potentialIndex].probability;
       }
-      //TODO: re: is untested unless I can figure out math to prove it
+      //TODO: is untested unless I can figure out math to prove it
       //if the total freq is above perfect accuracy that should work
       //or if multiple prob rounds up
       if(secondSum > 1) secondSum = 1;  //correct rounding error: can't have more than 100%

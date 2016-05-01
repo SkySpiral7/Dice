@@ -1,5 +1,5 @@
 'use strict';
-//TODO: re: all in file: test, move it somewhere
+//TODO: all in file: test, move it somewhere
 /**
 This function returns every possible combination of each element passed in.
 What it does is a little hard to describe. If you pass in:
@@ -15,7 +15,7 @@ function cartesianProduct(superArray)
    //although the only place this is currently used will have every element the same
    //so I could could count up in a number base which would be comparable complicated but easier to understand
 
-   //TODO: re: validate cartesianProduct
+   //TODO: validate cartesianProduct
    if(1 === superArray.length) return superArray;
    var results = firstCartesianProduct(superArray[0], superArray[1]);
    for (var i = 2; i < superArray.length; ++i)

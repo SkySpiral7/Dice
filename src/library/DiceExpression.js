@@ -11,7 +11,7 @@ function DiceExpression(arg1, arg2)
    */
    this.addTerm = function(term)
    {
-      //TODO: re: should I unbox parameters?
+      //TODO: should I unbox parameters?
       requireTypeOf('number', term.coefficient);  //allow NaN and Infinity
       requireTypeOf('number', term.exponent);
 
@@ -69,7 +69,7 @@ function DiceExpression(arg1, arg2)
             for (var exponentIndex = 0; exponentIndex < termArray[termIndex].exponent.length; ++exponentIndex)
             {
                termArray[termIndex].exponent[exponentIndex] *= -1;
-               //TODO: re: this is only fine if all functions allow exponent array
+               //TODO: this is only fine if all functions allow exponent array
             }
          }
       }
@@ -106,7 +106,7 @@ function DiceExpression(arg1, arg2)
             //convert arg1 from result array to term array
             for (var i = 0; i < arg1.length; ++i)
             {
-               //TODO: re: validation: useProbability requires probability else requires frequency
+               //TODO: validation: useProbability requires probability else requires frequency
                if(useProbability) arg1[i] = {exponent: arg1[i].result, coefficient: arg1[i].probability};
                else arg1[i] = {exponent: arg1[i].result, coefficient: arg1[i].frequency};
             }
@@ -119,7 +119,7 @@ function DiceExpression(arg1, arg2)
       }
       termArray = [];
 
-      //TODO: re: make DiceExpression._validate
+      //TODO: make DiceExpression._validate
       var die = arg1;
       var explodeCount = arg2;
       var hasExplosions = (undefined !== explodeCount && explodeCount > 0);
@@ -136,7 +136,7 @@ function DiceExpression(arg1, arg2)
    };
    this._constructor();
 }
-//TODO: re: doc and test DiceExpression.combineValues
+//TODO: doc and test DiceExpression.combineValues
 //before: [{[1]: 1/2}, {[1,2]: 1/4}, {[2,2]: 1/4}]
 //after: [{1: 1/2}, {3: 1/4}, {4: 1/4}]
 DiceExpression.combineValues = function(everyValue)
@@ -146,7 +146,7 @@ DiceExpression.combineValues = function(everyValue)
       everyValue[i].exponent = Math.summation(everyValue[i].exponent);
    }
 };
-//TODO: re: doc DiceExpression.everyValue and move some tests
+//TODO: doc DiceExpression.everyValue and move some tests
 DiceExpression.everyValue = function(die, explodeCount)
 {
    die = die.toJSON();  //this is the only thing I need the die for
@@ -219,4 +219,4 @@ new DiceExpression('7x^4 - x + 6x^3 + 2').toJSON():  //I won't support creation 
 {coefficient: 2, exponent: 0}
 ]
 */
-//TODO: re: make a math readme doc which gives a quick overview and links that math forum and se
+//TODO: make a math readme doc which gives a quick overview and links that math forum and se

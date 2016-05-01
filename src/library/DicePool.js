@@ -1,5 +1,5 @@
 'use strict';
-//TODO: re: should DicePool name exist or generate a string? (used for drawing bell curves)
+//TODO: should DicePool name exist or generate a string? (used for drawing bell curves)
 /**
 An object than represents a collection of die objects.
 It can be created in the following ways:
@@ -56,7 +56,7 @@ function DicePool(arg1, arg2)
             for (var groupResultIndex = 0; groupResultIndex < groupResults.length; ++groupResultIndex)
             {
                groupResults[groupResultIndex] *= -1;
-               //TODO: re: might be possible to optimize this into the die by changing the constant
+               //TODO: might be possible to optimize this into the die by changing the constant
                //would need to double check math for exploding first. no that would mess up drop/keep
             }
          }
@@ -66,8 +66,8 @@ function DicePool(arg1, arg2)
    };
    /**@returns {!number} the sum of this.roll()*/
    this.sumRoll = function(randomSource){return Math.summation(this.roll(randomSource));};
-   //TODO: re: consider toDiceArray and creating from a dice array
-   //TODO: re: make function this.getPool(). rename that to groups
+   //TODO: consider toDiceArray and creating from a dice array
+   //TODO: make function this.getPool(). rename that to groups
    /**@returns an object formatted for JsonReviver.reviveWith(). return.value has all of this DicePool's data elements in it*/
    this.toJSON = function()
    {
@@ -97,7 +97,7 @@ function DicePool(arg1, arg2)
       }
 
       DicePool._validate(arg1, arg2);
-      //array of dice is allowed  //TODO: re: optimize the groups together
+      //array of dice is allowed  //TODO: optimize the groups together
 
       name = arg1;
       pool = DicePool._defensiveCopier(arg2);
@@ -204,7 +204,7 @@ You should have no use for it although it isn't harmful to call.
 */
 DicePool._validate = function(debugName, pool)
 {
-   //TODO: re: improve error messages (include i value)
+   //TODO: improve error messages (include i value)
    requireTypeOf('string', debugName);
    requireInstanceOf(Array, pool);
    if(0 === pool.length) throw new Error(debugName + '\npool must not be empty');

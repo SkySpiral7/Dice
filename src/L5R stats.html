@@ -2,7 +2,7 @@
 <title>L5R Stats</title>
 <!--1.2 is so I stop going insane about things like Array.concat-->
 <script type="text/javaScript1.2">
-function deepCopy(obj) {  //TODO: use pointer to traverse the tree (Mana Khemina) without using recursion
+function deepCopy(obj) {  //TODO use pointer to traverse the tree (Mana Khemina) without using recursion
    if (obj instanceof Array)
    {
        var r = [];
@@ -45,7 +45,7 @@ function parseStr(){
    }
     return rollData;
 }
-function bruteForce(){  //TODO: make a C++ program for this. draw text using '#' or '=' or '*' etc. use global for returned array length
+function bruteForce(){  //TODO make a C++ program for this. draw text using '#' or '=' or '*' etc. use global for returned array length
     var results=[];
     var explodeCount=1;
     var explodeMax=explodeCount+3;
@@ -68,7 +68,7 @@ function bruteForce(){  //TODO: make a C++ program for this. draw text using '#'
              results.push([rollData[i]]);
           rollData=results;
       }
-       else rollData=cartesianProduct(rollData, deepCopy(eachValue));  //TODO: does anything need deep copy?
+       else rollData=cartesianProduct(rollData, deepCopy(eachValue));  //TODO does anything need deep copy?
        for(var i=2; i < diceCount; i++) rollData=nextCartesianProduct(rollData, deepCopy(eachValue));
 
        var droppedRollData=[];  //needs to be a deep copy so I can remove values without changing the original

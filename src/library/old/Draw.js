@@ -81,7 +81,7 @@ Draw.diceBellCurve = function(poolGiven, secondColumn, binom){
     resultsDiv.innerHTML += out;
 
    function parseStr(poolGiven, binom){
-       var diceArray=poolGiven.getAllDice();  //TODO: poolGiven is now only used for getStats() and brute
+       var diceArray=poolGiven.getAllDice();  //TODO poolGiven is now only used for getStats() and brute
 
        var doAnyExplode=false;
       for (var i=0; i < diceArray.length; i++)  //check each die
@@ -91,7 +91,7 @@ Draw.diceBellCurve = function(poolGiven, secondColumn, binom){
       {
           if((/^\d+/).test(''+binom)) binom='=='+binom;
           if(binom.startsWith("=") && !binom.startsWith("==")) binom='='+binom;  //must be double equal signs for eval
-          if(poolGiven.getStats().outsource.getStats().dropKeepValue!=0) throw new Error('?? binom can\'t have drop count');  //TODO: make error
+          if(poolGiven.getStats().outsource.getStats().dropKeepValue!=0) throw new Error('?? binom can\'t have drop count');  //TODO make error
 
           var finishedPolys=[];
          for (var diceIndex=0; diceIndex < diceArray.length; diceIndex++)
@@ -142,7 +142,7 @@ Draw.diceBellCurve = function(poolGiven, secondColumn, binom){
        return rollData.sort(sumAscending);  //sort by sum ascending
    }
 }
-Draw.compareDiceBellCurve = function(firstPoolGiven, secondPoolGiven){  //TODO: add a header, doc, also consider comparing >= col instead of exact
+Draw.compareDiceBellCurve = function(firstPoolGiven, secondPoolGiven){  //TODO add a header, doc, also consider comparing >= col instead of exact
     var resultsDiv = document.getElementById('graphResults');
     var out = '<br />Right minus left<br />\n<b>Roll:</b> ' + firstPoolGiven.getName() + ' vs ' + secondPoolGiven.getName();
     out+='<br />';

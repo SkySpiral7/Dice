@@ -16,7 +16,7 @@ Statistics.analyze = function(diceGroup)
    if(undefined === diceGroup.die.toJSON().explodeType) return algorithm(diceGroup, 0);
    //if(does explode):
    var stats = [], explodeCount = 0;  //200,001 sided die is the smallest that will end with 0 explodes
-   //TODO: re: should be math for predicting # explodes
+   //TODO: should be math for predicting # explodes
    do
    {
       stats = algorithm(diceGroup, explodeCount);
@@ -25,7 +25,7 @@ Statistics.analyze = function(diceGroup)
       //the only way for stats to be empty is if the explodeCount < the minimum number of explodes enforced by reroll
       //when the percent would be < 0.000% then stop
    } while(0 === stats.length || 0 !== Number(stats.last().probability.toFixed(5)));
-   //TODO: re: consider pushing 0% check down to DiceExpression
+   //TODO: consider pushing 0% check down to DiceExpression
    return stats;
 };
 /**
@@ -49,7 +49,7 @@ Statistics.calculateAggregates = function(stats)
    {
       //stats[i].frequency of 0 means the result is impossible which shouldn't exist in the array
       //if it does exist (garbage in) it will only affect min/max (garbage out)
-      //TODO: re: consider validation instead of garbage in/out
+      //TODO: consider validation instead of garbage in/out
       if(stats[i].result < min) min = stats[i].result;
       if(stats[i].result > max) max = stats[i].result;
       if (undefined != stats[i].frequency)
@@ -86,7 +86,7 @@ Statistics.calculateDiceSums = function(dicePool)
    var results = [], useProbability = dicePool.toJSON().hasExplosions;
    for (var i = 0; i < pool.length; ++i)
    {
-      var stats = Statistics.analyze(pool[i]);  //TODO: re: test
+      var stats = Statistics.analyze(pool[i]);  //TODO: test
       if(useProbability) Statistics.determineProbability(stats);  //if any of them have probability then they all need it
       results.push(stats);
    }
@@ -111,7 +111,7 @@ Statistics.compareStatistics = function(stats1, stats2)
 */
 Statistics.determineProbability = function(stats)
 {
-   //TODO: re: add null safe validate
+   //TODO: add null safe validate
    if(undefined !== stats[0].probability) return;  //already done
    var sum = 0;
    for (var i = 0; i < stats.length; ++i)
@@ -124,11 +124,11 @@ Statistics.determineProbability = function(stats)
       //delete stats[i].frequency;  //nah. leave it there since frequency has perfect precision
    }
 };
-//TODO: re: test all sort orders
+//TODO: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
-//TODO: re: make a brute force for every combination and also for every sum (currently only sum)
-//TODO: re: use brute every combination for pass/fail. which are -1, 0, 1
+//TODO: make a brute force for every combination and also for every sum (currently only sum)
+//TODO: use brute every combination for pass/fail. which are -1, 0, 1
 Statistics.useBruteForce = function(diceGroup, explodeCount)
 {
    if(undefined === diceGroup.die.toJSON().explodeType) explodeCount = 0;
@@ -136,13 +136,13 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
    for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
       var everyDieValue = DiceExpression.everyValue(diceGroup.die, explodeCount);
-      var newExpression = new DiceExpression(everyDieValue, (0 !== explodeCount));  //TODO: re: consider explodeCount 0 to use prob
-      //TODO: re: consider having DiceExpression and DiceExpression.everyValue take isNegative
+      var newExpression = new DiceExpression(everyDieValue, (0 !== explodeCount));  //TODO: consider explodeCount 0 to use prob
+      //TODO: consider having DiceExpression and DiceExpression.everyValue take isNegative
       if(diceGroup.areDiceNegative) newExpression.negateExponents();
 
       var stats = newExpression.toDiceResults();
       if(0 !== explodeCount) Statistics.determineProbability(stats);  //safe because it doesn't touch results
-      everyValue.push(stats);  //TODO: re: could just JSON.clone this in a loop
+      everyValue.push(stats);  //TODO: could just JSON.clone this in a loop
    }
    // everyValue = new Array(diceGroup.dieCount).fill(stats);  //need to prove this is safe or use JSON.clone
 
@@ -150,7 +150,7 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
    if (1 === everyValue.length)
    {
       var terms = new DiceExpression(everyValue[0], (0 !== explodeCount)).toJSON();
-      DiceExpression.combineValues(terms);  //TODO: re: obviously needs refactoring
+      DiceExpression.combineValues(terms);  //TODO: obviously needs refactoring
       return new DiceExpression(terms, (0 !== explodeCount)).toDiceResults();
    }
    var everyCombination = cartesianProduct(everyValue);

@@ -20,7 +20,7 @@ function nonRandomNumberGenerator(numberArray)
    };
 }
 
-//TODO: re: consider moving these tests to a new file:
+//TODO: consider moving these tests to a new file:
 Tester.Util = {};
 Tester.Util.dieResultsToNonRandomArray = function(isFirst)
 {

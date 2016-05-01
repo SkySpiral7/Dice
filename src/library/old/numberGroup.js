@@ -1,4 +1,4 @@
-function numberGroup(diceStringGiven){  //TODO: rename. maybe add successes later
+function numberGroup(diceStringGiven){  //TODO rename. maybe add successes later
     var dropKeepSwitch="None";
     var lowHighSwitch="None";
     var dropKeepValue=0;

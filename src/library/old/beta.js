@@ -6,12 +6,12 @@ function groupParser(groupString){  //TODO tons of testing. and make a loud opti
    while (groupString.contains("{"))
    {
        var parseArray=findFirstCompleteCurlyBrackets(groupString);
-       if(parseArray == null) throw new Error('{} wasn\'t paired');  //TODO: wrong bracket order
+       if(parseArray == null) throw new Error('{} wasn\'t paired');  //TODO wrong bracket order
        var sendArray=parseInner(parseArray[1]);  //array of sums
        var outsource=new numberGroup(parseArray[2]);  //modifiers end at [,+{}]
        outsource.dropDoing(sendArray);  //sendArray is changed
        groupString=parseArray[0]+"["+outsource.minMaxDoing(sendArray.summation())+"]"+numberGroup(parseArray[2]);
-       //TODO: I want {1d20, 1d6, 1d4}dl1 to return an array.length==2 but then what? do I allow ({1d20, 1d6, 1d4}dl1).summation()?
+       //TODO I want {1d20, 1d6, 1d4}dl1 to return an array.length==2 but then what? do I allow ({1d20, 1d6, 1d4}dl1).summation()?
    }
     return eval(groupString);  //so that it will be an array (or number) instead of string
    function parseInner(stringGiven){  //TODO have something like this for dicepool so it can have named dice in the constructor (typeof will say if such an object exists)

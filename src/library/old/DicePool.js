@@ -1,4 +1,4 @@
-//TODO: optimize: 1d6+1d6 === 2d6
+//TODO optimize: 1d6+1d6 === 2d6
 function DicePool(diceStringGiven, nameArray){
    //private:
     var diceArray=[];
@@ -273,7 +273,7 @@ function DicePool(diceStringGiven, nameArray){
        holder=holder.replace(/-/g, "+-");  //change minus to plus a negative so I can split by plus
        var newDiceArray=holder.split("+");
        if(newDiceArray[0]=='') newDiceArray.shift();  //in case of a leading +-
-       //TODO: doc (also Scatter): <a>You can sepperate multiple kinds of grand totals with ; or , each of which will be displayed in the same result box.</a><br />
+       //TODO doc (also Scatter): <a>You can sepperate multiple kinds of grand totals with ; or , each of which will be displayed in the same result box.</a><br />
        holder=newDiceArray;
        newDiceArray=[];
       if (!isNaN(holder[0]))
@@ -383,7 +383,7 @@ function DicePool(diceStringGiven, nameArray){
     if(arguments.length==0){nameArray=[]; return;}  //done. it is an empty pool. TODO test more
     //if(diceStringGiven==undefined) diceStringGiven="1d6";  //default. also test more stuff here like this
     nameArray=argumentsToArray(arguments, 1);
-    //TODO: doc: let me count the ways: DicePool(), DicePool("2d6"), DicePool(2, "yes", "no", "maybe"), DicePool(4, ["yes", "no", "maybe"]), DicePool(DicePool), DicePool(Die)
+    //TODO doc: let me count the ways: DicePool(), DicePool("2d6"), DicePool(2, "yes", "no", "maybe"), DicePool(4, ["yes", "no", "maybe"]), DicePool(DicePool), DicePool(Die)
     if(nameArray==undefined) nameArray=[];  //make empty array (not provided or diceStringGiven only)
     if(nameArray.length!=0 && typeof(diceStringGiven)!="number") throw new Error("DicePool("+diceStringGiven+", ~) the first parameter of a named die must be a number type which is the number of dice");
     if(nameArray.length!=0) diceStringGiven+="d6";  //needs to be a string for parsing
