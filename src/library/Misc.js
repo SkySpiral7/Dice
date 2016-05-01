@@ -51,18 +51,6 @@ function getError(functionToCall, args)
    try{functionToCall.apply(undefined, args);}
    catch(e){return e;}
 }
-/**@returns a property of window. Dots are allowed since eval is called.
-@throws Error if path isn't a string or contains function calls*/
-function getProperty(path)
-{
-   requireTypeOf('string', path);
-   if (!(/^[\w.]+$/).test(path.trim()))  //eval safety
-   {
-      throw new Error('evil code detected: ' + path);
-   }
-
-   return eval(path);  //might throw ReferenceError: <path's value> is not defined or a TypeError if a.b.c and b is null
-}
 /**@throws Error if actualObject is not an instanceof constructor.*/
 function requireInstanceOf(constructor, actualObject)
 {
