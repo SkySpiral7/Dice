@@ -54,8 +54,8 @@ Prebuilt.WarhammerAttackUnit = function(input)
    {
       if (savesRolled[i] < input.saveValue)  //save failed
       {
-         //the if < 7 check prevents an unneeded roll but is really to make testing easier
-         if (input.reanimateOrNoPainValue < 7 && d6.roll(input.randomSource)[0] < input.reanimateOrNoPainValue)
+         //the if > 6 check prevents an unneeded roll but is really to make testing easier
+         if (input.reanimateOrNoPainValue > 6 || d6.roll(input.randomSource)[0] < input.reanimateOrNoPainValue)
          {
             ++output.unsavedWounds;
             //lost knowledge: last value of i (might not be savesRolled.length)

@@ -87,11 +87,9 @@ rewrite everything
 -named dice should not be instanceof die. call the new object Spinner: to String/JSON, getSides, roll etc
 -NumericSpinner also. which has all die functions (some may do nothing)
 -also consider SimpleDie: Math.ceil(Math.random()*sideCount); 2 is either 1 or 2
--dicepool only takes string, array of json, or array of die
 -make dice and dicepool's toString return the code needed to create them: 'new DicePool("2d6")' toJSON only return "2d6"
 -make sure to doc everything: including include.js
 -make sure it is all tested
--currently explosions must be before reroll (put in functions)
 consumers:
 -warhammer
 -L5R

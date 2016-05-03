@@ -97,7 +97,8 @@ function DicePool(arg1, arg2)
       }
 
       DicePool._validate(arg1, arg2);
-      //array of dice is allowed  //TODO: optimize the groups together
+      //TODO: optimize the groups together
+      //TODO: let DicePool take an array of dice
 
       name = arg1;
       pool = DicePool._defensiveCopier(arg2);
@@ -214,6 +215,7 @@ DicePool._validate = function(debugName, pool)
          //throw new Error(debugName + '\ninvalid die: ' + pool[i].die);
          //don't both since Die will throw anyway. I decided to allow die: 2 which works but is confusing
       if(!(pool[i].die instanceof Die)) pool[i].die = new Die(pool[i].die);  //die required: throws if can't create
+      //TODO: validate that die exists
 
       if(undefined == pool[i].dieCount) pool[i].dieCount = 1;
       else if(!Number.isNatural(pool[i].dieCount)) throw new Error(debugName + '\ninvalid dieCount: ' + pool[i].dieCount);

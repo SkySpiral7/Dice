@@ -3,9 +3,9 @@
 <head>
 <title>Warhammer Dice</title>
 <meta charset="ASCII" />
-<script id="DiceInclude" src="library/include.js"></script><!--the code to test-->
+<script id="DiceInclude" src="library/include.js"></script>
 <script type="text/javaScript">
-//this script block is hacks for warhammer because the original API is lacking
+//this script block has a hack for warhammer because the original API is lacking
 Draw.WarhammerBellCurve = function(diceCount, toHitValue, toWoundValue, toSaveValue, extraSave, secondColumn){
     if(secondColumn==undefined) secondColumn='>=';
     var out = '';
@@ -90,43 +90,60 @@ Draw.generateBinomialTable = function(stats, secondColumn)
    var output = GenerateHtml.statistics(stats, secondColumn);
    return output.replace('<th>Roll</th>', '<th>Wounds Inflicted</th>');
 };
-function attack(){
-    var input = {};
-    input.diceCount = Number.parseInt(document.getElementById('diceCount').value);
-    document.getElementById('diceCount').value = input.diceCount;
-    input.maxWounds = Number.parseInt(document.getElementById('woundMax').value);
-    document.getElementById('woundMax').value = input.maxWounds;
-    input.toHitValue = Number.parseInt(document.getElementById('toHitValue').value);
-    document.getElementById('toHitValue').value = input.toHitValue;
-    input.toWoundValue = Number.parseInt(document.getElementById('toWoundValue').value);
-    document.getElementById('toWoundValue').value = input.toWoundValue;
-    input.saveValue = Number.parseInt(document.getElementById('saveValue').value);
-    document.getElementById('saveValue').value = input.saveValue;
-    input.reanimateOrNoPainValue = Number.parseInt(document.getElementById('reanimateOrNoPainValue').value);
-    document.getElementById('reanimateOrNoPainValue').value = input.reanimateOrNoPainValue;
-    var customColumn = document.getElementById('customColumn').value;
+function parseInput()
+{
+   var input = {};
+   input.diceCount = Number.parseInt(document.getElementById('diceCount').value);
+   document.getElementById('diceCount').value = input.diceCount;
+   input.maxWounds = Number.parseInt(document.getElementById('woundMax').value);
+   document.getElementById('woundMax').value = input.maxWounds;
+   input.toHitValue = Number.parseInt(document.getElementById('toHitValue').value);
+   document.getElementById('toHitValue').value = input.toHitValue;
+   input.toWoundValue = Number.parseInt(document.getElementById('toWoundValue').value);
+   document.getElementById('toWoundValue').value = input.toWoundValue;
+   input.saveValue = Number.parseInt(document.getElementById('saveValue').value);
+   document.getElementById('saveValue').value = input.saveValue;
+   input.reanimateOrNoPainValue = Number.parseInt(document.getElementById('reanimateOrNoPainValue').value);
+   document.getElementById('reanimateOrNoPainValue').value = input.reanimateOrNoPainValue;
+   input.customColumn = document.getElementById('customColumn').value;
+   return input;
+}
+function clearResults()
+{
+   document.getElementById('graphResults').textContent = '';
+   hitResult.textContent = '-';
+   woundedResult.textContent = '-';
+   unsaveWoundsResult.textContent = '-';
+   minResult.textContent = '-';
+   maxResult.textContent = '-';
+   avgResult.textContent = '-';
+   devResult.textContent = '-';
+}
+function rollAttack()
+{
+   var input = parseInput();
+   clearResults();
 
-    document.getElementById('graphResults').textContent = '';
-    hitResult.textContent = '-';
-    woundedResult.textContent = '-';
-    unsaveWoundsResult.textContent = '-';
-    minResult.textContent = '-';
-    maxResult.textContent = '-';
-    avgResult.textContent = '-';
-    devResult.textContent = '-';
    try{
-       var output = Prebuilt.WarhammerAttackUnit(input);
-       //this is done before drawing in case of error
-       hitResult.textContent = output.hit;  //always exists
-       if(undefined !== output.wounded) woundedResult.textContent = output.wounded;
-       if(undefined !== output.unsavedWounds) unsaveWoundsResult.textContent = output.unsavedWounds;
-       Draw.WarhammerBellCurve(input.diceCount, input.toHitValue, input.toWoundValue, input.saveValue, input.reanimateOrNoPainValue, customColumn);
+      var output = Prebuilt.WarhammerAttackUnit(input);
+      hitResult.textContent = output.hit;  //always exists
+      if(undefined !== output.wounded) woundedResult.textContent = output.wounded;
+      if(undefined !== output.unsavedWounds) unsaveWoundsResult.textContent = output.unsavedWounds;
    }
-    catch(error){alert('Error: ' + error.message); throw error;}
+   catch(error){alert('Error: ' + error.message); throw error;}
+};
+function mainDraw()
+{
+   var input = parseInput();
+   clearResults();
+   try{
+      Draw.WarhammerBellCurve(input.diceCount, input.toHitValue, input.toWoundValue, input.saveValue, input.reanimateOrNoPainValue, input.customColumn);
+   }
+   catch(error){alert('Error: ' + error.message); throw error;}
 };
 </script>
 <a>The random values are in order: number of enemies hit, number wounded, number of unsaved wounds.</a>
-<form action="javascript:attack();">
+<form action="javascript:mainDraw();">
 <table>
    <tr>
       <td style="text-align:right;">Number of Dice: </td>
@@ -168,7 +185,12 @@ function attack(){
       <td><input type="text" value=">=" size="5" id="customColumn" /></td>
       <td /><td />
    </tr>
-   <tr><td /><td><input type="submit" value="Attack" /></td><td /><td /></tr>
+   <tr>
+     <td />
+     <td><input type="submit" value="Draw" /></td><!--This is a submit button so that you can press enter in any field-->
+     <td><input type="button" value="Attack" onClick="javascript:rollAttack();" /></td>
+     <td />
+   </tr>
 </table>
 </form>
 <br />

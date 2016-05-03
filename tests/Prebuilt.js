@@ -8,7 +8,7 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6, 1, 5]);
+   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6, 1, 5]);  //the 5 is ignored
    actual = Prebuilt.WarhammerAttackUnit(input);
    stringValue = actual.toString();
    delete actual.toString;
@@ -126,6 +126,15 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'FNP/RP ignores wound'});}
 
    try{
+   input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 7};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [3, 4, 1]);
+   actual = Prebuilt.WarhammerAttackUnit(input);
+   delete actual.toString;
+   expected = {hit: 1, wounded: 1, unsavedWounds: 1};
+   testResults.push({Expected: expected, Actual: actual, Description: 'FNP/RP is optional'});
+   } catch(e){testResults.push({Error: e, Description: 'FNP/RP is optional'});}
+
+   try{
    input = {diceCount: 3, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 7};
    input.randomSource = dieResultsToNonRandomGenerator(6, [6, 1, 3].concat([4, 2]).concat([6]));
    actual = Prebuilt.WarhammerAttackUnit(input);
@@ -145,10 +154,10 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 5, maxWounds: 2, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 7};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6, 5, 6, 6].concat([6, 6, 5, 6, 6]).concat([6, 1, 1, 6, 6]));
+   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6, 5, 6, 6].concat([6, 6, 5, 6, 6]).concat([1, 2, 1, 1, 1]));
    actual = Prebuilt.WarhammerAttackUnit(input);
    delete actual.toString;
-   expected = {hit: 5, wounded: 5, unsavedWounds: 0};
+   expected = {hit: 5, wounded: 5, unsavedWounds: 2};
    testResults.push({Expected: expected, Actual: actual, Description: 'Ignore excessive wounds'});
    } catch(e){testResults.push({Error: e, Description: 'Ignore excessive wounds'});}
 

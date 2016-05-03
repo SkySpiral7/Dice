@@ -80,6 +80,13 @@ Statistics.calculateAggregates = function(stats)
 /*Unused shorter formula for mean:
 For XdY the mean is ((Y+1)/2)*X for any natural number of X and Y except X=1 which has no mean*/
 };
+/**
+This function analyzes the dicePool given and returns the result of the best possible algorithm.
+Each group of the pool will be individually optimized and the results combined.
+@param {object} dicePool the DicePool for which statistics will be calculated
+@returns {object[]} objects containing result (the sum rolled) and either frequency (if possible) or probability (otherwise).
+It will not include frequency of 0 or probability of less than 0.00000 (5) and will be in result ascending order.
+*/
 Statistics.calculateDiceSums = function(dicePool)
 {
    var pool = dicePool.toJSON().pool;
@@ -92,8 +99,17 @@ Statistics.calculateDiceSums = function(dicePool)
    }
    return Statistics.combineResults(results, useProbability);
 };
+/**
+This function takes an array of statistics (arrays), combining them into a single result (array).
+They are combined by assuming each element represents possibilities for a single die (or group) with
+the returned value being the statistics for the sum of them.
+@param {object[][]} statsArray each element was returned by a statistics calculation function
+@param {boolean} useProbability if true then frequency will be ignored (if present)
+@returns {object[]} a single statistics results
+*/
 Statistics.combineResults = function(statsArray, useProbability)
 {
+   //TODO: validate alot in this file
    //uses the non dropping algorithm (see Statistics.useNonDroppingAlgorithm)
    var workingExpression = new DiceExpression(statsArray[0], useProbability);
    for (var i = 1; i < statsArray.length; ++i)
@@ -127,8 +143,28 @@ Statistics.determineProbability = function(stats)
 //TODO: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
-//TODO: make a brute force for every combination and also for every sum (currently only sum)
+
 //TODO: use brute every combination for pass/fail. which are -1, 0, 1
+/*
+Statistics.passFailBinomial = function(dicePool, passCriteria, failCriteria)
+{
+Is this '>6' criteria based on the sum of the group or each value of the die?
+Warhammer is per die and so is shadow run. so do that only for now
+How does drop/keep work with this?
+Uh. well I don't think either does that so I could ignore this also
+If there must be only 1 group without drop/keep I'd be better off with:
+function(die, diceCount, passCriteria, failCriteria)
+which after looping through once can use non-dropping algorithm
+
+must have provide pass, fail, or both (although it's ok if no values exist for them)
+if(value is both) throw ambiguous error
+if(value pass) value = 1
+else if(value fail) value = -1
+else value = 0
+};
+*/
+
+//TODO: make a brute force for every combination and also for every sum (currently only sum)
 Statistics.useBruteForce = function(diceGroup, explodeCount)
 {
    if(undefined === diceGroup.die.toJSON().explodeType) explodeCount = 0;
