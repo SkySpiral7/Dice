@@ -11,19 +11,7 @@ Output's wounded and unsavedWounds might not be present.
 */
 Prebuilt.WarhammerAttackUnit = function(input)
 {
-   requireNaturalNumber(input.diceCount);
-   requireNaturalNumber(input.maxWounds);
-   requireNaturalNumber(input.toHitValue);
-   requireNaturalNumber(input.toWoundValue);
-
-   //saveValue is optional because some attacks ignore saves
-   if(undefined === input.saveValue) input.saveValue = 7;  //an impossible number
-   requireNaturalNumber(input.saveValue);
-
-   //Reanimation Protocol states that if the unit also has Feel No Pain then you must choose only 1 of them
-   //but most units have neither
-   if(undefined === input.reanimateOrNoPainValue) input.reanimateOrNoPainValue = 7;
-   requireNaturalNumber(input.reanimateOrNoPainValue);
+   Prebuilt.WarhammerAttackUnit._validateInput(input);
    //randomSource not validated because die will validate it
 
    var d6 = new Die();
@@ -64,4 +52,69 @@ Prebuilt.WarhammerAttackUnit = function(input)
       }
    }
    return output;
+};
+//TODO: doc and test
+//TODO: see old/stats util.js@generate_Binomials
+Prebuilt.WarhammerAttackUnit.Statistics = function(input)
+{
+   Prebuilt.WarhammerAttackUnit._validateInput(input);
+   //ignore randomSource
+
+   var d6 = new Die();
+   var workingStats = [{result: input.diceCount, probability: 1, frequency: 1}];
+
+   //the if statements are to avoid unnecessary calculations (that will ultimately multiply by 1)
+   if(input.toHitValue > 1) workingStats = nextPhase(workingStats, '>=' + input.toHitValue);
+   if(input.toWoundValue > 1) workingStats = nextPhase(workingStats, '>=' + input.toWoundValue);
+   if(input.saveValue < 7) workingStats = nextPhase(workingStats, '<' + input.saveValue);
+   if(input.reanimateOrNoPainValue < 7) workingStats = nextPhase(workingStats, '<' + input.reanimateOrNoPainValue);
+
+   return workingStats;
+
+   function nextPhase(workingStats, passCriteria)
+   {
+      var workingExpression = new DiceExpression([{coefficient: 1, exponent: 1}], true);
+      workingExpression.addTerm({coefficient: -1, exponent: 1});  //it is now empty
+      for (var i = 0; i < workingStats.length; ++i)
+      {
+         if (0 === workingStats[i].result)  //i = 0 is the only one that might have a result of 0
+         {
+            workingExpression.addTerm({coefficient: workingStats[i].probability, exponent: workingStats[i].result});
+            continue;  //all dice failed
+         }
+         var newStats = Statistics.passFailBinomial(d6, workingStats[i].result, passCriteria);
+         Statistics.determineProbability(newStats);
+         //TODO: explain with a comment:
+         combinePhase(workingExpression, newStats, workingStats[i].probability);
+      }
+      return workingExpression.toDiceResults();
+   }
+   function combinePhase(workingExpression, newStats, multiplier, frequencyMultiplier)
+   {
+      for (var i = 0; i < newStats.length; ++i)
+      {
+         newStats[i].probability *= multiplier;
+         //TODO: I think I could actually multiply the frequency instead of using probability:
+         //newStats[i].frequency *= frequencyMultiplier;
+         workingExpression.addTerm({coefficient: newStats[i].probability, exponent: newStats[i].result});
+      }
+   }
+};
+Prebuilt.WarhammerAttackUnit._validateInput = function(input)
+{
+   //TODO: each required one must be 1-6
+   requireNaturalNumber(input.diceCount);
+   requireNaturalNumber(input.maxWounds);
+   requireNaturalNumber(input.toHitValue);
+   requireNaturalNumber(input.toWoundValue);
+
+   //saveValue is optional because some attacks ignore saves
+   if(undefined === input.saveValue) input.saveValue = 7;  //an impossible number
+   requireNaturalNumber(input.saveValue);
+
+   //Reanimation Protocol states that if the unit also has Feel No Pain then you must choose only 1 of them
+   //but most units have neither
+   if(undefined === input.reanimateOrNoPainValue) input.reanimateOrNoPainValue = 7;
+   requireNaturalNumber(input.reanimateOrNoPainValue);
+   //randomSource not validated because die will validate it
 };

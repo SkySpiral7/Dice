@@ -1,74 +1,13 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Warhammer Dice</title>
+<title>Warhammer Dice Helper</title>
 <meta charset="ASCII" />
 <script id="DiceInclude" src="library/include.js"></script>
 <script type="text/javaScript">
-//this script block has a hack for warhammer because the original API is lacking
-Draw.WarhammerBellCurve = function(diceCount, toHitValue, toWoundValue, toSaveValue, extraSave, secondColumn){
-    if(secondColumn==undefined) secondColumn='>=';
-    var out = '';
-
-    var rollData=[];
-    for(var i=0; i < diceCount; i++) rollData.push(0);  //needs to start as this for it to combine correctly
-    rollData.push(1);  //[diceCount]
-    //the start data represents that the dice being equal to diceCount is 100% and all other values are 0%
-    if(toHitValue > 1) rollData=WarhammerCombine(rollData, toHitValue);
-    if(toWoundValue > 1) rollData=WarhammerCombine(rollData, toWoundValue);
-    if(toSaveValue < 7) rollData=WarhammerCombine(rollData, 8-(toSaveValue));  //weird but true
-    if(extraSave < 7) rollData=WarhammerCombine(rollData, 8-(extraSave));
-
-    out += Draw.generateBinomialTable(rollData, secondColumn);  //must be sent 1D
-    document.getElementById('graphResults').innerHTML += out;
-
-   function WarhammerCombine(originalCurve, targetNumber){
-       var results=[originalCurve[0]];  //set [0]. 0 can't be sent to Warhammer. the number is as is
-      for (var diceIndex=1; diceIndex < originalCurve.length; diceIndex++)
-      {
-          if(originalCurve[diceIndex]==0) continue;  //ignore the impossible values
-          var rollData=Warhammer(diceIndex, targetNumber);
-         for (var i=0; i < rollData.length; i++)
-         {
-             var chanceOfSuccess=rollData[i]*originalCurve[diceIndex];  //mulitply because both must be true
-             if(results[i]==undefined) results[i]=chanceOfSuccess;
-             else results[i]+=chanceOfSuccess;  //add exclusive events for either to be true
-         }
-      }
-       for(var i=0; i < results.length; i++) if(results[i]==undefined) results[i]=0;  //everything else did not occur. must fix up the number
-       return results;
-   }
-   function Warhammer(diceCount, targetNumber){
-       var diceArray = new DicePool(diceCount+'d6').getAllDice();
-       var finishedPolys=[];
-      for (var diceIndex=0; diceIndex < diceArray.length; diceIndex++)
-      {
-          var polyNom=everyDieValueWeighted(diceArray[diceIndex]);
-          var possibleNumberWins=0;
-          for(var i=0; i < polyNom.length; i++)  //count probability for each
-             if(polyNom[i][0] >= targetNumber) possibleNumberWins++;
-          var binomProb=generate_Binomials(1, (possibleNumberWins/polyNom.length));
-          var polyNom=[];
-         for (var i=0; i < binomProb.length; i++)
-         {
-             polyNom.push([i, binomProb[i]]);  //to be in the form of [value, freq]
-         }
-          finishedPolys.push(polyNom);  //stored as polys so I can multiply them
-      }
-       finishedPolys=Polynomial.multiplyPolynomials(finishedPolys, new DicePool());  //given an empty pool
-       var results=[];  //strip out the results so that it is 1D again
-       for(var i=0; i < finishedPolys.length; i++) results[finishedPolys[i][0]]=finishedPolys[i][1];
-       for(var i=0; i < results.length; i++) if(results[i]==undefined) results[i]=0;  //everything else did not occur. must fix up the number
-       return results;
-   }
-};
-</script>
-<script type="text/javaScript">
-//this script block needs to stay here because it is page specific
 function processWoundMax(stats)
 {
    var maxWounds = Number.parseInt(document.getElementById('woundMax').value);
-   document.getElementById('woundMax').value = maxWounds;
    if(maxWounds < 1) throw new Error('The maximum number of wounds must be at least 1');
    while (stats[stats.length-1].result > maxWounds && stats.length > 1)  //too many wounds
    {
@@ -88,7 +27,7 @@ Draw.generateBinomialTable = function(stats, secondColumn)
    devResult.textContent = aggregates.standardDeviation.toFixed(3);
 
    var output = GenerateHtml.statistics(stats, secondColumn);
-   return output.replace('<th>Roll</th>', '<th>Wounds Inflicted</th>');
+   document.getElementById('graphResults').innerHTML = output.replace('<th>Roll</th>', '<th>Wounds Inflicted</th>');
 };
 function parseInput()
 {
@@ -108,21 +47,13 @@ function parseInput()
    input.customColumn = document.getElementById('customColumn').value;
    return input;
 }
-function clearResults()
+function rollAttack()
 {
-   document.getElementById('graphResults').textContent = '';
    hitResult.textContent = '-';
    woundedResult.textContent = '-';
    unsaveWoundsResult.textContent = '-';
-   minResult.textContent = '-';
-   maxResult.textContent = '-';
-   avgResult.textContent = '-';
-   devResult.textContent = '-';
-}
-function rollAttack()
-{
+
    var input = parseInput();
-   clearResults();
 
    try{
       var output = Prebuilt.WarhammerAttackUnit(input);
@@ -134,10 +65,17 @@ function rollAttack()
 };
 function mainDraw()
 {
+   document.getElementById('graphResults').innerHTML = '';
+   minResult.textContent = '-';
+   maxResult.textContent = '-';
+   avgResult.textContent = '-';
+   devResult.textContent = '-';
+
    var input = parseInput();
-   clearResults();
+
    try{
-      Draw.WarhammerBellCurve(input.diceCount, input.toHitValue, input.toWoundValue, input.saveValue, input.reanimateOrNoPainValue, input.customColumn);
+      var stats = Prebuilt.WarhammerAttackUnit.Statistics(input);
+      Draw.generateBinomialTable(stats, input.customColumn);
    }
    catch(error){alert('Error: ' + error.message); throw error;}
 };
