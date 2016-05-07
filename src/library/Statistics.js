@@ -140,30 +140,59 @@ Statistics.determineProbability = function(stats)
       //delete stats[i].frequency;  //nah. leave it there since frequency has perfect precision
    }
 };
+//TODO: doc
+Statistics.passFailBinomial = function(die, diceCount, passCriteria, failCriteria)
+{
+   requireInstanceOf(Die, die);
+   requireNaturalNumber(diceCount);
+   if(null == passCriteria && null == failCriteria) throw new Error('Required: passCriteria and/or failCriteria');
+
+   if(null == passCriteria) passCriteria = '=== NaN';
+   else
+   {
+      requireTypeOf('string', passCriteria);
+      //TODO: not DRY or clean:
+      if(!(/^(?:[<>]=?|[!=]==?)?-?\d+$/).test(passCriteria)) throw new Error('Invalid passCriteria: ' + passCriteria);
+   }
+   if(null == failCriteria) failCriteria = '=== NaN';
+   else
+   {
+      requireTypeOf('string', failCriteria);
+      if(!(/^(?:[<>]=?|[!=]==?)?-?\d+$/).test(failCriteria)) throw new Error('Invalid failCriteria: ' + failCriteria);
+   }
+   if(undefined !== die.toJSON().explodeType) throw new Error('Exploding not supported: ' + JSON.stringify(die));
+   //I'm allowing reroll because there are no implications of it. even though I don't know why you would
+
+   var tempExpressionJson = DiceExpression.everyValue(die, 0);
+   var singleDieExpression = new DiceExpression([{coefficient: 1, exponent: 1}], false);
+   singleDieExpression.addTerm({coefficient: -1, exponent: 1});  //it is now empty
+   //TODO: I should be able to create an empty one directly (no arg)
+   //currently possible to create an empty one via an empty array but future validation will prevent that
+   for (var i = 0; i < tempExpressionJson.length; ++i)
+   {
+      var passed = eval(tempExpressionJson[i].exponent + passCriteria);
+      var failed = eval(tempExpressionJson[i].exponent + failCriteria);
+      if(passed && failed) throw new Error('Illegal: ' + tempExpressionJson[i].exponent + ' both passed and failed.' +
+         'die: ' + JSON.stringify(die) + ' pass: ' + passCriteria + ' fail: ' + failCriteria);
+
+      if(passed) singleDieExpression.addTerm({coefficient: 1, exponent: 1});
+      else if(failed) singleDieExpression.addTerm({coefficient: 1, exponent: -1});
+      else singleDieExpression.addTerm({coefficient: 1, exponent: 0});
+   }
+   var singleDieJson = singleDieExpression.toJSON();
+
+   //TODO: not DRY. this is the 3rd place with the non-dropping algorithm
+   var workingExpression = new DiceExpression(singleDieJson, false);  //no need to clone json because DiceExpression doesn't corrupt it
+   for (var dieIndex = 1; dieIndex < diceCount; ++dieIndex)
+   {
+      var newExpression = new DiceExpression(singleDieJson, false);
+      workingExpression.multiply(newExpression);
+   }
+   return workingExpression.toDiceResults();
+};
 //TODO: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/
 Statistics.resultAscending = function(a,b){return (a.result - b.result);};
-
-//TODO: use brute every combination for pass/fail. which are -1, 0, 1
-/*
-Statistics.passFailBinomial = function(dicePool, passCriteria, failCriteria)
-{
-Is this '>6' criteria based on the sum of the group or each value of the die?
-Warhammer is per die and so is shadow run. so do that only for now
-How does drop/keep work with this?
-Uh. well I don't think either does that so I could ignore this also
-If there must be only 1 group without drop/keep I'd be better off with:
-function(die, diceCount, passCriteria, failCriteria)
-which after looping through once can use non-dropping algorithm
-
-must have provide pass, fail, or both (although it's ok if no values exist for them)
-if(value is both) throw ambiguous error
-if(value pass) value = 1
-else if(value fail) value = -1
-else value = 0
-};
-*/
-
 //TODO: make a brute force for every combination and also for every sum (currently only sum)
 Statistics.useBruteForce = function(diceGroup, explodeCount)
 {
@@ -234,6 +263,7 @@ Statistics.useNonDroppingAlgorithm = function(diceGroup, explodeCount)
    {
       //dice are immutable so it's ok to reuse the same one
       var newExpression = new DiceExpression(diceGroup.die, explodeCount);
+      //TODO: faster: since all dice are the same I can get json and reuse it a bunch
       if(diceGroup.areDiceNegative) newExpression.negateExponents();
       workingExpression.multiply(newExpression);
    }

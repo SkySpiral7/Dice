@@ -62,11 +62,11 @@ function requireInstanceOf(constructor, actualObject)
    if(!(actualObject instanceof constructor)) throw new Error('Expected: ' + constructor.name + '. Got: ' + actualObject.constructor.name
       + ' with toString: ' + actualObject);
 }
-/**@throws Error if actualObject is not a natural number. See Number.isNatural.*/
-function requireNaturalNumber(actualObject)
+/**@throws Error if actualNumber is not a natural number. See Number.isNatural.*/
+function requireNaturalNumber(actualNumber)  //might not be a number
 {
-   if(!Number.isNatural(actualObject)) throw new Error('Expected Natural Number. Got type: ' + typeof(actualObject) +
-      ' with toString: ' + actualObject);
+   if(!Number.isNatural(actualNumber)) throw new Error('Expected Natural Number. Got type: ' + typeof(actualNumber) +
+      ' with toString: ' + actualNumber);
 }
 /**@throws Error if actualObject doesn't have type expectedType.*/
 function requireTypeOf(expectedType, actualObject)

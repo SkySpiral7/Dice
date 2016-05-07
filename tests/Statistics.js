@@ -164,6 +164,114 @@ Tester.Statistics.determineProbability = function(isFirst)
 
    TesterUtility.displayResults('Statistics Statistics.determineProbability', testResults, isFirst);
 };
+Tester.Statistics.passFailBinomial = function(isFirst)
+{
+   TesterUtility.clearResults(isFirst);
+
+   var testResults = [], actual, expected;
+
+   try{
+   actual = Statistics.passFailBinomial(new Die(4), 1, '>=3', '===1');
+   expected = [
+      {result: -1, frequency: 1},
+      {result: 0, frequency: 1},
+      {result: 1, frequency: 2}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path both'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path both'});}
+
+   try{
+   actual = Statistics.passFailBinomial(new Die(2), 2, '===2');
+   expected = [
+      {result: 0, frequency: 1},
+      {result: 1, frequency: 2},
+      {result: 2, frequency: 1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path passCriteria'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path passCriteria'});}
+
+   try{
+   actual = Statistics.passFailBinomial(new Die(4), 1, null, '===1');
+   expected = [
+      {result: -1, frequency: 1},
+      {result: 0, frequency: 3}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path failCriteria'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path failCriteria'});}
+
+   try{
+   Statistics.passFailBinomial(4, 1, '>=3', '===1');
+   TesterUtility.failedToThrow(testResults, 'Invalid die');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireInstanceOf, [Die, 4]),
+         Actual: e, Description: 'Invalid die'});
+   }
+
+   try{
+   Statistics.passFailBinomial(new Die(4), -1, '>=3', '===1');
+   TesterUtility.failedToThrow(testResults, 'Invalid diceCount');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [-1]),
+         Actual: e, Description: 'Invalid diceCount'});
+   }
+
+   try{
+   Statistics.passFailBinomial(new Die(4), 1, 3, '===1');
+   TesterUtility.failedToThrow(testResults, 'Invalid passCriteria');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireTypeOf, ['string', 3]),
+         Actual: e, Description: 'Invalid passCriteria'});
+   }
+
+   try{
+   Statistics.passFailBinomial(new Die(4), 1, '>=3', 1);
+   TesterUtility.failedToThrow(testResults, 'Invalid failCriteria');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireTypeOf, ['string', 1]),
+         Actual: e, Description: 'Invalid failCriteria'});
+   }
+
+   try{
+   Statistics.passFailBinomial(new Die(4), 1);
+   TesterUtility.failedToThrow(testResults, 'Missing both criteria');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: new Error('Required: passCriteria and/or failCriteria'),
+         Actual: e, Description: 'Missing both criteria'});
+   }
+
+   try{
+   Statistics.passFailBinomial(new Die('1d4!'), 1, '>=3', '===1');
+   TesterUtility.failedToThrow(testResults, 'Can\'t explode');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: new Error('Exploding not supported: ' +
+         '{"sideCount":4,"constantModifier":0,"isFudgeDie":false,"explodeType":"{Normal}"}'),
+         Actual: e, Description: 'Can\'t explode'});
+   }
+
+   try{
+   actual = Statistics.passFailBinomial(new Die('1d3r1'), 1, '===3');
+   expected = [
+      {result: 0, frequency: 1},
+      {result: 1, frequency: 1}
+   ];
+   //more of a side effect than a requirement
+   testResults.push({Expected: expected, Actual: actual, Description: 'Reroll allowed'});
+   } catch(e){testResults.push({Error: e, Description: 'Reroll allowed'});}
+
+   TesterUtility.displayResults('Statistics Statistics.passFailBinomial', testResults, isFirst);
+};
 Tester.Statistics.useBruteForce = function(isFirst)
 {
    TesterUtility.clearResults(isFirst);
