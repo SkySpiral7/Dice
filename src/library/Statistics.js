@@ -140,7 +140,15 @@ Statistics.determineProbability = function(stats)
       //delete stats[i].frequency;  //nah. leave it there since frequency has perfect precision
    }
 };
-//TODO: doc
+//TODO: see old/stats util.js@generate_Binomials
+//TODO: consider a floor of 0 for games that just mean you failed
+/**Given a number of die and either passCriteria, failCriteria, or both, this function calculates the
+chances of the number of successes. A failure is -1, success is +1, and everything else is
+not counted (+0).
+@param {string} passCriteria must be like '>= 5'
+@param {string} failCriteria must be like '>= 5'
+@returns {object[]} a statistics object where the result is the sum of the successes (minus failures)
+*/
 Statistics.passFailBinomial = function(die, diceCount, passCriteria, failCriteria)
 {
    requireInstanceOf(Die, die);

@@ -164,3 +164,48 @@ TestSuite.Prebuilt.WarhammerAttackUnit = function(isFirst)
 
    return TestRunner.displayResults('Prebuilt Prebuilt.WarhammerAttackUnit', testResults, isFirst);
 };
+TestSuite.Prebuilt.WarhammerAttackUnit_Statistics = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], input, actual, expected;
+
+   try{
+   input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
+   actual = Prebuilt.WarhammerAttackUnit.Statistics(input);
+   var hitProb = (4*4*3*5)/(6*6*6*6);  //which is (4/6 * 4/6 * 3/6 * 5/6) but with better accuracy
+   expected = [
+      {result: 0, probability: (1 - hitProb)},
+      {result: 1, probability: hitProb}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Small happy math'});
+   } catch(e){testResults.push({Error: e, Description: 'Small happy math'});}
+
+   try{
+   input = {diceCount: 2, maxWounds: 2, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
+   actual = Prebuilt.WarhammerAttackUnit.Statistics(input);
+   var hitProb = (4*4*3*5)/(6*6*6*6);  //which is (4/6 * 4/6 * 3/6 * 5/6) but with better accuracy
+   var missProb = (1 - hitProb);
+   expected = [
+      {result: 0, probability: (missProb * missProb)},
+      {result: 1, probability: (hitProb * missProb * 2)},  //which is ((hitProb * missProb) + (missProb * hitProb))
+      {result: 2, probability: (hitProb * hitProb)}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '2 happy attackers'});
+   } catch(e){testResults.push({Error: e, Description: '2 happy attackers'});}
+
+   try{
+   input = {diceCount: 2, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
+   actual = Prebuilt.WarhammerAttackUnit.Statistics(input);
+   var hitProb = (4*4*3*5)/(6*6*6*6);  //which is (4/6 * 4/6 * 3/6 * 5/6) but with better accuracy
+   var missProb = (1 - hitProb);
+   expected = [
+      {result: 0, probability: (missProb * missProb)},
+      {result: 1, probability: (hitProb * missProb * 2)}  //which is ((hitProb * missProb) + (missProb * hitProb))
+   ];
+   expected[1].probability += (hitProb * hitProb);  //or the chance of 2 wounds
+   testResults.push({Expected: expected, Actual: actual, Description: '2 attackers, maxWounds'});
+   } catch(e){testResults.push({Error: e, Description: '2 attackers, maxWounds'});}
+
+   return TestRunner.displayResults('Prebuilt Prebuilt.WarhammerAttackUnit.Statistics', testResults, isFirst);
+};

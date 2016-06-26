@@ -53,8 +53,11 @@ Prebuilt.WarhammerAttackUnit = function(input)
    }
    return output;
 };
-//TODO: doc
-//TODO: see old/stats util.js@generate_Binomials
+/**Given valid input for Prebuilt.WarhammerAttackUnit, this function calculates the
+chances of the number of wounds.
+@param {object} with: diceCount, maxWounds, toHitValue, toWoundValue, ?saveValue, ?reanimateOrNoPainValue
+@returns {object[]} a statistics object where the result is the number of wounds
+*/
 Prebuilt.WarhammerAttackUnit.Statistics = function(input)
 {
    Prebuilt.WarhammerAttackUnit._validateInput(input);
@@ -128,5 +131,6 @@ Prebuilt.WarhammerAttackUnit._validateInput = function(input)
    //but most units have neither
    if(undefined === input.reanimateOrNoPainValue) input.reanimateOrNoPainValue = 7;
    requireNaturalNumber(input.reanimateOrNoPainValue);
-   //randomSource not validated because die will validate it
+
+   //randomSource is not validated because die will validate it
 };
