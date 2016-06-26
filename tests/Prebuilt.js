@@ -1,8 +1,8 @@
 'use strict';
-Tester.Prebuilt = {};
-Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
+TestSuite.Prebuilt = {};
+TestSuite.Prebuilt.WarhammerAttackUnit = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], input, expected, actual, stringValue;
 
@@ -17,10 +17,11 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    testResults.push({Expected: Stringifier.WarhammerAttackUnit(expected), Actual: stringValue, Description: 'Happy path: String Value'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
+   //TODO: move some of these tests to TestSuite.Prebuilt.WarhammerAttackUnit._validateInput
    try{
    input = {diceCount: -1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
    Prebuilt.WarhammerAttackUnit(input);
-   TesterUtility.failedToThrow(testResults, 'Invalid diceCount');
+   TestRunner.failedToThrow(testResults, 'Invalid diceCount');
    }
    catch(e)
    {
@@ -31,7 +32,7 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    try{
    input = {diceCount: 1, maxWounds: -1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
    Prebuilt.WarhammerAttackUnit(input);
-   TesterUtility.failedToThrow(testResults, 'Invalid maxWounds');
+   TestRunner.failedToThrow(testResults, 'Invalid maxWounds');
    }
    catch(e)
    {
@@ -42,7 +43,7 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: -3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
    Prebuilt.WarhammerAttackUnit(input);
-   TesterUtility.failedToThrow(testResults, 'Invalid toHitValue');
+   TestRunner.failedToThrow(testResults, 'Invalid toHitValue');
    }
    catch(e)
    {
@@ -53,7 +54,7 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: -3, saveValue: 4, reanimateOrNoPainValue: 6};
    Prebuilt.WarhammerAttackUnit(input);
-   TesterUtility.failedToThrow(testResults, 'Invalid toWoundValue');
+   TestRunner.failedToThrow(testResults, 'Invalid toWoundValue');
    }
    catch(e)
    {
@@ -64,7 +65,7 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: -4, reanimateOrNoPainValue: 6};
    Prebuilt.WarhammerAttackUnit(input);
-   TesterUtility.failedToThrow(testResults, 'Invalid saveValue');
+   TestRunner.failedToThrow(testResults, 'Invalid saveValue');
    }
    catch(e)
    {
@@ -75,7 +76,7 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: -6};
    Prebuilt.WarhammerAttackUnit(input);
-   TesterUtility.failedToThrow(testResults, 'Invalid reanimateOrNoPainValue');
+   TestRunner.failedToThrow(testResults, 'Invalid reanimateOrNoPainValue');
    }
    catch(e)
    {
@@ -161,5 +162,5 @@ Tester.Prebuilt.WarhammerAttackUnit = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Ignore excessive wounds'});
    } catch(e){testResults.push({Error: e, Description: 'Ignore excessive wounds'});}
 
-   TesterUtility.displayResults('Prebuilt Prebuilt.WarhammerAttackUnit', testResults, isFirst);
+   return TestRunner.displayResults('Prebuilt Prebuilt.WarhammerAttackUnit', testResults, isFirst);
 };

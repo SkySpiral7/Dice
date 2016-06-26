@@ -1,15 +1,15 @@
 'use strict';
-Tester.DiceExpression = {};
-Tester.DiceExpression.addTerm = function(isFirst)
+TestSuite.DiceExpression = {};
+TestSuite.DiceExpression.addTerm = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], expression, actual, expected;
 
    try{
    expression = new DiceExpression(new Die('dF'));
    expression.addTerm({coefficient: 'sd', exponent: 0});
-   TesterUtility.failedToThrow(testResults, 'Invalid coefficient');
+   TestRunner.failedToThrow(testResults, 'Invalid coefficient');
    }
    catch(e)
    {
@@ -20,7 +20,7 @@ Tester.DiceExpression.addTerm = function(isFirst)
    try{
    expression = new DiceExpression(new Die('dF'));
    expression.addTerm({coefficient: 2, exponent: 'sd2'});
-   TesterUtility.failedToThrow(testResults, 'Invalid exponent');
+   TestRunner.failedToThrow(testResults, 'Invalid exponent');
    }
    catch(e)
    {
@@ -76,11 +76,11 @@ Tester.DiceExpression.addTerm = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Don\'t add 0 coefficients'});
    } catch(e){testResults.push({Error: e, Description: 'Don\'t add 0 coefficients'});}
 
-   TesterUtility.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, isFirst);
 };
-Tester.DiceExpression.multiply = function(isFirst)
+TestSuite.DiceExpression.multiply = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], expression, actual, expected;
 
@@ -100,7 +100,7 @@ Tester.DiceExpression.multiply = function(isFirst)
 
    try{
    new DiceExpression(new Die()).multiply(2);
-   TesterUtility.failedToThrow(testResults, 'Illegal arg');
+   TestRunner.failedToThrow(testResults, 'Illegal arg');
    }
    catch(e)
    {
@@ -108,11 +108,11 @@ Tester.DiceExpression.multiply = function(isFirst)
          Actual: e, Description: 'Illegal arg'});
    }
 
-   TesterUtility.displayResults('DiceExpression new DiceExpression().multiply()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().multiply()', testResults, isFirst);
 };
-Tester.DiceExpression.negateExponents = function(isFirst)
+TestSuite.DiceExpression.negateExponents = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], expression, actual, expected;
 
@@ -145,11 +145,11 @@ Tester.DiceExpression.negateExponents = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Negate array exponents'});
    } catch(e){testResults.push({Error: e, Description: 'Negate array exponents'});}
 
-   TesterUtility.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
 };
-Tester.DiceExpression.toDiceResults = function(isFirst)
+TestSuite.DiceExpression.toDiceResults = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
@@ -175,11 +175,11 @@ Tester.DiceExpression.toDiceResults = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
-   TesterUtility.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, isFirst);
 };
-Tester.DiceExpression.toJSON = function(isFirst)
+TestSuite.DiceExpression.toJSON = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
@@ -193,11 +193,11 @@ Tester.DiceExpression.toJSON = function(isFirst)
    testResults.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
    } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
 
-   TesterUtility.displayResults('DiceExpression new DiceExpression().toJSON()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().toJSON()', testResults, isFirst);
 };
-Tester.DiceExpression._constructor = function(isFirst)
+TestSuite.DiceExpression._constructor = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
@@ -213,7 +213,7 @@ Tester.DiceExpression._constructor = function(isFirst)
 
    try{
    new DiceExpression(new Die())._constructor();
-   TesterUtility.failedToThrow(testResults, 'Call _constructor');
+   TestRunner.failedToThrow(testResults, 'Call _constructor');
    }
    catch(e)
    {
@@ -337,5 +337,5 @@ Tester.DiceExpression._constructor = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: minimum compound explodes'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: minimum compound explodes'});}
 
-   TesterUtility.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, isFirst);
 };

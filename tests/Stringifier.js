@@ -1,8 +1,8 @@
 'use strict';
-Tester.Stringifier = {};
-Tester.Stringifier.WarhammerAttackUnit = function(isFirst)
+TestSuite.Stringifier = {};
+TestSuite.Stringifier.WarhammerAttackUnit = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual;
 
@@ -26,5 +26,5 @@ Tester.Stringifier.WarhammerAttackUnit = function(isFirst)
    testResults.push({Expected: 'Number hit: 5. Number wounded: 3. Unsaved Wounds: 2.', Actual: actual, Description: 'Unsaved Wounds'});
    } catch(e){testResults.push({Error: e, Description: 'Unsaved Wounds'});}
 
-   TesterUtility.displayResults('Stringifier Stringifier.WarhammerAttackUnit', testResults, isFirst);
+   return TestRunner.displayResults('Stringifier Stringifier.WarhammerAttackUnit', testResults, isFirst);
 };

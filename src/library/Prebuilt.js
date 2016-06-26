@@ -58,7 +58,7 @@ Prebuilt.WarhammerAttackUnit = function(input)
 Prebuilt.WarhammerAttackUnit.Statistics = function(input)
 {
    Prebuilt.WarhammerAttackUnit._validateInput(input);
-   //ignore randomSource
+   //randomSource isn't used in this function so ignore it
 
    var d6 = new Die();
    var workingStats = [{result: input.diceCount, probability: 1, frequency: 1}];
@@ -68,6 +68,7 @@ Prebuilt.WarhammerAttackUnit.Statistics = function(input)
    if(input.toWoundValue > 1) workingStats = nextPhase(workingStats, '>=' + input.toWoundValue);
    if(input.saveValue < 7) workingStats = nextPhase(workingStats, '<' + input.saveValue);
    if(input.reanimateOrNoPainValue < 7) workingStats = nextPhase(workingStats, '<' + input.reanimateOrNoPainValue);
+   //TODO: needs to use input.maxWounds
 
    return workingStats;
 

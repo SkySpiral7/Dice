@@ -1,8 +1,8 @@
 'use strict';
-Tester.prototypes = {Array: {}, JSON: {}, Math: {}, Number: {}, String: {}};
-Tester.prototypes.Array.contains = function(isFirst)
+TestSuite.prototypes = {Array: {}, JSON: {}, Math: {}, Number: {}, String: {}};
+TestSuite.prototypes.Array.contains = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: true, Actual: ['a', 'b', 'c'].contains('b'), Description: 'Happy path: middle'});
@@ -10,11 +10,11 @@ Tester.prototypes.Array.contains = function(isFirst)
    testResults.push({Expected: false, Actual: ['1', '2', '3'].contains(2), Description: 'Type strict'});
    //testResults.push({Expected: false, Actual: ['1', undefined].contains(), Description: 'No arg'}); undefined behavior
 
-   TesterUtility.displayResults('prototypes Array.prototype.contains', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Array.prototype.contains', testResults, isFirst);
 };
-Tester.prototypes.Array.last = function(isFirst)
+TestSuite.prototypes.Array.last = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: 'c', Actual: ['a', 'b', 'c'].last(), Description: 'Happy path'});
@@ -22,11 +22,11 @@ Tester.prototypes.Array.last = function(isFirst)
    testResults.push({Expected: undefined, Actual: ['a', 'b', 'c',,,,].last(), Description: 'Last is undefined'});
    //var a = []; a[-1] = 5; a.last() is undefined behavior
 
-   TesterUtility.displayResults('prototypes Array.prototype.last', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Array.prototype.last', testResults, isFirst);
 };
-Tester.prototypes.Array.removeByIndex = function(isFirst)
+TestSuite.prototypes.Array.removeByIndex = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], testArray, returned;
 
@@ -46,7 +46,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
 
    try{
    testArray.removeByIndex(10);
-   TesterUtility.failedToThrow(testResults, 'Arg too large');
+   TestRunner.failedToThrow(testResults, 'Arg too large');
    }
    catch(e)
    {
@@ -55,7 +55,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
 
    try{
    testArray.removeByIndex(Infinity);
-   TesterUtility.failedToThrow(testResults, 'Arg Infinity');
+   TestRunner.failedToThrow(testResults, 'Arg Infinity');
    }
    catch(e)
    {
@@ -64,7 +64,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
 
    try{
    testArray.removeByIndex(-1);
-   TesterUtility.failedToThrow(testResults, 'Negative arg');
+   TestRunner.failedToThrow(testResults, 'Negative arg');
    }
    catch(e)
    {
@@ -73,7 +73,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
 
    try{
    testArray.removeByIndex(1.2);
-   TesterUtility.failedToThrow(testResults, 'Decimal arg');
+   TestRunner.failedToThrow(testResults, 'Decimal arg');
    }
    catch(e)
    {
@@ -82,7 +82,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
 
    try{
    testArray.removeByIndex(NaN);
-   TesterUtility.failedToThrow(testResults, 'NaN arg');
+   TestRunner.failedToThrow(testResults, 'NaN arg');
    }
    catch(e)
    {
@@ -91,7 +91,7 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
 
    try{
    testArray.removeByIndex();
-   TesterUtility.failedToThrow(testResults, 'No arg');
+   TestRunner.failedToThrow(testResults, 'No arg');
    }
    catch(e)
    {
@@ -100,18 +100,18 @@ Tester.prototypes.Array.removeByIndex = function(isFirst)
 
    try{
    testArray.removeByIndex('1');
-   TesterUtility.failedToThrow(testResults, 'Type strict');
+   TestRunner.failedToThrow(testResults, 'Type strict');
    }
    catch(e)
    {
        testResults.push({Expected: getError(requireTypeOf, ['number', '1']), Actual: e, Description: 'Type strict'});
    }
 
-   TesterUtility.displayResults('prototypes Array.prototype.removeByIndex', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Array.prototype.removeByIndex', testResults, isFirst);
 };
-Tester.prototypes.Array.removeElement = function(isFirst)
+TestSuite.prototypes.Array.removeElement = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], testArray, returned;
 
@@ -124,7 +124,7 @@ Tester.prototypes.Array.removeElement = function(isFirst)
 
    try{
    testArray.removeElement('blue');
-   TesterUtility.failedToThrow(testResults, 'Not found');
+   TestRunner.failedToThrow(testResults, 'Not found');
    }
    catch(e)
    {
@@ -133,18 +133,18 @@ Tester.prototypes.Array.removeElement = function(isFirst)
 
    try{
    testArray.removeElement('20');
-   TesterUtility.failedToThrow(testResults, 'Type strict');
+   TestRunner.failedToThrow(testResults, 'Type strict');
    }
    catch(e)
    {
        testResults.push({Expected: new Error('Element not found: 20'), Actual: e, Description: 'Type strict'});
    }
 
-   TesterUtility.displayResults('prototypes Array.prototype.removeElement', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Array.prototype.removeElement', testResults, isFirst);
 };
-Tester.prototypes.JSON.clone = function(isFirst)
+TestSuite.prototypes.JSON.clone = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: 5, Actual: JSON.clone(5), Description: 'Input: 5'});
@@ -155,11 +155,11 @@ Tester.prototypes.JSON.clone = function(isFirst)
    given.g = 5;
    testResults.push({Expected: {'f': 1}, Actual: actual, Description: 'Returns a different object'});
 
-   TesterUtility.displayResults('prototypes JSON.clone', testResults, isFirst);
+   return TestRunner.displayResults('prototypes JSON.clone', testResults, isFirst);
 };
-Tester.prototypes.Math.factorial = function(isFirst)
+TestSuite.prototypes.Math.factorial = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: 24, Actual: Math.factorial(4), Description: 'Input: 4'});
@@ -171,11 +171,11 @@ Tester.prototypes.Math.factorial = function(isFirst)
    testResults.push({Expected: undefined, Actual: Math.factorial(2.4), Description: 'Input: 2.4'});
    testResults.push({Expected: Infinity, Actual: Math.factorial(Infinity), Description: 'Input: Infinity'});
 
-   TesterUtility.displayResults('prototypes Math.factorial', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Math.factorial', testResults, isFirst);
 };
-Tester.prototypes.Math.summation = function(isFirst)
+TestSuite.prototypes.Math.summation = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: 5, Actual: Math.summation([1, 2, 5, -3]), Description: 'Happy path'});
@@ -184,11 +184,11 @@ Tester.prototypes.Math.summation = function(isFirst)
    testResults.push({Expected: Infinity, Actual: Math.summation([Infinity]), Description: 'Infinity'});
    testResults.push({Expected: NaN, Actual: Math.summation([NaN, -Infinity]), Description: 'NaN'});
 
-   TesterUtility.displayResults('prototypes Math.summation', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Math.summation', testResults, isFirst);
 };
-Tester.prototypes.Number.isInteger = function(isFirst)
+TestSuite.prototypes.Number.isInteger = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: true, Actual: Number.isInteger(5), Description: 'Happy path'});
@@ -200,11 +200,11 @@ Tester.prototypes.Number.isInteger = function(isFirst)
    testResults.push({Expected: false, Actual: Number.isInteger(NaN), Description: 'NaN'});
    testResults.push({Expected: false, Actual: Number.isInteger(Infinity), Description: 'Infinity'});
 
-   TesterUtility.displayResults('prototypes Number.isInteger', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Number.isInteger', testResults, isFirst);
 };
-Tester.prototypes.Number.isNatural = function(isFirst)
+TestSuite.prototypes.Number.isNatural = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: true, Actual: Number.isNatural(5), Description: 'Happy path'});
@@ -216,11 +216,11 @@ Tester.prototypes.Number.isNatural = function(isFirst)
    testResults.push({Expected: false, Actual: Number.isNatural(-5), Description: 'Negative'});
    testResults.push({Expected: false, Actual: Number.isNatural(0), Description: 'Zero'});
 
-   TesterUtility.displayResults('prototypes Number.isNatural', testResults, isFirst);
+   return TestRunner.displayResults('prototypes Number.isNatural', testResults, isFirst);
 };
-Tester.prototypes.String.contains = function(isFirst)
+TestSuite.prototypes.String.contains = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [];
    testResults.push({Expected: true, Actual: 'me and you'.contains('and'), Description: 'Happy path: middle'});
@@ -229,5 +229,5 @@ Tester.prototypes.String.contains = function(isFirst)
    //testResults.push({Expected: false, Actual: 'me 2 you'.contains(2), Description: 'Type strict'}); undefined behavior
    //testResults.push({Expected: false, Actual: 'me undefined you'.contains(), Description: 'No arg'}); undefined behavior
 
-   TesterUtility.displayResults('prototypes String.prototype.contains', testResults, isFirst);
+   return TestRunner.displayResults('prototypes String.prototype.contains', testResults, isFirst);
 };

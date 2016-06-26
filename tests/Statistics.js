@@ -1,8 +1,8 @@
 'use strict';
-Tester.Statistics = {};
-Tester.Statistics.analyze = function(isFirst)
+TestSuite.Statistics = {};
+TestSuite.Statistics.analyze = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], diceGroup, actual, expected;
 
@@ -48,17 +48,17 @@ Tester.Statistics.analyze = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '1d2!'});
    } catch(e){testResults.push({Error: e, Description: '1d2!'});}
 
-   TesterUtility.displayResults('Statistics Statistics.analyze', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.analyze', testResults, isFirst);
 };
-Tester.Statistics.calculateAggregates = function(isFirst)
+TestSuite.Statistics.calculateAggregates = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
    try{
    Statistics.calculateAggregates(5);
-   TesterUtility.failedToThrow(testResults, 'Wrong type arg');
+   TestRunner.failedToThrow(testResults, 'Wrong type arg');
    }
    catch(e)
    {
@@ -68,7 +68,7 @@ Tester.Statistics.calculateAggregates = function(isFirst)
 
    try{
    Statistics.calculateAggregates([]);
-   TesterUtility.failedToThrow(testResults, 'Empty array arg');
+   TestRunner.failedToThrow(testResults, 'Empty array arg');
    }
    catch(e)
    {
@@ -83,11 +83,11 @@ Tester.Statistics.calculateAggregates = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
    //TODO: test: probability
 
-   TesterUtility.displayResults('Statistics Statistics.calculateAggregates', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.calculateAggregates', testResults, isFirst);
 };
-Tester.Statistics.combineResults = function(isFirst)
+TestSuite.Statistics.combineResults = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected, stats, input;
 
@@ -135,11 +135,11 @@ Tester.Statistics.combineResults = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '3d2 false'});
    } catch(e){testResults.push({Error: e, Description: '3d2 false'});}
 
-   TesterUtility.displayResults('Statistics Statistics.combineResults', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.combineResults', testResults, isFirst);
 };
-Tester.Statistics.determineProbability = function(isFirst)
+TestSuite.Statistics.determineProbability = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
@@ -162,11 +162,11 @@ Tester.Statistics.determineProbability = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
-   TesterUtility.displayResults('Statistics Statistics.determineProbability', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.determineProbability', testResults, isFirst);
 };
-Tester.Statistics.passFailBinomial = function(isFirst)
+TestSuite.Statistics.passFailBinomial = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
@@ -201,7 +201,7 @@ Tester.Statistics.passFailBinomial = function(isFirst)
 
    try{
    Statistics.passFailBinomial(4, 1, '>=3', '===1');
-   TesterUtility.failedToThrow(testResults, 'Invalid die');
+   TestRunner.failedToThrow(testResults, 'Invalid die');
    }
    catch(e)
    {
@@ -211,7 +211,7 @@ Tester.Statistics.passFailBinomial = function(isFirst)
 
    try{
    Statistics.passFailBinomial(new Die(4), -1, '>=3', '===1');
-   TesterUtility.failedToThrow(testResults, 'Invalid diceCount');
+   TestRunner.failedToThrow(testResults, 'Invalid diceCount');
    }
    catch(e)
    {
@@ -221,7 +221,7 @@ Tester.Statistics.passFailBinomial = function(isFirst)
 
    try{
    Statistics.passFailBinomial(new Die(4), 1, 3, '===1');
-   TesterUtility.failedToThrow(testResults, 'Invalid passCriteria');
+   TestRunner.failedToThrow(testResults, 'Invalid passCriteria');
    }
    catch(e)
    {
@@ -231,7 +231,7 @@ Tester.Statistics.passFailBinomial = function(isFirst)
 
    try{
    Statistics.passFailBinomial(new Die(4), 1, '>=3', 1);
-   TesterUtility.failedToThrow(testResults, 'Invalid failCriteria');
+   TestRunner.failedToThrow(testResults, 'Invalid failCriteria');
    }
    catch(e)
    {
@@ -241,7 +241,7 @@ Tester.Statistics.passFailBinomial = function(isFirst)
 
    try{
    Statistics.passFailBinomial(new Die(4), 1);
-   TesterUtility.failedToThrow(testResults, 'Missing both criteria');
+   TestRunner.failedToThrow(testResults, 'Missing both criteria');
    }
    catch(e)
    {
@@ -251,7 +251,7 @@ Tester.Statistics.passFailBinomial = function(isFirst)
 
    try{
    Statistics.passFailBinomial(new Die('1d4!'), 1, '>=3', '===1');
-   TesterUtility.failedToThrow(testResults, 'Can\'t explode');
+   TestRunner.failedToThrow(testResults, 'Can\'t explode');
    }
    catch(e)
    {
@@ -270,11 +270,11 @@ Tester.Statistics.passFailBinomial = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Reroll allowed'});
    } catch(e){testResults.push({Error: e, Description: 'Reroll allowed'});}
 
-   TesterUtility.displayResults('Statistics Statistics.passFailBinomial', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.passFailBinomial', testResults, isFirst);
 };
-Tester.Statistics.useBruteForce = function(isFirst)
+TestSuite.Statistics.useBruteForce = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
@@ -377,11 +377,11 @@ Tester.Statistics.useBruteForce = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2! KeepHighest 1 explodeCount 1'});
    } catch(e){testResults.push({Error: e, Description: '2d2! KeepHighest 1 explodeCount 1'});}
 
-   TesterUtility.displayResults('Statistics Statistics.useBruteForce', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.useBruteForce', testResults, isFirst);
 };
-Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)
+TestSuite.Statistics.useNonDroppingAlgorithm = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;
 
@@ -425,5 +425,5 @@ Tester.Statistics.useNonDroppingAlgorithm = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
    } catch(e){testResults.push({Error: e, Description: '-d3'});}
 
-   TesterUtility.displayResults('Statistics Statistics.useNonDroppingAlgorithm', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.useNonDroppingAlgorithm', testResults, isFirst);
 };

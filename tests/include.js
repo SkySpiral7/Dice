@@ -5,6 +5,8 @@ var fileNames = ['DiceExpression', 'DicePool', 'Die', 'GenerateHtml', 'Parser', 
    'Testing Util'];  //must be last
 //includePath was defined in src/library/include.js
 
+TestConfig.defaultDelta = Number.EPSILON;  //since this program only deals with natural numbers and statistics
+
 for (var i = 0; i < fileNames.length; ++i)
 {
    document.write('<script type="text/javaScript" src="' + includePath + fileNames[i] + '.js"></script>');

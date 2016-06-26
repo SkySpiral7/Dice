@@ -1,8 +1,8 @@
 'use strict';
-Tester.Parser = {};
-Tester.Parser.dicePool = function(isFirst)
+TestSuite.Parser = {};
+TestSuite.Parser.dicePool = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], returned, expected, string;
 
@@ -26,7 +26,7 @@ Tester.Parser.dicePool = function(isFirst)
 
    try{
    Parser.dicePool();
-   TesterUtility.failedToThrow(testResults, 'No arg');
+   TestRunner.failedToThrow(testResults, 'No arg');
    }
    catch(e)
    {
@@ -86,11 +86,11 @@ Tester.Parser.dicePool = function(isFirst)
    testResults.push({Expected: expected, Actual: returned, Description: 'Negative: -d4'});
    } catch(e){testResults.push({Error: e, Description: 'Negative: -d4'});}
 
-   TesterUtility.displayResults('Parser Parser.dicePool', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser.dicePool', testResults, isFirst);
 };
-Tester.Parser._diceGroup = function(isFirst)
+TestSuite.Parser._diceGroup = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], expected, string, group;
 
@@ -112,7 +112,7 @@ Tester.Parser._diceGroup = function(isFirst)
 
    try{
    Parser._diceGroup('d6+h3', 'h3', {});
-   TesterUtility.failedToThrow(testResults, 'Non dz type');
+   TestRunner.failedToThrow(testResults, 'Non dz type');
    }
    catch(e)
    {
@@ -121,7 +121,7 @@ Tester.Parser._diceGroup = function(isFirst)
 
    try{
    Parser._diceGroup('d6+', '', {});
-   TesterUtility.failedToThrow(testResults, 'Empty arg');
+   TestRunner.failedToThrow(testResults, 'Empty arg');
    }
    catch(e)
    {
@@ -168,7 +168,7 @@ Tester.Parser._diceGroup = function(isFirst)
    try{
    string = 'df!';
    Parser._diceGroup(string, string, {});
-   TesterUtility.failedToThrow(testResults, 'Fudge die: illegal');
+   TestRunner.failedToThrow(testResults, 'Fudge die: illegal');
    }
    catch(e)
    {
@@ -179,7 +179,7 @@ Tester.Parser._diceGroup = function(isFirst)
    try{
    string = 'd!';
    Parser._diceGroup(string, string, {});
-   TesterUtility.failedToThrow(testResults, 'No sideCount');
+   TestRunner.failedToThrow(testResults, 'No sideCount');
    }
    catch(e)
    {
@@ -206,7 +206,7 @@ Tester.Parser._diceGroup = function(isFirst)
    try{
    string = 'd3! explode';
    Parser._diceGroup(string, string, {});
-   TesterUtility.failedToThrow(testResults, '2 explode');
+   TestRunner.failedToThrow(testResults, '2 explode');
    }
    catch(e)
    {
@@ -216,7 +216,7 @@ Tester.Parser._diceGroup = function(isFirst)
    try{
    string = 'd3r-1 reroll 0';
    Parser._diceGroup(string, string, {});
-   TesterUtility.failedToThrow(testResults, '2 reroll');
+   TestRunner.failedToThrow(testResults, '2 reroll');
    }
    catch(e)
    {
@@ -226,7 +226,7 @@ Tester.Parser._diceGroup = function(isFirst)
    try{
    string = 'd3! reroll 1 reroll rocks';
    Parser._diceGroup(string, string, {});
-   TesterUtility.failedToThrow(testResults, 'Unparsable');
+   TestRunner.failedToThrow(testResults, 'Unparsable');
    }
    catch(e)
    {
@@ -236,18 +236,18 @@ Tester.Parser._diceGroup = function(isFirst)
    try{
    string = 'd3 reroll 1!';
    Parser._diceGroup(string, string, {});
-   TesterUtility.failedToThrow(testResults, 'Illegal: Long then short');
+   TestRunner.failedToThrow(testResults, 'Illegal: Long then short');
    }
    catch(e)
    {
        testResults.push({Expected: new Error('d3 reroll 1!\nUnparsable: !'), Actual: e, Description: 'Illegal: Long then short'});
    }
 
-   TesterUtility.displayResults('Parser Parser._diceGroup', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser._diceGroup', testResults, isFirst);
 };
-Tester.Parser._shortHand = function(isFirst)
+TestSuite.Parser._shortHand = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], returned, expected, string, group;
 
@@ -290,7 +290,7 @@ Tester.Parser._shortHand = function(isFirst)
    try{
    string = '!!!';  //Compound then regular
    Parser._shortHand(string, string, {die: {}});
-   TesterUtility.failedToThrow(testResults, '2 explode');
+   TestRunner.failedToThrow(testResults, '2 explode');
    }
    catch(e)
    {
@@ -300,7 +300,7 @@ Tester.Parser._shortHand = function(isFirst)
    try{
    string = 'r1r2';
    Parser._shortHand(string, string, {die: {}});
-   TesterUtility.failedToThrow(testResults, '2 reroll');
+   TestRunner.failedToThrow(testResults, '2 reroll');
    }
    catch(e)
    {
@@ -350,18 +350,18 @@ Tester.Parser._shortHand = function(isFirst)
    try{
    string = 'd1k1';
    Parser._shortHand(string, string, {die: {}});
-   TesterUtility.failedToThrow(testResults, '2 dropKeep');
+   TestRunner.failedToThrow(testResults, '2 dropKeep');
    }
    catch(e)
    {
        testResults.push({Expected: new Error('d1k1\nmultiple drop/keep criteria found. Max is 1'), Actual: e, Description: '2 dropKeep'});
    }
 
-   TesterUtility.displayResults('Parser Parser._shortHand', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser._shortHand', testResults, isFirst);
 };
-Tester.Parser._longHand = function(isFirst)
+TestSuite.Parser._longHand = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], returned, expected, string, group;
 
@@ -422,7 +422,7 @@ Tester.Parser._longHand = function(isFirst)
    try{
    string = ' explode explode';
    Parser._longHand(string, string, {die: {}});
-   TesterUtility.failedToThrow(testResults, '2 explode');
+   TestRunner.failedToThrow(testResults, '2 explode');
    }
    catch(e)
    {
@@ -432,7 +432,7 @@ Tester.Parser._longHand = function(isFirst)
    try{
    string = ' reroll 2 reroll 3';
    Parser._longHand(string, string, {die: {}});
-   TesterUtility.failedToThrow(testResults, '2 reroll');
+   TestRunner.failedToThrow(testResults, '2 reroll');
    }
    catch(e)
    {
@@ -482,7 +482,7 @@ Tester.Parser._longHand = function(isFirst)
    try{
    string = ' remove highest keep lowest';
    Parser._longHand(string, string, {die: {}});
-   TesterUtility.failedToThrow(testResults, '2 dropKeep');
+   TestRunner.failedToThrow(testResults, '2 dropKeep');
    }
    catch(e)
    {
@@ -498,5 +498,5 @@ Tester.Parser._longHand = function(isFirst)
    testResults.push({Expected: string, Actual: returned, Description: 'Ignore keep alone: dropKeepCount'});
    } catch(e){testResults.push({Error: e, Description: 'Ignore keep alone'});}
 
-   TesterUtility.displayResults('Parser Parser._longHand', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser._longHand', testResults, isFirst);
 };

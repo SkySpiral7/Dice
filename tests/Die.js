@@ -1,8 +1,8 @@
 'use strict';
-Tester.Die = {};
-Tester.Die.roll = function(isFirst)
+TestSuite.Die = {};
+TestSuite.Die.roll = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, nonRandomNumbers, generator;
 
@@ -13,7 +13,7 @@ Tester.Die.roll = function(isFirst)
 
    try{
    new Die().roll(5);
-   TesterUtility.failedToThrow(testResults, 'randomSource wrong type');
+   TestRunner.failedToThrow(testResults, 'randomSource wrong type');
    }
    catch(e)
    {
@@ -63,11 +63,11 @@ Tester.Die.roll = function(isFirst)
    testResults.push({Expected: [9], Actual: actual, Description: 'Reroll with compound explode'});
    } catch(e){testResults.push({Error: e, Description: 'Reroll with compound explode'});}
 
-   TesterUtility.displayResults('Die new Die().roll()', testResults, isFirst);
+   return TestRunner.displayResults('Die new Die().roll()', testResults, isFirst);
 };
-Tester.Die._constructor = function(isFirst)
+TestSuite.Die._constructor = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], die, input, expected;
 
@@ -80,7 +80,7 @@ Tester.Die._constructor = function(isFirst)
 
    try{
    new Die()._constructor();
-   TesterUtility.failedToThrow(testResults, 'Call _constructor');
+   TestRunner.failedToThrow(testResults, 'Call _constructor');
    }
    catch(e)
    {
@@ -103,7 +103,7 @@ Tester.Die._constructor = function(isFirst)
 
    try{
    new Die('10d3');
-   TesterUtility.failedToThrow(testResults, '10 dice');
+   TestRunner.failedToThrow(testResults, '10 dice');
    }
    catch(e)
    {
@@ -112,7 +112,7 @@ Tester.Die._constructor = function(isFirst)
 
    try{
    new Die('0d3');
-   TesterUtility.failedToThrow(testResults, '0 dice');
+   TestRunner.failedToThrow(testResults, '0 dice');
    }
    catch(e)
    {
@@ -121,7 +121,7 @@ Tester.Die._constructor = function(isFirst)
 
    try{
    new Die('d3+d2');
-   TesterUtility.failedToThrow(testResults, '2 dice groups');
+   TestRunner.failedToThrow(testResults, '2 dice groups');
    }
    catch(e)
    {
@@ -130,7 +130,7 @@ Tester.Die._constructor = function(isFirst)
 
    try{
    new Die('d3! drop highest');
-   TesterUtility.failedToThrow(testResults, 'Drop dice');
+   TestRunner.failedToThrow(testResults, 'Drop dice');
    }
    catch(e)
    {
@@ -140,7 +140,7 @@ Tester.Die._constructor = function(isFirst)
 
    try{
    new Die('-d3');
-   TesterUtility.failedToThrow(testResults, 'Negative die');
+   TestRunner.failedToThrow(testResults, 'Negative die');
    }
    catch(e)
    {
@@ -148,11 +148,11 @@ Tester.Die._constructor = function(isFirst)
          Actual: e, Description: 'Negative die'});
    }
 
-   TesterUtility.displayResults('Die new Die()._constructor', testResults, isFirst);
+   return TestRunner.displayResults('Die new Die()._constructor', testResults, isFirst);
 };
-Tester.Die._optimizeReroll = function(isFirst)
+TestSuite.Die._optimizeReroll = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], input, expected;
 
@@ -178,11 +178,11 @@ Tester.Die._optimizeReroll = function(isFirst)
    testResults.push({Expected: expected, Actual: input, Description: '=== max'});
    } catch(e){testResults.push({Error: e, Description: '=== max'});}
 
-   TesterUtility.displayResults('Die Die._optimizeReroll', testResults, isFirst);
+   return TestRunner.displayResults('Die Die._optimizeReroll', testResults, isFirst);
 };
-Tester.Die._validate = function(isFirst)
+TestSuite.Die._validate = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], input, expected;
 
@@ -211,7 +211,7 @@ Tester.Die._validate = function(isFirst)
 
    try{
    Die._validate('1d6', {});
-   TesterUtility.failedToThrow(testResults, 'sideCount is required');
+   TestRunner.failedToThrow(testResults, 'sideCount is required');
    }
    catch(e)
    {
@@ -220,7 +220,7 @@ Tester.Die._validate = function(isFirst)
 
    try{
    Die._validate('1d6', {sideCount: -2.5});
-   TesterUtility.failedToThrow(testResults, 'invalid sideCount');
+   TestRunner.failedToThrow(testResults, 'invalid sideCount');
    }
    catch(e)
    {
@@ -229,7 +229,7 @@ Tester.Die._validate = function(isFirst)
 
    try{
    Die._validate('1d6', {sideCount: 6, constantModifier: 2.5});
-   TesterUtility.failedToThrow(testResults, 'invalid constantModifier');
+   TestRunner.failedToThrow(testResults, 'invalid constantModifier');
    }
    catch(e)
    {
@@ -256,7 +256,7 @@ Tester.Die._validate = function(isFirst)
 
    try{
    Die._validate('1d6', {sideCount: 6, rerollCriteria: '!2'});
-   TesterUtility.failedToThrow(testResults, 'invalid rerollCriteria');
+   TestRunner.failedToThrow(testResults, 'invalid rerollCriteria');
    }
    catch(e)
    {
@@ -265,7 +265,7 @@ Tester.Die._validate = function(isFirst)
 
    try{
    Die._validate('1d6', {sideCount: 6, explodeType: Die.explodeTypes});
-   TesterUtility.failedToThrow(testResults, 'invalid exploding');
+   TestRunner.failedToThrow(testResults, 'invalid exploding');
    }
    catch(e)
    {
@@ -274,24 +274,24 @@ Tester.Die._validate = function(isFirst)
 
    try{
    Die._validate('1d6', {sideCount: 1, explodeType: Die.explodeTypes.Normal});
-   TesterUtility.failedToThrow(testResults, 'infinite exploding');
+   TestRunner.failedToThrow(testResults, 'infinite exploding');
    }
    catch(e)
    {
        testResults.push({Expected: new Error('1d6\nInfinite exploding. sideCount: 1'), Actual: e, Description: 'infinite exploding'});
    }
 
-   TesterUtility.displayResults('Die Die._validate', testResults, isFirst);
+   return TestRunner.displayResults('Die Die._validate', testResults, isFirst);
 };
-Tester.Die._validateReroll = function(isFirst)
+TestSuite.Die._validateReroll = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], input, expected;
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '===0'});
-   TesterUtility.failedToThrow(testResults, 'reroll impossible: === small');
+   TestRunner.failedToThrow(testResults, 'reroll impossible: === small');
    }
    catch(e)
    {
@@ -302,7 +302,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '<=0'});
-   TesterUtility.failedToThrow(testResults, 'reroll impossible: <= small');
+   TestRunner.failedToThrow(testResults, 'reroll impossible: <= small');
    }
    catch(e)
    {
@@ -320,7 +320,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '<1'});
-   TesterUtility.failedToThrow(testResults, 'reroll impossible: < min');
+   TestRunner.failedToThrow(testResults, 'reroll impossible: < min');
    }
    catch(e)
    {
@@ -331,7 +331,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '===7'});
-   TesterUtility.failedToThrow(testResults, 'reroll impossible: === large');
+   TestRunner.failedToThrow(testResults, 'reroll impossible: === large');
    }
    catch(e)
    {
@@ -342,7 +342,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '>=7'});
-   TesterUtility.failedToThrow(testResults, 'reroll impossible: >= large');
+   TestRunner.failedToThrow(testResults, 'reroll impossible: >= large');
    }
    catch(e)
    {
@@ -360,7 +360,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '>6'});
-   TesterUtility.failedToThrow(testResults, 'reroll impossible: > max');
+   TestRunner.failedToThrow(testResults, 'reroll impossible: > max');
    }
    catch(e)
    {
@@ -385,7 +385,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 1, constantModifier: 1, rerollCriteria: '!==2'});
-   TesterUtility.failedToThrow(testResults, 'reroll impossible: !== only');
+   TestRunner.failedToThrow(testResults, 'reroll impossible: !== only');
    }
    catch(e)
    {
@@ -396,7 +396,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '>=5', explodeType: Die.explodeTypes.Normal});
-   TesterUtility.failedToThrow(testResults, 'ambiguous not compound');
+   TestRunner.failedToThrow(testResults, 'ambiguous not compound');
    }
    catch(e)
    {
@@ -408,7 +408,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 1, rerollCriteria: '===13', explodeType: Die.explodeTypes.Compound});
-   TesterUtility.failedToThrow(testResults, 'ambiguous compound');
+   TestRunner.failedToThrow(testResults, 'ambiguous compound');
    }
    catch(e)
    {
@@ -441,7 +441,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 1, constantModifier: 0, rerollCriteria: '===1'});
-   TesterUtility.failedToThrow(testResults, 'infinite rerolling: 1');
+   TestRunner.failedToThrow(testResults, 'infinite rerolling: 1');
    }
    catch(e)
    {
@@ -454,7 +454,7 @@ Tester.Die._validateReroll = function(isFirst)
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 10, rerollCriteria: '<1000'});
    //minValue: 11
    //maxValue: 16
-   TesterUtility.failedToThrow(testResults, 'infinite rerolling: positive');
+   TestRunner.failedToThrow(testResults, 'infinite rerolling: positive');
    }
    catch(e)
    {
@@ -467,7 +467,7 @@ Tester.Die._validateReroll = function(isFirst)
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: -10, rerollCriteria: '>=-9'});
    //minValue: -9
    //maxValue: -4
-   TesterUtility.failedToThrow(testResults, 'infinite rerolling: negative');
+   TestRunner.failedToThrow(testResults, 'infinite rerolling: negative');
    }
    catch(e)
    {
@@ -478,7 +478,7 @@ Tester.Die._validateReroll = function(isFirst)
 
    try{
    Die._validateReroll('1d6', {sideCount: 6, constantModifier: 0, rerollCriteria: '!==10'});
-   TesterUtility.failedToThrow(testResults, 'infinite rerolling: !=');
+   TestRunner.failedToThrow(testResults, 'infinite rerolling: !=');
    }
    catch(e)
    {
@@ -487,5 +487,5 @@ Tester.Die._validateReroll = function(isFirst)
          Actual: e, Description: 'infinite rerolling: !='});
    }
 
-   TesterUtility.displayResults('Die Die._validateReroll', testResults, isFirst);
+   return TestRunner.displayResults('Die Die._validateReroll', testResults, isFirst);
 };

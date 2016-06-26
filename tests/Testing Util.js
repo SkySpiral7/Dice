@@ -21,10 +21,10 @@ function nonRandomNumberGenerator(numberArray)
 }
 
 //TODO: consider moving these tests to a new file:
-Tester.Util = {};
-Tester.Util.dieResultsToNonRandomArray = function(isFirst)
+TestSuite.Util = {};
+TestSuite.Util.dieResultsToNonRandomArray = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], actual;
 
@@ -33,11 +33,11 @@ Tester.Util.dieResultsToNonRandomArray = function(isFirst)
    testResults.push({Expected: [(4/8), (6/8)], Actual: actual, Description: 'Quick test'});
    } catch(e){testResults.push({Error: e, Description: 'Quick test'});}
 
-   TesterUtility.displayResults('Testing Util dieResultsToNonRandomArray', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util dieResultsToNonRandomArray', testResults, isFirst);
 };
-Tester.Util.dieResultsToNonRandomGenerator = function(isFirst)
+TestSuite.Util.dieResultsToNonRandomGenerator = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], generator;
 
@@ -46,11 +46,11 @@ Tester.Util.dieResultsToNonRandomGenerator = function(isFirst)
    testResults.push({Expected: (4/8), Actual: generator(), Description: 'Quick test'});
    } catch(e){testResults.push({Error: e, Description: 'Quick test'});}
 
-   TesterUtility.displayResults('Testing Util dieResultsToNonRandomGenerator', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util dieResultsToNonRandomGenerator', testResults, isFirst);
 };
-Tester.Util.nonRandomNumberGenerator = function(isFirst)
+TestSuite.Util.nonRandomNumberGenerator = function(isFirst)
 {
-   TesterUtility.clearResults(isFirst);
+   TestRunner.clearResults(isFirst);
 
    var testResults = [], generator;
 
@@ -65,12 +65,12 @@ Tester.Util.nonRandomNumberGenerator = function(isFirst)
 
    try{
    generator();
-   TesterUtility.failedToThrow(testResults, 'End');
+   TestRunner.failedToThrow(testResults, 'End');
    }
    catch(e)
    {
       testResults.push({Expected: new Error('Ran out of numbers'), Actual: e, Description: 'End'});
    }
 
-   TesterUtility.displayResults('Testing Util nonRandomNumberGenerator', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util nonRandomNumberGenerator', testResults, isFirst);
 };
