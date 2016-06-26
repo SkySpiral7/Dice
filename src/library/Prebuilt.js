@@ -53,7 +53,7 @@ Prebuilt.WarhammerAttackUnit = function(input)
    }
    return output;
 };
-//TODO: doc and test
+//TODO: doc
 //TODO: see old/stats util.js@generate_Binomials
 Prebuilt.WarhammerAttackUnit.Statistics = function(input)
 {
@@ -64,11 +64,13 @@ Prebuilt.WarhammerAttackUnit.Statistics = function(input)
    var workingStats = [{result: input.diceCount, probability: 1, frequency: 1}];
 
    //the if statements are to avoid unnecessary calculations (that will ultimately multiply by 1)
+   //TODO: validate doesn't allow toHitValue of 0 etc
    if(input.toHitValue > 1) workingStats = nextPhase(workingStats, '>=' + input.toHitValue);
    if(input.toWoundValue > 1) workingStats = nextPhase(workingStats, '>=' + input.toWoundValue);
    if(input.saveValue < 7) workingStats = nextPhase(workingStats, '<' + input.saveValue);
    if(input.reanimateOrNoPainValue < 7) workingStats = nextPhase(workingStats, '<' + input.reanimateOrNoPainValue);
-   //TODO: needs to use input.maxWounds
+
+   processWoundMax(input.maxWounds, workingStats);
 
    return workingStats;
 
@@ -98,6 +100,15 @@ Prebuilt.WarhammerAttackUnit.Statistics = function(input)
          //TODO: I think I could actually multiply the frequency instead of using probability:
          //newStats[i].frequency *= frequencyMultiplier;
          workingExpression.addTerm({coefficient: newStats[i].probability, exponent: newStats[i].result});
+      }
+   }
+   function processWoundMax(maxWounds, stats)
+   {
+      //already validated that maxWounds was a natural number so we don't need && stats.length > 1
+      while (stats.last().result > maxWounds)  //too many wounds
+      {
+         stats[stats.length-2].probability += stats[stats.length-1].probability;
+         stats.pop();  //then remove the last
       }
    }
 };

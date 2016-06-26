@@ -5,20 +5,9 @@
 <meta charset="ASCII" />
 <script id="DiceInclude" src="library/include.js"></script>
 <script type="text/javaScript">
-function processWoundMax(stats)
-{
-   var maxWounds = Number.parseInt(document.getElementById('woundMax').value);
-   if(maxWounds < 1) throw new Error('The maximum number of wounds must be at least 1');
-   while (stats[stats.length-1].result > maxWounds && stats.length > 1)  //too many wounds
-   {
-      stats[stats.length-2].probability += stats[stats.length-1].probability;
-      stats.pop();  //then remove the last
-   }
-}
 Draw.generateBinomialTable = function(stats, secondColumn)
 {
    if('=' === secondColumn) secondColumn = '==';
-   processWoundMax(stats);
    var aggregates = Statistics.calculateAggregates(stats);
 
    minResult.textContent = aggregates.minimum;
@@ -47,6 +36,16 @@ function parseInput()
    input.customColumn = document.getElementById('customColumn').value;
    return input;
 }
+function validateInput(input)
+{
+   if(input.diceCount <= 0) throw new Error('Invalid diceCount. Must be 1+.');
+   if(input.maxWounds <= 0) throw new Error('Invalid maxWounds. Must be 1+.');
+   if(input.toHitValue <= 0) throw new Error('Invalid toHitValue. Must be 1+.');
+   if(input.toWoundValue <= 0) throw new Error('Invalid toWoundValue. Must be 1+.');
+   if(input.saveValue <= 0) throw new Error('Invalid saveValue. Must be 1+.');
+   if(input.reanimateOrNoPainValue <= 0) throw new Error('Invalid reanimateOrNoPainValue. Must be 1+.');
+   //customColumn is only validated for mainDraw()
+}
 function rollAttack()
 {
    hitResult.textContent = '-';
@@ -56,6 +55,7 @@ function rollAttack()
    var input = parseInput();
 
    try{
+      validateInput(input);
       var output = Prebuilt.WarhammerAttackUnit(input);
       hitResult.textContent = output.hit;  //always exists
       if(undefined !== output.wounded) woundedResult.textContent = output.wounded;
@@ -74,6 +74,8 @@ function mainDraw()
    var input = parseInput();
 
    try{
+      validateInput(input);
+      if(!(/^(?:[<>]=?|[!=]?==?)$/).test(input.customColumn)) throw new Error('Invalid customColumn. Must a comparison like >=');
       var stats = Prebuilt.WarhammerAttackUnit.Statistics(input);
       Draw.generateBinomialTable(stats, input.customColumn);
    }
