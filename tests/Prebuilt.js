@@ -1,5 +1,188 @@
 'use strict';
 TestSuite.Prebuilt = {};
+TestSuite.Prebuilt.L5RGeneralRoll = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], input, expected, actual, stringValue;
+   //TODO: include stringValue later (see WarhammerAttackUnit)
+
+   try{
+   input = {circumstanceBonus: 1, numberOfRaises: 1, targetNumber: 5, diceRolled: 2, diceKept: 1, hasEmphasis: true};
+   //the die can't be optimized to 9 sided because of compound exploding:
+   input.randomSource = dieResultsToNonRandomGenerator(10, [1, 10, 2, 3, 5]);  //reroll, explosion, and 5 is ignored
+   //so the results are 12 and 3 with 12 kept (TN=10)
+   actual = Prebuilt.L5RGeneralRoll(input);
+   expected = {allValues: [3, 12], totalValue: 13, voidPointsRecovered: 0, success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, all values'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   input = {targetNumber: 5, diceRolled: 2, diceKept: 1};
+   Prebuilt.L5RGeneralRoll(input);
+   testResults.push({Expected: true, Actual: true, Description: 'Minimum doesn\'t throw'});
+   } catch(e){testResults.push({Error: e, Description: 'Minimum doesn\'t throw'});}
+
+   try{
+   input = {circumstanceBonus: 2.5, targetNumber: 5, diceRolled: 2, diceKept: 1};
+   Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Invalid circumstanceBonus');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: new Error('Must be an integer but was 2.5'),
+         Actual: e, Description: 'Invalid circumstanceBonus'});
+   }
+
+   try{
+   input = {numberOfRaises: -2, targetNumber: 5, diceRolled: 2, diceKept: 1};
+   Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Invalid numberOfRaises');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.numberOfRaises]),
+         Actual: e, Description: 'Invalid numberOfRaises'});
+   }
+
+   try{
+   input = {targetNumber: 'Fred', diceRolled: 2, diceKept: 1};
+   Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Invalid targetNumber');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.targetNumber]),
+         Actual: e, Description: 'Invalid targetNumber'});
+   }
+
+   try{
+   input = {targetNumber: 5, diceRolled: 'Fred', diceKept: 1};
+   Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Invalid diceRolled');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.diceRolled]),
+         Actual: e, Description: 'Invalid diceRolled'});
+   }
+
+   try{
+   input = {targetNumber: 5, diceRolled: 11, diceKept: 1};
+   Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Over max diceRolled');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: new Error('It\'s never possible to roll more than 10 dice. input was: 11'),
+         Actual: e, Description: 'Over max diceRolled'});
+   }
+
+   try{
+   input = {targetNumber: 5, diceRolled: 2, diceKept: 'Fred'};
+   Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Invalid diceKept');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireNaturalNumber, [input.diceKept]),
+         Actual: e, Description: 'Invalid diceKept'});
+   }
+
+   try{
+   input = {targetNumber: 5, diceRolled: 2, diceKept: 3};
+   Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Over max diceKept');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: new Error('diceKept (3) is more than diceRolled (2)'),
+         Actual: e, Description: 'Over max diceKept'});
+   }
+
+   try{
+   input = {targetNumber: 5, diceRolled: 2, diceKept: 2, hasEmphasis: 'Fred'};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [1, 6]);
+   actual = Prebuilt.L5RGeneralRoll(input);
+   delete actual.toString;
+   expected = {allValues: [1, 6], totalValue: 7, voidPointsRecovered: 0, success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Invalid hasEmphasis becomes false'});
+   } catch(e){testResults.push({Error: e, Description: 'Invalid hasEmphasis becomes false'});}
+
+   try{
+   input = {targetNumber: 5, diceRolled: 2, diceKept: 2};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [1, 6]);
+   actual = Prebuilt.L5RGeneralRoll(input);
+   delete actual.toString;
+   expected = {allValues: [1, 6], totalValue: 7, voidPointsRecovered: 0, success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'hasEmphasis defaults to false'});
+   } catch(e){testResults.push({Error: e, Description: 'hasEmphasis defaults to false'});}
+
+   try{
+   input = {numberOfRaises: 1, targetNumber: 5, diceRolled: 2, diceKept: 2};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [3, 6]);
+   actual = Prebuilt.L5RGeneralRoll(input);
+   delete actual.toString;
+   expected = {allValues: [3, 6], totalValue: 9, voidPointsRecovered: 0, success: false};
+   testResults.push({Expected: expected, Actual: actual, Description: 'numberOfRaises increases TN by 5: failure'});
+
+   input = {numberOfRaises: 1, targetNumber: 5, diceRolled: 2, diceKept: 2};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [4, 6]);
+   actual = Prebuilt.L5RGeneralRoll(input);
+   delete actual.toString;
+   expected = {allValues: [4, 6], totalValue: 10, voidPointsRecovered: 0, success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'numberOfRaises increases TN by 5: success'});
+   } catch(e){testResults.push({Error: e, Description: 'numberOfRaises increases TN by 5'});}
+
+   //hasEmphasis=true was tested by Happy path. and =false tested by Invalid/default hasEmphasis
+   //output.allValues.sort(Number.ascending); was tested by Happy path
+
+   try{
+   input = {targetNumber: 5, diceRolled: 1, diceKept: 1};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 10, 2]);
+   actual = Prebuilt.L5RGeneralRoll(input);
+   delete actual.toString;
+   expected = {allValues: [22], totalValue: 22, voidPointsRecovered: 1, success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'voidPointsRecovered: single die'});
+   } catch(e){testResults.push({Error: e, Description: 'voidPointsRecovered: single die'});}
+
+   try{
+   input = {targetNumber: 5, diceRolled: 2, diceKept: 2};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 1, 10, 2]);
+   actual = Prebuilt.L5RGeneralRoll(input).voidPointsRecovered;
+   testResults.push({Expected: 1, Actual: actual, Description: 'voidPointsRecovered: 2 dice'});
+   } catch(e){testResults.push({Error: e, Description: 'voidPointsRecovered: 2 dice'});}
+
+   try{
+   input = {targetNumber: 5, diceRolled: 1, diceKept: 1};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 10, 10, 2]);
+   actual = Prebuilt.L5RGeneralRoll(input).voidPointsRecovered;
+   testResults.push({Expected: 1, Actual: actual, Description: 'voidPointsRecovered: every other explode, round down'});
+   } catch(e){testResults.push({Error: e, Description: 'voidPointsRecovered: every other explode, round down'});}
+
+   try{
+   input = {targetNumber: 5, diceRolled: 2, diceKept: 1};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 1, 10, 2]);
+   actual = Prebuilt.L5RGeneralRoll(input).voidPointsRecovered;
+   testResults.push({Expected: 1, Actual: actual, Description: 'voidPointsRecovered: counts dropped dice'});
+   } catch(e){testResults.push({Error: e, Description: 'voidPointsRecovered: counts dropped dice'});}
+
+   //output.allValues.slice(); was tested by Happy path (because it dropped 1)
+
+   //positive circumstanceBonus was tested by Happy path
+   try{
+   input = {circumstanceBonus: -1, targetNumber: 5, diceRolled: 1, diceKept: 1};
+   input.randomSource = dieResultsToNonRandomGenerator(10, [6]);
+   actual = Prebuilt.L5RGeneralRoll(input);
+   delete actual.toString;
+   expected = {allValues: [6], totalValue: 5, voidPointsRecovered: 0, success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Negative circumstanceBonus'});
+   } catch(e){testResults.push({Error: e, Description: 'Negative circumstanceBonus'});}
+
+   //both success true/false was tested by numberOfRaises increases TN
+
+   return TestRunner.displayResults('Prebuilt Prebuilt.L5RGeneralRoll', testResults, isFirst);
+};
 TestSuite.Prebuilt.WarhammerAttackUnit = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
@@ -134,6 +317,15 @@ TestSuite.Prebuilt.WarhammerAttackUnit = function(isFirst)
    expected = {hit: 1, wounded: 1, unsavedWounds: 1};
    testResults.push({Expected: expected, Actual: actual, Description: 'FNP/RP is optional'});
    } catch(e){testResults.push({Error: e, Description: 'FNP/RP is optional'});}
+
+   try{
+   input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [3, 4, 6]);
+   actual = Prebuilt.WarhammerAttackUnit(input);
+   delete actual.toString;
+   expected = {hit: 1, wounded: 1, unsavedWounds: 1};
+   testResults.push({Expected: expected, Actual: actual, Description: 'saveValue is optional'});
+   } catch(e){testResults.push({Error: e, Description: 'saveValue is optional'});}
 
    try{
    input = {diceCount: 3, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 7};

@@ -1,4 +1,5 @@
 'use strict';
+//TODO: change this file to use Object.defineProperty for the sake of enumerable: false (the default)
 /**
 @param element to search for
 @returns {!boolean} true if the element exists in this array (using ===)
@@ -57,10 +58,10 @@ if (undefined === Math.factorial)
    Math.factorial = function(input)
    {
       if('number' !== typeof(input) || Number.isNaN(input)) return NaN;
+      if(Infinity === input) return Infinity;  //to prevent getting stuck in the loop
       if(input < 0 || Math.floor(input) !== input) return undefined;
       //factorial is actually defined for both of these cases but I do not know how to calculate them
       //nor do I care since I don't need it (YAGNI)
-      if(Infinity === input) return Infinity;  //to prevent getting stuck in the loop
 
       var result = 1;  //starts as 1 so that any number can be multiplied into it
       for(var i = 2; i <= input; ++i) result *= i;  //start at 2 because it's pointless to multiply by 1
@@ -78,8 +79,7 @@ if (undefined === Math.summation)
       var total = 0;
       for (var i = 0; i < array.length; ++i)
       {
-         var thisValue = array[i];  //stored so that array[i] is not mutated
-         if('number' === typeof(thisValue)) total += thisValue;
+         if('number' === typeof(array[i])) total += array[i];
       }
       return total;
    };

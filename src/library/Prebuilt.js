@@ -1,8 +1,65 @@
 'use strict';
 var Prebuilt = {};
+//TODO: add: Prebuilt.L5RContestedRoll. errata: if both raise and 1 wins by 3 then both fail
+/**
+This is prebuilt function for rolling dice in the game Legend of the Five Rings (L5R).
+Input's circumstanceBonus, numberOfRaises, and randomSource are optional.
+Input's circumstanceBonus can also be negative to represent a penalty.
+Note that the numberOfRaises will raise the targetNumber so don't pass in any free raises.
+Likewise if a free raise was used to increase the result then add 5 to circumstanceBonus.
+
+Simplified contract, given:
+{?circumstanceBonus, ?numberOfRaises, targetNumber, diceRolled, diceKept, ?hasEmphasis, ?randomSource}
+returns:
+{allValues[], totalValue, voidPointsRecovered, success}
+
+@param {object} input with: {?number: integer}circumstanceBonus, {?number: natural}numberOfRaises,
+   {number: natural}targetNumber, {number: natural}diceRolled, {number: natural}diceKept,
+   {?boolean}hasEmphasis, {?function}randomSource (see Die.roll)
+@returns {object} with: {number[]: natural}allValues, {number: integer}totalValue, {number: integer}voidPointsRecovered, {boolean}success
+*/
+//TODO: consider how to improve doc (for all functions)
+Prebuilt.L5RGeneralRoll = function(input)
+{
+   if(undefined === input.circumstanceBonus) input.circumstanceBonus = 0;
+   else if(!Number.isInteger(input.circumstanceBonus)) throw new Error('Must be an integer but was ' + input.circumstanceBonus);
+   if(undefined === input.numberOfRaises) input.numberOfRaises = 0;
+   else requireNaturalNumber(input.numberOfRaises);
+   requireNaturalNumber(input.targetNumber);
+   requireNaturalNumber(input.diceRolled);
+   if(input.diceRolled > 10) throw new Error('It\'s never possible to roll more than 10 dice. input was: ' + input.diceRolled);
+   requireNaturalNumber(input.diceKept);
+   if(input.diceKept > input.diceRolled) throw new Error('diceKept (' + input.diceKept + ') is more than diceRolled (' + input.diceRolled + ')');
+      //below doesn't use DicePool's KeepHighest therefore I must validate diceKept myself
+   if(true !== input.hasEmphasis) input.hasEmphasis = false;
+
+   input.targetNumber += (input.numberOfRaises * 5);  //increase difficulty
+
+   var output = {allValues: [], totalValue: 0, voidPointsRecovered: 0};
+   var dicePool = new DicePool(input.diceRolled + 'd10!!' + (input.hasEmphasis ? 'r1' : ''));
+
+   output.allValues = dicePool.roll(input.randomSource);
+   output.allValues.sort(Number.ascending);
+
+   //start with the highest number and count down until there's no explosion
+   for (var i = output.allValues.length - 1; i >= 0 && output.allValues[i] >= 10; --i)
+   {
+      output.voidPointsRecovered += Math.floor(output.allValues[i] / 10);  //for each explode. most dice don't recover void
+      //void points are recovered even for dice that are dropped
+   }
+   output.voidPointsRecovered = Math.floor(output.voidPointsRecovered / 2);  //every other explode
+
+   var valuesKept = output.allValues.slice();  //shallow clones array
+   DicePool.dropKeepTypes.KeepHighest.perform(input.diceKept, valuesKept);
+   output.totalValue = Math.summation(valuesKept) + input.circumstanceBonus;  //circumstanceBonus may be negative
+
+   output.success = (output.totalValue >= input.targetNumber);
+
+   return output;
+};
 /**
 This is prebuilt function for Warhammer for when a unit attacks a unit.
-This doesn't account for things like Helfrost, instant death, or attacks that ignore saves.
+This doesn't account for things like Helfrost or instant death.
 Input's saveValue, reanimateOrNoPainValue, and randomSource are optional.
 Output's wounded and unsavedWounds might not be present.
 
@@ -117,9 +174,9 @@ Prebuilt.WarhammerAttackUnit.Statistics = function(input)
 };
 Prebuilt.WarhammerAttackUnit._validateInput = function(input)
 {
-   //TODO: each required one must be 1-6
    requireNaturalNumber(input.diceCount);
    requireNaturalNumber(input.maxWounds);
+   //TODO: toHitValue and toWoundValue must be 1-6... I think?
    requireNaturalNumber(input.toHitValue);
    requireNaturalNumber(input.toWoundValue);
 
