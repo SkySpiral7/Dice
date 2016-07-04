@@ -128,8 +128,7 @@ DicePool.dropKeepTypes = {
       perform: function(dropCount, diceResults)
       {
          diceResults.sort(Number.ascending);
-         if(dropCount > diceResults.length) dropCount = diceResults.length;
-         for(var i = dropCount; i > 0; --i){diceResults.shift();}
+         diceResults.splice(0, dropCount);  //splice will remove all if dropCount >= diceResults.length
       }
    },
    DropHighest:
@@ -143,8 +142,7 @@ DicePool.dropKeepTypes = {
       {
          diceResults.sort(Number.ascending);
          diceResults.reverse();
-         if(dropCount > diceResults.length) dropCount = diceResults.length;
-         for(var i = dropCount; i > 0; --i){diceResults.shift();}
+         diceResults.splice(0, dropCount);  //splice will remove all if dropCount >= diceResults.length
       }
    },
    KeepLowest:

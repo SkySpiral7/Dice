@@ -35,51 +35,6 @@ function DnDAttack(attackBonus, minimumCritical, opposingAC, damageString, criti
     output+="miss";
     return output;
 };
-function L5RRoll(circumstanceBonus, numberOfRaises, targetNumber, diceRolled, diceKept, hasEmphasis, areRollsSilent){  //even silent will say how many void is recovered
-    if(typeof(circumstanceBonus)!="number") throw new Error("L5RRoll, circumstanceBonus ("+circumstanceBonus+") the must be a number type.");
-    if(typeof(numberOfRaises)!="number") throw new Error("L5RRoll, numberOfRaises ("+numberOfRaises+") the must be a number type.");
-    if(typeof(targetNumber)!="number") throw new Error("L5RRoll, targetNumber ("+targetNumber+") the must be a number type.");
-    if(typeof(diceRolled)!="number") throw new Error("L5RRoll, diceRolled ("+diceRolled+") the must be a number type.");
-    if(typeof(diceKept)!="number") throw new Error("L5RRoll, diceKept ("+diceKept+") the must be a number type.");
-    if(hasEmphasis!=true) hasEmphasis=false;
-    if(areRollsSilent!=false) areRollsSilent=true;
-
-    targetNumber+=(numberOfRaises*5);  //increase difficulty
-    targetNumber-=circumstanceBonus;  //same thing as a bonus. if negative then the targetNumber goes up
-    var diceArrary=[];
-    var totalValue=0;
-    var voidRecovered=0;
-    var output="";
-   for (var i=0; i < diceRolled; i++)
-   {
-       var valueRolled=silentRollDice("1d10!!");
-      if (valueRolled==1 && hasEmphasis)
-      {
-          if(!areRollsSilent) output+="reroll, ";
-          i--;
-          continue;  //roll again by looping around
-      }
-       if(!areRollsSilent) output+=valueRolled;
-       if(!areRollsSilent && i+1 < diceRolled) output+=", ";
-       totalValue+=valueRolled;
-       voidRecovered+=Math.floor(valueRolled/10);  //for each explode. usually 0
-       diceArrary.push(valueRolled);
-   }
-    diceArrary.sort(alphaNumAscending);
-    var diceDropped=diceRolled-diceKept;
-   while (diceDropped > 0)
-   {
-       totalValue-=diceArrary.shift();  //first remove one and subtract it from total
-       diceDropped--;
-   }
-    if(areRollsSilent) output+="Highest Total: "+totalValue+"\n";
-    else output+="\nValues kept: "+(diceArrary+'').replace(/,/g, "+")+" = "+totalValue+"\n";
-    if(totalValue >= targetNumber) output+="You succeeded by "+(totalValue-targetNumber);
-    else output+="You failed by "+(targetNumber-totalValue);
-    voidRecovered/=2;  //every other explode
-    if(voidRecovered >= 1 || !areRollsSilent) output+="\nVoid recovered: "+Math.floor(voidRecovered);
-    return output;
-};
 function IronClawDamage(damageDicePool, defenderDicePool, areRollsSilent){
     if(!(damageDicePool instanceof DicePool)) throw new Error("IronClawDamage("+damageDicePool+", ~) the first parameter must be a DicePool type.");
     if(!(defenderDicePool instanceof DicePool)) throw new Error("IronClawDamage(~, "+defenderDicePool+", ~) the second parameter must be a DicePool type.");
