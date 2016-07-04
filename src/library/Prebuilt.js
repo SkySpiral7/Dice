@@ -35,7 +35,8 @@ Prebuilt.L5RGeneralRoll = function(input)
 
    input.targetNumber += (input.numberOfRaises * 5);  //increase difficulty
 
-   var output = {valuesKept: [], totalValue: 0, voidPointsRecovered: 0, valuesDropped: []};
+   var output = {valuesKept: [], totalValue: 0, voidPointsRecovered: 0, valuesDropped: [], success: undefined};
+   output.toString = function(){return Stringifier.L5RGeneralRoll(this);};
    var dicePool = new DicePool(input.diceRolled + 'd10!!' + (input.hasEmphasis ? 'r1' : ''));
 
    var allValues = dicePool.roll(input.randomSource);
@@ -122,7 +123,7 @@ Prebuilt.WarhammerAttackUnit.Statistics = function(input)
    //randomSource isn't used in this function so ignore it
 
    var d6 = new Die();
-   var workingStats = [{result: input.diceCount, probability: 1, frequency: 1}];
+   var workingStats = [{result: input.diceCount, probability: 1}];
 
    //the if statements are to avoid unnecessary calculations (that will ultimately multiply by 1)
    //TODO: validate doesn't allow toHitValue of 0 etc
@@ -135,34 +136,43 @@ Prebuilt.WarhammerAttackUnit.Statistics = function(input)
 
    return workingStats;
 
-   function nextPhase(workingStats, passCriteria)
+   /**Rolling to hit and rolling to wound are 2 phases that would each call this function.*/
+   function nextPhase(previousStats, passCriteria)
    {
       var workingExpression = new DiceExpression([{coefficient: 1, exponent: 1}], true);
       workingExpression.addTerm({coefficient: -1, exponent: 1});  //it is now empty
-      for (var i = 0; i < workingStats.length; ++i)
+      for (var i = 0; i < previousStats.length; ++i)
       {
-         if (0 === workingStats[i].result)  //i = 0 is the only one that might have a result of 0
+         if (0 === previousStats[i].result)  //i = 0 is the only one that might have a result of 0
          {
-            workingExpression.addTerm({coefficient: workingStats[i].probability, exponent: workingStats[i].result});
-            continue;  //all dice failed
+            //all dice failed
+            workingExpression.addTerm({coefficient: previousStats[i].probability, exponent: previousStats[i].result});
+            continue;  //must continue because Statistics.passFailBinomial won't take 0 trials
          }
-         var newStats = Statistics.passFailBinomial(d6, workingStats[i].result, passCriteria);
+         var newStats = Statistics.passFailBinomial(d6, previousStats[i].result, passCriteria);
          Statistics.determineProbability(newStats);
-         //TODO: explain with a comment:
-         combinePhase(workingExpression, newStats, workingStats[i].probability);
+         /*previousStats was the results of the previous phase.
+         workingExpression will be the results of this phase.
+         newStats is the results that came from a single result of the previous phase.
+         newStats must be ANDed with the preconditions which is previousStats[i].probability.
+
+         For example: if this phase is rolling to wound then previousStats are the results of rolling
+         to hit. If i is 3 then newStats is the stats for all possible wounds if there are 3 hits.
+         workingExpression is the running total of all ways to get each wound count.*/
+         combinePhase(workingExpression, newStats, previousStats[i].probability);
       }
       return workingExpression.toDiceResults();
    }
-   function combinePhase(workingExpression, newStats, multiplier, frequencyMultiplier)
+   /**All of the newStats are combined into the workingExpression after being ANDed by multiplier.*/
+   function combinePhase(workingExpression, newStats, multiplier)
    {
       for (var i = 0; i < newStats.length; ++i)
       {
          newStats[i].probability *= multiplier;
-         //TODO: I think I could actually multiply the frequency instead of using probability:
-         //newStats[i].frequency *= frequencyMultiplier;
          workingExpression.addTerm({coefficient: newStats[i].probability, exponent: newStats[i].result});
       }
    }
+   /**This function combines all results above the maximum wounds ORing together the probability.*/
    function processWoundMax(maxWounds, stats)
    {
       //already validated that maxWounds was a natural number so we don't need && stats.length > 1
@@ -177,7 +187,7 @@ Prebuilt.WarhammerAttackUnit._validateInput = function(input)
 {
    requireNaturalNumber(input.diceCount);
    requireNaturalNumber(input.maxWounds);
-   //TODO: toHitValue and toWoundValue must be 1-6... I think?
+   //TODO: toHitValue and toWoundValue must be 1-6... can an attack ever ignore these?
    requireNaturalNumber(input.toHitValue);
    requireNaturalNumber(input.toWoundValue);
 
@@ -185,8 +195,8 @@ Prebuilt.WarhammerAttackUnit._validateInput = function(input)
    if(undefined === input.saveValue) input.saveValue = 7;  //an impossible number
    requireNaturalNumber(input.saveValue);
 
-   //Reanimation Protocol states that if the unit also has Feel No Pain then you must choose only 1 of them
-   //but most units have neither
+   //Reanimation Protocol states that if the unit also has Feel No Pain then you must choose only 1 of them to use.
+   //most units have neither
    if(undefined === input.reanimateOrNoPainValue) input.reanimateOrNoPainValue = 7;
    requireNaturalNumber(input.reanimateOrNoPainValue);
 
