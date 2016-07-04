@@ -1,6 +1,5 @@
 'use strict';
 var Prebuilt = {};
-//TODO: add: Prebuilt.L5RContestedRoll. errata: if both raise and 1 wins by 3 then both fail
 /**
 This is prebuilt function for rolling dice in the game Legend of the Five Rings (L5R).
 Input's circumstanceBonus, numberOfRaises, and randomSource are optional.
