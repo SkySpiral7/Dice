@@ -109,7 +109,8 @@ function Die(arg1)
    };
    this._constructor();
 }
-/**This is an enum since Symbols aren't well supported enough yet.*/
+/**This is an enum since Symbols aren't well supported enough yet.
+equals doesn't need to be defined because the functions aren't the same.*/
 Die.explodeTypes = {
    Compound: {toString: function(){return '{Compound}';}, toJSON: function(){return '{Compound}';}},
    Normal: {toString: function(){return '{Normal}';}, toJSON: function(){return '{Normal}';}},

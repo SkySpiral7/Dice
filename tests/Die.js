@@ -1,5 +1,44 @@
 'use strict';
 TestSuite.Die = {};
+TestSuite.Die.equals = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], actual, inputA, inputB;
+
+   try{
+   inputA = new Die(2);
+   actual = inputA.equals(inputA);
+   testResults.push({Expected: true, Actual: actual, Description: 'Happy path same'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path same'});}
+
+   try{
+   actual = new Die(2).equals(new Die('1d2'));
+   testResults.push({Expected: true, Actual: actual, Description: 'Happy path equal'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path equal'});}
+
+   try{
+   actual = new Die(2).equals(5);
+   testResults.push({Expected: false, Actual: actual, Description: 'Not a Die'});
+   } catch(e){testResults.push({Error: e, Description: 'Not a Die'});}
+
+   try{
+   actual = new Die(2).equals(null);
+   testResults.push({Expected: false, Actual: actual, Description: 'null'});
+   } catch(e){testResults.push({Error: e, Description: 'null'});}
+
+   try{
+   actual = new Die(2).equals(undefined);
+   testResults.push({Expected: false, Actual: actual, Description: 'undefined'});
+   } catch(e){testResults.push({Error: e, Description: 'undefined'});}
+
+   try{
+   actual = new Die('1d2').equals(new Die('1d2!'));
+   testResults.push({Expected: false, Actual: actual, Description: 'Not equal'});
+   } catch(e){testResults.push({Error: e, Description: 'Not equal'});}
+
+   return TestRunner.displayResults('Die new Die().equals()', testResults, isFirst);
+};
 TestSuite.Die.roll = function(isFirst)
 {
    TestRunner.clearResults(isFirst);

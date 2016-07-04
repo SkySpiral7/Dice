@@ -32,7 +32,15 @@ function DicePool(arg1, arg2)
    {
       if(!(other instanceof DicePool)) return false;
       if(this === other) return true;
-      return (JSON.stringify(this) === JSON.stringify(other));
+
+      //equality ignores the name
+      var myJson = this.toJSON();
+      delete myJson.name;
+
+      var otherJson = other.toJSON();
+      delete otherJson.name;
+
+      return (JSON.stringify(myJson) === JSON.stringify(otherJson));
    };
    /**
    @param {?function} randomSource a function that returns a random number between 0 inclusive and 1 exclusive.
@@ -116,7 +124,8 @@ function DicePool(arg1, arg2)
    };
    this._constructor();
 }
-/**This is an enum and strategy pattern.*/
+/**This is an enum and strategy pattern.
+equals doesn't need to be defined because the functions aren't the same.*/
 DicePool.dropKeepTypes = {
    DropLowest:
    {
@@ -224,13 +233,18 @@ DicePool._validate = function(debugName, pool)
          if(!Number.isNatural(pool[i].dropKeepCount)) throw new Error(debugName + '\ninvalid dropKeepCount: ' + pool[i].dropKeepCount);
          var explodeType = pool[i].die.toJSON().explodeType;
          var hasFiniteDiceCount = (undefined === explodeType || Die.explodeTypes.Compound === explodeType);
-         if(hasFiniteDiceCount && pool[i].dropKeepCount >= pool[i].dieCount) throw new Error(debugName + '\ndropKeepCount ('
+         if(hasFiniteDiceCount && pool[i].dropKeepCount > pool[i].dieCount) throw new Error(debugName + '\ndropKeepCount ('
             + pool[i].dropKeepCount + ') is too large. dieCount=' + pool[i].dieCount);
          //'3d3! drop 5' is allowed but stupid
 
          if(DicePool.dropKeepTypes.DropLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.DropHighest !== pool[i].dropKeepType
             && DicePool.dropKeepTypes.KeepLowest !== pool[i].dropKeepType && DicePool.dropKeepTypes.KeepHighest !== pool[i].dropKeepType)
             throw new Error(debugName + '\ninvalid dropKeepType: ' + pool[i].dropKeepType);
+
+         if(hasFiniteDiceCount && pool[i].dropKeepCount === pool[i].dieCount &&
+            (DicePool.dropKeepTypes.DropLowest === pool[i].dropKeepType || DicePool.dropKeepTypes.DropHighest === pool[i].dropKeepType))
+            throw new Error(debugName + '\nIllegal: all dice (' + pool[i].dieCount + ') are always dropped.');
+         //'3d10 keep 3' is allowed but redundant
       }
       else pool[i].dropKeepType = pool[i].dropKeepCount = undefined;
       //these aren't deleted so that DicePool._defensiveCopier will always produce the same number of keys

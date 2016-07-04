@@ -397,7 +397,7 @@ TestSuite.Parser._longHand = function(isFirst)
    string = ' reroll equal 2';
    returned = Parser._longHand(string, string, group);
    testResults.push({Expected: undefined, Actual: group.die.explodeType, Description: 'r=2: explode'});
-   testResults.push({Expected: '==2', Actual: group.die.rerollCriteria, Description: 'r=2: reroll'});
+   testResults.push({Expected: '=2', Actual: group.die.rerollCriteria, Description: 'r=2: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'r=2: returned'});
    } catch(e){testResults.push({Error: e, Description: 'r=2'});}
 
@@ -415,7 +415,7 @@ TestSuite.Parser._longHand = function(isFirst)
    string = ' rerolling 8';
    returned = Parser._longHand(string, string, group);
    testResults.push({Expected: undefined, Actual: group.die.explodeType, Description: 'r8: explode'});
-   testResults.push({Expected: '==8', Actual: group.die.rerollCriteria, Description: 'r8: reroll'});
+   testResults.push({Expected: '8', Actual: group.die.rerollCriteria, Description: 'r8: reroll'});
    testResults.push({Expected: '', Actual: returned, Description: 'r8: returned'});
    } catch(e){testResults.push({Error: e, Description: 'r8'});}
 

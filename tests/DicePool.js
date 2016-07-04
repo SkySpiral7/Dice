@@ -1,5 +1,58 @@
 'use strict';
 TestSuite.DicePool = {};
+TestSuite.DicePool.equals = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], actual, inputA, inputB;
+
+   try{
+   inputA = new DicePool('2d8');
+   actual = inputA.equals(inputA);
+   testResults.push({Expected: true, Actual: actual, Description: 'Happy path 2d8 same'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8 same'});}
+
+   try{
+   actual = new DicePool('2d8').equals(new DicePool('2d8'));
+   testResults.push({Expected: true, Actual: actual, Description: 'Happy path 2d8 equal'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8 equal'});}
+
+   try{
+   actual = new DicePool('2d8').equals(5);
+   testResults.push({Expected: false, Actual: actual, Description: 'Not a DicePool'});
+   } catch(e){testResults.push({Error: e, Description: 'Not a DicePool'});}
+
+   try{
+   actual = new DicePool('2d8').equals(null);
+   testResults.push({Expected: false, Actual: actual, Description: 'null'});
+   } catch(e){testResults.push({Error: e, Description: 'null'});}
+
+   try{
+   actual = new DicePool('2d8').equals(undefined);
+   testResults.push({Expected: false, Actual: actual, Description: 'undefined'});
+   } catch(e){testResults.push({Error: e, Description: 'undefined'});}
+
+   try{
+   inputA = new DicePool('2d8').toJSON();
+   inputA.name = 'A';
+   inputA = new DicePool(inputA);
+
+   inputB = new DicePool('2d8').toJSON();
+   inputB.name = 'B';
+   inputB = new DicePool(inputB);
+
+   actual = inputA.equals(inputB);
+   testResults.push({Expected: true, Actual: actual, Description: 'Ignores name: equal'});
+   testResults.push({Expected: false, Actual: (inputA.toJSON().name === inputB.toJSON().name), Description: 'Ignores name: names are different'});
+   } catch(e){testResults.push({Error: e, Description: 'Ignores name'});}
+
+   try{
+   actual = new DicePool('2d8').equals(new DicePool('2d8+1d4'));
+   testResults.push({Expected: false, Actual: actual, Description: 'Not equal'});
+   } catch(e){testResults.push({Error: e, Description: 'Not equal'});}
+
+   return TestRunner.displayResults('DicePool new DicePool().equals()', testResults, isFirst);
+};
 TestSuite.DicePool.roll = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
@@ -383,15 +436,15 @@ TestSuite.DicePool._validate = function(isFirst)
          die: d6,
          dieCount: 2,
          dropKeepType: DicePool.dropKeepTypes.DropLowest,
-         dropKeepCount: 2
+         dropKeepCount: 3
       }
    ];
-   DicePool._validate('2d6d2', input);
+   DicePool._validate('2d6d3', input);
    TestRunner.failedToThrow(testResults, 'dropKeepCount too large no explode');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('2d6d2\ndropKeepCount (2) is too large. dieCount=2'),
+       testResults.push({Expected: new Error('2d6d3\ndropKeepCount (3) is too large. dieCount=2'),
          Actual: e, Description: 'dropKeepCount too large no explode'});
    }
 
@@ -434,6 +487,37 @@ TestSuite.DicePool._validate = function(isFirst)
    DicePool._validate('2d6!d3', input);
    testResults.push({Expected: expected, Actual: input, Description: 'dropKeepCount not too large due to explode'});
    } catch(e){testResults.push({Error: e, Description: 'dropKeepCount not too large due to explode'});}
+
+   try{
+   input = [
+      {
+         die: d6,
+         dieCount: 2,
+         dropKeepType: DicePool.dropKeepTypes.DropLowest,
+         dropKeepCount: 2
+      }
+   ];
+   DicePool._validate('2d6d2', input);
+   TestRunner.failedToThrow(testResults, 'drop all');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('2d6d2\nIllegal: all dice (2) are always dropped.'),
+         Actual: e, Description: 'drop all'});
+   }
+
+   try{
+   input = [
+      {
+         die: d6,
+         dieCount: 2,
+         dropKeepType: DicePool.dropKeepTypes.KeepLowest,
+         dropKeepCount: 2
+      }
+   ];
+   DicePool._validate('2d6k2', input);
+   testResults.push({Expected: true, Actual: true, Description: 'keep all is allowed'});
+   } catch(e){testResults.push({Error: e, Description: 'keep all is allowed'});}
 
    try{
    input = [

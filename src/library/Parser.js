@@ -196,8 +196,6 @@ Parser._longHand = function(debugName, workingString, group)
             group.die.rerollCriteria += '=';
             workingString = workingString.replace(/^equal(?: to)? /, '');
          }
-         if('=' === group.die.rerollCriteria || '' === group.die.rerollCriteria) group.die.rerollCriteria = '==';
-           //first is if 'equal' and the other is default
          group.die.rerollCriteria += Number.parseInt(workingString);  //grab number
          workingString = workingString.replace(/^-?\d+/, '');  //remove
       }
