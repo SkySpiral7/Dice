@@ -24,7 +24,7 @@ Prebuilt.L5RGeneralRoll = function(input)
    if(undefined === input.circumstanceBonus) input.circumstanceBonus = 0;
    else if(!Number.isInteger(input.circumstanceBonus)) throw new Error('Must be an integer but was ' + input.circumstanceBonus);
    if(undefined === input.numberOfRaises) input.numberOfRaises = 0;
-   else requireNaturalNumber(input.numberOfRaises);
+   else if(!Number.isInteger(input.numberOfRaises) || input.numberOfRaises < 0) throw new Error('Must be a non-negative integer but was ' + input.numberOfRaises);
    requireNaturalNumber(input.targetNumber);
    requireNaturalNumber(input.diceRolled);
    if(input.diceRolled > 10) throw new Error('It\'s never possible to roll more than 10 dice. input was: ' + input.diceRolled);

@@ -82,58 +82,61 @@ function mainDraw()
    catch(error){alert('Error: ' + error.message); throw error;}
 };
 </script>
+</head>
+<body>
 <a>The random values are in order: number of enemies hit, number wounded, number of unsaved wounds.</a>
 <form action="javascript:mainDraw();">
 <table>
    <tr>
-      <td style="text-align:right;">Number of Dice: </td>
+      <td style="text-align:right;">Number of Dice:</td>
       <td><input type="text" value="15" size="5" id="diceCount" /></td>
       <td>Random Values</td>
       <td>Statistics</td>
    </tr>
    <tr>
-      <td style="text-align:right;">Number of Wounds Possible: </td>
+      <td style="text-align:right;">Number of Wounds Possible:</td>
       <td><input type="text" value="15" size="5" id="woundMax" /></td>
       <td />
    </tr>
    <tr>
-      <td style="text-align:right;">To Hit Value: </td>
+      <td style="text-align:right;">To Hit Value:</td>
       <td><input type="text" value="3" size="5" id="toHitValue" /></td>
       <td id="hitResult" style="text-align:center;">-</td>
       <td><b>Min:</b> <span id="minResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style="text-align:right;">To Wound Value: </td>
+      <td style="text-align:right;">To Wound Value:</td>
       <td><input type="text" value="3" size="5" id="toWoundValue" /></td>
       <td id="woundedResult" style="text-align:center;">-</td>
       <td><b>Max:</b> <span id="maxResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style="text-align:right;">To Save Value: </td>
+      <td style="text-align:right;">To Save Value:</td>
       <td><input type="text" value="4" size="5" id="saveValue" /></td>
       <td />
       <td><b>Avg:</b> <span id="avgResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style="text-align:right;">Reanimation or Feel No Pain: </td>
+      <td style="text-align:right;">Reanimation or Feel No Pain:</td>
       <td><input type="text" value="7" size="5" id="reanimateOrNoPainValue" /></td>
       <td id="unsaveWoundsResult" style="text-align:center;">-</td>
       <td><b>Std Dev:</b> <span id="devResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
-      <td style="text-align:right;">Custom Column: </td>
+      <td style="text-align:right;">Custom Column:</td>
       <td><input type="text" value=">=" size="5" id="customColumn" /></td>
       <td /><td />
    </tr>
    <tr>
-     <td />
-     <td><input type="submit" value="Draw" /></td><!--This is a submit button so that you can press enter in any field-->
-     <td><input type="button" value="Attack" onClick="javascript:rollAttack();" /></td>
-     <td />
+      <td />
+      <td><input type="submit" value="Draw" /></td><!--This is a submit button so that you can press enter in any field-->
+      <td><input type="button" value="Attack" onClick="javascript:rollAttack();" /></td>
+      <td />
    </tr>
 </table>
 </form>
 <br />
 <div id="graphResults"></div>
 <br /><br /><br /><br />
+</body>
 </html>

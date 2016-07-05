@@ -39,11 +39,22 @@ TestSuite.Prebuilt.L5RGeneralRoll = function(isFirst)
    try{
    input = {numberOfRaises: -2, targetNumber: 5, diceRolled: 2, diceKept: 1};
    Prebuilt.L5RGeneralRoll(input);
+   TestRunner.failedToThrow(testResults, 'Negative numberOfRaises');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: new Error('Must be a non-negative integer but was -2'),
+         Actual: e, Description: 'Negative numberOfRaises'});
+   }
+
+   try{
+   input = {numberOfRaises: 2.5, targetNumber: 5, diceRolled: 2, diceKept: 1};
+   Prebuilt.L5RGeneralRoll(input);
    TestRunner.failedToThrow(testResults, 'Invalid numberOfRaises');
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.numberOfRaises]),
+      testResults.push({Expected: new Error('Must be a non-negative integer but was 2.5'),
          Actual: e, Description: 'Invalid numberOfRaises'});
    }
 
