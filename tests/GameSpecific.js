@@ -51,6 +51,14 @@ TestSuite.GameSpecific.L5RDicePool = function(isFirst)
    }
 
    try{
+   actual = L5RDicePool(5, 3);
+   testResults.push({Expected: '5k3', Actual: actual.toJSON().name, Description: 'DicePool name'});
+
+   actual = L5RDicePool('+5k5r1');
+   testResults.push({Expected: '5k5 emphasis', Actual: actual.toJSON().name, Description: 'DicePool name with emphasis!'});
+   } catch(e){testResults.push({Error: e, Description: 'DicePool name'});}
+
+   try{
    L5RDicePool('2k2 + 2d4');
    TestRunner.failedToThrow(testResults, '2 groups');
    }

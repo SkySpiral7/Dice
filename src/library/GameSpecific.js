@@ -29,11 +29,16 @@ function L5RDicePool(arg1, arg2, arg3)
       arg3 = undefined;
    }
 
-   var dicePoolName = arg1;
-   if('string' === typeof(arg1)) arg1 = Parser.L5RShortHand(arg1, arg2);
+   var jsonResult;
+   if('string' === typeof(arg1)) jsonResult = Parser.L5RShortHand(arg1, arg2);
    else throw new Error('Illegal argument. input was: ' + debugString);
 
-   var dicePool = new DicePool(dicePoolName, arg1);
+   var dicePoolName = '' + jsonResult[0].dieCount + 'k';
+   if(undefined === jsonResult[0].dropKeepCount) dicePoolName += jsonResult[0].dieCount;
+   else dicePoolName += jsonResult[0].dropKeepCount;
+   if(undefined !== jsonResult[0].die.rerollCriteria) dicePoolName += ' emphasis';
+
+   var dicePool = new DicePool(dicePoolName, jsonResult);
    var jsonResult = dicePool.toJSON();
 
    if(jsonResult.pool.length !== 1) throw new Error('Not a valid L5R DicePool: multiple dice groups. input was: ' + debugString);

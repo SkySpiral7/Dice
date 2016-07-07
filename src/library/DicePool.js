@@ -242,9 +242,12 @@ DicePool._validate = function(debugName, pool)
             throw new Error(debugName + '\ninvalid dropKeepType: ' + pool[i].dropKeepType);
 
          if(hasFiniteDiceCount && pool[i].dropKeepCount === pool[i].dieCount &&
-            (DicePool.dropKeepTypes.DropLowest === pool[i].dropKeepType || DicePool.dropKeepTypes.DropHighest === pool[i].dropKeepType))
+            (DicePool.dropKeepTypes.KeepLowest === pool[i].dropKeepType || DicePool.dropKeepTypes.KeepHighest === pool[i].dropKeepType))
+            pool[i].dropKeepType = pool[i].dropKeepCount = undefined;
+         //'3d10 keep 3' is allowed. Strip off the keep in order to improve algorithms
+
+         else if(hasFiniteDiceCount && pool[i].dropKeepCount === pool[i].dieCount)
             throw new Error(debugName + '\nIllegal: all dice (' + pool[i].dieCount + ') are always dropped.');
-         //'3d10 keep 3' is allowed but redundant
       }
       else pool[i].dropKeepType = pool[i].dropKeepCount = undefined;
       //these aren't deleted so that DicePool._defensiveCopier will always produce the same number of keys

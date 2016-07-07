@@ -493,37 +493,6 @@ TestSuite.DicePool._validate = function(isFirst)
       {
          die: d6,
          dieCount: 2,
-         dropKeepType: DicePool.dropKeepTypes.DropLowest,
-         dropKeepCount: 2
-      }
-   ];
-   DicePool._validate('2d6d2', input);
-   TestRunner.failedToThrow(testResults, 'drop all');
-   }
-   catch(e)
-   {
-       testResults.push({Expected: new Error('2d6d2\nIllegal: all dice (2) are always dropped.'),
-         Actual: e, Description: 'drop all'});
-   }
-
-   try{
-   input = [
-      {
-         die: d6,
-         dieCount: 2,
-         dropKeepType: DicePool.dropKeepTypes.KeepLowest,
-         dropKeepCount: 2
-      }
-   ];
-   DicePool._validate('2d6k2', input);
-   testResults.push({Expected: true, Actual: true, Description: 'keep all is allowed'});
-   } catch(e){testResults.push({Error: e, Description: 'keep all is allowed'});}
-
-   try{
-   input = [
-      {
-         die: d6,
-         dieCount: 2,
          dropKeepType: 12,
          dropKeepCount: 1
       }
@@ -535,6 +504,46 @@ TestSuite.DicePool._validate = function(isFirst)
    {
        testResults.push({Expected: new Error('bad\ninvalid dropKeepType: 12'),
          Actual: e, Description: 'Invalid dropKeepType'});
+   }
+
+   try{
+   input = [
+      {
+         die: d6,
+         dieCount: 2,
+         dropKeepType: DicePool.dropKeepTypes.KeepLowest,
+         dropKeepCount: 2
+      }
+   ];
+   expected = [
+      {
+         die: d6,
+         dieCount: 2,
+         dropKeepType: undefined,
+         dropKeepCount: undefined,
+         areDiceNegative: false
+      }
+   ];
+   DicePool._validate('2d6k2', input);
+   testResults.push({Expected: expected, Actual: input, Description: 'keep all removes dropKeepType'});
+   } catch(e){testResults.push({Error: e, Description: 'keep all removes dropKeepType'});}
+
+   try{
+   input = [
+      {
+         die: d6,
+         dieCount: 2,
+         dropKeepType: DicePool.dropKeepTypes.DropLowest,
+         dropKeepCount: 2
+      }
+   ];
+   DicePool._validate('2d6d2', input);
+   TestRunner.failedToThrow(testResults, 'drop all');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('2d6d2\nIllegal: all dice (2) are always dropped.'),
+         Actual: e, Description: 'drop all'});
    }
 
    try{

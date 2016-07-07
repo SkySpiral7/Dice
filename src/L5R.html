@@ -34,12 +34,11 @@ function mainDraw()
    input.diceKept = Number.parseInt(document.getElementById('diceKept').value);
    input.hasEmphasis = document.getElementById('hasEmphasis').checked;
    Draw.diceBellCurve(new L5RDicePool(input));
-   //TODO: keep all should be optimized to not have drop/keep
 }
 </script>
 </head>
 <body>
-<a>TODO: warn against draw. Draw ignores TN, circ, raise</a>
+<a>Warning: if you don't keep all dice then drawing (but not rolling) will be VERY slow (5k3 won't finish). Drawing ignores TN, circumstance, and raises.</a>
 <form action="javascript:rollDice();">
 <table>
    <tr>
