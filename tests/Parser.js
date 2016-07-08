@@ -34,6 +34,15 @@ TestSuite.Parser.dicePool = function(isFirst)
    }
 
    try{
+   Parser.dicePool('');
+   TestRunner.failedToThrow(testResults, 'Empty string');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: new Error('\nexpected "d" or "z". Found: '), Actual: e, Description: 'Empty string'});
+   }
+
+   try{
    string = '\n  D8    -     z16\t ';
    returned = Parser.dicePool(string);
    expected = [
@@ -83,8 +92,20 @@ TestSuite.Parser.dicePool = function(isFirst)
          areDiceNegative: true
       }
    ];
-   testResults.push({Expected: expected, Actual: returned, Description: 'Negative: -d4'});
-   } catch(e){testResults.push({Error: e, Description: 'Negative: -d4'});}
+   testResults.push({Expected: expected, Actual: returned, Description: 'Leading Negative: -d4'});
+   } catch(e){testResults.push({Error: e, Description: 'Leading Negative: -d4'});}
+
+   try{
+   returned = Parser.dicePool('+d4');
+   expected = [
+      {
+         die: {sideCount: 4, constantModifier: 0},
+         dieCount: 1,
+         areDiceNegative: false
+      }
+   ];
+   testResults.push({Expected: expected, Actual: returned, Description: 'Leading plus: +d4'});
+   } catch(e){testResults.push({Error: e, Description: 'Leading plus: +d4'});}
 
    return TestRunner.displayResults('Parser Parser.dicePool', testResults, isFirst);
 };

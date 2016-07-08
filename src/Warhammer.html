@@ -21,6 +21,7 @@ Draw.generateBinomialTable = function(stats, secondColumn)
 function parseInput()
 {
    var input = {};
+
    input.diceCount = Number.parseInt(document.getElementById('diceCount').value);
    document.getElementById('diceCount').value = input.diceCount;
    input.maxWounds = Number.parseInt(document.getElementById('woundMax').value);
@@ -31,19 +32,23 @@ function parseInput()
    document.getElementById('toWoundValue').value = input.toWoundValue;
    input.saveValue = Number.parseInt(document.getElementById('saveValue').value);
    document.getElementById('saveValue').value = input.saveValue;
+
    input.reanimateOrNoPainValue = Number.parseInt(document.getElementById('reanimateOrNoPainValue').value);
+   if(Number.isNaN(input.reanimateOrNoPainValue)) input.reanimateOrNoPainValue = 7;
    document.getElementById('reanimateOrNoPainValue').value = input.reanimateOrNoPainValue;
+
    input.customColumn = document.getElementById('customColumn').value;
+
    return input;
 }
 function validateInput(input)
 {
-   if(input.diceCount <= 0) throw new Error('Invalid diceCount. Must be 1+.');
-   if(input.maxWounds <= 0) throw new Error('Invalid maxWounds. Must be 1+.');
-   if(input.toHitValue <= 0) throw new Error('Invalid toHitValue. Must be 1+.');
-   if(input.toWoundValue <= 0) throw new Error('Invalid toWoundValue. Must be 1+.');
-   if(input.saveValue <= 0) throw new Error('Invalid saveValue. Must be 1+.');
-   if(input.reanimateOrNoPainValue <= 0) throw new Error('Invalid reanimateOrNoPainValue. Must be 1+.');
+   if(!Number.isNatural(input.diceCount)) throw new Error('Invalid diceCount. Must be 1+.');
+   if(!Number.isNatural(input.maxWounds)) throw new Error('Invalid maxWounds. Must be 1+.');
+   if(!Number.isNatural(input.toHitValue)) throw new Error('Invalid toHitValue. Must be 1+.');
+   if(!Number.isNatural(input.toWoundValue)) throw new Error('Invalid toWoundValue. Must be 1+.');
+   if(!Number.isNatural(input.saveValue)) throw new Error('Invalid saveValue. Must be 1+.');
+   if(!Number.isNatural(input.reanimateOrNoPainValue)) throw new Error('Invalid reanimateOrNoPainValue. Must be 1+.');
    //customColumn is only validated for mainDraw()
 }
 function rollAttack()

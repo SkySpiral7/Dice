@@ -13,12 +13,13 @@ Parser.dicePool = function(inputString)
    var workingString = inputString.toLowerCase().replace(/\s+/g, ' ').replace(/-/g, '+-');  //make copy so that parse errors can use inputString
 
    var groupStringArray = workingString.split('+');
-   if('-' === inputString.trim()[0]) groupStringArray.shift();  //leading negative causes first element to be empty
+   if(groupStringArray.length > 1 && '' === groupStringArray[0]) groupStringArray.shift();  //leading sign causes first element to be empty
+      //the length check is so that passing in '' will enter loop and fail validation
 
    for (var groupIndex = 0; groupIndex < groupStringArray.length; ++groupIndex)
    {
       var groupObject = {};
-      workingString = groupStringArray[groupIndex].trim();
+      workingString = groupStringArray[groupIndex].trim();  //removes the spaces from '1d2 + 1d3'
       if('-' === workingString[0]){groupObject.areDiceNegative = true; workingString = workingString.substring(1).trim();}
       else groupObject.areDiceNegative = false;
 

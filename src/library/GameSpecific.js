@@ -61,8 +61,7 @@ Parser.L5RShortHand = function(inputString, hasEmphasis)
    var debugString = '' + inputString;  //enforces string type and is null safe
    inputString = debugString.trim().toLowerCase();
 
-   if(!(/^\+?\d+k\d+/).test(inputString)) throw new Error('Expected XkY. Found: ' + debugString);
-   if('+' === inputString[0]) inputString = inputString.substring(1);
+   if(!(/^\+?\s*\d+k\d+/).test(inputString)) throw new Error('Expected XkY. Found: ' + debugString);
    inputString = inputString.replace('k', 'd10!!kh');  //replaces only the first k
    if(hasEmphasis) inputString += ' reroll 1';
    //use shorthand kh and longhand reroll because short must be before long
