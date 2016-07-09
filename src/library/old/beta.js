@@ -144,37 +144,3 @@ TestSuite.Prebuilt.L5RContestedRoll = function(isFirst)
 
    return TestRunner.displayResults('Prebuilt Prebuilt.L5RContestedRoll', testResults, isFirst);
 };
-
-
-//http://stats.stackexchange.com/questions/130025/formula-for-dropping-dice-non-brute-force
-/**
-function probabilityThat_ZofNIsA(a, diceArray){
-    //assuming: homogeneous dice pool (such as 4d10), exactly 1 die is dropped (and it is the lowest), no rerolls or min/max, standard die only
-    //also assuming that a is a possible sum for the pool
-    //var diceArray = poolGiven.getAllDice();
-    var n = diceArray.length;
-    var result = (probabilityThat_XofNisSmallest(?) * probabilityThat_YofNisA(a, diceArray.slice(1)));
-    result += (probabilityThat_XofNisNotSmallest(?) * bigSum(a, diceArray.slice(1)));
-}
-
-function bigSum(a, diceArray){
-    var n = diceArray.length;
-}
-
-function probabilityThat_XofNisSmallest(?){
-}
-
-function probabilityThat_XofNisNotSmallest(?){
-}
-/**/
-
-function probabilityThat_YofNisA(a, diceArray){
-    var n = diceArray.length;
-    var finishedPolys=[];
-    for(var i=0; i < diceArray.length; i++){finishedPolys.push(Polynomial.createDiePolynomial(diceArray[i], 0));}  //0 indicates no explosions yet
-    var rollData=Polynomial.multiplyPolynomials(finishedPolys);
-
-    var totalFreq=0;
-    for(var i=0; i < rollData.length; i++){totalFreq+=rollData[i][1];}
-    for(var i=0; i < rollData.length; i++){if(rollData[i][0] === a) return (rollData[i][1] / totalFreq);}
-}

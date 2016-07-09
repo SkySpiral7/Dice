@@ -2,7 +2,8 @@
 
 var fileNames = ['DiceExpression', 'DicePool', 'Die', 'Draw', 'GenerateHtml', 'Parser', 'Prebuilt',
    'prototypes', 'Statistics', 'Stringifier',
-   'GameSpecific', 'Misc'];  //must be last. Misc currently doesn't need to be
+   'GameSpecific', 'Misc',  //must be last. Misc currently doesn't need to be
+   'StackExchange'];  //beta: ignore
 var includePath;  //this doesn't delete a pre-existing value.
 //I could loop over document.getElementsByTagName('script') but that's too much work and equal assumption
 if(null !== document.getElementById('DiceInclude')) includePath = document.getElementById('DiceInclude').src.replace('include.js', '');
