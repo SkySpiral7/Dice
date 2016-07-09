@@ -49,30 +49,10 @@ TestSuite.StackExchange.probabilityThat_ZofNIsA = function(isFirst)
    Statistics.determineProbability(expected);
    console.assert(4 === expected[4-1-2].result);  //probability 0 is excluded so results 1-2 aren't here.
    //currently fails
-   testResults.push({Expected: expected[1].probability, Actual: actual, Description: 'chance of 4 from 445 drop lowest'});
+   testResults.push({Expected: expected[1].probability, Actual: actual, Description: 'chance of 4 from 4d4 drop lowest'});
    } catch(e){testResults.push({Error: e, Description: 'chance of 4 from 4d4 drop lowest'});}
 
    return TestRunner.displayResults('StackExchange probabilityThat_ZofNIsA', testResults, isFirst);
-};
-TestSuite.StackExchange.probabilityThat_theSmallestIsA = function(isFirst)
-{
-   TestRunner.clearResults(isFirst);
-
-   var testResults = [], actual, expected;
-
-   try{
-   actual = probabilityThat_theSmallestIsA(1, new Die(2), 2);
-   //11, 12, 21, 22
-   testResults.push({Expected: (3/4), Actual: actual, Description: '1 using 2d2'});
-   } catch(e){testResults.push({Error: e, Description: '1 using 2d2'});}
-
-   try{
-   actual = probabilityThat_theSmallestIsA(2, new Die(2), 2);
-   //11, 12, 21, 22
-   testResults.push({Expected: (1/4), Actual: actual, Description: '2 using 2d2'});
-   } catch(e){testResults.push({Error: e, Description: '2 using 2d2'});}
-
-   return TestRunner.displayResults('StackExchange probabilityThat_theSmallestIsA', testResults, isFirst);
 };
 TestSuite.StackExchange.probabilityThat_XofNisSmallest = function(isFirst)
 {
@@ -81,7 +61,12 @@ TestSuite.StackExchange.probabilityThat_XofNisSmallest = function(isFirst)
    var testResults = [], actual, expected;
 
    try{
-   actual = probabilityThat_XofNisSmallest(new Die(2), 2);
+   actual = beta.StackExchange.probabilityThat_XofNisSmallest(new Die(2), 1);
+   testResults.push({Expected: 1, Actual: actual, Description: '1d2'});
+   } catch(e){testResults.push({Error: e, Description: '1d2'});}
+
+   try{
+   actual = beta.StackExchange.probabilityThat_XofNisSmallest(new Die(2), 2);
    //11, 12, 21, 22
    //maybe something like:
    //(I roll 1)(you roll 1) + (I roll 1)(you roll 2) + (I roll 2)(you roll 2)
@@ -90,7 +75,7 @@ TestSuite.StackExchange.probabilityThat_XofNisSmallest = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2'});}
 
    try{
-   actual = probabilityThat_XofNisSmallest(new Die(3), 2);
+   actual = beta.StackExchange.probabilityThat_XofNisSmallest(new Die(3), 2);
    //all: 11, 12, 13, 21, 22, 23, 31, 32, 33
    //(I roll 1)(you roll any) + (me 2)(you 2 or 3) + (me 3)(you 3)
    //(1/3) + (1/3)(2/3) + (1/3)(1/3) = 3/9 + 2/9 + 1/9 = 6/9
@@ -98,12 +83,12 @@ TestSuite.StackExchange.probabilityThat_XofNisSmallest = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d3'});}
 
    try{
-   actual = probabilityThat_XofNisSmallest(new Die(2), 3);
+   actual = beta.StackExchange.probabilityThat_XofNisSmallest(new Die(2), 3);
    //all: 111, 112, 121, 122, 211, 212, 221, 222
    //(me 1) + (me 2)(not 1)(not 1)
    //(1/2) + (1/2)^3 = 4/8 + 1/8
    testResults.push({Expected: (5/8), Actual: actual, Description: '3d2'});
    } catch(e){testResults.push({Error: e, Description: '3d2'});}
 
-   return TestRunner.displayResults('StackExchange probabilityThat_XofNisSmallest', testResults, isFirst);
+   return TestRunner.displayResults('StackExchange beta.StackExchange.probabilityThat_XofNisSmallest', testResults, isFirst);
 };

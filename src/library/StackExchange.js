@@ -31,7 +31,7 @@ beta.StackExchange.probabilityThatSumOfDiceIsA = function(a, die, dieCount)
       (1 / sideCount));
    }
    return result;
-}
+};
 
 /**Now suppose Z(n) is the sum of n dice when [the smallest] die is dropped. Then
 
@@ -44,9 +44,9 @@ function probabilityThat_ZofNIsA(a, die, dieCount)
    var diceKept = (dieCount-1);
    if(0 === diceKept || a < diceKept || a > (diceKept*sideCount)) return 0;
 
-   var result = (probabilityThat_XofNisSmallest(die, dieCount) * beta.StackExchange.probabilityThatSumOfDiceIsA(a, die, (dieCount-1)));
+   var result = (beta.StackExchange.probabilityThat_XofNisSmallest(die, dieCount) * beta.StackExchange.probabilityThatSumOfDiceIsA(a, die, (dieCount-1)));
 
-   var probabilityThat_XofNisNotSmallestResult = probabilityThat_XofNisNotSmallest(die, dieCount);
+   var probabilityThat_XofNisNotSmallestResult = beta.StackExchange.probabilityThat_XofNisNotSmallest(die, dieCount);
    var secondPart = 0;
    for (var k = 1; k <= sideCount; ++k)
    {
@@ -59,57 +59,42 @@ function probabilityThat_ZofNIsA(a, die, dieCount)
    return result;
 }
 
-/**and we can calculate M(n) using*/
-function probabilityThat_theSmallestIsA(a, die, dieCount)
-{
-   if(1 === dieCount) return (1 / die.toJSON().sideCount);  //this is probabilityThat_XofNIsA
-
-   var result = probabilityThat_XofNisSmallest(die, dieCount) * probabilityThat_XofNIsA_GivenThatXofNisTheSmallest(a, die, dieCount);
-   result += (probabilityThat_XofNisNotSmallest(die, dieCount) * probabilityThat_theSmallestIsA_GivenThatXofNisNotSmallest(a, die, dieCount));
-   return result;
-}
-
-/**Anyway, together this all suggests a dynamic programming algorithm based on Y(n), Z(n), and M(n). Should be quadratic in n.
+/**and we can calculate M(n) using
+~
+Anyway, together this all suggests a dynamic programming algorithm based on Y(n), Z(n), and M(n). Should be quadratic in n.
 
 edit: A comment has been raised on how to calculate p(X(n)<=M(n-1)). Since X(n),M(n-1) can each only take on one of six values, we can just sum over all possibilities:*/
-function probabilityThat_XofNisSmallest(die, dieCount)
+beta.StackExchange.probabilityThat_XofNisSmallest = function(die, dieCount)
 {
-   if(1 === dieCount) return 1;
-
+   //this implementation is based on how I calculated it by hand rather than based on his formula
    var sideCount = die.toJSON().sideCount;
+   if(1 === dieCount) return 1;  //fast path
+
    var result = 0;
-   for (var a = 1; a <= sideCount; ++a)
+   for (var myRoll = 1; myRoll <= sideCount; ++myRoll)
    {
-      for (var b = 1; b <= sideCount; ++b)
-      {
-         if(a <= b) result += ((1 / sideCount) * probabilityThat_theSmallestIsA(b, die, (dieCount-1)));
-      }
+      var probOtherRolledLower = ((myRoll-1)/sideCount);  //if myRoll=3 then other has a 2/x chance of rolling lower
+      var probOtherRolledEqualOrHigher = (1-probOtherRolledLower);
+      var probAllOthersRolledEqualOrHigher = Math.pow(probOtherRolledEqualOrHigher, (dieCount-1));
+      result += probAllOthersRolledEqualOrHigher;
    }
+   result *= (1/sideCount);  //did this here instead of every iteration
+      //it's the prob for rolling myRoll
+
    return result;
-}
+};
 
 /*Similarly, p(X(n)=k|X(n)>M(n-1)) can be calculated by applying Bayes rule then summing over the possible values of X(n),M(n-1).*/
 
 //others:
-function probabilityThat_XofNisNotSmallest(die, dieCount)
+beta.StackExchange.probabilityThat_XofNisNotSmallest = function(die, dieCount)
 {
-   return (1-probabilityThat_XofNisSmallest(die, dieCount));
-}
+   return (1-beta.StackExchange.probabilityThat_XofNisSmallest(die, dieCount));
+};
 function probabilityThat_XofNIsA_GivenThatXofNisNotSmallest(a, die, dieCount)
 {
-   //TODO: wrong?:
+   //TODO: probably wrong:
    return (1 / die.toJSON().sideCount);  //this is probabilityThat_XofNIsA
-}
-
-function probabilityThat_XofNIsA_GivenThatXofNisTheSmallest(a, die, dieCount)
-{
-   //TODO: wrong?:
-   return (1 / die.toJSON().sideCount);  //this is probabilityThat_XofNIsA
-}
-function probabilityThat_theSmallestIsA_GivenThatXofNisNotSmallest(a, die, dieCount)
-{
-   //TODO: wrong?:
-   return probabilityThat_theSmallestIsA(a, die, dieCount);
 }
 
 /**@returns the probability of of A given B.*/
