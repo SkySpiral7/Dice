@@ -1,12 +1,16 @@
 'use strict';
 /*Despite the tests this whole file should be considered beta until I can incorporate it into Statistics:
 1. Finish (die with no: constantModifier, rerollCriteria, explodeType)
-2. Make as generic as possible (likely multiple steps)
+2. Optimize
+3. Compare to brute force
+   a. if new is slower then ask if this is actually O(n) and if I'm doing something wrong
+   b. if new is faster then continue
+4. Make as generic as possible (likely multiple steps)
    a. die with: constantModifier, rerollCriteria, explodeType
    b. any number of drop
    c. any kind of drop, negative
-3. Optimize
-4. Put into Statistics*/
+5. Compare again to make sure this can still handle 10k1 etc
+6. Put into Statistics*/
 var beta = {StackExchange: {}};
 
 /**from: http://stats.stackexchange.com/questions/130025/formula-for-dropping-dice-non-brute-force
@@ -35,18 +39,19 @@ beta.StackExchange.probabilityThatSumOfDiceIsA = function(a, die, dieCount)
 
 /**Now suppose Z(n) is the sum of n dice when [the smallest] die is dropped. Then
 
-p(nth die is the smallest)p(Y(n-1)=a)+p(nth die is not the smallest)sumOverAllK(p(Z(n-1)=(a-k))p(X(n)=k))
+p(nth die is the smallest)p(Y(n-1)=a|nth die is the smallest) + p(nth die is not the smallest)sumOverAllK(p(Z(n-1)=(a-k))p(X(n)=k))
 
 If we define M(n) to be distribution of the minimum of n dies, then*/
 function probabilityThat_ZofNIsA(a, die, dieCount)
 {
    var sideCount = die.toJSON().sideCount;
    var diceKept = (dieCount-1);
+   if(0 === diceKept && 0 === a) return 1;  //dropping the only die will make the sum be 0
    if(0 === diceKept || a < diceKept || a > (diceKept*sideCount)) return 0;
    var diceCountExcludingSelf = (dieCount-1);  //same value as diceKept but different meaning
 
    var result = (beta.StackExchange.probabilityThat_XofNisSmallestOrEqual(die, dieCount) *
-      beta.StackExchange.probabilityThatSumOfDiceIsA(a, die, diceKept));
+      probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(a, die, diceKept));
 
    var probabilityThat_XofNisLargestResult = beta.StackExchange.probabilityThat_XofNisLargest(die, dieCount);
    var secondPart = 0;
@@ -60,13 +65,13 @@ function probabilityThat_ZofNIsA(a, die, dieCount)
    result += secondPart;
    return result;
 }
-/*Doing probabilityThat_ZofNIsA by hand, some work done by brute force (see tests):
-p(Z(n)=a) = p(X(n)<=M(n-1)) * p(Y(n-1)=a) + p(X(n)>M(n-1)) * sumOverAllK(p(Z(n-1)=(a-k))p(X(n)=k|X(n)>M(n-1)))
+/*Doing probabilityThat_ZofNIsA by hand, some work done by brute force (see other tests):
+p(Z(n)=a) = p(X(n)<=M(n-1)) * p(Y(n-1)=a|X(n)<=M(n-1)) + p(X(n)>M(n-1)) * sumOverAllK(p(Z(n-1)=(a-k))p(X(n)=k|X(n)>M(n-1)))
 Using 2d2 drop lowest, the chance of getting 1 is:
-p(Z(n)=1) = (3/4)*(1/2) + (1/4)*(p(Z(n-1)=(1-1))*0 + p(Z(n-1)=(1-2))*1)
-p(Z(n)=1) = (3/8) + (1/4)*(0*0 + 0*1)
-p(Z(n)=1) = 3/8
-However the correct answer is 1/4 therefore the formula is wrong
+p(Z(n)=1) = (3/4)*(1/3) + (1/4)*(p(Z(n-1)=(1-1))*0 + p(Z(n-1)=(1-2))*1)
+p(Z(n)=1) = (1/4) + (1/4)*(1*0 + 0*1)
+p(Z(n)=1) = 1/4
+This is the correct answer
 */
 
 /**and we can calculate M(n) using
@@ -128,6 +133,32 @@ function probabilityThat_XofNisSmallestOrEqual_GivenThatXofNIsA(a, die, dieCount
    var probAllOthersRolledEqualOrHigher = Math.pow(probOtherRolledEqualOrHigher, (dieCount-1));
 
    return probAllOthersRolledEqualOrHigher;
+}
+function probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(a, die, dieKept)
+{
+   //base cases are covered by probabilityThat_ZofNIsA
+   var sideCount = die.toJSON().sideCount;
+   var workingExpression = new DiceExpression([{coefficient: 1, exponent: 1}], false);
+   workingExpression.addTerm({coefficient: -1, exponent: 1});  //it is now empty
+   for (var k = 1; k <= sideCount; ++k)
+   {
+      var temp;
+      //we know that the first die is one of the smallest so reroll all smaller dice
+      if(1 === k) temp = Statistics.calculateDiceSums(new DicePool(dieKept + 'd' + sideCount));
+      else temp = Statistics.calculateDiceSums(new DicePool(dieKept + 'd' + sideCount + 'r<' + k));
+      for (var combinedIndex = 0; combinedIndex < temp.length; ++combinedIndex)
+      {
+         workingExpression.addTerm({coefficient: temp[combinedIndex].frequency, exponent: temp[combinedIndex].result});
+      }
+   }
+
+   var diceResults = workingExpression.toDiceResults();
+   Statistics.determineProbability(diceResults);
+   for (var findIndex = 0; findIndex < diceResults.length; ++findIndex)
+   {
+      if(a === diceResults[findIndex].result) return diceResults[findIndex].probability;
+   }
+   return 0;
 }
 
 /**@returns the probability of of A given B.*/

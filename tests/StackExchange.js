@@ -40,7 +40,6 @@ TestSuite.StackExchange.probabilityThat_ZofNIsA = function(isFirst)
    try{
    actual = probabilityThat_ZofNIsA(1, new Die(2), 2);
    //all: 11, 12, 21, 22 which become: 1, 2, 2, 2
-   //actual is currently: 3/8 = 0.375
    testResults.push({Expected: (1/4), Actual: actual, Description: 'chance of 1 from 2d2 drop lowest'});
    } catch(e){testResults.push({Error: e, Description: 'chance of 1 from 2d2 drop lowest'});}
 
@@ -176,4 +175,58 @@ TestSuite.StackExchange.probabilityThat_XofNisSmallestOrEqual_GivenThatXofNIsA =
    } catch(e){testResults.push({Error: e, Description: '3d2 given 2'});}
 
    return TestRunner.displayResults('StackExchange probabilityThat_XofNisSmallestOrEqual_GivenThatXofNIsA', testResults, isFirst);
+};
+TestSuite.StackExchange.probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], actual;
+
+   try{
+   actual = probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(1, new Die(2), 1);
+   //all: 11, 12, 21, 22
+   //given (first die is n): 11, 12, -, 22
+   //becomes (other die used by sum): 1, 2, 2
+   testResults.push({Expected: (1/3), Actual: actual, Description: '2d2 given 1'});
+   } catch(e){testResults.push({Error: e, Description: '2d2 given 1'});}
+
+   try{
+   actual = probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(2, new Die(2), 1);
+   testResults.push({Expected: (2/3), Actual: actual, Description: '2d2 given 2'});
+   } catch(e){testResults.push({Error: e, Description: '2d2 given 2'});}
+
+   try{
+   actual = probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(3, new Die(2), 2);
+   //all: 111, 112, 121, 122, 211, 212, 221, 222
+   //given (first die is n): 111, 112, 121, 122, -, -, -, 222
+   //becomes (other dice): 11, 12, 21, 22, 22
+   //with sum of: 2, 3, 3, 4, 4
+   testResults.push({Expected: (2/5), Actual: actual, Description: '3d2 given 3'});
+   } catch(e){testResults.push({Error: e, Description: '3d2 given 3'});}
+
+   try{
+   actual = probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(2, new Die(3), 1);
+   //all: 11, 12, 13, 21, 22, 23, 31, 32, 33
+   //given (first die is n): 11, 12, 13, -, 22, 23, -, -, 33
+   //becomes (other dice): 1, 2, 3, 2, 3, 3
+   //which is: 1*1, 2*2, 3*3 = 6 total
+   testResults.push({Expected: (2/6), Actual: actual, Description: '2d3 given 2'});
+   } catch(e){testResults.push({Error: e, Description: '2d3 given 2'});}
+
+   try{
+   actual = probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(3, new Die(3), 1);
+   testResults.push({Expected: (3/6), Actual: actual, Description: '2d3 given 3'});
+   } catch(e){testResults.push({Error: e, Description: '2d3 given 3'});}
+
+   try{
+   actual = probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual(4, new Die(3), 2);
+   //all: 111, 112, 113, 121, 122, 123, 131, 132, 133, 211, 212, 213, 221, 222, 223, 231, 232, 233, 311, 312, 313, 321, 322, 323, 331, 332, 333
+   //given (first die is n): 111, 112, 113, 121, 122, 123, 131, 132, 133, -, -, -, -, 222, 223, -, 232, 233, -, -, -, -, -, -, -, -, 333
+   //becomes (other dice): 11, 12, 13, 21, 22, 23, 31, 32, 33, 22, 23, 32, 33, 33
+   //with sum of: 2, 3, 4, 3, 4, 5, 4, 5, 6, 4, 5, 5, 6, 6
+   //which is: 2*1, 3*2, 4*4, 5*4, 6*3 = 14 total
+   testResults.push({Expected: (4/14), Actual: actual, Description: '3d3 given 4'});
+   } catch(e){testResults.push({Error: e, Description: '3d3 given 4'});}
+
+   return TestRunner.displayResults('StackExchange probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual', testResults, isFirst);
 };
