@@ -75,3 +75,17 @@ function requireTypeOf(expectedType, actualObject)
    if(expectedType !== typeof(actualObject)) throw new Error('Expected: ' + expectedType + '. Got: ' + typeof(actualObject)
       + ' with toString: ' + actualObject);
 }
+/*
+inspired by: https://www.mathsisfun.com/combinatorics/combinations-permutations-calculator.html
+TODO: consider adding function possibleCombinations({numberOfTypesOfObject: 3, numberOfObjectsChoosen: 2, orderMatters: true, canRepeat: true})
+statisticalCombination(numberOfTypesOfObject, numberOfObjectsChoosen){return combinatorics({orderMatters: false, canRepeat: false});}
+statisticalPermutation(numberOfTypesOfObject, numberOfObjectsChoosen){return combinatorics({orderMatters: true, canRepeat: false});}
+
+Formulas (assuming indistinguishable objects but allowing duplicate results):
+n=numberOfTypesOfObject, r=numberOfObjectsChoosen
+orderMatters: false, canRepeat: false. n!/((n-r)!*r!)
+orderMatters: true, canRepeat: false. n!/(n-r)!
+orderMatters: false, canRepeat: true. (n+r-1)!/(r!*(n-1)!) I haven't seen this formula before
+orderMatters: true, canRepeat: true. n^r
+Note that for all but the last the factorial can be reduced before calculated
+*/

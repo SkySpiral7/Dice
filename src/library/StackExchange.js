@@ -65,6 +65,32 @@ function probabilityThat_ZofNIsA(a, die, dieCount)
    result += secondPart;
    return result;
 }
+/**This is only for testing and will be deleted later. It helps test Z.
+It returns the brute force answer which is what probabilityThat_ZofNIsA is trying to find.
+This function's answer is known to be correct and thus can be used to compare or rule out.*/
+function subZ(a, die, dieCount)
+{
+   var sideCount = die.toJSON().sideCount;
+   var diceKept = (dieCount-1);
+   if(0 === diceKept && 0 === a) return 1;  //dropping the only die will make the sum be 0
+   if(0 === diceKept || a < diceKept || a > (diceKept*sideCount)) return 0;
+
+   var stats = Statistics.calculateDiceSums(new DicePool({name: 'Known correct answer', pool: [
+      {
+         die: die,
+         dieCount: dieCount,
+         dropKeepType: DicePool.dropKeepTypes.DropLowest,
+         dropKeepCount: 1,
+         areDiceNegative: false
+      }
+   ]}));
+   Statistics.determineProbability(stats);
+   for (var findIndex = 0; findIndex < stats.length; ++findIndex)
+   {
+      if(a === stats[findIndex].result) return stats[findIndex].probability;
+   }
+   return 0;
+}
 /*Doing probabilityThat_ZofNIsA by hand, some work done by brute force (see other tests):
 p(Z(n)=a) = p(X(n)<=M(n-1)) * p(Y(n-1)=a|X(n)<=M(n-1)) + p(X(n)>M(n-1)) * sumOverAllK(p(Z(n-1)=(a-k))p(X(n)=k|X(n)>M(n-1)))
 Using 2d2 drop lowest, the chance of getting 1 is:
@@ -116,6 +142,7 @@ function probabilityThat_XofNIsA_GivenThatXofNisLargest(a, die, dieCount)
 function probabilityThat_XofNisLargest_GivenThatXofNIsA(a, die, dieCount)
 {
    if(1 === dieCount) return 1;  //fast path
+   if(1 === a) return 0;  //since this is the smallest possible number it can't be strictly greater
    var sideCount = die.toJSON().sideCount;
 
    var probOtherRolledLower = ((a-1)/sideCount);  //if a=3 then other has a 2/x chance of rolling lower
