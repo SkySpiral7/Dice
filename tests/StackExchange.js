@@ -44,13 +44,37 @@ TestSuite.StackExchange.probabilityThat_ZofNIsA = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'chance of 1 from 2d2 drop lowest'});}
 
    try{
-   actual = beta.probabilityThat_ZofNIsA(4, new Die(4), 4);
-   expected = Statistics.calculateDiceSums(new DicePool('4d4 drop lowest'));
+   actual = beta.probabilityThat_ZofNIsA(2, new Die(2), 2);
+   testResults.push({Expected: (3/4), Actual: actual, Description: 'chance of 2 from 2d2 drop lowest'});
+   } catch(e){testResults.push({Error: e, Description: 'chance of 2 from 2d2 drop lowest'});}
+
+   try{
+   actual = beta.probabilityThat_ZofNIsA(3, new Die(3), 2);
+   expected = Statistics.calculateDiceSums(new DicePool('2d3 drop lowest'));
    Statistics.determineProbability(expected);
-   console.assert(4 === expected[4-1-2].result);  //probability 0 is excluded so results 1 and 2 aren't here.
+   console.assert(3 === expected[3-1].result);
+   testResults.push({Expected: expected[2].probability, Actual: actual, Description: 'chance of 3 from 2d3 drop lowest'});
+   } catch(e){testResults.push({Error: e, Description: 'chance of 3 from 2d3 drop lowest'});}
+
+   try{
+   actual = beta.probabilityThat_ZofNIsA(4, new Die(2), 3);
+   expected = Statistics.calculateDiceSums(new DicePool('3d2 drop lowest'));
+   Statistics.determineProbability(expected);
+   console.assert(4 === expected[4-1-1].result);  //probability 0 is excluded so results 1 isn't here.
    //currently fails
-   testResults.push({Expected: expected[1].probability, Actual: actual, Description: 'chance of 4 from 4d4 drop lowest'});
-   } catch(e){testResults.push({Error: e, Description: 'chance of 4 from 4d4 drop lowest'});}
+   testResults.push({Expected: expected[2].probability, Actual: actual, Description: 'chance of 4 from 3d2 drop lowest'});
+   } catch(e){testResults.push({Error: e, Description: 'chance of 4 from 3d2 drop lowest'});}
+
+   if(false){  //ignoring the stress test for now for the sake of speed
+   try{
+   actual = beta.probabilityThat_ZofNIsA(15, new Die(6), 6);  //could handle 8d8
+   expected = Statistics.calculateDiceSums(new DicePool('6d6 drop lowest'));  //high stress
+   Statistics.determineProbability(expected);
+   console.assert(15 === expected[15-1-4].result);  //probability 0 is excluded so results 1-4 aren't here.
+   //currently fails
+   testResults.push({Expected: expected[10].probability, Actual: actual, Description: 'chance of 15 from 6d6 drop lowest'});
+   } catch(e){testResults.push({Error: e, Description: 'chance of 15 from 6d6 drop lowest'});}
+   }
 
    return TestRunner.displayResults('StackExchange beta.probabilityThat_ZofNIsA', testResults, isFirst);
 };
@@ -105,15 +129,33 @@ TestSuite.StackExchange.probabilityThat_XofNIsA_GivenThatXofNisLargest = functio
 
    try{
    actual = beta.probabilityThat_XofNIsA_GivenThatXofNisLargest(1, new Die(2), 2);
-   //all: 11, 12, 21, 22 so x is: -, 2, 2, -
+   //all: 11, 12, 21, 22
+   //x is: -, 2, 2, -
    testResults.push({Expected: 0, Actual: actual, Description: '1 from 2d2'});
    } catch(e){testResults.push({Error: e, Description: '1 from 2d2'});}
 
    try{
    actual = beta.probabilityThat_XofNIsA_GivenThatXofNisLargest(2, new Die(2), 2);
-   //all: 11, 12, 21, 22 so the x is: -, 2, 2, -
+   //all: 11, 12, 21, 22
+   //x is: -, 2, 2, -
    testResults.push({Expected: 1, Actual: actual, Description: '2 in 2d2'});
    } catch(e){testResults.push({Error: e, Description: '2 in 2d2'});}
+
+   try{
+   actual = beta.probabilityThat_XofNIsA_GivenThatXofNisLargest(2, new Die(2), 3);
+   //all: 111, 112, 121, 122, 211, 212, 221, 222
+   //x is: -, 2, 2, -, 2, -, -, -
+   //currently fails. actual is 1/3
+   testResults.push({Expected: 1, Actual: actual, Description: '2 in 3d2'});
+   } catch(e){testResults.push({Error: e, Description: '2 in 3d2'});}
+
+   try{
+   actual = beta.probabilityThat_XofNIsA_GivenThatXofNisLargest(2, new Die(3), 2);
+   //all: 11, 12, 13, 21, 22, 23, 31, 32, 33
+   //x is: -, 2, 3, 2, -, 3, 3, 3, -
+   //which is: 2*2, 3*4 = 6 total
+   testResults.push({Expected: (2/6), Actual: actual, Description: '2 in 2d3'});
+   } catch(e){testResults.push({Error: e, Description: '2 in 2d3'});}
 
    return TestRunner.displayResults('StackExchange beta.probabilityThat_XofNIsA_GivenThatXofNisLargest', testResults, isFirst);
 };
@@ -139,6 +181,14 @@ TestSuite.StackExchange.probabilityThat_XofNisLargest_GivenThatXofNIsA = functio
    //all: 11, 12, 21, 22
    testResults.push({Expected: (2/4), Actual: actual, Description: '2 in 2d2'});
    } catch(e){testResults.push({Error: e, Description: '2 in 2d2'});}
+
+   try{
+   actual = beta.probabilityThat_XofNisLargest_GivenThatXofNIsA(2, new Die(2), 3);
+   //all: 111, 112, 121, 122, 211, 212, 221, 222
+   //given: 211, 212, 221, 222
+   //largest: Y, N, N, N
+   testResults.push({Expected: (1/4), Actual: actual, Description: '2 in 3d2'});
+   } catch(e){testResults.push({Error: e, Description: '2 in 3d2'});}
 
    return TestRunner.displayResults('StackExchange beta.probabilityThat_XofNisLargest_GivenThatXofNIsA', testResults, isFirst);
 };

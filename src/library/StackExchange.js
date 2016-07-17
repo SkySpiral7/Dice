@@ -98,6 +98,28 @@ p(Z(n)=1) = (3/4)*(1/3) + (1/4)*(p(Z(n-1)=(1-1))*0 + p(Z(n-1)=(1-2))*1)
 p(Z(n)=1) = (1/4) + (1/4)*(1*0 + 0*1)
 p(Z(n)=1) = 1/4
 This is the correct answer
+
+Using 3d2 drop lowest, the chance of getting 4 is:
+p(Z(n)=a) = p(X(n)<=M(n-1)) * p(Y(n-1)=a|X(n)<=M(n-1)) + p(X(n)>M(n-1)) * sumOverAllK(p(Z(n-1)=(a-k))p(X(n)=k|X(n)>M(n-1)))
+p(Z(3)=4) = (5/8)*(2/5) + (3/8)*(p(Z(3-1)=(4-1))*0 + p(Z(3-1)=(4-2))*1)
+   p(Z(2)=2) = p(X(n)<=M(n-1)) * p(Y(n-1)=a|X(n)<=M(n-1)) + p(X(n)>M(n-1)) * sumOverAllK(p(Z(n-1)=(a-k))p(X(n)=k|X(n)>M(n-1)))
+   p(Z(2)=2) = (3/4)*(2/3) + (1/4)*(p(Z(1)=(2-1))*0 + p(Z(1)=(2-2))*1)
+   p(Z(2)=2) = (1/2) + (1/4)*(0*0 + 1*1)
+   p(Z(2)=2) = (1/2) + (1/4)
+   p(Z(2)=2) = 3/4 same as 1-p(Z(2)=1) so this is correct
+p(Z(3)=4) = (5/8)*(2/5) + (3/8)*(0*0 + (3/4)*1)
+p(Z(3)=4) = (1/4) + (3/8)*(3/4)
+p(Z(3)=4) = (8/32) + (9/32)
+p(Z(3)=4) = 17/32 = 0.53125 but my code is getting 11/32 = 0.34375
+Brute force gets:
+[
+   {result: 2, frequency: 1, probability: 0.125},  //is 1/8
+   {result: 3, frequency: 3, probability: 0.375},  //is 3/8
+   {result: 4, frequency: 4, probability: 0.5}     //is 4/8
+]
+all rolls: 111, 112, 121, 122, 211, 212, 221, 222
+becomes sums: 2, 3, 3, 4, 3, 4, 4, 4
+which is: 2*1, 3*3, 4*4 = 8 total
 */
 
 /**and we can calculate M(n) using
