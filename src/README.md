@@ -3,7 +3,7 @@ File descriptions
 #battle tech dice.html
 A simple web interface for rolling dice for the game BattleTech.
 
-Surprisingly not based on "tabletop dice.html" (even though initially it was going to be).
+It is very old and ugly. It needs to be rewritten to hook up to the new dice library.
 
 **Inputs**: initiative (with and without Combat Paralysis), number needed to hit
 
@@ -12,20 +12,23 @@ Surprisingly not based on "tabletop dice.html" (even though initially it was goi
 Also has: the ability to reroll criticals. and general purpose 2d6, 1d6 and coin.
 
 
-#L5R dice.html
+#L5R.html
 A simple web interface for rolling dice for the game Legend of the Five Rings.
 
-Based on an old version of "tabletop dice.html" which was then stripped out and given a specific interface.
+It is hooked up to the dice library and is therefore an example use case.
 
-**Inputs**: XkY, Emphasis
+**Inputs**: TN, circumstance bonus, number of (non-free) raises, XkY, Emphasis
 
-**Outputs**: list of each kept die sorted, list of each dropped die sorted, total of the dice kept, void points recovered
+**Outputs**: list of each kept die sorted, list of each dropped die sorted, total of the dice kept, result, void points recovered,
+and a drawn distribution curve with min, max, average, and standard deviation.
 
 
 #L5R stats.html
+**Deprecated** this will be deleted later. It only exists until I can compare performance.
+
 A simple web interface for drawing a distribution curve of the dice for the game Legend of the Five Rings.
 
-Based on "tabletop dice.html" which was then heavily stripped out in hopes of improving performance
+Based on and old "tabletop dice.html" which was then heavily stripped out in hopes of improving performance
 (only for this one type of dice curve), it tragically did not help.
 
 If all dice are kept it performs wonders and is able to do 3,300k3,300 within a minute. But if even
@@ -33,10 +36,7 @@ If all dice are kept it performs wonders and is able to do 3,300k3,300 within a 
 hand 3k1 the next slowest takes only 3 seconds).
 
 If all dice are kept a formula is used that is very fast but otherwise it must find every possible
-combination. At my college I asked the two professors of Probability and Statistics (and the Computer
-Science professor) and a month later they agreed that this problem would require far more knowledge and
-skill then they had. In fact this problem might even be NP-Complete. If anyone is able to solve this
-problem I would greatly appreciate it.
+combination.
 
 **Inputs**: XkY, Emphasis
 
@@ -44,18 +44,10 @@ problem I would greatly appreciate it.
 
 
 #tabletop dice.html
-A javascript dice rolling library. The html around it has full functional documentation (of the ones
-that are finished) except for Draw.compareDiceBellCurve which works fine. The html also has a textarea
-for eval. For example you can program: if(rollDice("2d6") === 12){}. Or create a Die or DicePool object etc.
+A general purpose html that's hooked up to the dice rolling library. It has a textarea
+which eval is called on so that you may write small programs on the fly.
 
-This is also meant to be the one dice roller to rule them all. And you might've heard that claim before
-but **seriously**, excluding performance and visuals of dice, I only know of **one** thing it's missing:
-an arbitrary grouping of dice syntax such as (1d6)d4. Which I thought [Roll20](https://wiki.roll20.net/Dice_Reference)
-had at one point... I was at one point working on this functionality in the function groupParser.
-
-This file has it all: rolling dice, drawing dice distribution curves, dice and dicepool objects that
-allow any kind of custom die, convenience functions for common things like DnDAttack, IronClawOpposedRoll,
-and WarhammerAttackUnit (open file for documentation).
+The functional documentation is old and will be removed after all of them have been copied into jsDoc comments (as needed).
 
 **Inputs**: (open file for documentation) a textarea for eval
 
@@ -66,7 +58,8 @@ and WarhammerAttackUnit (open file for documentation).
 A simple web interface for drawing a distribution curve of the dice for the game Warhammer 40k. And
 for rolling random values using the inputs to know the results of an attack.
 
-Based on "tabletop dice.html". The user form has been greatly simplified and only supports Warhammer.
+It is hooked up to the dice library and is therefore an example use case.
+The user form has been greatly simplified and only supports Warhammer.
 A few changes to the javascript were also needed to support the new interface.
 
 **Inputs**: Number of Dice, Number of Wounds Possible, To Hit Value, To Wound Value, To Save Value, Reanimation or Feel No Pain, (and Custom Column)
