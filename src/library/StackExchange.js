@@ -3,6 +3,12 @@
 1. Finish (die with no: constantModifier, rerollCriteria, explodeType)
 2. Optimize
 3. Compare to brute force
+   {
+      var start = Date.now();
+      Statistics.calculateDiceSums(new DicePool('7d7 drop lowest'));
+      var end = Date.now();
+      return new Date(end-start).toISOString().substr(17,6) + ' seconds';
+   }
    a. if new is slower then ask if this is actually O(n) and if I'm doing something wrong
    b. if new is faster then continue
 4. Make as generic as possible (likely multiple steps)
@@ -130,8 +136,8 @@ edit: A comment has been raised on how to calculate p(X(n)<=M(n-1)). Since X(n),
 beta.probabilityThat_XofNisSmallestOrEqual = function(die, dieCount)
 {
    //this implementation is based on how I calculated it by hand rather than based on his formula
-   var sideCount = die.toJSON().sideCount;
    if(1 === dieCount) return 1;  //fast path
+   var sideCount = die.toJSON().sideCount;
 
    var result = 0;
    for (var myRoll = 1; myRoll <= sideCount; ++myRoll)
@@ -148,30 +154,27 @@ beta.probabilityThat_XofNisSmallestOrEqual = function(die, dieCount)
 //others:
 beta.probabilityThat_XofNisLargest = function(die, dieCount)
 {
+   if(1 === dieCount) return 1;  //edge case and fast path
    return (1-beta.probabilityThat_XofNisSmallestOrEqual(die, dieCount));
 };
 beta.probabilityThat_XofNIsA_GivenThatXofNisLargest = function(a, die, dieCount)
 {
-   var probabilityThat_XofNIsA = (1 / die.toJSON().sideCount);
-   if(1 === dieCount) return probabilityThat_XofNIsA;  //with only 1 die being the largest means nothing
-   var probabilityThat_XofNisLargest = beta.probabilityThat_XofNisLargest(die, dieCount);
-
-   var probabilityThat_XofNisLargest_GivenThatXofNIsAResult = beta.probabilityThat_XofNisLargest_GivenThatXofNIsA(a, die, dieCount);
-
-   return bayesTheorem(probabilityThat_XofNisLargest_GivenThatXofNIsAResult, probabilityThat_XofNIsA, probabilityThat_XofNisLargest);
-};
-
-beta.probabilityThat_XofNisLargest_GivenThatXofNIsA = function(a, die, dieCount)
-{
-   if(1 === dieCount) return 1;  //fast path
-   if(1 === a) return 0;  //since this is the smallest possible number it can't be strictly greater
    var sideCount = die.toJSON().sideCount;
+   if(1 === dieCount) return (1 / sideCount);  //with only 1 die being the largest means nothing
+   if(1 === a) return 0;  //if there is more than 1 die then the largest can't be 1
 
-   var probOtherRolledLower = ((a-1)/sideCount);  //if a=3 then other has a 2/x chance of rolling lower
-   var probAllOthersRolledLower = Math.pow(probOtherRolledLower, (dieCount-1));
+   var result = [];
+   for (var myRoll = 2; myRoll <= sideCount; ++myRoll)
+   {
+      var probOtherRolledLower = ((myRoll-1)/sideCount);  //if myRoll=3 then other has a 2/x chance of rolling lower
+      var probAllOthersRolledLower = Math.pow(probOtherRolledLower, (dieCount-1));
+      result.push({result: myRoll, frequency: probAllOthersRolledLower});  //weighted
+   }
+   Statistics.determineProbability(result);
 
-   return probAllOthersRolledLower;
+   return result[a-2].probability;  //-1 because 0 indexed. -1 because result: 1 is excluded
 };
+
 beta.probabilityThat_XofNisSmallestOrEqual_GivenThatXofNIsA = function(a, die, dieCount)
 {
    if(1 === dieCount) return 1;  //fast path
@@ -209,9 +212,3 @@ beta.probabilityThatSumOfDiceIsA_GivenThatXofNisSmallestOrEqual = function(a, di
    }
    return 0;
 };
-
-/**@returns the probability of of A given B.*/
-function bayesTheorem(probabilityOfBGivenA, probabilityOfA, probabilityOfB)
-{
-   return (probabilityOfBGivenA * probabilityOfA / probabilityOfB);
-}
