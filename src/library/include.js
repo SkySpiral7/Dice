@@ -3,7 +3,7 @@
 var fileNames = ['DiceExpression', 'DicePool', 'Die', 'Draw', 'GenerateHtml', 'Parser', 'Prebuilt',
    'prototypes', 'Statistics', 'Stringifier',
    'GameSpecific', 'Misc',  //must be last. Misc currently doesn't need to be
-   'StackExchange'];  //beta: ignore
+   'beta/StackExchangeWhuber'];  //beta: ignore
 var includePath;  //this doesn't delete a pre-existing value.
 //I could loop over document.getElementsByTagName('script') but that's too much work and equal assumption
 if(null !== document.getElementById('DiceInclude')) includePath = document.getElementById('DiceInclude').src.replace('include.js', '');
@@ -15,4 +15,4 @@ for (var i = 0; i < fileNames.length; ++i)
 }
 
 //change this here so that the tests/include.js can be passed a specific includePath
-includePath = includePath.replace('src/library', 'tests');
+includePath = includePath.replace('src/', 'tests/');

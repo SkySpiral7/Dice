@@ -19,7 +19,7 @@
 6. Put into Statistics*/
 var beta = {};
 
-/**from: http://stats.stackexchange.com/questions/130025/formula-for-dropping-dice-non-brute-force
+/**from: http://stats.stackexchange.com/questions/130025/formula-for-dropping-dice-non-brute-force/130036#130036
 I'm not sure about the general problem with varying numbers of dice, sides, and drops, but I think I can see an efficient algorithm for the drop-1 case. The qualifier is that I'm not completely sure that it's correct, but right now I can't see any flaws.
 
 Let's start by not dropping any dice. Suppose X(n) represents the nth die, and suppose Y(n) represents the sum of n dice. Then*/
@@ -74,7 +74,7 @@ beta.probabilityThat_ZofNIsA = function(a, die, dieCount)
 /**This is only for testing and will be deleted later. It helps test Z.
 It returns the brute force answer which is what probabilityThat_ZofNIsA is trying to find.
 This function's answer is known to be correct and thus can be used to compare or rule out.*/
-function subZ(a, die, dieCount)
+function beta.bruteZ(a, die, dieCount)
 {
    var sideCount = die.toJSON().sideCount;
    var diceKept = (dieCount-1);
