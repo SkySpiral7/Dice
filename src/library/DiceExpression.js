@@ -28,6 +28,11 @@ function DiceExpression(arg1, arg2)
       termArray.push(term);
       termArray.sort(DiceExpression.exponentDescending);  //TODO: is this needed?
    };
+   /**@returns a copy of this object.*/
+   this.clone = function()
+   {
+      return new DiceExpression(termArray, useProbability);  //the constrcutor will do a defensive copy
+   };
    /**@returns true if other is equal to this.*/
    this.equals = function(other)
    {
@@ -75,6 +80,16 @@ function DiceExpression(arg1, arg2)
       }
       termArray.reverse();  //works in this case
    };
+   /**This function lets you subtract another DiceExpression from this Expression (this Expression is mutated to be the result).*/
+   this.subtractExpression = function(otherExpression)
+   {
+      requireInstanceOf(DiceExpression, otherExpression);
+      var otherTerms = otherExpression.toJSON();
+      for (var i = 0; i < otherTerms.length; ++i)
+      {
+        this.addTerm({exponent: otherTerms[i].exponent, coefficient: -otherTerms[i].coefficient});
+      }
+   };
    /**@returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).*/
    this.toDiceResults = function()
    {
@@ -91,6 +106,7 @@ function DiceExpression(arg1, arg2)
    /**@returns an object formatted for JsonReviver.reviveWith(). return.value has this DiceExpression's termArray*/
    this.toJSON = function()
    {
+      //TODO: doesn't include useProbability
       return JSON.clone(termArray);  //defensive copy
    };
 

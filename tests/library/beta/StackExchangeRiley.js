@@ -2,6 +2,7 @@
 TestSuite.StackExchange = {};
 TestSuite.StackExchange.probabilityThat_ZofNIsA_meetsRequirements = function(isFirst)
 {
+   return {tableName: 'unmade', testResults: []};  //remove this when actual tests exist. ADD TESTS
    TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected;

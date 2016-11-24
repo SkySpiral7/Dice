@@ -78,6 +78,22 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, isFirst);
 };
+TestSuite.DiceExpression.clone = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], expression, actual, expected;
+
+   try{
+   expression = new DiceExpression(new Die(3));
+   expected = expression.toJSON();
+   actual = expression.clone();
+   expression.addTerm({coefficient: 5, exponent: 1});
+   testResults.push({Expected: expected, Actual: actual.toJSON(), Description: 'Clone returns a copy'});
+   } catch(e){testResults.push({Error: e, Description: 'Clone returns a copy'});}
+
+   return TestRunner.displayResults('DiceExpression new DiceExpression().clone()', testResults, isFirst);
+};
 TestSuite.DiceExpression.multiply = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
@@ -146,6 +162,31 @@ TestSuite.DiceExpression.negateExponents = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Negate array exponents'});}
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
+};
+TestSuite.DiceExpression.subtractExpression = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], expression, actual, expected;
+
+   try{
+   new DiceExpression(new Die()).subtractExpression(2);
+   TestRunner.failedToThrow(testResults, 'Illegal arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: getError(requireInstanceOf, [DiceExpression, 2]),
+         Actual: e, Description: 'Illegal arg'});
+   }
+
+   try{
+   actual = new DiceExpression([{exponent: 1, coefficient: 6}, {exponent: 2, coefficient: 4}]);
+   actual.subtractExpression(new DiceExpression([{exponent: 1, coefficient: 2}, {exponent: 2, coefficient: 1}]));
+   expected = new DiceExpression([{exponent: 1, coefficient: 4}, {exponent: 2, coefficient: 3}]);
+   testResults.push({Expected: expected, Actual: actual, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});
+   } catch(e){testResults.push({Error: e, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});}
+
+   return TestRunner.displayResults('DiceExpression new DiceExpression().subtractExpression()', testResults, isFirst);
 };
 TestSuite.DiceExpression.toDiceResults = function(isFirst)
 {
