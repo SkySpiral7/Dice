@@ -5,6 +5,16 @@ function DiceExpression(arg1, arg2)
 {
    var termArray, useProbability;
 
+   /**This function lets you add this Expression to otherExpression (this Expression is mutated to be the result).*/
+   this.add = function(otherExpression)
+   {
+      requireInstanceOf(DiceExpression, otherExpression);
+      var otherTerms = otherExpression.toJSON();
+      for (var i = 0; i < otherTerms.length; ++i)
+      {
+        this.addTerm(otherTerms[i]);
+      }
+   };
    /**
    This function lets you add a term to this Expression (this Expression is mutated to be the result).
    If you have a Expression e then e.addTerm({coefficient: 3, exponent: 2}) is e + 3x^2.
@@ -31,6 +41,7 @@ function DiceExpression(arg1, arg2)
    /**@returns a copy of this object.*/
    this.clone = function()
    {
+      if(0 === termArray.length) return DiceExpression.empty(useProbability);  //to avoid edge case of constructor
       return new DiceExpression(termArray, useProbability);  //the constrcutor will do a defensive copy
    };
    /**@returns true if other is equal to this.*/
@@ -81,7 +92,7 @@ function DiceExpression(arg1, arg2)
       termArray.reverse();  //works in this case
    };
    /**This function lets you subtract another DiceExpression from this Expression (this Expression is mutated to be the result).*/
-   this.subtractExpression = function(otherExpression)
+   this.subtract = function(otherExpression)
    {
       requireInstanceOf(DiceExpression, otherExpression);
       var otherTerms = otherExpression.toJSON();
@@ -96,7 +107,7 @@ function DiceExpression(arg1, arg2)
       var result = [];
       for (var i = 0; i < termArray.length; ++i)
       {
-         //rename them to something meaningful
+         //rename them from the expression names to the dice names
          if(useProbability) result.push({result: termArray[i].exponent, probability: termArray[i].coefficient});
          else result.push({result: termArray[i].exponent, frequency: termArray[i].coefficient});
       }
@@ -161,6 +172,14 @@ DiceExpression.combineValues = function(everyValue)
    {
       everyValue[i].exponent = Math.summation(everyValue[i].exponent);
    }
+};
+//TODO: doc DiceExpression.empty
+DiceExpression.empty = function(useProbability)
+{
+   if(undefined === useProbability) useProbability = false;
+   var result = new DiceExpression([{coefficient: 1, exponent: 1}], useProbability);
+   result.addTerm({coefficient: -1, exponent: 1});  //it is now empty
+   return result;
 };
 //TODO: doc DiceExpression.everyValue and move some tests
 DiceExpression.everyValue = function(die, explodeCount)
