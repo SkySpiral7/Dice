@@ -10,13 +10,16 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 4, weapon: {damageString: '1d8', flatDamageModifer: 3}, opposingAc: 12};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [19]).concat(dieResultsToNonRandomArray(8, [5])));
    actual = Prebuilt.PathfinderAttack(input);
+   stringValue = actual.toString();
+   delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 8}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, all values'});
+   testResults.push({Expected: Stringifier.PathfinderAttack(expected), Actual: stringValue, Description: 'Happy path, string value'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
    input = {attackBonus: -5, weapon: {minimumCritical: 1, criticalMultiplier: 1, damageString: '1d2', flatDamageModifer: -5, extraDamageDiceString: '1d2'}, opposingAc: 5, damageReduction: 0};
-   actual = Prebuilt.PathfinderAttack(input);
+   Prebuilt.PathfinderAttack(input);
    testResults.push({Expected: true, Actual: true, Description: 'Minimum values don\'t throw'});
    } catch(e){testResults.push({Error: e, Description: 'Minimum values don\'t throw'});}
 
@@ -145,6 +148,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 12};
    input.randomSource = dieResultsToNonRandomGenerator(20, [1]);
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Critical Miss'};
    testResults.push({Expected: expected, Actual: actual, Description: 'Critical Miss'});
    } catch(e){testResults.push({Error: e, Description: 'Critical Miss'});}
@@ -153,6 +157,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 100};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 1]).concat(dieResultsToNonRandomArray(8, [5])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 5}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Natural 20 auto hits'});
    } catch(e){testResults.push({Error: e, Description: 'Natural 20 auto hits'});}
@@ -161,6 +166,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {minimumCritical: 15, damageString: '1d8'}, opposingAc: 100};
    input.randomSource = dieResultsToNonRandomGenerator(20, [16]);
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Miss'};
    testResults.push({Expected: expected, Actual: actual, Description: 'Increased threat range doesn\'t auto hit'});
    } catch(e){testResults.push({Error: e, Description: 'Increased threat range doesn\'t auto hit'});}
@@ -169,6 +175,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 100};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 20]).concat(dieResultsToNonRandomArray(8, [5])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 5}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Confirm with natural 20 isn\'t special'});
    } catch(e){testResults.push({Error: e, Description: 'Confirm with natural 20 isn\'t special'});}
@@ -177,6 +184,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {minimumCritical: 18, damageString: '1d8'}, opposingAc: 11};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [18, 11]).concat(dieResultsToNonRandomArray(8, [5, 3])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 0, lethal: 8}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Increased critical range. Damage rolled twice.'});
    } catch(e){testResults.push({Error: e, Description: 'Increased critical range. Damage rolled twice.'});}
@@ -185,6 +193,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: 2, extraDamageDiceString: '1d6'}, opposingAc: 11};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 20]).concat(dieResultsToNonRandomArray(8, [5, 7, 6])).concat(dieResultsToNonRandomArray(6, [5])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    //29 === (5+2)+(7+2)+(6+2)+5
    expected = {attack: 'Critical Hit', damage: {nonLethal: 0, lethal: 29}};
    testResults.push({Expected: expected, Actual: actual, Description: 'x3 includes flat mod but not dice'});
@@ -194,6 +203,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: -2}, opposingAc: 11};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 20]).concat(dieResultsToNonRandomArray(8, [1, 2, 3])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 2, lethal: 1}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Minimum damage is nonlethal and applies to each'});
    } catch(e){testResults.push({Error: e, Description: 'Minimum damage is nonlethal and applies to each'});}
@@ -202,6 +212,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {damageString: '1d8', flatDamageModifer: -1}, opposingAc: 11, damageReduction: 5};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 10]).concat(dieResultsToNonRandomArray(8, [8, 1])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 1, lethal: 2}};
    testResults.push({Expected: expected, Actual: actual, Description: 'lethal damage > DR'});
    } catch(e){testResults.push({Error: e, Description: 'lethal damage > DR'});}
@@ -210,6 +221,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 11, damageReduction: 5};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [10]).concat(dieResultsToNonRandomArray(8, [5])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'lethal damage === DR'});
    } catch(e){testResults.push({Error: e, Description: 'lethal damage === DR'});}
@@ -218,6 +230,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 11, damageReduction: 5};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [10]).concat(dieResultsToNonRandomArray(8, [3])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'lethal damage < DR'});
    } catch(e){testResults.push({Error: e, Description: 'lethal damage < DR'});}
@@ -226,6 +239,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: -1}, opposingAc: 11, damageReduction: 3};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 10]).concat(dieResultsToNonRandomArray(8, [1, 1, 3])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 1, lethal: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'DR for lethal then non'});
    } catch(e){testResults.push({Error: e, Description: 'DR for lethal then non'});}
@@ -234,6 +248,7 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: -1}, opposingAc: 11, damageReduction: 5};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 10]).concat(dieResultsToNonRandomArray(8, [1, 1, 3])));
    actual = Prebuilt.PathfinderAttack(input);
+   delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 0, lethal: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'DR for both'});
    } catch(e){testResults.push({Error: e, Description: 'DR for both'});}

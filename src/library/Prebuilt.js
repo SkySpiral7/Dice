@@ -49,6 +49,7 @@ Prebuilt.PathfinderAttack = function(input)
    }
 
    var output = {attack: 'Hit', damage:{nonLethal: 0, lethal: 0}};
+   output.toString = function(){return Stringifier.PathfinderAttack(this);};
    var damagePool = new DicePool(input.weapon.damageString);
    var numberOfTimesToRollDamage = 1;
 

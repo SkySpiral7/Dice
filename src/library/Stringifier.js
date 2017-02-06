@@ -1,6 +1,21 @@
 'use strict';
 var Stringifier = {};
 /**
+@param {!object} rollResults the results of Prebuilt.PathfinderAttack
+@returns {!string} a human readable description of those results
+*/
+Stringifier.PathfinderAttack = function(attackResults)
+{
+   if(undefined === attackResults.damage) return attackResults.attack + '.';
+   if(0 === attackResults.damage.lethal && 0 === attackResults.damage.nonLethal) return attackResults.attack + ' but damage reduction has reduced it all.';
+   var output = attackResults.attack + ' dealing ';
+   if(0 !== attackResults.damage.lethal) output += attackResults.damage.lethal + ' points of damage';
+   if(0 !== attackResults.damage.lethal && 0 !== attackResults.damage.nonLethal) output += ' and ';
+   if(0 !== attackResults.damage.nonLethal) output += attackResults.damage.nonLethal + ' points of non-lethal damage';
+   output = output.replace(/ 1 points/g, ' 1 point');
+   return output + '.';
+};
+/**
 @param {!object} rollResults the results of Prebuilt.L5RGeneralRoll
 @returns {!string} a human readable description of those results
 */

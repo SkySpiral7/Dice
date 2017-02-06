@@ -1,5 +1,55 @@
 'use strict';
 TestSuite.Stringifier = {};
+TestSuite.Stringifier.PathfinderAttack = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], actual, expected;
+
+   try{
+   actual = Stringifier.PathfinderAttack({attack: 'Critical Miss'});
+   expected  = 'Critical Miss.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Critical Miss'});
+   } catch(e){testResults.push({Error: e, Description: 'Critical Miss'});}
+
+   try{
+   actual = Stringifier.PathfinderAttack({attack: 'Miss'});
+   expected  = 'Miss.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Miss'});
+   } catch(e){testResults.push({Error: e, Description: 'Miss'});}
+
+   try{
+   actual = Stringifier.PathfinderAttack({attack: 'Hit', damage: {nonLethal: 0, lethal: 0}});
+   expected  = 'Hit but damage reduction has reduced it all.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Hit no damage'});
+   } catch(e){testResults.push({Error: e, Description: 'Hit no damage'});}
+
+   try{
+   actual = Stringifier.PathfinderAttack({attack: 'Hit', damage: {nonLethal: 0, lethal: 1}});
+   expected  = 'Hit dealing 1 point of damage.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Hit lethal'});
+   } catch(e){testResults.push({Error: e, Description: 'Hit lethal'});}
+
+   try{
+   actual = Stringifier.PathfinderAttack({attack: 'Hit', damage: {nonLethal: 5, lethal: 0}});
+   expected  = 'Hit dealing 5 points of non-lethal damage.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Hit non-lethal'});
+   } catch(e){testResults.push({Error: e, Description: 'Hit non-lethal'});}
+
+   try{
+   actual = Stringifier.PathfinderAttack({attack: 'Critical Hit', damage: {nonLethal: 5, lethal: 31}});
+   expected  = 'Critical Hit dealing 31 points of damage and 5 points of non-lethal damage.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Critical Hit both'});
+   } catch(e){testResults.push({Error: e, Description: 'Critical Hit both'});}
+
+   try{
+   actual = Stringifier.PathfinderAttack({attack: 'Critical Hit', damage: {nonLethal: 1, lethal: 1}});
+   expected  = 'Critical Hit dealing 1 point of damage and 1 point of non-lethal damage.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Grammar'});
+   } catch(e){testResults.push({Error: e, Description: 'Grammar'});}
+
+   return TestRunner.displayResults('Stringifier Stringifier.PathfinderAttack', testResults, isFirst);
+};
 TestSuite.Stringifier.L5RGeneralRoll = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
