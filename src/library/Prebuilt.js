@@ -1,6 +1,90 @@
 'use strict';
 var Prebuilt = {};
 /**
+This is prebuilt function for rolling dice to attack in Pathfinder (the same rules probably applies to Dungeons and Dragons 3.5 and 3.0).
+
+Simplified contract, given:
+{attackBonus, weapon: {minimumCritical, criticalMultiplier, damageString, flatDamageModifer, extraDamageDiceString}, opposingAc, damageReduction, randomSource}
+returns:
+{attack: 'Critical Miss'/'Miss'/'Hit'/'Critical Hit', damage: {nonLethal, lethal}}
+
+This function does not take into consideration:
+missChances: spell failure, incorporeal, cover, concealment, spell resistance, spell DC, mirror spells
+multiple attacks (attackBonus would be an array)
+DR doesn't work on touch attacks, energy, etc
+Combat maneuvers can't score threats (use a criticalMultiplier of 1)
+spells (with attacks) have crit 20 x2
+
+It likewise assumes that the DR can be applied to all of the damage and applies DR to the lethal damage then the nonlethal damage (if any).
+This function assumes the attack is lethal, nonlethal damage can only appear when the minimum damage is used.
+*/
+Prebuilt.PathfinderAttack = function(input)
+{
+   if(undefined === input.weapon) throw new Error("weapon object is required.");
+   if(undefined === input.weapon.minimumCritical) input.weapon.minimumCritical = 20;
+   else requireNaturalNumber(input.weapon.minimumCritical);
+   if(input.weapon.minimumCritical > 20) throw new Error('Invalid weapon.minimumCritical. It was: ' + input.weapon.minimumCritical);
+   if(undefined === input.weapon.criticalMultiplier) input.weapon.criticalMultiplier = 2;
+   else requireNaturalNumber(input.weapon.criticalMultiplier);
+   requireTypeOf('string', input.weapon.damageString);
+   if(undefined === input.weapon.flatDamageModifer) input.weapon.flatDamageModifer = 0;
+   else requireInteger(input.weapon.flatDamageModifer);
+   if(undefined !== input.weapon.extraDamageDiceString) requireTypeOf('string', input.weapon.extraDamageDiceString);
+
+   requireInteger(input.attackBonus);
+   requireNaturalNumber(input.opposingAc);
+   if(undefined === input.damageReduction) input.damageReduction = 0;
+   else if(!Number.isInteger(input.damageReduction) || input.damageReduction < 0) throw new Error('Must be a non-negative integer but was ' + input.damageReduction);
+
+   var d20 = new Die(20);
+   var attackRolled = d20.roll(input.randomSource)[0];
+   if(1 === attackRolled) return {attack: 'Critical Miss'};
+   if(20 !== attackRolled && (input.attackBonus+attackRolled) < input.opposingAc) return {attack: 'Miss'};  //increased critical range doesn't increase auto-hits
+
+   var isCriticalHit = false;
+   if (attackRolled >= input.weapon.minimumCritical)
+   {
+      attackRolled = d20.roll(input.randomSource)[0];
+      if((input.attackBonus+attackRolled) >= input.opposingAc) isCriticalHit = true;  //a natural 20 on confirmation isn't special
+   }
+
+   var output = {attack: 'Hit', damage:{nonLethal: 0, lethal: 0}};
+   var damagePool = new DicePool(input.weapon.damageString);
+   var numberOfTimesToRollDamage = 1;
+
+   if (isCriticalHit)
+   {
+      output.attack = 'Critical Hit';
+      numberOfTimesToRollDamage = input.weapon.criticalMultiplier;
+   }
+   for (var i=0; i < numberOfTimesToRollDamage; ++i)
+   {
+      var sum = damagePool.sumRoll(input.randomSource);
+      sum += input.weapon.flatDamageModifer;  //flat values like strength are always included in each damage
+      if(sum < 1) ++output.damage.nonLethal;  //all damage has a minimum of 1 before DR. but becomes nonlethal
+      else output.damage.lethal += sum;
+   }
+   //extra dice damage like sneak attack are always included only once
+   if(undefined !== input.weapon.extraDamageDiceString) output.damage.lethal += new DicePool(input.weapon.extraDamageDiceString).sumRoll(input.randomSource);
+
+   var damageToReduce = input.damageReduction;
+   if (output.damage.lethal >= damageToReduce)
+   {
+      output.damage.lethal -= damageToReduce;
+      //leave output.damage.nonLethal
+      damageToReduce = 0;
+   }
+   else
+   {
+      damageToReduce -= output.damage.lethal;
+      output.damage.lethal = 0;
+      if(output.damage.nonLethal > damageToReduce) output.damage.nonLethal -= damageToReduce;
+      else output.damage.nonLethal = 0;
+   }
+
+   return output;
+};
+/**
 This is prebuilt function for rolling dice in the game Legend of the Five Rings (L5R).
 Input's circumstanceBonus, numberOfRaises, and randomSource are optional.
 Input's circumstanceBonus can also be negative to represent a penalty.

@@ -38,7 +38,7 @@ if (undefined === Array.prototype.removeElement)
 }
 /**
 @returns a copy of the input according to JSON.stringify. Objects with toJSON defined will stay that way
-unless the reviver arg transforms them (see JsonReviver.instanceof for dice).
+unless the reviver arg transforms them back.
 */
 if(undefined === JSON.clone){JSON.clone = function(input, reviver){return JSON.parse(JSON.stringify(input), reviver);};}
 /**

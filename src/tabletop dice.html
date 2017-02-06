@@ -73,9 +73,11 @@ function toggleDoc()
 <body>
 <br />
 <label for="inputCode">Code:</label><br />
-<textarea id="inputCode" rows="7" cols="50">var myDiceString="2d6";
-//rollDice(myDiceString);
-Draw.diceBellCurve(new DicePool(myDiceString));
+<textarea id="inputCode" rows="7" cols="50">
+var dicePool = new DicePool("2d6");
+
+writeln(dicePool.sumRoll());
+Draw.diceBellCurve(dicePool);
 </textarea><br />
 <input type="button" onclick="main();" value="Execute" /><br />
 <br /><label for="results">Output:</label><br />
