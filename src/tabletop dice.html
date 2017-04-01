@@ -30,21 +30,16 @@ function main()
 {
    document.getElementById('results').value = '';
    document.getElementById('graphResults').innerHTML = '';
-   var didThrow = true;
    try
    {
       eval(document.getElementById('inputCode').value);
-      didThrow = false;
    }
-   finally
+   catch (exception)
    {
-      if (didThrow)
-      {
-         if('' !== document.getElementById('results').value) writeln();
-         writeln('An error has occurred check the console for details.');
-      }
+      if('' !== document.getElementById('results').value) writeln();
+      writeln('An error has occurred check the console for details.\n' + exception);
+      throw exception;
    }
-   //writeln("\nEnd of program");
 }
 /**
 @param {!string} message to append to the results text area.
