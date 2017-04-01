@@ -1,7 +1,7 @@
 'use strict';
 var Prebuilt = {};
 /**
-This is prebuilt function for rolling dice to attack in Pathfinder (the same rules probably applies to Dungeons and Dragons 3.5 and 3.0).
+This is prebuilt function for rolling dice to attack in Pathfinder (the same rules probably apply to Dungeons and Dragons 3.5 and 3.0).
 
 Simplified contract, given:
 {attackBonus, weapon: {minimumCritical, criticalMultiplier, damageString, flatDamageModifer, extraDamageDiceString}, opposingAc, damageReduction, randomSource}
@@ -36,28 +36,28 @@ Prebuilt.PathfinderAttack = function(input)
    if(undefined === input.damageReduction) input.damageReduction = 0;
    else if(!Number.isInteger(input.damageReduction) || input.damageReduction < 0) throw new Error('Must be a non-negative integer but was ' + input.damageReduction);
 
+   var output = {};
+   output.toString = function(){return Stringifier.PathfinderAttack(this);};
    var d20 = new Die(20);
    var attackRolled = d20.roll(input.randomSource)[0];
-   if(1 === attackRolled) return {attack: 'Critical Miss'};
-   if(20 !== attackRolled && (input.attackBonus+attackRolled) < input.opposingAc) return {attack: 'Miss'};  //increased critical range doesn't increase auto-hits
+   if(1 === attackRolled){output.attack = 'Critical Miss'; return output;}
+   if(20 !== attackRolled && (input.attackBonus+attackRolled) < input.opposingAc){output.attack = 'Miss'; return output;}  //increased critical range doesn't increase auto-hits
 
-   var isCriticalHit = false;
+   output.attack = 'Hit';
+   var numberOfTimesToRollDamage = 1;
    if (attackRolled >= input.weapon.minimumCritical)
    {
       attackRolled = d20.roll(input.randomSource)[0];
-      if((input.attackBonus+attackRolled) >= input.opposingAc) isCriticalHit = true;  //a natural 20 on confirmation isn't special
+      if ((input.attackBonus+attackRolled) >= input.opposingAc)  //a natural 20 on confirmation isn't special
+      {
+         output.attack = 'Critical Hit';
+         numberOfTimesToRollDamage = input.weapon.criticalMultiplier;
+      }
    }
 
-   var output = {attack: 'Hit', damage:{nonLethal: 0, lethal: 0}};
-   output.toString = function(){return Stringifier.PathfinderAttack(this);};
+   output.damage = {nonLethal: 0, lethal: 0};
    var damagePool = new DicePool(input.weapon.damageString);
-   var numberOfTimesToRollDamage = 1;
 
-   if (isCriticalHit)
-   {
-      output.attack = 'Critical Hit';
-      numberOfTimesToRollDamage = input.weapon.criticalMultiplier;
-   }
    for (var i=0; i < numberOfTimesToRollDamage; ++i)
    {
       var sum = damagePool.sumRoll(input.randomSource);

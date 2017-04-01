@@ -4,17 +4,17 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], input, expected, actual, stringValue;
+   var testResults = [], input, expected, actual, actualStringValue;
 
    try{
    input = {attackBonus: 4, weapon: {damageString: '1d8', flatDamageModifer: 3}, opposingAc: 12};
    input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [19]).concat(dieResultsToNonRandomArray(8, [5])));
    actual = Prebuilt.PathfinderAttack(input);
-   stringValue = actual.toString();
+   actualStringValue = actual.toString();
    delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 8}};
-   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, all values'});
-   testResults.push({Expected: Stringifier.PathfinderAttack(expected), Actual: stringValue, Description: 'Happy path, string value'});
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, return value'});
+   testResults.push({Expected: Stringifier.PathfinderAttack(expected), Actual: actualStringValue, Description: 'Happy path, string value'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
@@ -148,9 +148,11 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 12};
    input.randomSource = dieResultsToNonRandomGenerator(20, [1]);
    actual = Prebuilt.PathfinderAttack(input);
+   actualStringValue = actual.toString();
    delete actual.toString;
    expected = {attack: 'Critical Miss'};
-   testResults.push({Expected: expected, Actual: actual, Description: 'Critical Miss'});
+   testResults.push({Expected: expected, Actual: actual, Description: 'Critical Miss, return value'});
+   testResults.push({Expected: Stringifier.PathfinderAttack(expected), Actual: actualStringValue, Description: 'Critical Miss, string value'});
    } catch(e){testResults.push({Error: e, Description: 'Critical Miss'});}
 
    try{
@@ -166,9 +168,11 @@ TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
    input = {attackBonus: 1, weapon: {minimumCritical: 15, damageString: '1d8'}, opposingAc: 100};
    input.randomSource = dieResultsToNonRandomGenerator(20, [16]);
    actual = Prebuilt.PathfinderAttack(input);
+   actualStringValue = actual.toString();
    delete actual.toString;
    expected = {attack: 'Miss'};
    testResults.push({Expected: expected, Actual: actual, Description: 'Increased threat range doesn\'t auto hit'});
+   testResults.push({Expected: Stringifier.PathfinderAttack(expected), Actual: actualStringValue, Description: 'Miss, string value'});
    } catch(e){testResults.push({Error: e, Description: 'Increased threat range doesn\'t auto hit'});}
 
    try{
