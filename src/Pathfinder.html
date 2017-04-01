@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Pathfinder Attack Helper</title>
+<meta charset="ASCII" />
+<script id="DiceInclude" type="text/javaScript" src="library/include.js"></script>
+<script>
+var characters = [];
+function createCharacterOptions()
+{
+   characters = eval(document.getElementById('characterData').value);
+   var characterOptions = '';
+   for (var i=0; i < characters.length; ++i)
+   {
+      characterOptions += '<option value="' + i + '">' + characters[i].name + '</option>';
+   }
+   document.getElementById('attacker').innerHTML = characterOptions;
+   createAttackOptions();
+   document.getElementById('target').innerHTML = characterOptions;
+}
+function createAttackOptions()
+{
+   var characterAttacks = characters[document.getElementById('attacker').value].attacks;
+   var attackOptions = '';
+   for (var i=0; i < characterAttacks.length; ++i)
+   {
+      attackOptions += '<option value="' + i + '">' + characterAttacks[i].name + '</option>';
+   }
+   document.getElementById('attackUsed').innerHTML = attackOptions;
+}
+var randomSource = undefined;  //will be set by test
+function attack()
+{
+   var attacker = characters[document.getElementById('attacker').value];
+   var attackUsed = attacker.attacks[document.getElementById('attackUsed').value];
+   var target = characters[document.getElementById('target').value];
+   var isFlatFooted = document.getElementById('flatFooted').value;
+
+   var targetAc = 0;
+   if(isFlatFooted && attackUsed.isTouchAttack) targetAc = target.armorClass.flatTouch;
+   else if(isFlatFooted) targetAc = target.armorClass.flat;
+   else if(attackUsed.isTouchAttack) targetAc = target.armorClass.touch;
+   else targetAc = target.armorClass.normal;
+
+   var input = {opposingAc: targetAc, attackBonus: attackUsed.attackBonus, weapon: attackUsed, damageReduction: target.damageReduction, randomSource: randomSource};
+   document.getElementById('result').value = Prebuilt.PathfinderAttack(input).toString();
+}
+//TODO: test, initiative
+</script>
+</head>
+<body>
+<!--
+<script type="text/javaScript" src="../tests/library/include.js"></script>
+<input type="button" onclick="TestRunner.testAll(TestSuite.client.Pathfinder);" value="Test file" /><br />
+-->
+<label for="characterData">Character Data:</label><br />
+<textarea cols="120" rows="20" id="characterData">[
+   {name: "Rognir Ironfury",
+      armorClass: {normal: 17, flat: 17, touch: 10, flatTouch: 10},
+      attacks: [
+         {name: "Masterwork Dwarven Waraxe", attackBonus: 7, damageString: "1d10", flatDamageModifer: 3, criticalMultiplier: 3},
+         {name: "Throwing Axe (1H)", attackBonus: 6, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 10 ft)", attackBonus: 3, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 20 ft)", attackBonus: 1, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 30 ft)", attackBonus: -1, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 40 ft)", attackBonus: -3, damageString: "1d6", flatDamageModifer: 3}
+      ]
+   },
+   {name: "Fuyurou \"Col\" Kitayama",
+      armorClass: {normal: 14, flat: 12, touch: 12, flatTouch: 10},
+      attacks: [
+         {name: "Masterwork Short Sword", attackBonus: 5, damageString: "1d6", flatDamageModifer: 2, minimumCritical: 19},
+         {name: "Masterwork Shortbow (within 30 ft)", attackBonus: 6, damageString: "1d6", flatDamageModifer: 1, criticalMultiplier: 3},
+         {name: "Masterwork Shortbow (within 60 ft)", attackBonus: 5, damageString: "1d6", criticalMultiplier: 3},
+         {name: "Bite", attackBonus: 4, damageString: "1d4"},
+         {name: "Dagger", attackBonus: 4, damageString: "1d4", minimumCritical: 19}
+      ]
+   },
+   {name: "Modrin Revin",
+      armorClass: {normal: 11, flat: 11, touch: 10, flatTouch: 10},
+      attacks: [
+         {name: "Light Crossbow (within 80 ft)", attackBonus: 1, damageString: "1d8", minimumCritical: 19},
+         {name: "Claws (Primary attack)", attackBonus: -1, damageString: "1d4", flatDamageModifer: -2},
+         {name: "Claws (Secondary attack)", attackBonus: -8, damageString: "1d4", flatDamageModifer: -2},
+         {name: "Ray of Frost", attackBonus: 1, damageString: "1d3", isTouchAttack: true}
+         //Burning Hands doesn't miss and does 3d4+3 fire in a 15 ft cone. DC 15 Reflex save for half damage
+         //Magic Missile doesn't miss and does 2d4+2 force to 1 target (or 1d4+1 to 2 targets within 15 ft)
+      ]
+   },
+   {name: "Brottor Balderk",
+      armorClass: {normal: 15, flat: 15, touch: 8, flatTouch: 8},
+      attacks: [
+         {name: "Battleaxe", attackBonus: 4, damageString: "1d8", flatDamageModifer: 2, criticalMultiplier: 3}
+      ]
+   }
+]</textarea>
+<br />
+<input type="button" onclick="createCharacterOptions();" value="Parse Character Data" /><br />
+<br />
+<label>Attacker: <select id="attacker" onChange="createAttackOptions();"></select></label> <label>using: <select id="attackUsed"></select></label><br />
+<label>Target: <select id="target"></select></label> <label>Flat-footed? <input type="checkbox" id="flatFooted" /></label><br />
+<br />
+<input type="button" onclick="attack();" value="Attack" /><br />
+<br />
+<label>Result: <input type="text" readonly="true" id="result" size="30" /></label><br />
+<script>document.getElementById('characterData').focus();</script>
+</body>
+</html>
