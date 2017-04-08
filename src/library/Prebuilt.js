@@ -1,9 +1,88 @@
 'use strict';
 var Prebuilt = {};
 /**
+ * This is prebuilt function for the Mistborn system, it rolls dice for a challenge roll type.
+ * input (which may be mutated) is an object that contains:
+ * diceCount: should be the raw number before the minium of 2 (or maximum of 10) is enforced because fewer dice is not the same as negative nudges
+ * difficulty: optional, defaults to 1. must be 0 to 5. While a difficulty of 0 isn't possible for a challenge it is allowed so that this function can be used by a contest without difficulty.
+ * nudges: optional, defaults to 0, must not be negative.
+ * randomSource: optional, passed to DicePool.roll, see that for more info.
+ *
+ * output is an object that contains:
+ * outcome: will not > 6 because no nudges are spent. Might be < -6 because rules are unclear what should happen in such cases (ditto for > 6)
+ * nudges: 0+ none are spent
+ * allResults: an array containing all results from highest to lowest (may be empty)
+ * {boolean} success: true if using the highest result would be a success (nudges can't change a failure to a success)
+ */
+Prebuilt.MistbornChallenge = function(input)
+{
+   requireInteger(input.diceCount);
+   //TODO: difficulty must be 0..5
+   if(undefined === input.difficulty) input.difficulty = 1;
+   requireInteger(input.difficulty);
+   if(undefined === input.nudges) input.nudges = 0;
+   //TODO: nudges must be 0+
+   requireInteger(input.nudges);
+
+   var outcomePenalty = 0;
+   if (input.diceCount > 10)
+   {
+      input.nudges += (input.diceCount - 10);
+      input.diceCount = 10;
+   }
+   else if (input.diceCount < 2)
+   {
+      outcomePenalty = (2 - input.diceCount);
+      input.diceCount = 2;
+   }
+
+   var diceRolled = new DicePool(input.diceCount + 'd6').roll(input.randomSource);
+   diceRolled.sort();
+   diceRolled.reverse();
+
+   //count nudges
+   while (6 === diceRolled[0])
+   {
+      ++input.nudges;
+      diceRolled.shift();
+   }
+
+   //remove first occurrence of each number
+   for (var i = 1; i < 6; ++i)
+   {
+      if(diceRolled.contains(i)) diceRolled.removeElement(i);
+   }
+   var highestResult = 0;  //0 is used if there are no pairs
+   if(0 !== diceRolled.length) highestResult = diceRolled[0];
+
+   var output = {};
+   output.allResults = [];
+   for (var i = highestResult; i > 0; --i)  //No need to check for ones higher than highestResult. Counting down puts them in the right order too
+   {
+      if(diceRolled.contains(i)) output.allResults.push(i);  //3+ of a kind is the same as a pair so no need to count the occurrences
+   }
+
+   output.outcome = highestResult - input.difficulty - outcomePenalty;
+   output.success = (output.outcome >= 0);
+
+   output.nudges = input.nudges;
+   return output;
+};
+/*
+More mistborn:
+Contests: highest result wins (outcome subtracts the results) nudges are tie breakers, another tie: action taker?
+EXTENDED CONTESTS just uses contest rules multiple times 2..5 (first one to X successes wins tie: nudges, tie: continue)
+    tie can occur since they both act 1 per beat. output needs to say beats
+    extended contest shouldn't be autmated since there's supposed to be narrative each beat
+more than 2 people requires player input but uses contest rules
+with difficulty uses difficulty rules and contest (subtracting results). each can have different difficulty. result-difficulty (possibly 0)=result to compare. compare1-compare2=outcome
+conflicts require player input
+*/
+
+/**
 This is prebuilt function for rolling dice to attack in Pathfinder (the same rules probably apply to Dungeons and Dragons 3.5 and 3.0).
 
-Simplified contract, given:
+Simplified contract, given (input may be mutated):
 {attackBonus, weapon: {minimumCritical, criticalMultiplier, damageString, flatDamageModifer, extraDamageDiceString}, opposingAc, damageReduction, randomSource}
 returns:
 {attack: 'Critical Miss'/'Miss'/'Hit'/'Critical Hit', damage: {nonLethal, lethal}}
@@ -102,7 +181,7 @@ Simplified contract, given:
 returns:
 {valuesKept[], totalValue, voidPointsRecovered, valuesDropped[], success}
 
-@param {object} input with: {?number: integer}circumstanceBonus, {?number: natural}numberOfRaises,
+@param {object} input (which may be mutated) with: {?number: integer}circumstanceBonus, {?number: natural}numberOfRaises,
    {number: natural}targetNumber, {number: natural}diceRolled, {number: natural}diceKept,
    {?boolean}hasEmphasis, {?function}randomSource (see Die.roll)
 @returns {object} with: {number[]: natural}valuesKept, {number: integer}totalValue, {number: integer}voidPointsRecovered,
@@ -149,13 +228,14 @@ Prebuilt.L5RGeneralRoll = function(input)
 
    return output;
 };
+//There's no Prebuilt.WarhammerAttackWithTemplate because I don't know how they work (although I do know how scatter dice works)
 /**
 This is prebuilt function for Warhammer for when a unit attacks a unit.
 This doesn't account for things like Helfrost or instant death.
 Input's saveValue, reanimateOrNoPainValue, and randomSource are optional.
 Output's wounded and unsavedWounds might not be present.
 
-@param {object} with: diceCount, maxWounds, toHitValue, toWoundValue, ?saveValue, ?reanimateOrNoPainValue, ?randomSource
+@param {object} (which may be mutated) with: diceCount, maxWounds, toHitValue, toWoundValue, ?saveValue, ?reanimateOrNoPainValue, ?randomSource
 @returns {object} with: hit, ?wounded, ?unsavedWounds
 */
 Prebuilt.WarhammerAttackUnit = function(input)
@@ -204,7 +284,7 @@ Prebuilt.WarhammerAttackUnit = function(input)
 };
 /**Given valid input for Prebuilt.WarhammerAttackUnit, this function calculates the
 chances of the number of wounds.
-@param {object} with: diceCount, maxWounds, toHitValue, toWoundValue, ?saveValue, ?reanimateOrNoPainValue
+@param {object} (which may be mutated) with: diceCount, maxWounds, toHitValue, toWoundValue, ?saveValue, ?reanimateOrNoPainValue
 @returns {object[]} a statistics object where the result is the number of wounds
 */
 Prebuilt.WarhammerAttackUnit.Statistics = function(input)
@@ -273,6 +353,8 @@ Prebuilt.WarhammerAttackUnit.Statistics = function(input)
       }
    }
 };
+/**This is an internal function called by Prebuilt.WarhammerAttackUnit and Prebuilt.WarhammerAttackUnit.Statistics
+it isn't intended to be called directly. All it does is default values and throw.*/
 Prebuilt.WarhammerAttackUnit._validateInput = function(input)
 {
    requireNaturalNumber(input.diceCount);

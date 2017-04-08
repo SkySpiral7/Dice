@@ -1,5 +1,104 @@
 'use strict';
 TestSuite.Prebuilt = {};
+TestSuite.Prebuilt.MistbornChallenge = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], input, expected, actual;
+
+   try{
+   input = {diceCount: 7, difficulty: 1, nudges: 1};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 3, 6, 3, 5, 2, 2]);
+   actual = Prebuilt.MistbornChallenge(input);
+   expected = {outcome: 2, nudges: 3, allResults: [3, 2], success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, return value'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   input = {diceCount: 3};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [1, 1, 1]);
+   actual = Prebuilt.MistbornChallenge(input);
+   expected = {outcome: 0, nudges: 0, allResults: [1], success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Nudge defaults to 0. difficulty defaults to 1. 3+ of a kind isn\'t special'});
+   } catch(e){testResults.push({Error: e, Description: 'default values'});}
+
+   try{
+   input = {};
+   Prebuilt.MistbornChallenge(input);
+   TestRunner.failedToThrow(testResults, 'Non integer diceCount');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireInteger, [input.diceCount]),
+         Actual: e, Description: 'Non integer diceCount'});
+   }
+
+   try{
+   input = {diceCount: 4, difficulty: 'fish'};
+   Prebuilt.MistbornChallenge(input);
+   TestRunner.failedToThrow(testResults, 'Non integer difficulty');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireInteger, [input.difficulty]),
+         Actual: e, Description: 'Non integer difficulty'});
+   }
+
+   try{
+   input = {diceCount: 4, nudges: 'fish'};
+   Prebuilt.MistbornChallenge(input);
+   TestRunner.failedToThrow(testResults, 'Non integer nudges');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(requireInteger, [input.nudges]),
+         Actual: e, Description: 'Non integer nudges'});
+   }
+
+   try{
+   input = {diceCount: 11, difficulty: 2};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 3, 6, 3, 5, 2, 2, 1, 2, 2]);
+   actual = Prebuilt.MistbornChallenge(input);
+   expected = {outcome: 1, nudges: 3, allResults: [3, 2], success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: '10+ become nudges'});
+   } catch(e){testResults.push({Error: e, Description: '10+ become nudges'});}
+
+   try{
+   input = {diceCount: -1};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [2, 2]);
+   actual = Prebuilt.MistbornChallenge(input);
+   expected = {outcome: -2, nudges: 0, allResults: [2], success: false};
+   testResults.push({Expected: expected, Actual: actual, Description: 'X < 2 lowers result and causes failure'});
+   } catch(e){testResults.push({Error: e, Description: 'X < 2 lowers result'});}
+
+   try{
+   input = {diceCount: 2};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [1, 5]);
+   actual = Prebuilt.MistbornChallenge(input);
+   expected = {outcome: -1, nudges: 0, allResults: [], success: false};
+   testResults.push({Expected: expected, Actual: actual, Description: 'No pairs means 0'});
+   } catch(e){testResults.push({Error: e, Description: 'No pairs means 0'});}
+
+   try{
+   input = {diceCount: 0, difficulty: 5};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [1, 5]);
+   actual = Prebuilt.MistbornChallenge(input);
+   expected = {outcome: -7, nudges: 0, allResults: [], success: false};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Allows outcome to be < -6'});
+   } catch(e){testResults.push({Error: e, Description: 'Allows outcome to be < -6'});}
+
+   //there's no test for outcome > 6 because the function can't return that
+
+   try{
+   input = {diceCount: 2};
+   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6]);
+   actual = Prebuilt.MistbornChallenge(input);
+   expected = {outcome: -1, nudges: 2, allResults: [], success: false};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: pair of 6 is result 0'});
+   } catch(e){testResults.push({Error: e, Description: 'Edge case: pair of 6 is result 0'});}
+
+   return TestRunner.displayResults('Prebuilt Prebuilt.MistbornChallenge', testResults, isFirst);
+};
 TestSuite.Prebuilt.PathfinderAttack = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
