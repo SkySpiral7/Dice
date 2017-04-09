@@ -68,14 +68,16 @@ Prebuilt.MistbornChallenge = function(input)
    output.nudges = input.nudges;
    return output;
 };
-/*
+/**
  * This is prebuilt function for the Mistborn system, it rolls dice for a contest roll type.
  * character1 and character2 are 2 objects that will each be passed to Prebuilt.MistbornChallenge (see function for details) however the difficulty (for each) defaults to 0.
  *
  * output is an object that contains:
- * winner which is either "Character 1", "Character 2", "Both failed", or "Tie"
- * outcome which is likely between s
- *
+ * winner which is either "Character 1", "Character 2", "Both failed", or "Tie". Note that the winner might not have succeeded at the task (for that check success)
+ * outcome never negative. undefined for "Both failed" or "Tie". might be more than 6 if there's a big difference (eg character1=5 vs character2=-2)
+ * character1 which is an object with result, nudges, success. success is undefined if there was no difficulty
+ * character2 which is an object with result, nudges, success. success is undefined if there was no difficulty
+ */
 Prebuilt.MistbornContest = function(character1, character2)
 {
    if(undefined === character1.difficulty) character1.difficulty = 0;
@@ -83,13 +85,18 @@ Prebuilt.MistbornContest = function(character1, character2)
    if(undefined === character2.difficulty) character2.difficulty = 0;
    var result2 = Prebuilt.MistbornChallenge(character2);
 
-   var output = {character1: {nudges: character1.nudges, success: result1.success}, character2: {nudges: character2.nudges, success: result2.success}};
+   var output = {};
+   output.character1 = {result: result1.outcome, nudges: result1.nudges, success: result1.success};
+   output.character2 = {result: result2.outcome, nudges: result2.nudges, success: result2.success};
+   if(0 === character1.difficulty) delete output.character1.success;
+   if(0 === character2.difficulty) delete output.character2.success;
+
    //if both pass then subtract results like normal
-   //if both fail then that's a special kind of tie
-   if (0 !== character1.difficulty && !result1.success && 0 !== character2.difficulty && !result2.success)
+   //if both fail then that's a special kind of tie (it doesn't subtract results and has a different meaning than a normal tie)
+   if (false === output.character1.success && false === output.character2.success)
    {
       output.winner = 'Both failed';
-      output.outcome = undefined;
+      //outcome is undefined
       return output;
    }
    //if they both have difficulty and only 1 passes then he wins (subtract like normal)
@@ -98,7 +105,6 @@ Prebuilt.MistbornContest = function(character1, character2)
    //if char1 has difficulty and fails (< 0) and char2 has result >= 0 then subtract like normal (char2 wins)
    //if char1 has difficulty and passes (>= 0) and char2 has result < 0 then subtract like normal (char1 wins)
    //if char1 has difficulty and fails (< 0) and char2 has result < 0. as per an example in the rules char2 can fail which must mean that the numbers are subtracted as normal
-      //TODO: this is difficult to detect and I'm not sure what the outcome is
 
    if (result1.outcome > result2.outcome)
    {
@@ -120,11 +126,8 @@ Prebuilt.MistbornContest = function(character1, character2)
       output.winner = 'Character 2';
       output.outcome = 0;
    }
-   else
-   {
-      output.winner = 'Tie';
-      output.outcome = undefined;
-   }
+   else output.winner = 'Tie';  //outcome is undefined
+
    return output;
 };
 /*
