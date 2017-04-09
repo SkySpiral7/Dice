@@ -9,10 +9,10 @@ var Prebuilt = {};
  * randomSource: optional, passed to DicePool.roll, see that for more info.
  *
  * output is an object that contains:
- * outcome: will not > 6 because no nudges are spent. Might be < -6 because rules are unclear what should happen in such cases (ditto for > 6)
+ * outcome: (using the highest result) will not be > 6 because no nudges are spent. Might be < -6 because rules are unclear what should happen in such cases (ditto for > 6)
  * nudges: 0+ none are spent
- * allResults: an array containing all results from highest to lowest (may be empty)
- * {boolean} success: true if using the highest result would be a success (nudges can't change a failure to a success)
+ * allResults: an array containing all results from highest to lowest (may be empty). returned because the rules allow choosing which one is used
+ * {boolean} success: true if outcome isn't negative (nudges can't change a failure to a success)
  */
 Prebuilt.MistbornChallenge = function(input)
 {
@@ -69,13 +69,70 @@ Prebuilt.MistbornChallenge = function(input)
    return output;
 };
 /*
-More mistborn:
-Contests: highest result wins (outcome subtracts the results) nudges are tie breakers, another tie: action taker?
-EXTENDED CONTESTS just uses contest rules multiple times 2..5 (first one to X successes wins tie: nudges, tie: continue)
-    tie can occur since they both act 1 per beat. output needs to say beats
-    extended contest shouldn't be autmated since there's supposed to be narrative each beat
-more than 2 people requires player input but uses contest rules
-with difficulty uses difficulty rules and contest (subtracting results). each can have different difficulty. result-difficulty (possibly 0)=result to compare. compare1-compare2=outcome
+ * This is prebuilt function for the Mistborn system, it rolls dice for a contest roll type.
+ * character1 and character2 are 2 objects that will each be passed to Prebuilt.MistbornChallenge (see function for details) however the difficulty (for each) defaults to 0.
+ *
+ * output is an object that contains:
+ * winner which is either "Character 1", "Character 2", "Both failed", or "Tie"
+ * outcome which is likely between s
+ *
+Prebuilt.MistbornContest = function(character1, character2)
+{
+   if(undefined === character1.difficulty) character1.difficulty = 0;
+   var result1 = Prebuilt.MistbornChallenge(character1);
+   if(undefined === character2.difficulty) character2.difficulty = 0;
+   var result2 = Prebuilt.MistbornChallenge(character2);
+
+   var output = {character1: {nudges: character1.nudges, success: result1.success}, character2: {nudges: character2.nudges, success: result2.success}};
+   //if both pass then subtract results like normal
+   //if both fail then that's a special kind of tie
+   if (0 !== character1.difficulty && !result1.success && 0 !== character2.difficulty && !result2.success)
+   {
+      output.winner = 'Both failed';
+      output.outcome = undefined;
+      return output;
+   }
+   //if they both have difficulty and only 1 passes then he wins (subtract like normal)
+
+   //if char1 has difficulty and passes (>= 0) and char2 has result >= 0 then subtract like normal (either could win)
+   //if char1 has difficulty and fails (< 0) and char2 has result >= 0 then subtract like normal (char2 wins)
+   //if char1 has difficulty and passes (>= 0) and char2 has result < 0 then subtract like normal (char1 wins)
+   //if char1 has difficulty and fails (< 0) and char2 has result < 0. as per an example in the rules char2 can fail which must mean that the numbers are subtracted as normal
+      //TODO: this is difficult to detect and I'm not sure what the outcome is
+
+   if (result1.outcome > result2.outcome)
+   {
+      output.winner = 'Character 1';
+      output.outcome = result1.outcome - result2.outcome;
+   }
+   else if (result1.outcome < result2.outcome)
+   {
+      output.winner = 'Character 2';
+      output.outcome = result2.outcome - result1.outcome;
+   }
+   else if (result1.nudges > result2.nudges)
+   {
+      output.winner = 'Character 1';
+      output.outcome = 0;
+   }
+   else if (result1.nudges < result2.nudges)
+   {
+      output.winner = 'Character 2';
+      output.outcome = 0;
+   }
+   else
+   {
+      output.winner = 'Tie';
+      output.outcome = undefined;
+   }
+   return output;
+};
+/*
+No more Mistborn:
+Extended contests just uses contest rules multiple times 2..5 (first one to X successes wins tie: nudges, tie: continue)
+   tie can occur since they both act 1 per beat. output needs to say beats
+   extended contest shouldn't be automated since there's supposed to be narrative each beat therefore just call contest multiple times manually
+a contest of more than 2 people requires player input but uses contest rules
 conflicts require player input
 */
 
