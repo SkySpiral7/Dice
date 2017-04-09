@@ -14,5 +14,5 @@ for (var i = 0; i < fileNames.length; ++i)
    document.write('<script type="text/javaScript" src="' + includePath + fileNames[i] + '.js"></script>');
 }
 
-//change this here so that the tests/include.js can be passed a specific includePath
-includePath = includePath.replace('src/', 'tests/');
+//change this here so that the test/javascript/include.js can be passed a specific includePath
+includePath = includePath.replace('main/', 'test/');

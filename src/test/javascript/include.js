@@ -4,7 +4,7 @@ var fileNames = ['DiceExpression', 'DicePool', 'Die', 'GenerateHtml', 'Parser', 
    'Statistics', 'Stringifier',
    'GameSpecific', 'Testing Util',  //must be last
    'beta/StackExchangeWhuber'];  //beta: ignore
-//includePath was defined in src/library/include.js
+//includePath was defined in main/javascript/include.js
 
 TestConfig.defaultDelta = Number.EPSILON;  //since this program only deals with natural numbers and statistics
 
