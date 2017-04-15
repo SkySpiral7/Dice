@@ -7,7 +7,7 @@ vs
 Statistics.calculateDiceSums(new DicePool('6d10 drop lowest'));
 Statistics.calculateDiceSums(new DicePool('3d170 drop lowest'));
 */
-function function1(sideCount, smallestSide)
+function expressionForASingleDie(sideCount, smallestSide)  //f1 of se. should be replaced by DiceExpression.everyValue
 {
    var result = DiceExpression.empty();
    for (var i=smallestSide; i <= sideCount; ++i)
@@ -16,9 +16,9 @@ function function1(sideCount, smallestSide)
    }
    return result;
 }
-function function2(dieCount, sideCount, smallestSide)
+function expressionForMultipleDice(dieCount, sideCount, smallestSide)  //f2 of se. should be replaced by Statistics.useNonDroppingAlgorithm
 {
-   var base = function1(sideCount, smallestSide);
+   var base = expressionForASingleDie(sideCount, smallestSide);
    var result = base.clone();
    for (var i=2; i <= dieCount; ++i)
    {
@@ -26,21 +26,19 @@ function function2(dieCount, sideCount, smallestSide)
    }
    return result;
 }
-function function3(dieCount, sideCount, smallestSide)
+function expressionForDropLowestIsExactlyResult(dieCount, sideCount, smallestSide)  //f3 of se with x^-k
 {
-   var result = function2(dieCount, sideCount, smallestSide);
-   result.subtract(function2(dieCount, sideCount, smallestSide+1));
+   var result = expressionForMultipleDice(dieCount, sideCount, smallestSide);
+   result.subtract(expressionForMultipleDice(dieCount, sideCount, smallestSide+1));  //this ignores all sums that are greater
+   result.multiply(new DiceExpression([{exponent: -smallestSide, coefficient: 1}]));  //I think this drops the lowest die. It can't be moved to f2 because it needs to be x^-k for k+1 as well
    return result;
 }
-function function4(dieCount, sideCount)
+function diceResultsForASingleDrop(dieCount, sideCount)  //f4 of se with moved x^-k
 {
-   var workingExpression = function3(dieCount, sideCount, 1);
-   workingExpression.multiply(new DiceExpression([{exponent: -1, coefficient: 1}]));
+   var workingExpression = expressionForDropLowestIsExactlyResult(dieCount, sideCount, 1);
    for (var smallestSide=2; smallestSide <= sideCount; ++smallestSide)
    {
-      var currentExpression = function3(dieCount, sideCount, smallestSide);
-      currentExpression.multiply(new DiceExpression([{exponent: -smallestSide, coefficient: 1}]));
-      workingExpression.add(currentExpression);
+      workingExpression.add(expressionForDropLowestIsExactlyResult(dieCount, sideCount, smallestSide));
    }
    return workingExpression.toDiceResults();
 }

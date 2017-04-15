@@ -1,5 +1,6 @@
 'use strict';
 //TODO: change this file to use Object.defineProperty for the sake of enumerable: false (the default)
+//TODO: run the tests in a few browsers to get a list of polyfil
 /**
 @param element to search for
 @returns {!boolean} true if the element exists in this array (using ===)
