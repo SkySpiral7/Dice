@@ -74,7 +74,7 @@ TestSuite.client.Pathfinder.attack = function(isFirst)
    document.getElementById('result').value = '';
    document.getElementById('attackButton').onclick();
 
-   testResults.push({Expected: false, Actual: '' === document.getElementById('result').value, Description: 'All values attack didn\'t throw'});
+   testResults.push({Expected: false, Actual: '' === document.getElementById('result').innerHTML, Description: 'All values attack didn\'t throw'});
    } catch(e){testResults.push({Error: e, Description: 'attackButton'});}
 
    return TestRunner.displayResults('Pathfinder attack', testResults, isFirst);

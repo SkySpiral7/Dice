@@ -44,7 +44,7 @@ function createAttackOptions()
 function attack()
 {
    var input = createAttackInput();
-   document.getElementById('result').value = Prebuilt.PathfinderAttack(input).toString();
+   document.getElementById('result').innerHTML = Prebuilt.PathfinderAttack(input).toString();
 }
 function createAttackInput()
 {
@@ -91,7 +91,7 @@ function createAttackInput()
 <br />
 <input type="button" onclick="safeButton(attack);" value="Attack" id="attackButton" /><br />
 <br />
-<label>Result: <input type="text" readonly="true" id="result" size="30" /></label><br />
+Result: <span id="result"></span><br />
 <script>document.getElementById('characterData').focus();</script>
 </body>
 </html>
