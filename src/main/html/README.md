@@ -3,13 +3,13 @@ File descriptions
 #battle tech dice.html
 A simple web interface for rolling dice for the game BattleTech.
 
-It is very old and ugly. It needs to be rewritten to hook up to the new dice library.
+It is hooked up to the dice library and is therefore an example use case.
 
 **Inputs**: initiative (with and without Combat Paralysis), number needed to hit
 
 **Outputs**: hit/miss, location #, # of critical hits, upper/lower critical hit list, critical hit area # list
 
-Also has: the ability to reroll criticals. and general purpose 2d6, 1d6 and coin.
+Also has: the ability to reroll criticals.
 
 
 #L5R.html
