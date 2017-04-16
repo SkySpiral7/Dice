@@ -75,10 +75,42 @@ function createAttackInput()
 -->
 <label for="characterData">Character Data:</label><br />
 <textarea cols="120" rows="20" id="characterData">[
-   {name: "Character name",
-      armorClass: {normal: 12, flat: 11, touch: 10, flatTouch: 9}, damageReduction: 0,
+   {name: "Rognir Ironfury",
+      armorClass: {normal: 17, flat: 17, touch: 10, flatTouch: 10},
       attacks: [
-         {name: "Attack name", attackBonus: 1, minimumCritical: 20, criticalMultiplier: 2, damageString: "1d8", flatDamageModifer: 3, extraDamageDiceString: "1d6", isTouchAttack: false}
+         {name: "Masterwork Dwarven Waraxe", attackBonus: 7, damageString: "1d10", flatDamageModifer: 3, criticalMultiplier: 3},
+         {name: "Throwing Axe (1H)", attackBonus: 6, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 10 ft)", attackBonus: 3, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 20 ft)", attackBonus: 1, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 30 ft)", attackBonus: -1, damageString: "1d6", flatDamageModifer: 3},
+         {name: "Throwing Axe (throw 40 ft)", attackBonus: -3, damageString: "1d6", flatDamageModifer: 3}
+      ]
+   },
+   {name: "Fuyurou \"Col\" Kitayama",
+      armorClass: {normal: 14, flat: 12, touch: 12, flatTouch: 10},
+      attacks: [
+         {name: "Masterwork Short Sword", attackBonus: 5, damageString: "1d6", flatDamageModifer: 2, minimumCritical: 19},
+         {name: "Masterwork Shortbow (within 30 ft)", attackBonus: 6, damageString: "1d6", flatDamageModifer: 1, criticalMultiplier: 3},
+         {name: "Masterwork Shortbow (within 60 ft)", attackBonus: 5, damageString: "1d6", criticalMultiplier: 3},
+         {name: "Bite", attackBonus: 4, damageString: "1d4"},
+         {name: "Dagger", attackBonus: 4, damageString: "1d4", minimumCritical: 19}
+      ]
+   },
+   {name: "Modrin Revin",
+      armorClass: {normal: 11, flat: 11, touch: 10, flatTouch: 10},
+      attacks: [
+         {name: "Light Crossbow (within 80 ft)", attackBonus: 1, damageString: "1d8", minimumCritical: 19},
+         {name: "Claws (Primary attack)", attackBonus: -1, damageString: "1d4", flatDamageModifer: -2},
+         {name: "Claws (Secondary attack)", attackBonus: -8, damageString: "1d4", flatDamageModifer: -2},
+         {name: "Ray of Frost", attackBonus: 1, damageString: "1d3", isTouchAttack: true}
+         //Burning Hands doesn't miss and does 3d4+3 fire in a 15 ft cone. DC 15 Reflex save for half damage
+         //Magic Missile doesn't miss and does 2d4+2 force to 1 target (or 1d4+1 to 2 targets within 15 ft)
+      ]
+   },
+   {name: "Brottor Balderk",
+      armorClass: {normal: 15, flat: 15, touch: 8, flatTouch: 8},
+      attacks: [
+         {name: "Battleaxe", attackBonus: 4, damageString: "1d8", flatDamageModifer: 2, criticalMultiplier: 3}
       ]
    }
 ]</textarea>

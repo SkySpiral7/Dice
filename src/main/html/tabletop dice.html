@@ -69,10 +69,7 @@ function toggleDoc()
 <br />
 <label for="inputCode">Code:</label><br />
 <textarea id="inputCode" rows="7" cols="50">
-var dicePool = new DicePool("2d6");
-
-writeln(dicePool.sumRoll());
-Draw.diceBellCurve(dicePool);
+writeln(new DicePool('1d20').sumRoll());
 </textarea><br />
 <input type="button" onclick="main();" value="Execute" /><br />
 <br /><label for="results">Output:</label><br />
