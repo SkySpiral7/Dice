@@ -17,6 +17,12 @@ TestSuite.client.Pathfinder.createCharacterOptions = function(isFirst)
    testResults.push({Expected: '1', Actual: document.getElementById('attacker').options[1].value, Description: 'Character.Option[1].value'});
    } catch(e){testResults.push({Error: e, Description: 'parseCharacterButton'});}
 
+   try{
+   document.getElementById('characterData').value = '[{name: "Alice", attacks: []}, {name: "Bob", attacks: []}]';
+   document.getElementById('parseCharacterButton').onclick();
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[0].text, Description: 'Parsing is more forgiving than JSON'});
+   } catch(e){testResults.push({Error: e, Description: 'Parsing is more forgiving than JSON'});}
+
    return TestRunner.displayResults('Pathfinder createCharacterOptions', testResults, isFirst);
 };
 TestSuite.client.Pathfinder.createAttackOptions = function(isFirst)

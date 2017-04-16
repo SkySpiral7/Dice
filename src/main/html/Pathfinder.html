@@ -4,7 +4,8 @@
 <title>Pathfinder Attack Helper</title>
 <meta charset="ASCII" />
 <script id="DiceInclude" type="text/javaScript" src="../javascript/include.js"></script>
-<script>
+<script type="text/javaScript">
+'use strict';
 var characters = [];
 function safeButton(functionName)
 {
@@ -20,7 +21,7 @@ function safeButton(functionName)
 }
 function createCharacterOptions()
 {
-   characters = eval(document.getElementById('characterData').value);
+   characters = eval(document.getElementById('characterData').value);  //there's no benefit to JSON.parse in this case so use eval to be less strict
    var characterOptions = '';
    for (var i=0; i < characters.length; ++i)
    {
