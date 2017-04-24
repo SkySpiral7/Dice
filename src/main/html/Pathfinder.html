@@ -19,9 +19,14 @@ function safeButton(functionName)
       throw exception;
    }
 }
-function createCharacterOptions()
+function parseCharacterData()
 {
    characters = eval(document.getElementById('characterData').value);  //there's no benefit to JSON.parse in this case so use eval to be less strict
+   createCharacterOptions();
+   initiative();
+}
+function createCharacterOptions()
+{
    var characterOptions = '';
    for (var i=0; i < characters.length; ++i)
    {
@@ -61,14 +66,40 @@ function createAttackInput()
    else if(isTouchAttack) targetAc = target.armorClass.touch;
    else targetAc = target.armorClass.normal;
 
-   return {opposingAc: targetAc, attackBonus: attackUsed.attackBonus, weapon: attackUsed, damageReduction: target.damageReduction};
+   return {opposingAc: targetAc, attackBonus: attackUsed.attackBonus, weapon: attackUsed, damageReduction: target.damageReduction, randomSource: randomSource};
 }
-//TODO: initiative
+var randomSource;  //used for testing
+function initiative()
+{
+   var d20 = new Die(20);
+   for (var i = 0; i < characters.length; ++i)
+   {
+      characters[i].currentInitiative = characters[i].initiative + d20.roll(randomSource)[0];
+      //FYI: this is polluting the characters array
+   }
+   characters.sort(initiativeSortOrder);
+   createCharacterOptions();
+}
+function initiativeSortOrder(first, second)
+{
+   if(first.currentInitiative > second.currentInitiative) return -1;
+   if(first.currentInitiative < second.currentInitiative) return 1;
+
+   if(first.initiative > second.initiative) return -1;
+   if(first.initiative < second.initiative) return 1;
+
+   //TODO: doesn't handle ties (should roll d20 once)
+   //"If there is still a tie, the tied characters should roll to determine which one of them goes before the other."
+   return 0;
+}
+//TODO: misc modifiers, delay turn, temporary notes
 </script>
 </head>
 <body>
 <!----
 <script type="text/javaScript" src="../../../../Miscellaneous/src/main/javascript/testRunner.js"></script>
+<script type="text/javaScript" src="../../test/javascript/Testing Util.js"></script>
+<script type="text/javaScript" src="../../../../Miscellaneous/src/main/javascript/unstableSort.js"></script>
 <script type="text/javaScript" src="../../test/html/Pathfinder.js"></script>
 <textarea id="testResults" cols="80" rows="20"></textarea><br />
 <input type="button" onclick="TestRunner.testAll();" value="Test file" />
@@ -78,19 +109,21 @@ function createAttackInput()
 <textarea cols="120" rows="20" id="characterData">[
    {name: "Character name",
       armorClass: {normal: 12, flat: 11, touch: 10, flatTouch: 9}, damageReduction: 0,
+      initiative: 0,
       attacks: [
          {name: "Attack name", attackBonus: 1, minimumCritical: 20, criticalMultiplier: 2, damageString: "1d8", flatDamageModifer: 3, extraDamageDiceString: "1d6", isTouchAttack: false}
       ]
    }
 ]</textarea>
 <br />
-<input type="button" onclick="safeButton(createCharacterOptions);" value="Parse Character Data" id="parseCharacterButton" /><br />
+<input type="button" onclick="safeButton(parseCharacterData);" value="Parse Character Data" id="parseCharacterButton" /><br />
+<br />
+<input type="button" onclick="safeButton(initiative);" value="Reroll initiative" id="initiativeButton" /><br />
 <br />
 <label>Attacker: <select id="attacker" onchange="createAttackOptions();"></select></label> <label>using: <select id="attackUsed"></select></label><br />
 <label>Target: <select id="target"></select></label> <label>Flat-footed? <input type="checkbox" id="flatFooted" /></label><br />
 <br />
-<input type="button" onclick="safeButton(attack);" value="Attack" id="attackButton" /><br />
-<br />
+<input type="button" onclick="safeButton(attack);" value="Attack" id="attackButton" />
 Result: <span id="result"></span><br />
 <script>document.getElementById('characterData').focus();</script>
 </body>
