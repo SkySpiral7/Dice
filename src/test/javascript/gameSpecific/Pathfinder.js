@@ -41,7 +41,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.weapon.minimumCritical]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.weapon.minimumCritical]),
          Actual: e, Description: 'Non natural minimumCritical'});
    }
 
@@ -63,7 +63,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.weapon.criticalMultiplier]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.weapon.criticalMultiplier]),
          Actual: e, Description: 'Non natural criticalMultiplier'});
    }
 
@@ -74,7 +74,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireTypeOf, ['string', input.weapon.damageString]),
+      testResults.push({Expected: getError(Validation.requireTypeOf, ['string', input.weapon.damageString]),
          Actual: e, Description: 'Invalid damageString'});
    }
 
@@ -85,7 +85,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireInteger, [input.weapon.flatDamageModifer]),
+      testResults.push({Expected: getError(Validation.requireInteger, [input.weapon.flatDamageModifer]),
          Actual: e, Description: 'Invalid flatDamageModifer'});
    }
 
@@ -96,7 +96,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireTypeOf, ['string', input.weapon.extraDamageDiceString]),
+      testResults.push({Expected: getError(Validation.requireTypeOf, ['string', input.weapon.extraDamageDiceString]),
          Actual: e, Description: 'Invalid extraDamageDiceString'});
    }
 
@@ -107,7 +107,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireInteger, [input.attackBonus]),
+      testResults.push({Expected: getError(Validation.requireInteger, [input.attackBonus]),
          Actual: e, Description: 'Invalid attackBonus'});
    }
 
@@ -118,7 +118,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.opposingAc]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.opposingAc]),
          Actual: e, Description: 'Invalid opposingAc'});
    }
 
@@ -257,7 +257,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'DR for both'});
    } catch(e){testResults.push({Error: e, Description: 'DR for both'});}
 
-   return TestRunner.displayResults('Prebuilt Pathfinder.Attack', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.Attack', testResults, isFirst);
 };
 TestSuite.Pathfinder.Attack_Stringifier = function(isFirst)
 {
@@ -307,5 +307,5 @@ TestSuite.Pathfinder.Attack_Stringifier = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Grammar'});
    } catch(e){testResults.push({Error: e, Description: 'Grammar'});}
 
-   return TestRunner.displayResults('Stringifier Pathfinder.Attack.Stringifier', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.Attack.Stringifier', testResults, isFirst);
 };

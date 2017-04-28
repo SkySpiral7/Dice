@@ -17,7 +17,7 @@ if (undefined === Array.prototype.removeByIndex)
 {
    Array.prototype.removeByIndex = function(index)
    {
-      requireTypeOf('number', index);  //NaN and Infinity will be detected below
+      Validation.requireTypeOf('number', index);  //NaN and Infinity will be detected below
       if(Number.isNaN(index) || index < 0 || Math.floor(index) !== index) throw new Error('Illegal index: ' + index);
       if(index >= this.length) throw new Error('Illegal index: ' + index + '. length=' + this.length);
       return this.splice(index, 1)[0];

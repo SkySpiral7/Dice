@@ -22,22 +22,22 @@ Pathfinder.Attack = function(input)
 {
    if(undefined === input.weapon) throw new Error("weapon object is required.");
    if(undefined === input.weapon.minimumCritical) input.weapon.minimumCritical = 20;
-   else requireNaturalNumber(input.weapon.minimumCritical);
+   else Validation.requireNaturalNumber(input.weapon.minimumCritical);
    if(input.weapon.minimumCritical > 20) throw new Error('Invalid weapon.minimumCritical. It was: ' + input.weapon.minimumCritical);
    if(undefined === input.weapon.criticalMultiplier) input.weapon.criticalMultiplier = 2;
-   else requireNaturalNumber(input.weapon.criticalMultiplier);
-   requireTypeOf('string', input.weapon.damageString);
+   else Validation.requireNaturalNumber(input.weapon.criticalMultiplier);
+   Validation.requireTypeOf('string', input.weapon.damageString);
    if(undefined === input.weapon.flatDamageModifer) input.weapon.flatDamageModifer = 0;
-   else requireInteger(input.weapon.flatDamageModifer);
-   if(undefined !== input.weapon.extraDamageDiceString) requireTypeOf('string', input.weapon.extraDamageDiceString);
+   else Validation.requireInteger(input.weapon.flatDamageModifer);
+   if(undefined !== input.weapon.extraDamageDiceString) Validation.requireTypeOf('string', input.weapon.extraDamageDiceString);
    //TODO: move flatDamageModifer, extraDamageDiceString out of weapon (see next lines)
    //short: {offense: {attackBonus, flatDamageModifer, extraDamageDiceString, weapon: {minimumCritical, criticalMultiplier, damageString}},
       //targetDefense: {ac, damageReduction}, randomSource}
    //full: {offense: {attackBonus, flatDamageModifer, extraDamageDiceString, weapon: {minimumCritical, criticalMultiplier, damageString, attackBonus, flatDamageModifer, extraDamageDiceString}},
       //targetDefense: {ac, damageReduction}, randomSource}
 
-   requireInteger(input.attackBonus);
-   requireNaturalNumber(input.opposingAc);
+   Validation.requireInteger(input.attackBonus);
+   Validation.requireNaturalNumber(input.opposingAc);
    if(undefined === input.damageReduction) input.damageReduction = 0;
    else if(!Number.isInteger(input.damageReduction) || input.damageReduction < 0) throw new Error('Must be a non-negative integer but was ' + input.damageReduction);
 

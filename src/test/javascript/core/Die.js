@@ -56,7 +56,7 @@ TestSuite.Die.roll = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireTypeOf, ['function', 5]),
+      testResults.push({Expected: getError(Validation.requireTypeOf, ['function', 5]),
          Actual: e, Description: 'randomSource wrong type'});
    }
 

@@ -26,7 +26,7 @@ TestSuite.Warhammer.AttackUnit_Stringifier = function(isFirst)
    testResults.push({Expected: 'Number hit: 5. Number wounded: 3. Unsaved Wounds: 2.', Actual: actual, Description: 'Unsaved Wounds'});
    } catch(e){testResults.push({Error: e, Description: 'Unsaved Wounds'});}
 
-   return TestRunner.displayResults('Stringifier Warhammer.AttackUnit.Stringifier', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Stringifier', testResults, isFirst);
 };
 TestSuite.Warhammer.AttackUnit = function(isFirst)
 {
@@ -124,7 +124,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Ignore excessive wounds'});
    } catch(e){testResults.push({Error: e, Description: 'Ignore excessive wounds'});}
 
-   return TestRunner.displayResults('Prebuilt Warhammer.AttackUnit', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit', testResults, isFirst);
 };
 TestSuite.Warhammer.AttackUnit_Statistics = function(isFirst)
 {
@@ -201,7 +201,7 @@ TestSuite.Warhammer.AttackUnit_Statistics = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Giant output unchanged'});
    } catch(e){testResults.push({Error: e, Description: 'Giant output unchanged'});}
 
-   return TestRunner.displayResults('Prebuilt Warhammer.AttackUnit.Statistics', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Statistics', testResults, isFirst);
 };
 TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
 {
@@ -216,7 +216,7 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.diceCount]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.diceCount]),
          Actual: e, Description: 'Invalid diceCount'});
    }
 
@@ -227,7 +227,7 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.maxWounds]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.maxWounds]),
          Actual: e, Description: 'Invalid maxWounds'});
    }
 
@@ -238,7 +238,7 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.toHitValue]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.toHitValue]),
          Actual: e, Description: 'Invalid toHitValue'});
    }
 
@@ -249,7 +249,7 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.toWoundValue]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.toWoundValue]),
          Actual: e, Description: 'Invalid toWoundValue'});
    }
 
@@ -270,7 +270,7 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.saveValue]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.saveValue]),
          Actual: e, Description: 'Invalid saveValue'});
    }
 
@@ -291,9 +291,9 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.reanimateOrNoPainValue]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.reanimateOrNoPainValue]),
          Actual: e, Description: 'Invalid reanimateOrNoPainValue'});
    }
 
-   return TestRunner.displayResults('Prebuilt Warhammer.AttackUnit._validateInput', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit._validateInput', testResults, isFirst);
 };

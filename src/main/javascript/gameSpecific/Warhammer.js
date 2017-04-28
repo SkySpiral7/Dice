@@ -129,20 +129,20 @@ Warhammer.AttackUnit.Statistics = function(input)
 it isn't intended to be called directly. All it does is default values and throw.*/
 Warhammer.AttackUnit._validateInput = function(input)
 {
-   requireNaturalNumber(input.diceCount);
-   requireNaturalNumber(input.maxWounds);
+   Validation.requireNaturalNumber(input.diceCount);
+   Validation.requireNaturalNumber(input.maxWounds);
    //TODO: toHitValue and toWoundValue must be 1-6... can an attack ever ignore these?
-   requireNaturalNumber(input.toHitValue);
-   requireNaturalNumber(input.toWoundValue);
+   Validation.requireNaturalNumber(input.toHitValue);
+   Validation.requireNaturalNumber(input.toWoundValue);
 
    //saveValue is optional because some attacks ignore saves
    if(undefined === input.saveValue) input.saveValue = 7;  //an impossible number
-   requireNaturalNumber(input.saveValue);
+   Validation.requireNaturalNumber(input.saveValue);
 
    //Reanimation Protocol states that if the unit also has Feel No Pain then you must choose only 1 of them to use.
    //most units have neither
    if(undefined === input.reanimateOrNoPainValue) input.reanimateOrNoPainValue = 7;
-   requireNaturalNumber(input.reanimateOrNoPainValue);
+   Validation.requireNaturalNumber(input.reanimateOrNoPainValue);
 
    //randomSource is not validated because die will validate it
 };

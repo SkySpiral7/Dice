@@ -16,13 +16,13 @@ var Mistborn = {};
  */
 Mistborn.Challenge = function(input)
 {
-   requireInteger(input.diceCount);
+   Validation.requireInteger(input.diceCount);
    //TODO: difficulty must be 0..5
    if(undefined === input.difficulty) input.difficulty = 1;
-   requireInteger(input.difficulty);
+   Validation.requireInteger(input.difficulty);
    if(undefined === input.nudges) input.nudges = 0;
    //TODO: nudges must be 0+
-   requireInteger(input.nudges);
+   Validation.requireInteger(input.nudges);
 
    var outcomePenalty = 0;
    if (input.diceCount > 10)

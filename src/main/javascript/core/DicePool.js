@@ -213,8 +213,8 @@ You should have no use for it although it isn't harmful to call.
 DicePool._validate = function(debugName, pool)
 {
    //TODO: improve error messages (include i value)
-   requireTypeOf('string', debugName);
-   requireInstanceOf(Array, pool);
+   Validation.requireTypeOf('string', debugName);
+   Validation.requireInstanceOf(Array, pool);
    if(0 === pool.length) throw new Error(debugName + '\npool must not be empty');
    for (var i = 0; i < pool.length; ++i)
    {

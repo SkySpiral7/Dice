@@ -94,10 +94,10 @@ L5R.GeneralRoll = function(input)
    else if(!Number.isInteger(input.circumstanceBonus)) throw new Error('Must be an integer but was ' + input.circumstanceBonus);
    if(undefined === input.numberOfRaises) input.numberOfRaises = 0;
    else if(!Number.isInteger(input.numberOfRaises) || input.numberOfRaises < 0) throw new Error('Must be a non-negative integer but was ' + input.numberOfRaises);
-   requireNaturalNumber(input.targetNumber);
-   requireNaturalNumber(input.diceRolled);
+   Validation.requireNaturalNumber(input.targetNumber);
+   Validation.requireNaturalNumber(input.diceRolled);
    if(input.diceRolled > 10) throw new Error('It\'s never possible to roll more than 10 dice. input was: ' + input.diceRolled);
-   requireNaturalNumber(input.diceKept);
+   Validation.requireNaturalNumber(input.diceKept);
    if(input.diceKept > input.diceRolled) throw new Error('diceKept (' + input.diceKept + ') is more than diceRolled (' + input.diceRolled + ')');
       //below doesn't use DicePool's KeepHighest therefore I must validate diceKept myself
    if(true !== input.hasEmphasis) input.hasEmphasis = false;

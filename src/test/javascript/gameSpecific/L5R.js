@@ -78,7 +78,7 @@ TestSuite.L5R.DicePool = function(isFirst)
          Actual: e, Description: '11+ dice'});
    }
 
-   return TestRunner.displayResults('GameSpecific L5R.DicePool', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.DicePool', testResults, isFirst);
 };
 TestSuite.L5R.Parser = function(isFirst)
 {
@@ -148,7 +148,7 @@ TestSuite.L5R.Parser = function(isFirst)
          Actual: e, Description: 'Includes drop'});
    }
 
-   return TestRunner.displayResults('GameSpecific L5R.Parser', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.Parser', testResults, isFirst);
 };
 TestSuite.L5R.GeneralRoll_Stringifier = function(isFirst)
 {
@@ -179,7 +179,7 @@ TestSuite.L5R.GeneralRoll_Stringifier = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'None dropped'});
    } catch(e){testResults.push({Error: e, Description: 'None dropped'});}
 
-   return TestRunner.displayResults('Stringifier L5R.GeneralRoll.Stringifier', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.GeneralRoll.Stringifier', testResults, isFirst);
 };
 TestSuite.L5R.GeneralRoll = function(isFirst)
 {
@@ -246,7 +246,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.targetNumber]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.targetNumber]),
          Actual: e, Description: 'Invalid targetNumber'});
    }
 
@@ -257,7 +257,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.diceRolled]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.diceRolled]),
          Actual: e, Description: 'Invalid diceRolled'});
    }
 
@@ -279,7 +279,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [input.diceKept]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [input.diceKept]),
          Actual: e, Description: 'Invalid diceKept'});
    }
 
@@ -373,5 +373,5 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
 
    //both success true/false was tested by numberOfRaises increases TN
 
-   return TestRunner.displayResults('Prebuilt L5R.GeneralRoll', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.GeneralRoll', testResults, isFirst);
 };

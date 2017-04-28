@@ -29,7 +29,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireInteger, [input.diceCount]),
+      testResults.push({Expected: getError(Validation.requireInteger, [input.diceCount]),
          Actual: e, Description: 'Non integer diceCount'});
    }
 
@@ -40,7 +40,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireInteger, [input.difficulty]),
+      testResults.push({Expected: getError(Validation.requireInteger, [input.difficulty]),
          Actual: e, Description: 'Non integer difficulty'});
    }
 
@@ -51,7 +51,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireInteger, [input.nudges]),
+      testResults.push({Expected: getError(Validation.requireInteger, [input.nudges]),
          Actual: e, Description: 'Non integer nudges'});
    }
 
@@ -97,7 +97,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: pair of 6 is result 0'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: pair of 6 is result 0'});}
 
-   return TestRunner.displayResults('Prebuilt Mistborn.Challenge', testResults, isFirst);
+   return TestRunner.displayResults('Mistborn Mistborn.Challenge', testResults, isFirst);
 };
 TestSuite.Mistborn.Contest = function(isFirst)
 {
@@ -222,5 +222,5 @@ TestSuite.Mistborn.Contest = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'difficulty:fail, other:negative, winner:2'});
    } catch(e){testResults.push({Error: e, Description: 'difficulty:fail, other:negative, winner:2'});}
 
-   return TestRunner.displayResults('Prebuilt Mistborn.Contest', testResults, isFirst);
+   return TestRunner.displayResults('Mistborn Mistborn.Contest', testResults, isFirst);
 };

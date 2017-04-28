@@ -346,7 +346,7 @@ TestSuite.DicePool._validate = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireTypeOf, ['string', undefined]), Actual: e, Description: 'Invalid name'});
+       testResults.push({Expected: getError(Validation.requireTypeOf, ['string', undefined]), Actual: e, Description: 'Invalid name'});
    }
 
    try{
@@ -355,7 +355,7 @@ TestSuite.DicePool._validate = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireInstanceOf, [Array, NaN]), Actual: e, Description: 'Invalid pool'});
+       testResults.push({Expected: getError(Validation.requireInstanceOf, [Array, NaN]), Actual: e, Description: 'Invalid pool'});
    }
 
    try{

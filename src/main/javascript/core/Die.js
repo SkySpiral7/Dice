@@ -25,7 +25,7 @@ function Die(arg1)
    this.roll = function(randomSource)
    {
       if(undefined == randomSource) randomSource = Math.random;
-      requireTypeOf('function', randomSource);
+      Validation.requireTypeOf('function', randomSource);
       //TODO: consider moving randomSource into Die's data
 
       var valueArray = [];
