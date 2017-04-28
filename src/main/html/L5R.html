@@ -3,7 +3,7 @@
 <head>
 <title>L5R dice</title>
 <meta charset="ASCII" />
-<script id="DiceInclude" src="../javascript/include.js"></script>
+<script id="DiceInclude" src="../javascript/Include.js"></script>
 <script type="text/javaScript">
 'use strict';
 function parseRequiredInput()
@@ -48,7 +48,7 @@ function rollDice()
       input.targetNumber = Number.parseInt(document.getElementById('targetNumber').value);
       if(!Number.isNatural(input.targetNumber)) throw new Error('Invalid targetNumber. Must be 1+.');
 
-      var result = Prebuilt.L5RGeneralRoll(input);
+      var result = L5R.GeneralRoll(input);
 
       document.getElementById('valuesKept').textContent = result.valuesKept;
       document.getElementById('valuesDropped').textContent = result.valuesDropped;
@@ -66,7 +66,7 @@ function mainDraw()
    var input = parseRequiredInput();
    try{
       validateRequiredInput(input);
-      Draw.diceBellCurve(new L5RDicePool(input));
+      Draw.diceBellCurve(new L5R.DicePool(input));
    }
    catch(error){alert('Error: ' + error.message); throw error;}
 }

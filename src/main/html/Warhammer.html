@@ -3,7 +3,7 @@
 <head>
 <title>Warhammer Dice Helper</title>
 <meta charset="ASCII" />
-<script id="DiceInclude" src="../javascript/include.js"></script>
+<script id="DiceInclude" src="../javascript/Include.js"></script>
 <script type="text/javaScript">
 'use strict';
 Draw.generateBinomialTable = function(stats, secondColumn)
@@ -62,7 +62,7 @@ function rollAttack()
 
    try{
       validateInput(input);
-      var output = Prebuilt.WarhammerAttackUnit(input);
+      var output = Warhammer.AttackUnit(input);
       hitResult.textContent = output.hit;  //always exists
       if(undefined !== output.wounded) woundedResult.textContent = output.wounded;
       if(undefined !== output.unsavedWounds) unsaveWoundsResult.textContent = output.unsavedWounds;
@@ -82,7 +82,7 @@ function mainDraw()
    try{
       validateInput(input);
       if(!(/^(?:[<>]=?|[!=]?==?)$/).test(input.customColumn)) throw new Error('Invalid customColumn. Must a comparison like >=');
-      var stats = Prebuilt.WarhammerAttackUnit.Statistics(input);
+      var stats = Warhammer.AttackUnit.Statistics(input);
       Draw.generateBinomialTable(stats, input.customColumn);
    }
    catch(error){alert('Error: ' + error.message); throw error;}

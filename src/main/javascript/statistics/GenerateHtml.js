@@ -12,6 +12,7 @@ GenerateHtml.aggregates = function(aggregate)
 };
 GenerateHtml.compareStatistics = function(diffStats)
 {
+   //TODO: make GenerateHtml.compareStatistics
    return '';
 };
 GenerateHtml.statistics = function(stats, secondColumn)

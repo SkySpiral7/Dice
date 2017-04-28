@@ -27,6 +27,7 @@ if (undefined === Array.prototype.removeByIndex)
 @param element the first occurrence of which will be removed
 @returns {!number} the index of the removed element
 */
+//TODO: rename to removeByValue?
 if (undefined === Array.prototype.removeElement)
 {
    Array.prototype.removeElement = function(obj)

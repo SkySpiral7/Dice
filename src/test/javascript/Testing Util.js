@@ -1,4 +1,10 @@
 'use strict';
+/**@returns the error that is thrown by functionToCall when passed args. Note that functionToCall can't reference the this pointer.*/
+function getError(functionToCall, args)
+{
+   try{functionToCall.apply(undefined, args);}
+   catch(e){return e;}
+}
 function dieResultsToNonRandomArray(sides, numberArray)
 {
    for (var i = 0; i < numberArray.length; ++i)

@@ -3,7 +3,7 @@
 <head>
 <title>Pathfinder Attack Helper</title>
 <meta charset="ASCII" />
-<script id="DiceInclude" type="text/javaScript" src="../javascript/include.js"></script>
+<script id="DiceInclude" type="text/javaScript" src="../javascript/Include.js"></script>
 <script type="text/javaScript">
 'use strict';
 var characters = [];
@@ -49,7 +49,7 @@ function createAttackOptions()
 function attack()
 {
    var input = createAttackInput();
-   document.getElementById('result').innerHTML = Prebuilt.PathfinderAttack(input).toString();
+   document.getElementById('result').innerHTML = Pathfinder.Attack(input).toString();
 }
 function createAttackInput()
 {
@@ -78,6 +78,10 @@ function initiative()
       //FYI: this is polluting the characters array
    }
    characters.sort(initiativeSortOrder);
+   //re-number current from 0..x repeat ties
+   //for each tie roll 1dx for the number of ties... use a deck of cards
+   //re-number them accordingly (now without ties)
+   //call sort again
    createCharacterOptions();
 }
 function initiativeSortOrder(first, second)

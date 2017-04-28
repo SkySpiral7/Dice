@@ -1,9 +1,10 @@
 'use strict';
 
-var fileNames = ['DiceExpression', 'DicePool', 'Die', 'GenerateHtml', 'Parser', 'Prebuilt', 'prototypes',
-   'Statistics', 'Stringifier',
-   'GameSpecific', 'Testing Util',  //must be last
-   'beta/StackExchangeWhuber'];  //beta: ignore
+fileNames.removeElement('core/Validation');
+fileNames.removeElement('statistics/Draw');
+fileNames.removeElement('statistics/Misc');
+fileNames.push('Testing Util');
+
 //includePath was defined in main/javascript/include.js
 
 TestConfig.defaultDelta = Number.EPSILON;  //since this program only deals with natural numbers and statistics

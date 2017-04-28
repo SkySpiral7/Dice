@@ -103,8 +103,8 @@ I don't know if comparing rolls is actually a thing and there are a few issues w
    if(undefined === inputB.circumstanceBonus) inputB.circumstanceBonus = 0;
    ++inputB.circumstanceBonus;
 
-   output.resultA = Prebuilt.L5RGeneralRoll(inputA);
-   output.resultB = Prebuilt.L5RGeneralRoll(inputB);
+   output.resultA = L5R.GeneralRoll(inputA);
+   output.resultB = L5R.GeneralRoll(inputB);
 
    var effectiveATotal = output.resultA.totalValue + (inputB.numberOfRaises * 5);
    var effectiveBTotal = output.resultB.totalValue + (inputA.numberOfRaises * 5);
