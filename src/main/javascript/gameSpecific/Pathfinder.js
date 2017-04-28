@@ -105,3 +105,66 @@ Pathfinder.Attack.Stringifier = function(attackResults)
    output = output.replace(/ 1 points/g, ' 1 point');
    return output + '.';
 };
+/**
+ * Wonderous Item "Deck of Illusions": http://paizo.com/pathfinderRPG/prd/coreRulebook/magicItems/wondrousItems.html#deck-of-illusions
+ * Each card is only used once. No special rules (see website for details).
+ * @param allowRandomlyMissing if true there's a 10% chance of 1d20 cards missing. if false (the default) then all cards will be present.
+ * @param randomSource will be passed to Die.roll()
+ */
+Pathfinder.DeckOfIllusions = function(allowRandomlyMissing, randomSource)
+{
+   var deck = new CustomDice.DeckOfCards([
+      'Red dragon',
+      'Male human fighter and four guards',
+      'Female human wizard',
+      'Male human druid',
+      'Cloud giant',
+      'Ettin',
+      'Bugbear',
+      'Goblin',
+      'Glabrezu (demon)',
+      'Male elf wizard and female apprentice',
+      'Half-elf ranger',
+      'Harpy',
+      'Male half-orc barbarian',
+      'Ogre mage',
+      'Gnoll',
+      'Kobold',
+      'Lich',
+      'Three human clerics',
+      'Medusa',
+      'Male dwarf paladin',
+      'Frost giant',
+      'Troll',
+      'Hobgoblin',
+      'Goblin',
+      'Iron golem',
+      'Three halfling rogues',
+      'Pixies',
+      'Half-elf bard',
+      'Hill giant',
+      'Ogre',
+      'Orc',
+      'Kobold',
+      'Illusion of deck\'s owner',
+      'Illusion of deck\'s owner (sex reversed)']);
+   if (true === allowRandomlyMissing && 1 === new Die(10).roll(randomSource)[0])  //10% of some missing
+   {
+      var numberMissing = new Die(20).roll(randomSource)[0];  //1d20 cards missing
+      while (numberMissing > 0)
+      {
+         deck.draw(randomSource);
+         --numberMissing;
+      }
+   }
+   return deck;
+};
+//TODO: add below decks to Pathfinder
+/*
+Deck of Many Things, Harrow: http://www.d20pfsrd.com/magic-items/artifacts/minor-artifacts/deck-of-many-things-harrow/
+*/
+/*
+Deck of Many Things:
+http://paizo.com/pathfinderRPG/prd/ultimateEquipment/artifactsAndOthers/artifacts.html#deck-of-many-things
+http://www.d20pfsrd.com/magic-items/artifacts/minor-artifacts/deck-of-many-things/
+*/

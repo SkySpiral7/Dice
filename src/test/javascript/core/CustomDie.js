@@ -29,10 +29,10 @@ TestSuite.CustomDice.DeckOfCards = function(isFirst)
    try{
    input = ['a', 'b', 'c'];
    die = new CustomDice.DeckOfCards(input);
-   nonRandomGenerator = dieResultsToNonRandomGenerator(3, [1]);
-   testResults.push({Expected: 'a', Actual: die.roll(nonRandomGenerator), Description: 'Happy path'});
+   nonRandomGenerator = dieResultsToNonRandomGenerator(3, [2]);
+   testResults.push({Expected: 'b', Actual: die.roll(nonRandomGenerator), Description: 'Happy path'});
    nonRandomGenerator = dieResultsToNonRandomGenerator(2, [1]);
-   testResults.push({Expected: 'b', Actual: die.roll(nonRandomGenerator), Description: 'Holds onto array'});
+   testResults.push({Expected: 'a', Actual: die.roll(nonRandomGenerator), Description: 'Holds onto array'});
    testResults.push({Expected: ['a', 'b', 'c'], Actual: input.copy(), Description: 'Does not change input'});
    input.pop();
    nonRandomGenerator = dieResultsToNonRandomGenerator(1, [1]);

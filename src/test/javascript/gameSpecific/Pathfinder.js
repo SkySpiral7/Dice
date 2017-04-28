@@ -309,3 +309,34 @@ TestSuite.Pathfinder.Attack_Stringifier = function(isFirst)
 
    return TestRunner.displayResults('Pathfinder Pathfinder.Attack.Stringifier', testResults, isFirst);
 };
+TestSuite.Pathfinder.DeckOfIllusions = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], nonRandomGenerator, die;
+
+   try{
+   nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
+   die = new Pathfinder.DeckOfIllusions(false, nonRandomGenerator);
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: die.draw(nonRandomGenerator), Description: 'Happy path: keep all cards'});
+   nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
+   die = new Pathfinder.DeckOfIllusions();
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: die.draw(nonRandomGenerator), Description: 'Keep all cards is default'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   nonRandomGenerator = dieResultsToNonRandomGenerator(10, [2]);
+   die = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
+   nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: die.draw(nonRandomGenerator), Description: 'Randomly kept all cards'});
+
+   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(10, [1]).concat(dieResultsToNonRandomArray(20, [2]))  //remove 2 cards
+   .concat(dieResultsToNonRandomArray(34, [1])).concat(dieResultsToNonRandomArray(33, [33])));  //remove first then last
+   die = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
+   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(32, [1]).concat(dieResultsToNonRandomArray(31, [31])));  //draw new first then last
+   testResults.push({Expected: 'Male human fighter and four guards', Actual: die.draw(nonRandomGenerator), Description: 'Removed first card'});
+   testResults.push({Expected: 'Illusion of deck\'s owner', Actual: die.draw(nonRandomGenerator), Description: 'Removed last card'});
+   } catch(e){testResults.push({Error: e, Description: 'allowRandomlyMissing'});}
+
+   return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfIllusions', testResults, isFirst);
+};
