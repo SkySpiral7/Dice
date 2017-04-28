@@ -38,6 +38,8 @@ if (undefined === Array.prototype.removeElement)
       return foundIndex;
    };
 }
+/**Returns a shallow copy of this array.*/
+if (undefined === Array.prototype.copy){Array.prototype.copy=function(){return this.slice(0);};}
 /**
 @returns a copy of the input according to JSON.stringify. Objects with toJSON defined will stay that way
 unless the reviver arg transforms them back.

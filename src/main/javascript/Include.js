@@ -1,7 +1,7 @@
 'use strict';
 
-var fileNames = ['core/DicePool', 'core/Die', 'core/Parser', 'core/Prototypes', 'core/Validation']
-.concat(['statistics/DiceExpression', 'statistics/Draw', 'statistics/GenerateHtml', 'statistics/Main', 'statistics/Misc']);
+var fileNames = ['core/CustomDie', 'core/DicePool', 'core/Die', 'core/Parser', 'core/Prototypes', 'core/Validation']
+.concat(['statistics/DiceExpression', 'statistics/Draw', 'statistics/GenerateHtml', 'statistics/Main', 'statistics/Misc'])
 //don't include gameSpecific since the client likely only wants 1 or 0
 
 var includePath = document.getElementById('DiceInclude').src.replace('Include.js', '');
