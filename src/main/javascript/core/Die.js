@@ -5,6 +5,17 @@ new Die() for a 1d6
 new Die(20) for a 1d20
 new Die('d10!!')
 new Die({sideCount: 6, constantModifier: -1, rerollCriteria: '===1', explodeType: Die.explodeTypes.Normal})
+
+Note that the most common dice are:
+d4: new Die(4),
+d6: new Die(6),
+d8: new Die(8),
+d10: new Die(10),
+d12: new Die(12),
+d20: new Die(20),
+percentile: new Die(100),
+fudge: new Die('1dF')  //Fudge is the original name although they are also called Fate dice.
+However note that for these you will need to roll()[0] since roll returns an array.
 */
 function Die(arg1)
 {
