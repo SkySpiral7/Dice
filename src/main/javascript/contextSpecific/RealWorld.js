@@ -1,5 +1,4 @@
 'use strict';
-/**Ok so real life isn't a game but whatever it makes sense under "gameSpecific".*/
 var RealWorld = {};
 RealWorld.Coin = new CustomDice.CustomDie(['Heads', 'Tails']);
 /** Note that there are 10 "yes", 5 neutral, and 5 "no". Therefore whenever you roll it the "Outlook [is] good". */

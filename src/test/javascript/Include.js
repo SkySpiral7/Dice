@@ -1,7 +1,7 @@
 'use strict';
 
 //since I'm testing everything I need to include every file
-fileNames = fileNames.concat(['gameSpecific/L5R', 'gameSpecific/Mistborn', 'gameSpecific/Pathfinder', 'gameSpecific/RealWorld', 'gameSpecific/Warhammer']);
+fileNames = fileNames.concat(['contextSpecific/L5R', 'contextSpecific/Mistborn', 'contextSpecific/Pathfinder', 'contextSpecific/RealWorld', 'contextSpecific/Warhammer']);
 addScripts();
 
 //addScripts, fileNames, includePath are defined in main/javascript/Include.js
