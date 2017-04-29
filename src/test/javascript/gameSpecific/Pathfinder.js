@@ -390,3 +390,17 @@ TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
 
    return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfManyThings', testResults, isFirst);
 };
+TestSuite.Pathfinder.HarrowDeckOfManyThings = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], nonRandomGenerator, expected;
+
+   try{
+   nonRandomGenerator = dieResultsToNonRandomGenerator(54, [47]);
+   expected = {'Harrow Card': 'The Twin', 'Alignment': 'N', 'Effect': 'The character physically becomes a member of the opposite gender.'};
+   testResults.push({Expected: expected, Actual: Pathfinder.HarrowDeckOfManyThings.roll(nonRandomGenerator), Description: 'Happy path'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   return TestRunner.displayResults('Pathfinder Pathfinder.HarrowDeckOfManyThings', testResults, isFirst);
+};
