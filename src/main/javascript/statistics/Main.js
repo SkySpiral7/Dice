@@ -226,7 +226,7 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
       DiceExpression.combineValues(terms);  //TODO: obviously needs refactoring
       return new DiceExpression(terms, (0 !== explodeCount)).toDiceResults();
    }
-   var everyCombination = cartesianProduct(everyValue);
+   var everyCombination = Combination.cartesianProduct(everyValue);
 
    var everySum = [];
    for (var resultIndex = 0; resultIndex < everyCombination.length; ++resultIndex)

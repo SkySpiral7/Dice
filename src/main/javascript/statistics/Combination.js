@@ -1,5 +1,6 @@
 'use strict';
-//TODO: all in file: test, move it somewhere
+//TODO: test: Combination.cartesianProduct
+var Combination = {};
 /**
 This function returns every possible combination of each element passed in.
 What it does is a little hard to describe. If you pass in:
@@ -9,7 +10,7 @@ so it is the cartesianProduct of the 2 sets passed in. This allows any number of
 The elements are not required to have the same length.
 @param {Array[]} superArray (which isn't mutated) is the array of all sets whose elements are to be matched up
 */
-function cartesianProduct(superArray)
+Combination.cartesianProduct = function(superArray)
 {
    //alternatively I could count up with indexes: [0,0,0] then [0,0,1] etc but that would be more complicated
    //although the only place this is currently used will have every element the same
@@ -38,7 +39,7 @@ function cartesianProduct(superArray)
       for (var i = 0; i < array1.length; ++i)
       for (var j = 0; j < array2.length; ++j)
       {
-         var thisRow = array1[i].slice();  //copy array
+         var thisRow = array1[i].copy();
          thisRow.push(array2[j]);  //the difference is here: array2[j] is added to a copy of array1[i] so that it will be on the same level
          results.push(thisRow);
       }
