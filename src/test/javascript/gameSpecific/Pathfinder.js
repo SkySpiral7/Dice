@@ -313,30 +313,80 @@ TestSuite.Pathfinder.DeckOfIllusions = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], nonRandomGenerator, die;
+   var testResults = [], nonRandomGenerator, deck;
 
    try{
    nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
-   die = new Pathfinder.DeckOfIllusions(false, nonRandomGenerator);
-   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: die.draw(nonRandomGenerator), Description: 'Happy path: keep all cards'});
+   deck = new Pathfinder.DeckOfIllusions(false, nonRandomGenerator);
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(nonRandomGenerator), Description: 'Happy path: keep all cards'});
    nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
-   die = new Pathfinder.DeckOfIllusions();
-   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: die.draw(nonRandomGenerator), Description: 'Keep all cards is default'});
+   deck = new Pathfinder.DeckOfIllusions();
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(nonRandomGenerator), Description: 'Keep all cards is default'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
    nonRandomGenerator = dieResultsToNonRandomGenerator(10, [2]);
-   die = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
+   deck = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
    nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
-   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: die.draw(nonRandomGenerator), Description: 'Randomly kept all cards'});
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(nonRandomGenerator), Description: 'Randomly kept all cards'});
 
    nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(10, [1]).concat(dieResultsToNonRandomArray(20, [2]))  //remove 2 cards
    .concat(dieResultsToNonRandomArray(34, [1])).concat(dieResultsToNonRandomArray(33, [33])));  //remove first then last
-   die = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
+   deck = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
    nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(32, [1]).concat(dieResultsToNonRandomArray(31, [31])));  //draw new first then last
-   testResults.push({Expected: 'Male human fighter and four guards', Actual: die.draw(nonRandomGenerator), Description: 'Removed first card'});
-   testResults.push({Expected: 'Illusion of deck\'s owner', Actual: die.draw(nonRandomGenerator), Description: 'Removed last card'});
+   testResults.push({Expected: 'Male human fighter and four guards', Actual: deck.draw(nonRandomGenerator), Description: 'Removed first card'});
+   testResults.push({Expected: 'Illusion of deck\'s owner', Actual: deck.draw(nonRandomGenerator), Description: 'Removed last card'});
    } catch(e){testResults.push({Error: e, Description: 'allowRandomlyMissing'});}
 
    return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfIllusions', testResults, isFirst);
+};
+TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], nonRandomGenerator, deck, actual, expected;
+
+   try{
+   deck = new Pathfinder.DeckOfManyThings();
+   nonRandomGenerator = dieResultsToNonRandomGenerator(22, [1]);
+   testResults.push({Expected: [{Plaque: 'Balance', Effect: 'Change alignment instantly.'}], Actual: deck.draw(nonRandomGenerator), Description: 'Happy path'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   deck = new Pathfinder.DeckOfManyThings();
+   nonRandomGenerator = dieResultsToNonRandomGenerator(22, [1, 1]);
+   actual = [deck.draw(nonRandomGenerator)[0].Plaque, deck.draw(nonRandomGenerator)[0].Plaque];
+   testResults.push({Expected: ['Balance', 'Balance'], Actual: actual, Description: 'Can draw same card again'});
+   } catch(e){testResults.push({Error: e, Description: 'Can draw same card again'});}
+
+   try{
+   deck = new Pathfinder.DeckOfManyThings();
+   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [10]).concat(dieResultsToNonRandomArray(21, [10])));
+   testResults.push({Expected: ['Jester', 'Key'], Actual: [deck.draw(nonRandomGenerator)[0].Plaque, deck.draw(nonRandomGenerator)[0].Plaque], Description: 'Jester gets removed'});
+   } catch(e){testResults.push({Error: e, Description: 'Jester gets removed'});}
+
+   try{
+   deck = new Pathfinder.DeckOfManyThings();
+   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [7]).concat(dieResultsToNonRandomArray(21, [7])));
+   expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.'},
+      {Plaque: 'Gem', Effect: 'Gain your choice of 25 pieces of jewelry or 50 gems.'}]
+   actual = deck.draw(nonRandomGenerator);
+   testResults.push({Expected: expected, Actual: actual, Description: 'Fool gets removed and draws again'});
+   nonRandomGenerator = dieResultsToNonRandomGenerator(21, [7]);
+   testResults.push({Expected: 'Gem', Actual: deck.draw(nonRandomGenerator)[0].Plaque, Description: 'Is actually removed'});
+   } catch(e){testResults.push({Error: e, Description: 'Fool gets removed and draws again'});}
+
+   try{
+   deck = new Pathfinder.DeckOfManyThings();
+   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [7]).concat(dieResultsToNonRandomArray(21, [9])));
+   expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.'},
+      {Plaque: 'Jester', Effect: 'Gain 10,000 XP or two more draws from the deck.'}]
+   actual = deck.draw(nonRandomGenerator);
+   testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: Fool can draw Jester'});
+
+   nonRandomGenerator = dieResultsToNonRandomGenerator(20, [9]);
+   testResults.push({Expected: 'Key', Actual: deck.draw(nonRandomGenerator)[0].Plaque, Description: 'And both are removed'});
+   } catch(e){testResults.push({Error: e, Description: 'Edge case: Fool can draw Jester'});}
+
+   return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfManyThings', testResults, isFirst);
 };
