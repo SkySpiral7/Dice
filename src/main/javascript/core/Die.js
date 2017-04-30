@@ -37,8 +37,9 @@ function Die(arg1)
    {
       if(undefined == randomSource) randomSource = Math.random;
       Validation.requireTypeOf('function', randomSource);
-      //TODO: consider moving randomSource into Die's data
 
+      //valid d1 can't explode or reroll
+      if(1 === sideCount) return [(1 + constantModifier)];  //this fast path makes testing easier because it doesn't call randomSource
       var valueArray = [];
       var maxValue = sideCount + constantModifier;
       var needsValue, valueRolled;

@@ -106,6 +106,56 @@ Pathfinder.Attack.Stringifier = function(attackResults)
    return output + '.';
 };
 /**
+ * This function is used to roll initiative and sort the characters accordingly. It automatically handles ties.
+ * @param characters an array of objects each with the key 'initiative' (which is the bonus not the rolled amount).
+ *    This is not mutated. You will need some sort of way to indentify the objects (eg name) in order for the return value to be meaningful.
+ * @param randomSource passed to Die.roll
+ * @return an array of the characters in order. The initiative numbers aren't given: the characters are kept as-is.
+ */
+Pathfinder.RollInitiative = function(characters, randomSource)
+{
+   var d20 = new Die(20), characterIndex, wrappedCharacters = [];
+   for (characterIndex = 0; characterIndex < characters.length; ++characterIndex)
+   {
+      var currentInitiative = (characters[characterIndex].initiative + d20.roll(randomSource)[0]);
+      wrappedCharacters.push({currentInitiative: currentInitiative, character: characters[characterIndex]});
+   }
+   wrappedCharacters.sort(Pathfinder.RollInitiative._initiativeComparator);
+   var newCharacterOrder = [];
+   for (characterIndex = 0; characterIndex < wrappedCharacters.length;)  //the loop below will increment i
+   {
+      var tieArray = [wrappedCharacters[characterIndex]];
+      var baseCharacter = wrappedCharacters[characterIndex];
+      //starting with the next character search all remaining characters for ties.
+      for (++characterIndex; characterIndex < wrappedCharacters.length; ++characterIndex)  //uses same index
+      {
+         if(0 === Pathfinder.RollInitiative._initiativeComparator(baseCharacter, wrappedCharacters[characterIndex])) tieArray.push(wrappedCharacters[characterIndex]);
+         else break;  //because they are sorted we can stop looking for ties. the parent loop will handle this character next
+      }
+      var tieDie = new CustomDice.DeckOfCards(tieArray);
+      for (var tieIndex = 0; tieIndex < tieArray.length; ++tieIndex)  //for each tied character
+      {
+         //of the tied characters randomly determine the order
+         newCharacterOrder.push(tieDie.draw(randomSource).character);
+      }
+   }
+   return newCharacterOrder;
+};
+/**
+ * Used internally by Pathfinder.RollInitiative. It is a sort function that doesn't roll dice.
+ * It expects each arg to be like this: {currentInitiative: 5, character: {initiative: 2}}
+ */
+Pathfinder.RollInitiative._initiativeComparator = function(first, second)
+{
+   if(first.currentInitiative > second.currentInitiative) return -1;
+   if(first.currentInitiative < second.currentInitiative) return 1;
+
+   if(first.character.initiative > second.character.initiative) return -1;
+   if(first.character.initiative < second.character.initiative) return 1;
+
+   return 0;
+};
+/**
  * Wonderous Item "Deck of Illusions": http://paizo.com/pathfinderRPG/prd/coreRulebook/magicItems/wondrousItems.html#deck-of-illusions
  * Each card is only used once. No special rules (see website for details).
  * @param allowRandomlyMissing if true there's a 10% chance of 1d20 cards missing. if false (the default) then all cards will be present.

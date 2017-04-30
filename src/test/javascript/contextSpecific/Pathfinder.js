@@ -309,6 +309,76 @@ TestSuite.Pathfinder.Attack_Stringifier = function(isFirst)
 
    return TestRunner.displayResults('Pathfinder Pathfinder.Attack.Stringifier', testResults, isFirst);
 };
+TestSuite.Pathfinder.RollInitiative = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], actual, expected, randomSource;
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
+   var characterInput = [{name: 'Alice', initiative: 0}, {name: 'Bob', initiative: 1}];
+   actual = Pathfinder.RollInitiative(characterInput, randomSource);
+
+   testResults.push({Expected: {name: 'Bob', initiative: 1}, Actual: actual[0], Description: 'Happy path: character[0]'});
+   testResults.push({Expected: {name: 'Alice', initiative: 0}, Actual: actual[1], Description: 'Happy path: character[1]'});
+   testResults.push({Expected: 'Alice', Actual: characterInput[0].name, Description: 'Happy path: Doesn\'t mutate input'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [15, 15, 2]).concat(dieResultsToNonRandomArray(2, [2])));
+   actual = Pathfinder.RollInitiative([{name: 'Alice', initiative: 1}, {name: 'Bob', initiative: 1}, {name: 'Clara', initiative: 1}], randomSource);
+
+   testResults.push({Expected: 'Bob', Actual: actual[0].name, Description: 'Double tied initiative character[0]'});
+   testResults.push({Expected: 'Alice', Actual: actual[1].name, Description: 'Double tied initiative character[1]'});
+   testResults.push({Expected: 'Clara', Actual: actual[2].name, Description: 'Double tied initiative character[2]'});
+   } catch(e){testResults.push({Error: e, Description: 'Double tied initiative'});}
+
+   try{
+   randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 15, 15, 15, 10, 10])
+   .concat(deckResultsToNonRandomArray(3, [2, 2])).concat(deckResultsToNonRandomArray(2, [1])));
+   actual = Pathfinder.RollInitiative([{name: 'Alice', initiative: 0},
+      {name: 'Bob', initiative: 1}, {name: 'Clara', initiative: 1}, {name: 'Dan', initiative: 1},
+      {name: 'Edward', initiative: 1}, {name: 'Frank', initiative: 1}], randomSource);
+
+   testResults.push({Expected: 'Alice', Actual: actual[0].name, Description: 'Stress Double tied initiative character[0]'});
+   testResults.push({Expected: 'Clara', Actual: actual[1].name, Description: 'Stress Double tied initiative character[1]'});
+   testResults.push({Expected: 'Dan', Actual: actual[2].name, Description: 'Stress Double tied initiative character[2]'});
+   testResults.push({Expected: 'Bob', Actual: actual[3].name, Description: 'Stress Double tied initiative character[3]'});
+   testResults.push({Expected: 'Edward', Actual: actual[4].name, Description: 'Stress Double tied initiative character[4]'});
+   testResults.push({Expected: 'Frank', Actual: actual[5].name, Description: 'Stress Double tied initiative character[5]'});
+   } catch(e){testResults.push({Error: e, Description: 'Stress Double tied initiative'});}
+
+   return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative', testResults, isFirst);
+};
+TestSuite.Pathfinder.RollInitiative_initiativeComparator = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], characters;
+
+   try{
+   characters = [{currentInitiative: 9, character: {name: 'Alice', initiative: 2}}, {currentInitiative: 15, character: {name: 'Bob', initiative: 2}},
+      {currentInitiative: 3, character: {name: 'Clara', initiative: 2}}];
+   stableSort(characters, Pathfinder.RollInitiative._initiativeComparator);
+
+   testResults.push({Expected: 'Bob', Actual: characters[0].character.name, Description: 'highest total first'});
+   testResults.push({Expected: 'Alice', Actual: characters[1].character.name, Description: 'then next'});
+   testResults.push({Expected: 'Clara', Actual: characters[2].character.name, Description: 'lowest total last'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   characters = [{currentInitiative: 5, character: {name: 'Alice', initiative: 2}}, {currentInitiative: 5, character: {name: 'Bob', initiative: 3}},
+      {currentInitiative: 5, character: {name: 'Clara', initiative: 1}}];
+   stableSort(characters, Pathfinder.RollInitiative._initiativeComparator);
+
+   testResults.push({Expected: 'Bob', Actual: characters[0].character.name, Description: 'tied initiative total: highest bonus first'});
+   testResults.push({Expected: 'Alice', Actual: characters[1].character.name, Description: 'tied initiative total: then next'});
+   testResults.push({Expected: 'Clara', Actual: characters[2].character.name, Description: 'tied initiative total: lowest bonus last'});
+   } catch(e){testResults.push({Error: e, Description: 'tied initiative total'});}
+
+   return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative._initiativeComparator', testResults, isFirst);
+};
 TestSuite.Pathfinder.DeckOfIllusions = function(isFirst)
 {
    TestRunner.clearResults(isFirst);

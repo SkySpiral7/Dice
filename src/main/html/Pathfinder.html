@@ -23,8 +23,13 @@ function safeButton(functionName)
 function parseCharacterData()
 {
    characters = eval(document.getElementById('characterData').value);  //there's no benefit to JSON.parse in this case so use eval to be less strict
+   initiative();  //calls createCharacterOptions
+}
+var randomSource;  //used for testing
+function initiative()
+{
+   characters = Pathfinder.RollInitiative(characters, randomSource);
    createCharacterOptions();
-   initiative();
 }
 function createCharacterOptions()
 {
@@ -69,34 +74,6 @@ function createAttackInput()
 
    return {opposingAc: targetAc, attackBonus: attackUsed.attackBonus, weapon: attackUsed, damageReduction: target.damageReduction, randomSource: randomSource};
 }
-var randomSource;  //used for testing
-function initiative()
-{
-   var d20 = new Die(20);
-   for (var i = 0; i < characters.length; ++i)
-   {
-      characters[i].currentInitiative = characters[i].initiative + d20.roll(randomSource)[0];
-      //FYI: this is polluting the characters array
-   }
-   characters.sort(initiativeSortOrder);
-   //re-number current from 0..x repeat ties
-   //for each tie roll 1dx for the number of ties... use a deck of cards
-   //re-number them accordingly (now without ties)
-   //call sort again
-   createCharacterOptions();
-}
-function initiativeSortOrder(first, second)
-{
-   if(first.currentInitiative > second.currentInitiative) return -1;
-   if(first.currentInitiative < second.currentInitiative) return 1;
-
-   if(first.initiative > second.initiative) return -1;
-   if(first.initiative < second.initiative) return 1;
-
-   //TODO: doesn't handle ties (should roll d20 once)
-   //"If there is still a tie, the tied characters should roll to determine which one of them goes before the other."
-   return 0;
-}
 //TODO: misc modifiers, delay turn, temporary notes
 </script>
 </head>
@@ -104,7 +81,6 @@ function initiativeSortOrder(first, second)
 <!----
 <script type="text/javaScript" src="../../../../Miscellaneous/src/main/javascript/testRunner.js"></script>
 <script type="text/javaScript" src="../../test/javascript/Testing Util.js"></script>
-<script type="text/javaScript" src="../../../../Miscellaneous/src/main/javascript/unstableSort.js"></script>
 <script type="text/javaScript" src="../../test/html/Pathfinder.js"></script>
 <textarea id="testResults" cols="80" rows="20"></textarea><br />
 <input type="button" onclick="TestRunner.testAll();" value="Test file" />
