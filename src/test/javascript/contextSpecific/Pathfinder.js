@@ -398,7 +398,7 @@ TestSuite.Pathfinder.HarrowDeckOfManyThings = function(isFirst)
 
    try{
    nonRandomGenerator = dieResultsToNonRandomGenerator(54, [47]);
-   expected = {CardName: 'The Twin', Alignment: 'N', Effect: 'The character physically becomes a member of the opposite gender.'};
+   expected = {CardName: 'The Twin', Alignment: 'N', Suit: 'Crown', Effect: 'The character physically becomes a member of the opposite gender.'};
    testResults.push({Expected: expected, Actual: Pathfinder.HarrowDeckOfManyThings.draw(nonRandomGenerator), Description: 'Happy path'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
