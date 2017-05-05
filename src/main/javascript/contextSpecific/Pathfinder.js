@@ -211,39 +211,41 @@ Pathfinder.DeckOfIllusions = function(allowRandomlyMissing, randomSource)
 };
 /**
  * Artifact "Deck of Many Things": http://paizo.com/pathfinderRPG/prd/ultimateEquipment/artifactsAndOthers/artifacts.html#deck-of-many-things
+ * This is a constructor and will create the deck with all 22 cards.
  */
 Pathfinder.DeckOfManyThings = function()
 {
    var deckValues = [
-      {Plaque: 'Balance', Effect: 'Change alignment instantly.'},
-      {Plaque: 'Comet', Effect: 'Defeat the next monster you meet to gain one level.'},
-      {Plaque: 'Donjon', Effect: 'You are imprisoned.'},
-      {Plaque: 'Eurayle', Effect: '-1 penalty on all saving throws henceforth.'},
-      {Plaque: 'The Fates', Effect: 'Avoid any situation you choose, once.'},
-      {Plaque: 'Flames', Effect: 'Enmity between you and an outsider.'},
-      {Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.'},
-      {Plaque: 'Gem', Effect: 'Gain your choice of 25 pieces of jewelry or 50 gems.'},
-      {Plaque: 'Idiot', Effect: 'Lose 1d4+1 Intelligence. You may draw again.'},
-      {Plaque: 'Jester', Effect: 'Gain 10,000 XP or two more draws from the deck.'},
-      {Plaque: 'Key', Effect: 'Gain a major magic weapon.'},
-      {Plaque: 'Knight', Effect: 'Gain the service of a 4th-level fighter.'},
-      {Plaque: 'Moon', Effect: 'You are granted 1d4 wishes.'},
-      {Plaque: 'Rogue', Effect: 'One of your friends turns against you.'},
-      {Plaque: 'Ruin', Effect: 'Immediately lose all wealth and property.'},
-      {Plaque: 'Skull', Effect: 'Defeat dread wraith or be forever destroyed.'},
-      {Plaque: 'Star', Effect: 'Immediately gain a +2 inherent bonus to one ability score.'},
-      {Plaque: 'Sun', Effect: 'Gain beneficial medium wondrous item and 50,000 XP.'},
-      {Plaque: 'Talons', Effect: 'All magic items you possess disappear permanently.'},
-      {Plaque: 'Throne', Effect: 'Gain a +6 bonus on Diplomacy checks plus a small castle.'},
-      {Plaque: 'Vizier', Effect: 'Know the answer to your next dilemma.'},
-      {Plaque: 'The Void', Effect: 'Body functions, but soul is trapped elsewhere.'}];
+      {Plaque: 'Balance', Effect: 'Change alignment instantly.', Clarification: 'The character must change to a radically different alignment. If the character fails to act according to the new alignment, she gains a negative level.'},
+      {Plaque: 'Comet', Effect: 'Defeat the next monster you meet to gain one level.', Clarification: 'The character must single-handedly defeat the next hostile monster or monsters encountered, or the benefit is lost. If successful, the character gains enough XP to attain the next experience level.'},
+      {Plaque: 'Donjon', Effect: 'You are imprisoned.', Clarification: 'This card signifies imprisonment-either by the imprisonment spell or by some powerful being. All gear and spells are stripped from the victim in any case. Draw no more cards.'},
+      {Plaque: 'Euryale', Effect: '-1 penalty on all saving throws henceforth.', Clarification: 'The medusa-like visage of this card brings a curse that only the Fates card or a deity can remove. The -1 penalty on all saving throws is otherwise permanent.'},
+      {Plaque: 'The Fates', Effect: 'Avoid any situation you choose, once.', Clarification: 'This card enables the character to avoid even an instantaneous occurrence if so desired, for the fabric of reality is unraveled and respun. Note that it does not enable something to happen. It can only stop something from happening or reverse a past occurrence. The reversal is only for the character who drew the card; other party members may have to endure the situation.'},
+      {Plaque: 'Flames', Effect: 'Enmity between you and an outsider.', Clarification: 'Hot anger, jealousy, and envy are but a few of the possible motivational forces for the enmity. The enmity of the outsider can\'t be ended until one of the parties has been slain. Determine the outsider randomly, and assume that it attacks the character (or plagues her life in some way) within 1d20 days.'},
+      {Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.', Clarification: 'The payment of XP and the redraw are mandatory. This card is always discarded when drawn, unlike all others except the Jester.'},
+      {Plaque: 'Gem', Effect: 'Gain your choice of 25 pieces of jewelry or 50 gems.', Clarification: 'This card indicates wealth. The jewelry is all gold set with gems, each piece worth 2,000 gp, and the gems are worth 1,000 gp each.'},
+      {Plaque: 'Idiot', Effect: 'Lose 1d4+1 Intelligence. You may draw again.', Clarification: 'This card causes the drain of 1d4+1 points of Intelligence immediately. The additional draw is optional.'},
+      {Plaque: 'Jester', Effect: 'Gain 10,000 XP or two more draws from the deck.', Clarification: 'This card is always discarded when drawn, unlike all others except the Fool. The redraws are optional.'},
+      {Plaque: 'Key', Effect: 'Gain a major magic weapon.', Clarification: 'The magic weapon granted must be one usable by the character. It suddenly appears out of nowhere in the character\'s hand.'},
+      {Plaque: 'Knight', Effect: 'Gain the service of a 4th-level fighter.', Clarification: 'The fighter appears out of nowhere and serves loyally until death. He or she is of the same race (or kind) and gender as the character. This fighter can be taken as a cohort by a character with the Leadership feat.'},
+      {Plaque: 'Moon', Effect: 'You are granted 1d4 wishes.', Clarification: 'This card bears the image of a moonstone gem with the appropriate number of wishes shown as gleams therein; sometimes it depicts a moon with its phase indicating the number of wishes (full = four; gibbous = three; half = two; quarter = one). These wishes are the same as those granted by the 9th-level wizard spell and must be used within a number of minutes equal to the number received.'},
+      {Plaque: 'Rogue', Effect: 'One of your friends turns against you.', Clarification: 'When this card is drawn, one of the character\'s NPC friends (preferably a cohort) is totally alienated and made forever hostile. If the character has no cohorts, the enmity of some powerful personage (or community, or religious order) can be substituted. The hatred is secret until the time is ripe for it to be revealed with devastating effect.'},
+      {Plaque: 'Ruin', Effect: 'Immediately lose all wealth and property.', Clarification: 'As implied by its name, when this card is drawn, all nonmagical possessions of the drawer are lost.'},
+      {Plaque: 'Skull', Effect: 'Defeat dread wraith or be forever destroyed.', Clarification: 'A dread wraith appears. The character must fight it alone-if others help, dread wraiths appear to fight them as well. If the character is slain, she is slain forever and cannot be revived, even with a wish or a miracle.'},
+      {Plaque: 'Star', Effect: 'Immediately gain a +2 inherent bonus to one ability score.', Clarification: 'The 2 points are added to any ability the character chooses. They cannot be divided among two abilities.'},
+      {Plaque: 'Sun', Effect: 'Gain beneficial medium wondrous item and 50,000 XP.', Clarification: 'Roll for a medium wondrous item until a useful item is indicated.'},
+      {Plaque: 'Talons', Effect: 'All magic items you possess disappear permanently.', Clarification: 'When this card is drawn, every magic item owned or possessed by the character is instantly and irrevocably lost, except for the deck.'},
+      {Plaque: 'Throne', Effect: 'Gain a +6 bonus on Diplomacy checks plus a small castle.', Clarification: 'The character becomes a true leader in people\'s eyes. The castle gained appears in any open area she wishes (but the decision where to place it must be made within 1 hour).'},
+      {Plaque: 'Vizier', Effect: 'Know the answer to your next dilemma.', Clarification: 'This card empowers the character drawing it with the one-time ability to call upon a source of wisdom to solve any single problem or answer fully any question upon her request. The query or request must be made within 1 year. Whether the information gained can be successfully acted upon is another matter entirely.'},
+      {Plaque: 'The Void', Effect: 'Body functions, but soul is trapped elsewhere.', Clarification: 'This black card spells instant disaster. The character\'s body continues to function, as though comatose, but her psyche is trapped in a prison somewhere-in an object on a far plane or planet, possibly in the possession of an outsider. A wish or a miracle does not bring the character back, instead merely revealing the plane of entrapment. Draw no more cards.'}
+   ];
    var deck = new CustomDice.CustomDie(deckValues);
    /**
     * You may only draw 1 card at a time because certain effects affect your ability or desire to draw more (and thus will continue each hour if applicable).
     * However an array is always returned to account for the Fool, for all other cards the array will have 1 element.
     * The cards Fool and Jester will be removed if drawn.
     * Cards like Moon will not roll dice for you.
-    * @return an array of 1-2 objects with the keys Plaque and Effect.
+    * @return an array of 1-2 objects with the keys Plaque, Effect, and Clarification.
     */
    this.roll = function(randomSource)
    {
@@ -269,7 +271,7 @@ Pathfinder.DeckOfManyThings = function()
 /**
  * Artifact "Harrow Deck of Many Things": http://www.d20pfsrd.com/magic-items/artifacts/minor-artifacts/deck-of-many-things-harrow/
  * All cards are always replaced so there's no requirement to handle anything in a special way.
- * Which is why this object is already created. All cards are present.
+ * Which is why this object is already created. All 54 cards are present.
  * No cards are handled in any special way so cards like The Joke will require you to call draw 3 more times (since the cards replace themselves you can get another 'The Joke' card).
  *
  * Note that each suit represents an ability
