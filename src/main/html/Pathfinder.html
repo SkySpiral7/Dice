@@ -3,8 +3,10 @@
 <head>
 <title>Pathfinder Attack Helper</title>
 <meta charset="ASCII" />
-<script id="DiceInclude" type="text/javaScript" src="../javascript/include.js"></script>
-<script>
+<script id="DiceInclude" type="text/javaScript" src="../javascript/Include.js"></script>
+<script src="../javascript/contextSpecific/Pathfinder.js"></script>
+<script type="text/javaScript">
+'use strict';
 var characters = [];
 function safeButton(functionName)
 {
@@ -18,9 +20,19 @@ function safeButton(functionName)
       throw exception;
    }
 }
+function parseCharacterData()
+{
+   characters = eval(document.getElementById('characterData').value);  //there's no benefit to JSON.parse in this case so use eval to be less strict
+   initiative();  //calls createCharacterOptions
+}
+var randomSource;  //used for testing
+function initiative()
+{
+   characters = Pathfinder.RollInitiative(characters, randomSource);
+   createCharacterOptions();
+}
 function createCharacterOptions()
 {
-   characters = eval(document.getElementById('characterData').value);
    var characterOptions = '';
    for (var i=0; i < characters.length; ++i)
    {
@@ -43,7 +55,7 @@ function createAttackOptions()
 function attack()
 {
    var input = createAttackInput();
-   document.getElementById('result').value = Prebuilt.PathfinderAttack(input).toString();
+   document.getElementById('result').innerHTML = Pathfinder.Attack(input).toString();
 }
 function createAttackInput()
 {
@@ -60,23 +72,25 @@ function createAttackInput()
    else if(isTouchAttack) targetAc = target.armorClass.touch;
    else targetAc = target.armorClass.normal;
 
-   return {opposingAc: targetAc, attackBonus: attackUsed.attackBonus, weapon: attackUsed, damageReduction: target.damageReduction};
+   return {opposingAc: targetAc, attackBonus: attackUsed.attackBonus, weapon: attackUsed, damageReduction: target.damageReduction, randomSource: randomSource};
 }
-//TODO: initiative
+//TODO: misc modifiers, delay turn, temporary notes
 </script>
 </head>
 <body>
-<!--
-<script type="text/javaScript" src="../../Miscellaneous/src/javascript/test runner.js"></script>
-<script type="text/javaScript" src="../tests/Pathfinder.js"></script>
+<!----
+<script type="text/javaScript" src="../../../../Miscellaneous/src/main/javascript/testRunner.js"></script>
+<script type="text/javaScript" src="../../test/javascript/Testing Util.js"></script>
+<script type="text/javaScript" src="../../test/html/Pathfinder.js"></script>
 <textarea id="testResults" cols="80" rows="20"></textarea><br />
-<input type="button" onclick="TestRunner.testAll(TestSuite.client.Pathfinder);" value="Test file" />
+<input type="button" onclick="TestRunner.testAll();" value="Test file" />
 <br />
--->
+<!---->
 <label for="characterData">Character Data:</label><br />
 <textarea cols="120" rows="20" id="characterData">[
    {name: "Rognir Ironfury",
       armorClass: {normal: 17, flat: 17, touch: 10, flatTouch: 10},
+      initiativeButton: 0,
       attacks: [
          {name: "Masterwork Dwarven Waraxe", attackBonus: 7, damageString: "1d10", flatDamageModifer: 3, criticalMultiplier: 3},
          {name: "Throwing Axe (1H)", attackBonus: 6, damageString: "1d6", flatDamageModifer: 3},
@@ -88,6 +102,7 @@ function createAttackInput()
    },
    {name: "Fuyurou \"Col\" Kitayama",
       armorClass: {normal: 14, flat: 12, touch: 12, flatTouch: 10},
+      initiativeButton: 2,
       attacks: [
          {name: "Masterwork Short Sword", attackBonus: 5, damageString: "1d6", flatDamageModifer: 2, minimumCritical: 19},
          {name: "Masterwork Shortbow (within 30 ft)", attackBonus: 6, damageString: "1d6", flatDamageModifer: 1, criticalMultiplier: 3},
@@ -98,6 +113,7 @@ function createAttackInput()
    },
    {name: "Modrin Revin",
       armorClass: {normal: 11, flat: 11, touch: 10, flatTouch: 10},
+      initiativeButton: 0,
       attacks: [
          {name: "Light Crossbow (within 80 ft)", attackBonus: 1, damageString: "1d8", minimumCritical: 19},
          {name: "Claws (Primary attack)", attackBonus: -1, damageString: "1d4", flatDamageModifer: -2},
@@ -109,20 +125,22 @@ function createAttackInput()
    },
    {name: "Brottor Balderk",
       armorClass: {normal: 15, flat: 15, touch: 8, flatTouch: 8},
+      initiativeButton: -2,
       attacks: [
          {name: "Battleaxe", attackBonus: 4, damageString: "1d8", flatDamageModifer: 2, criticalMultiplier: 3}
       ]
    }
 ]</textarea>
 <br />
-<input type="button" onclick="safeButton(createCharacterOptions);" value="Parse Character Data" id="parseCharacterButton" /><br />
+<input type="button" onclick="safeButton(parseCharacterData);" value="Parse Character Data" id="parseCharacterButton" /><br />
+<br />
+<input type="button" onclick="safeButton(initiative);" value="Reroll initiative" id="initiativeButton" /><br />
 <br />
 <label>Attacker: <select id="attacker" onchange="createAttackOptions();"></select></label> <label>using: <select id="attackUsed"></select></label><br />
 <label>Target: <select id="target"></select></label> <label>Flat-footed? <input type="checkbox" id="flatFooted" /></label><br />
 <br />
-<input type="button" onclick="safeButton(attack);" value="Attack" id="attackButton" /><br />
-<br />
-<label>Result: <input type="text" readonly="true" id="result" size="30" /></label><br />
+<input type="button" onclick="safeButton(attack);" value="Attack" id="attackButton" />
+Result: <span id="result"></span><br />
 <script>document.getElementById('characterData').focus();</script>
 </body>
 </html>

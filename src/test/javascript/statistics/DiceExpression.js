@@ -12,7 +12,7 @@ TestSuite.DiceExpression.add = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireInstanceOf, [DiceExpression, 2]),
+       testResults.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
          Actual: e, Description: 'Illegal arg'});
    }
 
@@ -38,7 +38,7 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireTypeOf, ['number', 'sd']),
+       testResults.push({Expected: getError(Validation.requireTypeOf, ['number', 'sd']),
          Actual: e, Description: 'Invalid coefficient'});
    }
 
@@ -49,7 +49,7 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireTypeOf, ['number', 'sd2']),
+       testResults.push({Expected: getError(Validation.requireTypeOf, ['number', 'sd2']),
          Actual: e, Description: 'Invalid exponent'});
    }
 
@@ -166,7 +166,7 @@ TestSuite.DiceExpression.multiply = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireInstanceOf, [DiceExpression, 2]),
+       testResults.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
          Actual: e, Description: 'Illegal arg'});
    }
 
@@ -221,7 +221,7 @@ TestSuite.DiceExpression.subtract = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireInstanceOf, [DiceExpression, 2]),
+       testResults.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
          Actual: e, Description: 'Illegal arg'});
    }
 

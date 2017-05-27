@@ -46,7 +46,7 @@ TestSuite.Die.roll = function(isFirst)
    var testResults = [], actual, nonRandomNumbers, generator;
 
    try{
-   //use the only die that isn't random
+   //use the only die that isn't random for no-arg so that I can check the return value
    testResults.push({Expected: [1], Actual: new Die(1).roll(), Description: 'No arg'});
    } catch(e){testResults.push({Error: e, Description: 'No arg'});}
 
@@ -56,9 +56,15 @@ TestSuite.Die.roll = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireTypeOf, ['function', 5]),
+      testResults.push({Expected: getError(Validation.requireTypeOf, ['function', 5]),
          Actual: e, Description: 'randomSource wrong type'});
    }
+
+   try{
+   generator = function(){throw new Error('Assertion failed');};
+   actual = new Die({sideCount: 1, constantModifier: 10}).roll(generator);
+   testResults.push({Expected: [11], Actual: actual, Description: 'Do not call randomSource for d1'});
+   } catch(e){testResults.push({Error: e, Description: 'Do not call randomSource for d1'});}
 
    try{
    generator = nonRandomNumberGenerator([0]);

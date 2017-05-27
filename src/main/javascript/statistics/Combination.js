@@ -1,5 +1,6 @@
 'use strict';
-//TODO: all in file: test, move it somewhere
+//TODO: test: Combination.cartesianProduct
+var Combination = {};
 /**
 This function returns every possible combination of each element passed in.
 What it does is a little hard to describe. If you pass in:
@@ -9,7 +10,7 @@ so it is the cartesianProduct of the 2 sets passed in. This allows any number of
 The elements are not required to have the same length.
 @param {Array[]} superArray (which isn't mutated) is the array of all sets whose elements are to be matched up
 */
-function cartesianProduct(superArray)
+Combination.cartesianProduct = function(superArray)
 {
    //alternatively I could count up with indexes: [0,0,0] then [0,0,1] etc but that would be more complicated
    //although the only place this is currently used will have every element the same
@@ -38,48 +39,12 @@ function cartesianProduct(superArray)
       for (var i = 0; i < array1.length; ++i)
       for (var j = 0; j < array2.length; ++j)
       {
-         var thisRow = array1[i].slice();  //copy array
+         var thisRow = array1[i].copy();
          thisRow.push(array2[j]);  //the difference is here: array2[j] is added to a copy of array1[i] so that it will be on the same level
          results.push(thisRow);
       }
       return results;
    }
-}
-/**@returns the error that is thrown by functionToCall when passed args. Note that functionToCall can't reference the this pointer.*/
-function getError(functionToCall, args)
-{
-   try{functionToCall.apply(undefined, args);}
-   catch(e){return e;}
-}
-/**@throws Error if actualObject is not an instanceof constructor.*/
-function requireInstanceOf(constructor, actualObject)
-{
-   if('function' !== typeof(constructor)) throw new Error('Programming error. constructor is type ' + typeof(constructor));
-   //edge case: null is type object
-   if(null === actualObject) throw new Error('Expected: ' + constructor.name + '. Got null');
-   if('object' !== typeof(actualObject)) throw new Error('Expected: ' + constructor.name + '. Got type: ' + typeof(actualObject)
-      + ' with toString: ' + actualObject);
-   if(!(actualObject instanceof constructor)) throw new Error('Expected: ' + constructor.name + '. Got: ' + actualObject.constructor.name
-      + ' with toString: ' + actualObject);
-}
-/**@throws Error if actualNumber is not an integer. See Number.isInteger.*/
-function requireInteger(actualNumber)  //might not be a number
-{
-   if(!Number.isInteger(actualNumber)) throw new Error('Expected Integer. Got type: ' + typeof(actualNumber) +
-      ' with toString: ' + actualNumber);
-}
-/**@throws Error if actualNumber is not a natural number. See Number.isNatural.*/
-function requireNaturalNumber(actualNumber)  //might not be a number
-{
-   if(!Number.isNatural(actualNumber)) throw new Error('Expected Natural Number. Got type: ' + typeof(actualNumber) +
-      ' with toString: ' + actualNumber);
-}
-/**@throws Error if actualObject doesn't have type expectedType.*/
-function requireTypeOf(expectedType, actualObject)
-{
-   if('string' !== typeof(expectedType)) throw new Error('Programming error. expectedType is type ' + typeof(constructor));
-   if(expectedType !== typeof(actualObject)) throw new Error('Expected: ' + expectedType + '. Got: ' + typeof(actualObject)
-      + ' with toString: ' + actualObject);
 }
 /*
 inspired by: https://www.mathsisfun.com/combinatorics/combinations-permutations-calculator.html

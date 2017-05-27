@@ -1,4 +1,10 @@
 'use strict';
+/**@returns the error that is thrown by functionToCall when passed args. Note that functionToCall can't reference the this pointer.*/
+function getError(functionToCall, args)
+{
+   try{functionToCall.apply(undefined, args);}
+   catch(e){return e;}
+}
 function dieResultsToNonRandomArray(sides, numberArray)
 {
    for (var i = 0; i < numberArray.length; ++i)
@@ -7,9 +13,23 @@ function dieResultsToNonRandomArray(sides, numberArray)
    }
    return numberArray;
 }
+//TODO: far better: nonRandomNumberGenerator([{dieSides: 5, values: [1, 2]}, {deckSize: 3, values: [1, 2]}])
+function deckResultsToNonRandomArray(initialSize, numberArray)
+{
+   for (var i = 0; i < numberArray.length; ++i)
+   {
+      numberArray[i] = (numberArray[i] - 1) / initialSize;
+      --initialSize;
+   }
+   return numberArray;
+}
 function dieResultsToNonRandomGenerator(sides, numberArray)
 {
    return nonRandomNumberGenerator(dieResultsToNonRandomArray(sides, numberArray));
+}
+function deckResultsToNonRandomGenerator(initialSize, numberArray)
+{
+   return nonRandomNumberGenerator(deckResultsToNonRandomArray(initialSize, numberArray));
 }
 function nonRandomNumberGenerator(numberArray)
 {

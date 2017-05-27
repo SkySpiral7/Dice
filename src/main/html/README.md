@@ -1,17 +1,5 @@
 File descriptions
 =================
-#battle tech dice.html
-A simple web interface for rolling dice for the game BattleTech.
-
-It is very old and ugly. It needs to be rewritten to hook up to the new dice library.
-
-**Inputs**: initiative (with and without Combat Paralysis), number needed to hit
-
-**Outputs**: hit/miss, location #, # of critical hits, upper/lower critical hit list, critical hit area # list
-
-Also has: the ability to reroll criticals. and general purpose 2d6, 1d6 and coin.
-
-
 #L5R.html
 A simple web interface for rolling dice for the game Legend of the Five Rings.
 
@@ -47,7 +35,7 @@ combination.
 A simple web interface for attacking characters in Pathfinder.
 
 It is hooked up to the dice library and is therefore an example use case.
-The user form has been greatly simplified and only supports Pathfinder.
+The user form is very simple (after providing the character data).
 
 **Inputs**: Character data, Attacker, attack used, Target, is target flat-footed?
 

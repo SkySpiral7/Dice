@@ -95,7 +95,7 @@ TestSuite.prototypes.Array.removeByIndex = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireTypeOf, ['number', undefined]), Actual: e, Description: 'No arg'});
+       testResults.push({Expected: getError(Validation.requireTypeOf, ['number', undefined]), Actual: e, Description: 'No arg'});
    }
 
    try{
@@ -104,7 +104,7 @@ TestSuite.prototypes.Array.removeByIndex = function(isFirst)
    }
    catch(e)
    {
-       testResults.push({Expected: getError(requireTypeOf, ['number', '1']), Actual: e, Description: 'Type strict'});
+       testResults.push({Expected: getError(Validation.requireTypeOf, ['number', '1']), Actual: e, Description: 'Type strict'});
    }
 
    return TestRunner.displayResults('prototypes Array.prototype.removeByIndex', testResults, isFirst);

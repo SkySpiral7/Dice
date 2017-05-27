@@ -42,7 +42,7 @@ dice have no actual maximum (unless enforced externally).
 Statistics.calculateAggregates = function(stats)
 {
    var min = Infinity, max = -Infinity, count = 0, sum = 0;
-   requireInstanceOf(Array, stats);
+   Validation.requireInstanceOf(Array, stats);
    if(0 === stats.length) throw new Error('stats must not be an empty array');
    //an empty array would return {minimum: Infinity, maximum: -Infinity, mean: NaN, standardDeviation: NaN}
    for (var i = 0; i < stats.length; ++i)
@@ -151,21 +151,21 @@ not counted (+0).
 */
 Statistics.passFailBinomial = function(die, diceCount, passCriteria, failCriteria)
 {
-   requireInstanceOf(Die, die);
-   requireNaturalNumber(diceCount);
+   Validation.requireInstanceOf(Die, die);
+   Validation.requireNaturalNumber(diceCount);
    if(null == passCriteria && null == failCriteria) throw new Error('Required: passCriteria and/or failCriteria');
 
    if(null == passCriteria) passCriteria = '=== NaN';
    else
    {
-      requireTypeOf('string', passCriteria);
+      Validation.requireTypeOf('string', passCriteria);
       //TODO: not DRY or clean:
       if(!(/^(?:[<>]=?|[!=]==?)?-?\d+$/).test(passCriteria)) throw new Error('Invalid passCriteria: ' + passCriteria);
    }
    if(null == failCriteria) failCriteria = '=== NaN';
    else
    {
-      requireTypeOf('string', failCriteria);
+      Validation.requireTypeOf('string', failCriteria);
       if(!(/^(?:[<>]=?|[!=]==?)?-?\d+$/).test(failCriteria)) throw new Error('Invalid failCriteria: ' + failCriteria);
    }
    if(undefined !== die.toJSON().explodeType) throw new Error('Exploding not supported: ' + JSON.stringify(die));
@@ -226,7 +226,7 @@ Statistics.useBruteForce = function(diceGroup, explodeCount)
       DiceExpression.combineValues(terms);  //TODO: obviously needs refactoring
       return new DiceExpression(terms, (0 !== explodeCount)).toDiceResults();
    }
-   var everyCombination = cartesianProduct(everyValue);
+   var everyCombination = Combination.cartesianProduct(everyValue);
 
    var everySum = [];
    for (var resultIndex = 0; resultIndex < everyCombination.length; ++resultIndex)

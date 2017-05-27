@@ -1,17 +1,3 @@
-function NamedDie(){return new Die(argumentsToArray(arguments));};  //alias/ short cut
-function NamedDicePool(numberOfDice){return new DicePool(numberOfDice, argumentsToArray(arguments, 1));};  //alias/ short cut (DicePool will validate)
-function FudgeDie(){return new Die("1dF");};  //alias
-function StandardCoin(){return new Die("Heads", "Tails");}  //alias
-function Coin(firstName, secondname){  //alias
-    if(arguments.length == 0) return new Die("1z2");  //called Coin()
-    return new Die([firstName, secondname]);   //ignore all other arguments for a coin with named sides
-};
-Spinner = NamedDie;  //alias
-//examples: (short cuts)
-function MagicEightBall(){return new NamedDie("As I see it, yes", "It is certain", "It is decidedly so", "Most likely", "Outlook good", "Signs point to yes", "Without a doubt", "Yes", "Yes - definitely", "You may rely on it", "Reply hazy, try again", "Ask again later", "Better not tell you now", "Cannot predict now", "Concentrate and ask again", "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful");};
-function AskMagicEightBall(){writeln(MagicEightBall().roll());};  //shorthand
-function TwisterSpinner(){return new NamedDie("Left Hand Red", "Left Hand Green", "Left Hand Yellow", "Left Hand Blue", "Left Foot Red", "Left Foot Green", "Left Foot Yellow", "Left Foot Blue", "Right Hand Red", "Right Hand Green", "Right Hand Yellow", "Right Hand Blue", "Right Foot Red", "Right Foot Green", "Right Foot Yellow", "Right Foot Blue");};
-function SpinTwisterSpinner(){writeln(TwisterSpinner().spin());};  //shorthand recall: spin == roll
 /*
 http://home.windstream.net/fcsi/Penetratinghits.txt
 http://www.pryderockindustries.com/downloads/gameaids/tables_bt_bmrr_tw_grey.pdf

@@ -1,5 +1,6 @@
 'use strict';
 //TODO: change this file to use Object.defineProperty for the sake of enumerable: false (the default)
+//TODO: run the tests in a few browsers to get a list of polyfil
 /**
 @param element to search for
 @returns {!boolean} true if the element exists in this array (using ===)
@@ -16,7 +17,7 @@ if (undefined === Array.prototype.removeByIndex)
 {
    Array.prototype.removeByIndex = function(index)
    {
-      requireTypeOf('number', index);  //NaN and Infinity will be detected below
+      Validation.requireTypeOf('number', index);  //NaN and Infinity will be detected below
       if(Number.isNaN(index) || index < 0 || Math.floor(index) !== index) throw new Error('Illegal index: ' + index);
       if(index >= this.length) throw new Error('Illegal index: ' + index + '. length=' + this.length);
       return this.splice(index, 1)[0];
@@ -26,6 +27,7 @@ if (undefined === Array.prototype.removeByIndex)
 @param element the first occurrence of which will be removed
 @returns {!number} the index of the removed element
 */
+//TODO: rename to removeByValue?
 if (undefined === Array.prototype.removeElement)
 {
    Array.prototype.removeElement = function(obj)
@@ -36,6 +38,8 @@ if (undefined === Array.prototype.removeElement)
       return foundIndex;
    };
 }
+/**Returns a shallow copy of this array.*/
+if (undefined === Array.prototype.copy){Array.prototype.copy=function(){return this.slice(0);};}
 /**
 @returns a copy of the input according to JSON.stringify. Objects with toJSON defined will stay that way
 unless the reviver arg transforms them back.

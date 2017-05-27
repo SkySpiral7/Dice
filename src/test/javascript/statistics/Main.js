@@ -62,7 +62,7 @@ TestSuite.Statistics.calculateAggregates = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireInstanceOf, [Array, 5]),
+      testResults.push({Expected: getError(Validation.requireInstanceOf, [Array, 5]),
          Actual: e, Description: 'Wrong type arg'});
    }
 
@@ -205,7 +205,7 @@ TestSuite.Statistics.passFailBinomial = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireInstanceOf, [Die, 4]),
+      testResults.push({Expected: getError(Validation.requireInstanceOf, [Die, 4]),
          Actual: e, Description: 'Invalid die'});
    }
 
@@ -215,7 +215,7 @@ TestSuite.Statistics.passFailBinomial = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireNaturalNumber, [-1]),
+      testResults.push({Expected: getError(Validation.requireNaturalNumber, [-1]),
          Actual: e, Description: 'Invalid diceCount'});
    }
 
@@ -225,7 +225,7 @@ TestSuite.Statistics.passFailBinomial = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireTypeOf, ['string', 3]),
+      testResults.push({Expected: getError(Validation.requireTypeOf, ['string', 3]),
          Actual: e, Description: 'Invalid passCriteria'});
    }
 
@@ -235,7 +235,7 @@ TestSuite.Statistics.passFailBinomial = function(isFirst)
    }
    catch(e)
    {
-      testResults.push({Expected: getError(requireTypeOf, ['string', 1]),
+      testResults.push({Expected: getError(Validation.requireTypeOf, ['string', 1]),
          Actual: e, Description: 'Invalid failCriteria'});
    }
 

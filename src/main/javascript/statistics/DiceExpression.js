@@ -8,7 +8,7 @@ function DiceExpression(arg1, arg2)
    /**This function lets you add this Expression to otherExpression (this Expression is mutated to be the result).*/
    this.add = function(otherExpression)
    {
-      requireInstanceOf(DiceExpression, otherExpression);
+      Validation.requireInstanceOf(DiceExpression, otherExpression);
       var otherTerms = otherExpression.toJSON();
       for (var i = 0; i < otherTerms.length; ++i)
       {
@@ -22,8 +22,8 @@ function DiceExpression(arg1, arg2)
    this.addTerm = function(term)
    {
       //TODO: should I unbox parameters?
-      requireTypeOf('number', term.coefficient);  //allow NaN and Infinity
-      requireTypeOf('number', term.exponent);
+      Validation.requireTypeOf('number', term.coefficient);  //allow NaN and Infinity
+      Validation.requireTypeOf('number', term.exponent);
 
       if(0 === term.coefficient) return;  //fast path and to prevent adding it
       for (var i = 0; i < termArray.length; ++i)
@@ -57,7 +57,7 @@ function DiceExpression(arg1, arg2)
    */
    this.multiply = function(otherExpression)
    {
-      requireInstanceOf(DiceExpression, otherExpression);
+      Validation.requireInstanceOf(DiceExpression, otherExpression);
       //copy out termArray so that this.addTerm can be used for the new terms
       var oldTermArray = termArray;
       termArray = [];
@@ -94,7 +94,7 @@ function DiceExpression(arg1, arg2)
    /**This function lets you subtract another DiceExpression from this Expression (this Expression is mutated to be the result).*/
    this.subtract = function(otherExpression)
    {
-      requireInstanceOf(DiceExpression, otherExpression);
+      Validation.requireInstanceOf(DiceExpression, otherExpression);
       var otherTerms = otherExpression.toJSON();
       for (var i = 0; i < otherTerms.length; ++i)
       {
