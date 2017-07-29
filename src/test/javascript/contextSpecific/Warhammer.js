@@ -297,3 +297,68 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
 
    return TestRunner.displayResults('Warhammer Warhammer.AttackUnit._validateInput', testResults, isFirst);
 };
+TestSuite.Warhammer.RollScatterDice = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], randomSource, expected, actual;
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(6, [6]);
+   actual = Warhammer.RollScatterDice(false, randomSource);
+   expected = {result: 'Misfire'};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, all values, misfire'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path, all values, misfire'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [2]}, {dieSides: 3, values: [3]}]);
+   actual = Warhammer.RollScatterDice(undefined, randomSource);
+   expected = {result: 'Direct Hit'};
+   testResults.push({Expected: expected, Actual: actual, Description: 'alwaysScatter defaults to false'});
+   } catch(e){testResults.push({Error: e, Description: 'alwaysScatter defaults to false'});}
+
+   try{
+   Warhammer.RollScatterDice();
+   testResults.push({Expected: 'Didn\'t throw', Actual: 'Didn\'t throw', Description: 'randomSource defaults to Math.random'});
+   } catch(e){testResults.push({Error: e, Description: 'randomSource defaults to Math.random'});}
+
+   try{
+   Warhammer.RollScatterDice(false, 5);
+   TestRunner.failedToThrow(testResults, 'randomSource wrong type');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(Validation.requireTypeOf, ['function', 5]),
+         Actual: e, Description: 'randomSource wrong type'});
+   }
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(6, [6]);
+   actual = Warhammer.RollScatterDice(true, randomSource);
+   expected = {result: 'Misfire'};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Misfire ignores alwaysScatter'});
+   } catch(e){testResults.push({Error: e, Description: 'Misfire ignores alwaysScatter'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [4]}, {dieSides: 3, values: [3]}]);
+   actual = Warhammer.RollScatterDice(false, randomSource);
+   expected = {result: 'Direct Hit'};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Direct Hit ignores distance'});
+   } catch(e){testResults.push({Error: e, Description: 'Direct Hit'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5]}, {dieSides: 3, values: [1]}, {values: [125/360]}]);
+   actual = Warhammer.RollScatterDice(false, randomSource);
+   expected = {result: 'Scatter', angleInDegrees: 125, distance: 10};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Decides to scatter'});
+   } catch(e){testResults.push({Error: e, Description: 'Decides to scatter'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [2]}, {values: [35.156752/360]}]);
+   actual = Warhammer.RollScatterDice(true, randomSource);
+   expected = {result: 'Scatter', angleInDegrees: 35.156752, distance: 4};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Forced to scatter'});
+   } catch(e){testResults.push({Error: e, Description: 'Forced to scatter'});}
+
+   return TestRunner.displayResults('Warhammer Warhammer.RollScatterDice', testResults, isFirst);
+};

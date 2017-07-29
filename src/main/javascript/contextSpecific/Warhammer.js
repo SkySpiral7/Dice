@@ -1,6 +1,5 @@
 'use strict';
 var Warhammer = {};
-//There's no Prebuilt.WarhammerAttackWithTemplate because I don't know how they work (although I do know how scatter dice works)
 /**
 This is prebuilt function for Warhammer for when a unit attacks a unit.
 This doesn't account for things like Helfrost or instant death.
@@ -162,4 +161,26 @@ Warhammer.AttackUnit.Stringifier = function(attackResults)
    output += 'Unsaved Wounds: ' + attackResults.unsavedWounds + '.';
 
    return output;
+};
+/**
+This is prebuilt function for Warhammer for when an attack is made with a template.
+This function only rolls the scatter dice (both the arrow die and the numbered die) but doesn't roll anything else like damage.
+Output's wounded and unsavedWounds might not be present.
+
+@param {boolean} alwaysScatter defaults to false. If true the result will never be 'Direct Hit'.
+@param {?function} randomSource optional. a function that returns a random number between 0 inclusive and 1 exclusive.
+   If not provided Math.random will be used.
+@returns {object} with: result (either 'Misfire', 'Direct Hit', or 'Scatter'), ?angleInDegrees, ?distance (in inches)
+*/
+Warhammer.RollScatterDice = function(alwaysScatter, randomSource)
+{
+   if(true !== alwaysScatter) alwaysScatter = false;
+   if(undefined == randomSource) randomSource = Math.random;
+   else Validation.requireTypeOf('function', randomSource);
+
+   var distance = new Die().roll(randomSource)[0] * 2;  //a d6 numbered 2,4,6,8,10,Misfire
+   if(12 === distance) return {result: 'Misfire'};  //misfire trumps direct hit
+   if(!alwaysScatter && 3 === new Die(3).roll(randomSource)[0]) return {result: 'Direct Hit'};  //TODO: is bullseye a more standard term? http://www.librarium-online.com/forums/aos-rules-help/142214-scatter-dice.html
+   var angle = randomSource()*360;  //don't use a Die because I don't want rounding (and using Die then adding randomSource would be pointless)
+   return {result: 'Scatter', angleInDegrees: angle, distance: distance};
 };

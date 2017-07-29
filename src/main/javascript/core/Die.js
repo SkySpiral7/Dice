@@ -36,7 +36,7 @@ function Die(arg1)
    this.roll = function(randomSource)
    {
       if(undefined == randomSource) randomSource = Math.random;
-      Validation.requireTypeOf('function', randomSource);
+      else Validation.requireTypeOf('function', randomSource);
 
       //valid d1 can't explode or reroll
       if(1 === sideCount) return [(1 + constantModifier)];  //this fast path makes testing easier because it doesn't call randomSource
