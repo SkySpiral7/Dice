@@ -23,7 +23,12 @@ function safeButton(functionName)
 function parseCharacterData()
 {
    characters = eval(document.getElementById('characterData').value);  //there's no benefit to JSON.parse in this case so use eval to be less strict
-   initiative();  //calls createCharacterOptions
+   for (var characterIndex=0; characterIndex < characters.length; ++characterIndex)
+   {
+      //notes is an optional input which defaults to empty string
+      if(undefined === characters[characterIndex].notes) characters[characterIndex].notes = '';
+   }
+   initiative();  //calls createCharacterOptions()
 }
 var randomSource;  //used for testing
 function initiative()
@@ -39,9 +44,10 @@ function createCharacterOptions()
       characterOptions += '<option value="' + i + '">' + characters[i].name + '</option>';
    }
    document.getElementById('attacker').innerHTML = characterOptions;
-   createAttackOptions();
    document.getElementById('target').innerHTML = characterOptions;
+   createAttackOptions();  //calls displayNotes()
 }
+/**This function calls displayNotes because it is the onchange for #attacker*/
 function createAttackOptions()
 {
    var characterAttacks = characters[document.getElementById('attacker').value].attacks;
@@ -51,6 +57,20 @@ function createAttackOptions()
       attackOptions += '<option value="' + i + '">' + characterAttacks[i].name + '</option>';
    }
    document.getElementById('attackUsed').innerHTML = attackOptions;
+   displayNotes();
+}
+function displayNotes()
+{
+   document.getElementById('attackerNotes').value = characters[document.getElementById('attacker').value].notes;
+   document.getElementById('targetNotes').value = characters[document.getElementById('target').value].notes;
+}
+function updateNotes(qualifier)
+{
+   //Don't check both note elements since they might be for the same character, the onchange only triggered for one of them and only that one has the correct info.
+   var newNotes = document.getElementById(qualifier + 'Notes').value;
+   var characterIndex = document.getElementById(qualifier).value;
+   characters[characterIndex].notes = newNotes;
+   displayNotes();
 }
 function attack()
 {
@@ -74,7 +94,7 @@ function createAttackInput()
 
    return {opposingAc: targetAc, attackBonus: attackUsed.attackBonus, weapon: attackUsed, damageReduction: target.damageReduction, randomSource: randomSource};
 }
-//TODO: misc modifiers, delay turn, temporary notes
+//TODO: misc modifiers, delay turn
 </script>
 </head>
 <body>
@@ -88,7 +108,9 @@ function createAttackInput()
 <!---->
 <label for="characterData">Character Data:</label><br />
 <textarea cols="120" rows="20" id="characterData">[
-   {name: "Character name",
+   {
+      name: "Character name",
+      notes: "short temp notes eg prone",
       armorClass: {normal: 12, flat: 11, touch: 10, flatTouch: 9}, damageReduction: 0,
       initiative: 0,
       attacks: [
@@ -100,11 +122,19 @@ function createAttackInput()
 <input type="button" onclick="safeButton(parseCharacterData);" value="Parse Character Data" id="parseCharacterButton" /><br />
 <br />
 <input type="button" onclick="safeButton(initiative);" value="Reroll initiative" id="initiativeButton" /><br />
-<br />
-<label>Attacker: <select id="attacker" onchange="createAttackOptions();"></select></label> <label>using: <select id="attackUsed"></select></label><br />
-<label>Target: <select id="target"></select></label> <label>Flat-footed? <input type="checkbox" id="flatFooted" /></label><br />
-<br />
+<div style="display: inline-block; width: 500px;">
+<h2>Attacker</h2>
+<select id="attacker" onchange="createAttackOptions();"></select> <label>using: <select id="attackUsed"></select></label><br />
+<label>Notes: <input type="text" id="attackerNotes" onchange="updateNotes('attacker');" /></label><br />
+</div>
+<div style="display: inline-block">
+<h2>Target</h2>
+<select id="target" onchange="displayNotes();"></select> <label>Flat-footed? <input type="checkbox" id="flatFooted" checked="true" /></label><br />
+<label>Notes: <input type="text" id="targetNotes" onchange="updateNotes('target');" /></label><br />
+</div>
+<br /><br />
 <input type="button" onclick="safeButton(attack);" value="Attack" id="attackButton" />
+<br />
 Result: <span id="result"></span><br />
 <script>document.getElementById('characterData').focus();</script>
 </body>
