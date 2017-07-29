@@ -88,6 +88,36 @@ function mainDraw()
    }
    catch(error){alert('Error: ' + error.message); throw error;}
 };
+function lineToAngleInDegrees(context, startX, startY, length, angle)
+{
+   angle *= Math.PI / 180;
+
+   var endX = startX + (length * Math.cos(angle));
+   var endY = startY + (length * Math.sin(angle));
+
+   context.moveTo(startX, startY);
+   context.lineTo(endX, endY);
+}
+function drawScatterDice(alwaysScatter)
+{
+   var canvas = document.getElementById('myCanvas');
+   var context = canvas.getContext('2d');
+
+   context.clearRect(0, 0, canvas.width, canvas.height);
+   context.beginPath();
+   context.arc(70, 70, 70, 0, 2*Math.PI);
+
+   var scatterDiceResult = Warhammer.RollScatterDice(alwaysScatter);
+   var scatterResults = document.getElementById('scatterResults');
+
+   if ('Scatter' === scatterDiceResult.result)
+   {
+      lineToAngleInDegrees(context, 70, 70, 70, scatterDiceResult.angleInDegrees);
+      scatterResults.innerHTML = 'Scattered ' + scatterDiceResult.distance + ' inches';
+   }
+   else scatterResults.innerHTML = scatterDiceResult.result;
+   context.stroke();
+}
 </script>
 </head>
 <body>
@@ -99,6 +129,7 @@ function mainDraw()
       <td><input type="text" value="15" size="5" id="diceCount" /></td>
       <td>Random Values</td>
       <td>Statistics</td>
+      <td rowspan="6"><canvas id="myCanvas" width="140" height="140" /></td>
    </tr>
    <tr>
       <td style="text-align:right;">Number of Wounds Possible:</td>
@@ -127,21 +158,37 @@ function mainDraw()
       <td style="text-align:right;">Reanimation or Feel No Pain:</td>
       <td><input type="text" value="7" size="5" id="reanimateOrNoPainValue" /></td>
       <td id="unsaveWoundsResult" style="text-align:center;">-</td>
-      <td><b>Std Dev:</b> <span id="devResult" style="text-align:center;">-</span></td>
+      <td style="width:110px;"><b>Std Dev:</b> <span id="devResult" style="text-align:center;">-</span></td>
    </tr>
    <tr>
       <td style="text-align:right;">Custom Column:</td>
       <td><input type="text" value=">=" size="5" id="customColumn" /></td>
       <td /><td />
+      <td>
+         <input type="button" value="Roll Scatter Dice" onclick="javascript:drawScatterDice(false);" />
+         <input type="button" value="Roll Scatter Dice that always scatter" onclick="javascript:drawScatterDice(true);" />
+      </td>
    </tr>
    <tr>
       <td />
       <td><input type="submit" value="Draw" /></td><!--This is a submit button so that you can press enter in any field-->
-      <td><input type="button" value="Attack" onClick="javascript:rollAttack();" /></td>
+      <td><input type="button" value="Attack" onclick="javascript:rollAttack();" /></td>
       <td />
+      <td><b>Result:</b> <span id="scatterResults">-</span></td>
    </tr>
 </table>
 </form>
+<script>
+'use strict';
+//draw initial circle on canvas after the canvas exists. Put into function to avoid polution.
+(function(){
+   var canvas = document.getElementById('myCanvas');
+   var context = canvas.getContext('2d');
+   context.beginPath();
+   context.arc(70, 70, 70, 0, 2*Math.PI);
+   context.stroke();
+})();
+</script>
 <br />
 <div id="graphResults"></div>
 <br /><br /><br /><br />
