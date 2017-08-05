@@ -51,63 +51,60 @@ GURPS.SuccessRoll = function(effectiveSkill, randomSource)
    return {success: (sumRolled <= effectiveSkill), critical: false, margin: Math.abs(sumRolled - effectiveSkill)};
 };
 GURPS.beta = {};
-GURPS.beta.QuickContestedSuccessRoll = function(input)
+GURPS.beta.QuickContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, randomSource)
 {
    throw new Error('Not finished');  //TODO: finishing this is blocked by contest questions below
    //3e page 2. 4e page 3
-   //validation
-   var character1 = GURPS.SuccessRoll();
+   var characterResult1 = GURPS.SuccessRoll(effectiveSkill1, randomSource);
+   var characterResult2 = GURPS.SuccessRoll(effectiveSkill2, randomSource);
+   if(characterResult1.success && !characterResult2.success) return 'Character 1';
+   if(!characterResult1.success && characterResult2.success) return 'Character 2';
+   //"the winner is the one who succeeded by the most, or failed by the least." that doesn't work for crit or sum 17
    //TODO: ask Tim: do contests (quick or regular) care about criticals? If so Alice with 5 Success vs Bob with 6 Criticial Success, who won?
-   //TODO: ask Tim: in contests (quick or regular) does it matter if the tie was "both succeed" or "both failed"?
-   var character1Passed = ('Critical success' === character1 || 'Success' === character1);
-   var character2 = GURPS.SuccessRoll();
-   var character2Passed = ('Critical success' === character2 || 'Success' === character2);
-   if(character1Passed && !character2Passed) return 'Character 1';
-   if(!character1Passed && character2Passed) return 'Character 2';
+   //TODO: ask Tim: in contests (quick or regular) does it matter if the tie was "both succeeded" or "both failed"?
    var diff = character1 - character2;
    if(diff < 0) return 'Character 1';
    if(diff > 0) return 'Character 2';
    //4e adds a "margin of victory" which is the diff between
    return 'Tie';
 };
-GURPS.beta.RegularContestedSuccessRoll = function(input)
+GURPS.beta.RegularContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, randomSource)
 {
    throw new Error('Not finished');  //TODO: finishing this is blocked by contest questions above
    //3e page 2. 4e page 3
-   //validation
+   Validation.requireInteger(effectiveSkill1);
+   Validation.requireInteger(effectiveSkill2);
    //4e doesn't look like it uses the reduction
    //TODO: ask Tim: does 3e always reduce like this or is it a GM judgement call? The answer will prompt a boolean passed in or a GURPS version passed in
-   if (input.character1.skill > 14 && input.character2.skill > 14)
+   if (effectiveSkill1 > 14 && effectiveSkill2 > 14)
    {
-      var max = Math.max(input.character1.skill, input.character2.skill);
+      var max = Math.max(effectiveSkill1, effectiveSkill2);
       var diff = max - 14;
-      input.character1.skill -= diff;
-      input.character2.skill -= diff;
+      effectiveSkill1 -= diff;
+      effectiveSkill2 -= diff;
    }
-   var character1 = GURPS.SuccessRoll();
-   var character1Passed = ('Critical success' === character1 || 'Success' === character1);
-   var character2 = GURPS.SuccessRoll();
-   var character2Passed = ('Critical success' === character2 || 'Success' === character2);
-   if(character1Passed && !character2Passed) return 'Character 1';
-   if(!character1Passed && character2Passed) return 'Character 2';
-   //note that neither edition needs to know the margin of victory
+   var characterResult1 = GURPS.SuccessRoll(effectiveSkill1, randomSource);
+   var characterResult2 = GURPS.SuccessRoll(effectiveSkill2, randomSource);
+   if(characterResult1.success && !characterResult2.success) return 'Character 1';
+   if(!characterResult1.success && characterResult2.success) return 'Character 2';
+   //note that neither edition needs to know the margin of victory and I doubt there's any difference between "both succeeded" and "both failed"
    return 'Tie';
 };
 /**Not compatable with 4e if Tim says that min basic damage is different. Otherwise it can do both. Could still do both if given gurps version*/
-GURPS.beta.Attack3e = function(input)
+GURPS.beta.Attack3e = function(attackEffectiveSkill, defenseEffectiveSkill, damageString, damageReduction, randomSource)
 {
    throw new Error('Not even close to finished');  //TODO: finishing this is blocked by a huge number of questions below
    //3e pages 25, 26. 4e pages 26, 27
-   var attackResult = GURPS.SuccessRoll();
+   var attackResult = GURPS.SuccessRoll(attackEffectiveSkill, randomSource);
    //TODO: ask Tim: is there any difference between crit fail and fail for attack?
-   if('Critical failure' === attackResult || 'Failure' === attackResult) return 'Miss';
-   if ('Critical success' !== attackResult)  //crit hit ignores defense
+   if(!attackResult.success) return 'Miss';
+   if (!attackResult.critical)  //crit hit ignores defense
    {
-      var defenseResult = GURPS.SuccessRoll();  //note that crit success is a success even if skill is 1 or 2 (consistent with SuccessRoll)
+      var defenseResult = GURPS.SuccessRoll(defenseEffectiveSkill, randomSource);  //note that crit success is a success even if skill is 1 or 2 (consistent with SuccessRoll)
       //TODO: ask Tim: is there any difference between crit success and success for defense?
       //TODO: ask Tim: is there any difference between crit failure and failure for defense?
       //TODO: ask Tim: each active defense says "per turn" is that a Pathfinder round?
-      if('Critical success' === defenseResult || 'Success' === defenseResult) return 'Dodge';
+      if(defenseResult.success) return 'Dodge';
       //TODO: All-Out Defense gets 2 defense rolls
       //TODO: if there's 2 defense they need to know whether parry succeeded because it has an auto counter attack
       //TODO: failing to parry bare-handed lets them attack your arms instead of torso. 4e doesn't have this
@@ -128,15 +125,21 @@ GURPS.beta.Attack3e = function(input)
    if(damageAmount <= 0) return 'No damage';
    return damageAmount + ' Damage';
 };
-GURPS.beta._parseDamageString = function(damageString)
+GURPS._parseDamageString = function(debugString)
 {
-   throw new Error('Not finished');  //TODO: could finish if I decide if it should enforce the min basic damage etc
-   //TODO: ask Tim: are there any weapons that have -1.5 or x1.5 or anything non-whole number?
-   var dicePool = new DicePool(/\d+d6?(?:[-+*xX]\d+)?/);
-   if(notMultiplied) return dicePool.sumRoll;
+   //TODO: consider moving min basic damage etc into here when working on Attack
+   //TODO: ask Tim: are there any damage that has -1.5 or x1.5 or anything non-whole number? Well explosives deal 1/4 damage by yard away
+   debugString = '' + debugString;  //enforces string type and is null safe
+   var workingString = debugString.trim().toLowerCase();
+
+   if(!(/^\d+d6?(?:[-+*x]\d+)?$/).test(workingString)) throw new Error('Expected #d (and optional +# etc). Found: ' + debugString);
+   workingString = workingString.replace('x', '*');
+   var dieCount = Number.parseInt(workingString);  //only parses leading integer
+   workingString = workingString.replace(/^\d+d6?/, '');
+   var dicePool = new DicePool([{die: new Die(), dieCount: dieCount}]);
    return function(randomSource)
    {
       var sum = dicePool.sumRoll(randomSource);
-      return (sum * multiplier);
+      return eval(''+sum+workingString);  //workingString may be the empty string
    }
 };

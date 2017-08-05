@@ -269,3 +269,57 @@ TestSuite.GURPS.SuccessRoll = function(isFirst)
 
    return TestRunner.displayResults('GURPS GURPS.SuccessRoll', testResults, isFirst);
 };
+TestSuite.GURPS._parseDamageString = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], randomSource, actual;
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [3]}]);
+   actual = GURPS._parseDamageString('1d+2')(randomSource);
+   testResults.push({Expected: 5, Actual: actual, Description: 'Happy path'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   GURPS._parseDamageString('2d10');
+   TestRunner.failedToThrow(testResults, 'Invalid damageString');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: new Error('Expected #d (and optional +# etc). Found: 2d10'),
+         Actual: e, Description: 'Invalid damageString'});
+   }
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [4,6]}]);
+   actual = GURPS._parseDamageString('2d6-1')(randomSource);
+   testResults.push({Expected: 9, Actual: actual, Description: '2d6-1'});
+   } catch(e){testResults.push({Error: e, Description: '2d6-1'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [4]}]);
+   actual = GURPS._parseDamageString('1d')(randomSource);
+   testResults.push({Expected: 4, Actual: actual, Description: '1d'});
+   } catch(e){testResults.push({Error: e, Description: '1d'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1]}]);
+   actual = GURPS._parseDamageString('1DX3')(randomSource);
+   testResults.push({Expected: 3, Actual: actual, Description: 'Ignores case'});
+   } catch(e){testResults.push({Error: e, Description: 'Ignores case'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1]}]);
+   actual = GURPS._parseDamageString('1dx2')(randomSource);
+   testResults.push({Expected: 2, Actual: actual, Description: 'Lowercase x'});
+   } catch(e){testResults.push({Error: e, Description: 'Lowercase x'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [6,4]}]);
+   actual = GURPS._parseDamageString('2d*4')(randomSource);
+   testResults.push({Expected: 40, Actual: actual, Description: 'Allows *'});
+   } catch(e){testResults.push({Error: e, Description: 'Allows *'});}
+
+   return TestRunner.displayResults('GURPS GURPS._parseDamageString', testResults, isFirst);
+};
