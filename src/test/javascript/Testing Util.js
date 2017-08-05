@@ -13,7 +13,6 @@ function dieResultsToNonRandomArray(sides, numberArray)
    }
    return numberArray;
 }
-//TODO: far better: nonRandomNumberGenerator([{dieSides: 5, values: [1, 2]}, {deckSize: 3, values: [1, 2]}])
 function deckResultsToNonRandomArray(initialSize, numberArray)
 {
    for (var i = 0; i < numberArray.length; ++i)
@@ -33,6 +32,22 @@ function deckResultsToNonRandomGenerator(initialSize, numberArray)
 }
 function nonRandomNumberGenerator(numberArray)
 {
+   return function()
+   {
+      if(0 === numberArray.length) throw new Error('Ran out of numbers');
+      return numberArray.shift();
+   };
+}
+//TODO: make this better, test this, convert everything to use this
+function betterNonRandomNumberGenerator(input)
+{
+   var numberArray = [];
+   for (var i=0; i < input.length; ++i)
+   {
+      if(undefined != input[i].dieSides) numberArray = numberArray.concat(dieResultsToNonRandomArray(input[i].dieSides, input[i].values));
+      else if(undefined != input[i].deckSize) numberArray = numberArray.concat(deckResultsToNonRandomArray(input[i].deckSize, input[i].values));
+      else numberArray = numberArray.concat(input[i].values);
+   }
    return function()
    {
       if(0 === numberArray.length) throw new Error('Ran out of numbers');

@@ -419,7 +419,8 @@ TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
    try{
    deck = new Pathfinder.DeckOfManyThings();
    nonRandomGenerator = dieResultsToNonRandomGenerator(22, [1]);
-   testResults.push({Expected: [{Plaque: 'Balance', Effect: 'Change alignment instantly.'}], Actual: deck.draw(nonRandomGenerator), Description: 'Happy path'});
+   expected = [{Plaque: 'Balance', Effect: 'Change alignment instantly.', Clarification: 'The character must change to a radically different alignment. If the character fails to act according to the new alignment, she gains a negative level.'}];
+   testResults.push({Expected: expected, Actual: deck.draw(nonRandomGenerator), Description: 'Happy path'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
@@ -438,8 +439,8 @@ TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
    try{
    deck = new Pathfinder.DeckOfManyThings();
    nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [7]).concat(dieResultsToNonRandomArray(21, [7])));
-   expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.'},
-      {Plaque: 'Gem', Effect: 'Gain your choice of 25 pieces of jewelry or 50 gems.'}]
+   expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.', Clarification: 'The payment of XP and the redraw are mandatory. This card is always discarded when drawn, unlike all others except the Jester.'},
+      {Plaque: 'Gem', Effect: 'Gain your choice of 25 pieces of jewelry or 50 gems.', Clarification: 'This card indicates wealth. The jewelry is all gold set with gems, each piece worth 2,000 gp, and the gems are worth 1,000 gp each.'}]
    actual = deck.draw(nonRandomGenerator);
    testResults.push({Expected: expected, Actual: actual, Description: 'Fool gets removed and draws again'});
    nonRandomGenerator = dieResultsToNonRandomGenerator(21, [7]);
@@ -449,8 +450,8 @@ TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
    try{
    deck = new Pathfinder.DeckOfManyThings();
    nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [7]).concat(dieResultsToNonRandomArray(21, [9])));
-   expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.'},
-      {Plaque: 'Jester', Effect: 'Gain 10,000 XP or two more draws from the deck.'}]
+   expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.', Clarification: 'The payment of XP and the redraw are mandatory. This card is always discarded when drawn, unlike all others except the Jester.'},
+      {Plaque: 'Jester', Effect: 'Gain 10,000 XP or two more draws from the deck.', Clarification: 'This card is always discarded when drawn, unlike all others except the Fool. The redraws are optional.'}]
    actual = deck.draw(nonRandomGenerator);
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: Fool can draw Jester'});
 

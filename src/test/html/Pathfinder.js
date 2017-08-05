@@ -1,6 +1,53 @@
 'use strict';
 TestConfig.betweenEach=function(){randomSource = undefined;};
 TestSuite.client = {Pathfinder: {}};
+TestSuite.client.Pathfinder.parseCharacterData = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [];
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   document.getElementById('characterData').value = '[{name: "Alice", initiative: 0, attacks: []}, {name: \'Bob\', initiative: 0, attacks: []}]';
+   //don't test an object with getter/setter or anything crazy because while it is allowed it isn't intentionally supported
+   document.getElementById('parseCharacterButton').onclick();
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[0].text, Description: 'Parsing is more forgiving than JSON'});
+   } catch(e){testResults.push({Error: e, Description: 'Parsing is more forgiving than JSON'});}
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', notes: 'Is noteworthy', initiative: 0, attacks: []}]);
+   document.getElementById('parseCharacterButton').onclick();
+   testResults.push({Expected: '', Actual: characters[0].notes, Description: 'Defaults notes to ""'});
+   testResults.push({Expected: 'Is noteworthy', Actual: characters[1].notes, Description: 'Without destroying notes'});
+   } catch(e){testResults.push({Error: e, Description: 'Notes default to ""'});}
+
+   return TestRunner.displayResults('Pathfinder.html parseCharacterData', testResults, isFirst);
+};
+TestSuite.client.Pathfinder.initiative = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [];
+
+   try{
+   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', initiative: 1, attacks: []}]);
+   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
+   document.getElementById('parseCharacterButton').onclick();
+
+   testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').options[0].text, Description: 'parseCharacterButton initiative: Character.Option[0].text'});
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[1].text, Description: 'parseCharacterButton initiative: Character.Option[1].text'});
+
+   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
+   document.getElementById('initiativeButton').onclick();
+
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[0].text, Description: 'initiativeButton: Character.Option[0].text'});
+   testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').options[1].text, Description: 'initiativeButton: Character.Option[1].text'});
+   } catch(e){testResults.push({Error: e, Description: 'initiative'});}
+
+   return TestRunner.displayResults('Pathfinder.html initiative', testResults, isFirst);
+};
 TestSuite.client.Pathfinder.createCharacterOptions = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
@@ -9,22 +56,19 @@ TestSuite.client.Pathfinder.createCharacterOptions = function(isFirst)
 
    try{
    randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
-   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', initiative: 0, attacks: []}]);
+   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', notes: 'Is noteworthy', initiative: 0, attacks: []}, {name: 'Bob', initiative: 0, attacks: []}]);
    document.getElementById('parseCharacterButton').onclick();
 
    testResults.push({Expected: document.getElementById('attacker').innerHTML, Actual: document.getElementById('target').innerHTML, Description: 'Attacker and target options match'});
+   testResults.push({Expected: 0, Actual: document.getElementById('attacker').selectedIndex, Description: 'Attacker defaults to character[0]'});
    testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[0].text, Description: 'Character.Option[0].text'});
    testResults.push({Expected: '0', Actual: document.getElementById('attacker').options[0].value, Description: 'Character.Option[0].value'});
+   testResults.push({Expected: 'Is noteworthy', Actual: document.getElementById('attackerNotes').value, Description: 'attackerNotes.value'});
+   testResults.push({Expected: 0, Actual: document.getElementById('target').selectedIndex, Description: 'Target defaults to character[0]'});
    testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').options[1].text, Description: 'Character.Option[1].text'});
    testResults.push({Expected: '1', Actual: document.getElementById('attacker').options[1].value, Description: 'Character.Option[1].value'});
+   testResults.push({Expected: 'Is noteworthy', Actual: document.getElementById('targetNotes').value, Description: 'targetNotes.value'});
    } catch(e){testResults.push({Error: e, Description: 'parseCharacterButton'});}
-
-   try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
-   document.getElementById('characterData').value = '[{name: "Alice", initiative: 0, attacks: []}, {name: \'Bob\', initiative: 0, attacks: []}]';
-   document.getElementById('parseCharacterButton').onclick();
-   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[0].text, Description: 'Parsing is more forgiving than JSON'});
-   } catch(e){testResults.push({Error: e, Description: 'Parsing is more forgiving than JSON'});}
 
    return TestRunner.displayResults('Pathfinder.html createCharacterOptions', testResults, isFirst);
 };
@@ -36,27 +80,115 @@ TestSuite.client.Pathfinder.createAttackOptions = function(isFirst)
 
    try{
    randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
-   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: [{name: 'Punch'}, {name: 'Kick'}]},
-      {name: 'Bob', initiative: 0, attacks: [{name: 'Stab'}, {name: 'Slash'}]}]);
+   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', notes: 'Starts with A', initiative: 0, attacks: [{name: 'Punch'}, {name: 'Kick'}]},
+      {name: 'Bob', notes: 'Ends with B', initiative: 0, attacks: [{name: 'Stab'}, {name: 'Slash'}]}]);
    document.getElementById('parseCharacterButton').onclick();
 
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').selectedOptions[0].text, Description: 'parseCharacterButton: Assert attacker is Alice'});
    testResults.push({Expected: 'Punch', Actual: document.getElementById('attackUsed').options[0].text, Description: 'parseCharacterButton: Attack.Option[0].text'});
    testResults.push({Expected: '0', Actual: document.getElementById('attackUsed').options[0].value, Description: 'parseCharacterButton: Attack.Option[0].value'});
    testResults.push({Expected: 'Kick', Actual: document.getElementById('attackUsed').options[1].text, Description: 'parseCharacterButton: Attack.Option[1].text'});
    testResults.push({Expected: '1', Actual: document.getElementById('attackUsed').options[1].value, Description: 'parseCharacterButton: Attack.Option[1].value'});
+   testResults.push({Expected: 'Starts with A', Actual: document.getElementById('attackerNotes').value, Description: 'parseCharacterButton: attackerNotes'});
    } catch(e){testResults.push({Error: e, Description: 'parseCharacterButton'});}
 
    try{
    document.getElementById('attacker').selectedIndex = 1;
    document.getElementById('attacker').onchange();
 
+   testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').selectedOptions[0].text, Description: 'parseCharacterButton: Assert attacker is Bob'});
    testResults.push({Expected: 'Stab', Actual: document.getElementById('attackUsed').options[0].text, Description: 'attacker onchange: Attack.Option[0].text'});
    testResults.push({Expected: '0', Actual: document.getElementById('attackUsed').options[0].value, Description: 'attacker onchange: Attack.Option[0].value'});
    testResults.push({Expected: 'Slash', Actual: document.getElementById('attackUsed').options[1].text, Description: 'attacker onchange: Attack.Option[1].text'});
    testResults.push({Expected: '1', Actual: document.getElementById('attackUsed').options[1].value, Description: 'attacker onchange: Attack.Option[1].value'});
+   testResults.push({Expected: 'Ends with B', Actual: document.getElementById('attackerNotes').value, Description: 'attacker onchange: attackerNotes'});
    } catch(e){testResults.push({Error: e, Description: 'attacker onchange'});}
 
    return TestRunner.displayResults('Pathfinder.html createAttackOptions', testResults, isFirst);
+};
+TestSuite.client.Pathfinder.displayNotes = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [];
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', notes: 'Starts with A', initiative: 0, attacks: []},
+      {name: 'Bob', notes: 'Ends with B', initiative: 0, attacks: []}]);
+   document.getElementById('parseCharacterButton').onclick();
+
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').selectedOptions[0].text, Description: 'Assert attacker is Alice'});
+   testResults.push({Expected: 'Starts with A', Actual: document.getElementById('attackerNotes').value, Description: 'attackerNotes.value'});
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('target').selectedOptions[0].text, Description: 'Assert target is Alice'});
+   testResults.push({Expected: 'Starts with A', Actual: document.getElementById('targetNotes').value, Description: 'targetNotes.value'});
+   } catch(e){testResults.push({Error: e, Description: 'Initial'});}
+
+   try{
+   document.getElementById('target').selectedIndex = 1;
+   document.getElementById('target').onchange();
+
+   testResults.push({Expected: 'Bob', Actual: document.getElementById('target').selectedOptions[0].text, Description: 'Assert target is Bob'});
+   testResults.push({Expected: 'Ends with B', Actual: document.getElementById('targetNotes').value, Description: 'targetNotes.value changed'});
+   } catch(e){testResults.push({Error: e, Description: 'target onchange'});}
+
+   return TestRunner.displayResults('Pathfinder.html displayNotes', testResults, isFirst);
+};
+TestSuite.client.Pathfinder.updateNotes = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [];
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', initiative: 0, attacks: []}]);
+   document.getElementById('parseCharacterButton').onclick();
+   document.getElementById('target').selectedIndex = 1;
+   document.getElementById('target').onchange();
+
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').selectedOptions[0].text, Description: 'Different characters: Assert attacker is Alice'});
+   testResults.push({Expected: '', Actual: document.getElementById('attackerNotes').value, Description: 'Different characters: initial attackerNotes.value'});
+   testResults.push({Expected: 'Bob', Actual: document.getElementById('target').selectedOptions[0].text, Description: 'Different characters: Assert target is Bob'});
+   testResults.push({Expected: '', Actual: document.getElementById('targetNotes').value, Description: 'Different characters: initial targetNotes.value'});
+
+   document.getElementById('attackerNotes').value = 'Starts with A';
+   document.getElementById('attackerNotes').onchange();
+
+   testResults.push({Expected: 'Starts with A', Actual: document.getElementById('attackerNotes').value, Description: 'Different characters, change attackerNotes: new attackerNotes.value'});
+   testResults.push({Expected: '', Actual: document.getElementById('targetNotes').value, Description: 'Different characters, change attackerNotes: same targetNotes.value'});
+
+   document.getElementById('targetNotes').value = 'Ends with B';
+   document.getElementById('targetNotes').onchange();
+
+   testResults.push({Expected: 'Starts with A', Actual: document.getElementById('attackerNotes').value, Description: 'Different characters, change targetNotes: same attackerNotes.value'});
+   testResults.push({Expected: 'Ends with B', Actual: document.getElementById('targetNotes').value, Description: 'Different characters, change targetNotes: new targetNotes.value'});
+   } catch(e){testResults.push({Error: e, Description: 'Different characters'});}
+
+   try{
+   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}]);
+   document.getElementById('parseCharacterButton').onclick();
+
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').selectedOptions[0].text, Description: 'Same character: Assert attacker is Alice'});
+   testResults.push({Expected: '', Actual: document.getElementById('attackerNotes').value, Description: 'Same character: initial attackerNotes.value'});
+   testResults.push({Expected: 'Alice', Actual: document.getElementById('target').selectedOptions[0].text, Description: 'Same character: Assert target is Alice'});
+   testResults.push({Expected: '', Actual: document.getElementById('targetNotes').value, Description: 'Same character: initial targetNotes.value'});
+
+   document.getElementById('attackerNotes').value = 'Starts with A';
+   document.getElementById('attackerNotes').onchange();
+
+   testResults.push({Expected: 'Starts with A', Actual: document.getElementById('attackerNotes').value, Description: 'Same character, change attackerNotes: new attackerNotes.value'});
+   testResults.push({Expected: 'Starts with A', Actual: document.getElementById('targetNotes').value, Description: 'Same character, change attackerNotes: new targetNotes.value'});
+
+   document.getElementById('targetNotes').value = 'Ends with B';
+   document.getElementById('targetNotes').onchange();
+
+   testResults.push({Expected: 'Ends with B', Actual: document.getElementById('attackerNotes').value, Description: 'Same character, change targetNotes: new attackerNotes.value'});
+   testResults.push({Expected: 'Ends with B', Actual: document.getElementById('targetNotes').value, Description: 'Same character, change targetNotes: new targetNotes.value'});
+   } catch(e){testResults.push({Error: e, Description: 'Same character'});}
+
+   return TestRunner.displayResults('Pathfinder.html updateNotes', testResults, isFirst);
 };
 TestSuite.client.Pathfinder.attack = function(isFirst)
 {
@@ -168,27 +300,4 @@ TestSuite.client.Pathfinder.createAttackInput = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Flat-footed touch attack'});}
 
    return TestRunner.displayResults('Pathfinder.html createAttackInput', testResults, isFirst);
-};
-TestSuite.client.Pathfinder.initiative = function(isFirst)
-{
-   TestRunner.clearResults(isFirst);
-
-   var testResults = [];
-
-   try{
-   document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', initiative: 1, attacks: []}]);
-   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
-   document.getElementById('parseCharacterButton').onclick();
-
-   testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').options[0].text, Description: 'parseCharacterButton initiative: Character.Option[0].text'});
-   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[1].text, Description: 'parseCharacterButton initiative: Character.Option[1].text'});
-
-   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
-   document.getElementById('initiativeButton').onclick();
-
-   testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[0].text, Description: 'initiativeButton: Character.Option[0].text'});
-   testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').options[1].text, Description: 'initiativeButton: Character.Option[1].text'});
-   } catch(e){testResults.push({Error: e, Description: 'initiative'});}
-
-   return TestRunner.displayResults('Pathfinder.html initiative', testResults, isFirst);
 };
