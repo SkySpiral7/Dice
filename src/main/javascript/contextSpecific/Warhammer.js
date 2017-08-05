@@ -1,4 +1,5 @@
 'use strict';
+/**This was made for 7th edition although the functions should also work for 8th edition.*/
 var Warhammer = {};
 /**
 This is prebuilt function for Warhammer for when a unit attacks a unit.

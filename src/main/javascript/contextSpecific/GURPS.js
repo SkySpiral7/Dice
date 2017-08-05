@@ -1,9 +1,14 @@
 'use strict';
+/**This was made to focus on 3rd edition although the functions also work for 4th edition.*/
 var GURPS = {};
-//TODO: include in tabletop dice when at least 1 is finished
+/**A "reaction roll" is a roll made by the GM to determine how his NPCs react to the PCs.
+@param {?number} reactionModifier an integer which is the total modifier to the dice sum. defaults to 0.
+@param {?function} randomSource optional. Will be passed to DicePool.sumRoll
+@returns {string} one of: Disastrous, Very Bad, Bad, Poor, Neutral, Good, Very Good, Excellent
+*/
 GURPS.ReactionRoll = function(reactionModifier, randomSource)
 {
-   //TODO: prod is finished. only needs tests (test include) and doc
+   if(undefined === reactionModifier) reactionModifier = 0;
    Validation.requireInteger(reactionModifier);
    var resultNumber = new DicePool('3d6').sumRoll(randomSource) + reactionModifier;
    if(resultNumber <= 0) return 'Disastrous';
@@ -15,7 +20,8 @@ GURPS.ReactionRoll = function(reactionModifier, randomSource)
    if(resultNumber <= 18) return 'Very Good';
    return 'Excellent';
 };
-GURPS.SuccessRoll = function(basicSkill, modifier, randomSource)
+GURPS.beta = {};
+GURPS.beta.SuccessRoll = function(basicSkill, modifier, randomSource)
 {
    //3e page 2. 4e pages 2, 3
    //TODO: could finish if I assume crits always exist. only needs validation, tests, and doc.
@@ -36,7 +42,7 @@ GURPS.SuccessRoll = function(basicSkill, modifier, randomSource)
    if(sumRolled <= effectiveSkill) return 'Success';
    return 'Failure';
 };
-GURPS.QuickContestedSuccessRoll = function(input)
+GURPS.beta.QuickContestedSuccessRoll = function(input)
 {
    throw new Error('Not finished');  //TODO: finishing this is blocked by contest questions below
    //3e page 2. 4e page 3
@@ -55,7 +61,7 @@ GURPS.QuickContestedSuccessRoll = function(input)
    //4e adds a "margin of victory" which is the diff between
    return 'Tie';
 };
-GURPS.RegularContestedSuccessRoll = function(input)
+GURPS.beta.RegularContestedSuccessRoll = function(input)
 {
    throw new Error('Not finished');  //TODO: finishing this is blocked by contest questions above
    //3e page 2. 4e page 3
@@ -79,7 +85,7 @@ GURPS.RegularContestedSuccessRoll = function(input)
    return 'Tie';
 };
 /**Not compatable with 4e if Tim says that min basic damage is different. Otherwise it can do both. Could still do both if given gurps version*/
-GURPS.Attack3e = function(input)
+GURPS.beta.Attack3e = function(input)
 {
    throw new Error('Not even close to finished');  //TODO: finishing this is blocked by a huge number of questions below
    //3e pages 25, 26. 4e pages 26, 27
@@ -113,14 +119,14 @@ GURPS.Attack3e = function(input)
    //TODO: explosion roll damage as-is (no attack or defense) and have damage precent reduction
    //TODO: in 4e crushing has a min damage of 0 (before DR) and everything else has a min damage of 1 (before DR)
    //TODO: ask Tim: in 3e does damage has a min of 1 or 0 before DR? Does type (eg crushing) make a difference?
-   //TODO: ask Tim: are there any weapons that have -1.5 or x1.5 or anything non-whole number?
    var damageAmount = (GURPS._parseDamageString(damageString)(randomSource) - damageReduction);
    if(damageAmount <= 0) return 'No damage';
    return damageAmount + ' Damage';
 };
-GURPS._parseDamageString = function(damageString)
+GURPS.beta._parseDamageString = function(damageString)
 {
    throw new Error('Not finished');  //TODO: could finish if I decide if it should enforce the min basic damage etc
+   //TODO: ask Tim: are there any weapons that have -1.5 or x1.5 or anything non-whole number?
    var dicePool = new DicePool(/\d+d6?(?:[-+*xX]\d+)?/);
    if(notMultiplied) return dicePool.sumRoll;
    return function(randomSource)

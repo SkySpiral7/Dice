@@ -17,6 +17,7 @@ percentile: new Die(100),
 fudge: new Die('1dF')  //Fudge is the original name although they are also called Fate dice.
 However note that for these you will need to roll()[0] since roll returns an array.
 */
+//TODO: create a Die.cache() which reuses dice. I doubt the constructor could be changed to do that
 function Die(arg1)
 {
    var sideCount, constantModifier, isFudgeDie, rerollCriteria, explodeType;

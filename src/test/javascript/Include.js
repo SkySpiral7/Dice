@@ -2,10 +2,12 @@
 
 //addScripts, fileNames, includePath are defined in main/javascript/Include.js
 //since I'm testing everything I need to include every file
-fileNames = fileNames.concat(['contextSpecific/L5R', 'contextSpecific/Mistborn', 'contextSpecific/Pathfinder', 'contextSpecific/RealWorld', 'contextSpecific/Warhammer']);
+var allCoreFiles = fileNames;  //don't include the core prod files again but save them for the core tests
+fileNames = ['contextSpecific/GURPS', 'contextSpecific/L5R', 'contextSpecific/Mistborn', 'contextSpecific/Pathfinder', 'contextSpecific/RealWorld', 'contextSpecific/Warhammer'];
 addScripts();
 
 {
+fileNames = allCoreFiles.concat(fileNames);
 includePath = includePath.replace('main/', 'test/');
 
 //these have no tests
@@ -24,4 +26,4 @@ includePath = '../../../../Miscellaneous/src/main/javascript/';
 fileNames = ['unstableSort']
 addScripts();
 
-TestConfig.defaultDelta = Number.EPSILON;  //since this program only deals with natural numbers and statistics
+TestConfig.defaultDelta = Number.EPSILON;  //since this program only deals with integers and statistics
