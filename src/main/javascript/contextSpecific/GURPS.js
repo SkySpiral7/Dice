@@ -20,28 +20,37 @@ GURPS.ReactionRoll = function(reactionModifier, randomSource)
    if(resultNumber <= 18) return 'Very Good';
    return 'Excellent';
 };
-GURPS.beta = {};
-GURPS.beta.SuccessRoll = function(basicSkill, modifier, randomSource)
+/**A "success roll" is a die roll made when you need to "test" one of your skills or abilities.
+You may not attempt a success roll if your effective skill is less than 3 unless you are attempting a defense roll.
+This function assumes that you are allowed to make a success roll.
+
+@param {number} effectiveSkill an integer which is the sum of your base skill (including defense) and all modifiers.
+@param {?function} randomSource optional. Will be passed to DicePool.sumRoll
+@returns {object} with {boolean} success, {boolean} critical, and {number} margin the absolute value of the difference between
+your effectiveSkill and the dice sum. Used by 4e (margin of success and margin of failure) and internally for quick contests (3e and 4e).
+margin is undefined for criticals since they ignore the difference between the sum and effectiveSkill.
+margin is undefined for a sum of 17 which always fails.
+*/
+GURPS.SuccessRoll = function(effectiveSkill, randomSource)
 {
-   //3e page 2. 4e pages 2, 3
-   //TODO: could finish if I assume crits always exist. only needs validation, tests, and doc.
-   //validation "You may not attempt a success roll if your effective skill is less than 3 unless you are attempting a defense roll"
-   var effectiveSkill = basicSkill + modifier;
+   Validation.requireInteger(effectiveSkill);
    var sumRolled = new DicePool('3d6').sumRoll(randomSource);
 
-   //TODO: ask Tim: When Unconsciousness and rolling to live do crits still function? Ie for non-attack, non-contest rolls do crits always exist?
-   if(sumRolled <= 4) return 'Critical success';
-   if(5 === sumRolled && effectiveSkill >= 15) return 'Critical success';
-   if(6 === sumRolled && effectiveSkill >= 16) return 'Critical success';
+   //TODO: ask Tim: are all non-attack, non-contest rolls a success roll (eg: negative HT and rolling to stay awake)?
+      //If no do crits exist for these? Do crits always exist for success rolls?
+   //TODO: ask 4e: is the margin defined for crits? If so it can be negative? Eg skill 2 sum 3 margin: -1
+   if (sumRolled <= 4
+      || (5 === sumRolled && effectiveSkill >= 15)
+      || (6 === sumRolled && effectiveSkill >= 16)) return {success: true, critical: true};
 
-   if(18 === sumRolled) return 'Critical failure';
-   if(17 === sumRolled && effectiveSkill < 16) return 'Critical failure';
-   if(sumRolled >= (effectiveSkill + 10)) return 'Critical failure';
+   if(18 === sumRolled) return {success: false, critical: true};
+   //TODO: ask 4e: what is the margin of failure for sum 17 skill 17+? I heard that there is a "rule of 16" which caps effectiveSkill at 16, is that always true?
+   else if(17 === sumRolled) return {success: false, critical: (effectiveSkill < 16)};  //sum 17 is the reason I don't or them together
+   else if(sumRolled >= (effectiveSkill + 10)) return {success: false, critical: true};
 
-   //4e added "DEGREE OF SUCCESS OR FAILURE" if not a crit. 3e also needs this for QuickContestedSuccessRoll
-   if(sumRolled <= effectiveSkill) return 'Success';
-   return 'Failure';
+   return {success: (sumRolled <= effectiveSkill), critical: false, margin: Math.abs(sumRolled - effectiveSkill)};
 };
+GURPS.beta = {};
 GURPS.beta.QuickContestedSuccessRoll = function(input)
 {
    throw new Error('Not finished');  //TODO: finishing this is blocked by contest questions below
@@ -90,25 +99,21 @@ GURPS.beta.Attack3e = function(input)
    throw new Error('Not even close to finished');  //TODO: finishing this is blocked by a huge number of questions below
    //3e pages 25, 26. 4e pages 26, 27
    var attackResult = GURPS.SuccessRoll();
-   //17 fails no matter the effective skill (this differes from SuccessRoll)
    //TODO: ask Tim: is there any difference between crit fail and fail for attack?
-   //TODO: confirm with Tim: I hope the lite rules are wrong in this: they say that 17 is auto fail ignoring skill
-   if(17 === attackResult || 'Critical failure' === attackResult || 'Failure' === attackResult) return 'Miss';
+   if('Critical failure' === attackResult || 'Failure' === attackResult) return 'Miss';
    if ('Critical success' !== attackResult)  //crit hit ignores defense
    {
       var defenseResult = GURPS.SuccessRoll();  //note that crit success is a success even if skill is 1 or 2 (consistent with SuccessRoll)
-      //17 fails no matter the effective skill (this differes from SuccessRoll)
       //TODO: ask Tim: is there any difference between crit success and success for defense?
       //TODO: ask Tim: is there any difference between crit failure and failure for defense?
       //TODO: ask Tim: each active defense says "per turn" is that a Pathfinder round?
-      if(17 !== defenseResult && ('Critical success' === defenseResult || 'Success' === defenseResult)) return 'Dodge';
+      if('Critical success' === defenseResult || 'Success' === defenseResult) return 'Dodge';
       //TODO: All-Out Defense gets 2 defense rolls
       //TODO: if there's 2 defense they need to know whether parry succeeded because it has an auto counter attack
       //TODO: failing to parry bare-handed lets them attack your arms instead of torso. 4e doesn't have this
       //TODO: ask Tim: does All-Out Defense have an exception for crit failure?
       //TODO: ask Tim: All-Out Defense with fencing weapon and fencing skill says defend any number of times. Is it still only twice per attack?
       //TODO: All-Out Attack and others have no defense roll (if there's no passive defense)
-      //TODO: ask Tim: if you only have passive defense does a roll of 17 always fail?
       //TODO: ask Tim: if you have passive defense do you get to roll defense against a critical hit?
    }
    if(3 === attackResult) return 'Max damage';
