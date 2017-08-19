@@ -75,38 +75,38 @@ GURPS.QuickContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, ran
    Validation.requireInteger(effectiveSkill2);
    var characterResult1 = GURPS._noCritSuccessRoll(effectiveSkill1, randomSource);
    var characterResult2 = GURPS._noCritSuccessRoll(effectiveSkill2, randomSource);
-   //"the winner is the one who succeeded by the most, or failed by the least." assumed that criticals are ignored
+
+   var result = {};
+   result.toString = function(){return GURPS.QuickContestedSuccessRoll.Stringifier(this);};
+   result.winnerSucceeded = true;
+   result.loserSucceeded = false;
    //4e adds a "margin of victory" which is the diff between
-   if(characterResult1.success && !characterResult2.success) return {winner: 'Character 1', winnerSucceeded: true, loserSucceeded: false, margin: (characterResult1.margin - characterResult2.margin)};
-   if(!characterResult1.success && characterResult2.success) return {winner: 'Character 2', winnerSucceeded: true, loserSucceeded: false, margin: (characterResult2.margin - characterResult1.margin)};
+   result.margin = Math.abs(characterResult1.margin - characterResult2.margin);
 
-   var margin = characterResult1.margin - characterResult2.margin;
-   var result = {winnerSucceeded: characterResult1.success, loserSucceeded: characterResult1.success};  //they don't have to match who won since they are the same value
-   result.margin = Math.abs(margin);
+   //"the winner is the one who succeeded by the most, or failed by the least."
+   if(characterResult1.success && !characterResult2.success){result.winner = 'Character 1'; return result;}
+   if(!characterResult1.success && characterResult2.success){result.winner = 'Character 2'; return result;}
 
-   if(margin > 0) result.winner = 'Character 1';
-   else if(margin < 0) result.winner = 'Character 2';
+   result.winnerSucceeded = result.loserSucceeded = characterResult1.success;  //they don't have to match who won since they are the same value
+
+   if(characterResult1.margin > characterResult2.margin) result.winner = 'Character 1';
+   else if(characterResult1.margin < characterResult2.margin) result.winner = 'Character 2';
    else result.winner = 'Tie';
 
    return result;
 };
-GURPS.beta = {};
 /**
 @param {!object} contestResults the results of GURPS.QuickContestedSuccessRoll
 @returns {!string} a human readable description of those results
 */
-GURPS.beta.QuickContestedSuccessRoll_Stringifier = function(contestResults)
+GURPS.QuickContestedSuccessRoll.Stringifier = function(contestResults)
 {
-   //copied from pathfinder
-   if(undefined === contestResults.damage) return contestResults.attack + '.';
-   if(0 === contestResults.damage.lethal && 0 === contestResults.damage.nonLethal) return contestResults.attack + ' but damage reduction has reduced it all.';
-   var output = contestResults.attack + ' dealing ';
-   if(0 !== contestResults.damage.lethal) output += contestResults.damage.lethal + ' points of damage';
-   if(0 !== contestResults.damage.lethal && 0 !== contestResults.damage.nonLethal) output += ' and ';
-   if(0 !== contestResults.damage.nonLethal) output += contestResults.damage.nonLethal + ' points of non-lethal damage';
-   output = output.replace(/ 1 points/g, ' 1 point');
-   return output + '.';
+   if('Tie' !== contestResults.winner && contestResults.winnerSucceeded) return contestResults.winner + ' succeeded by ' + contestResults.margin + '.';
+   if('Tie' !== contestResults.winner && !contestResults.winnerSucceeded) return contestResults.winner + ' was ' + contestResults.margin + ' points closer.';
+   if(contestResults.winnerSucceeded) return 'Tie: both succeeded by the same amount.';
+   return 'Tie: both failed by the same amount.';
 };
+GURPS.beta = {};
 GURPS.beta.RegularContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, randomSource)
 {
    throw new Error('Not finished');  //TODO: finishing this is blocked by question below?

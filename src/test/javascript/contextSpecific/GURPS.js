@@ -302,13 +302,16 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], randomSource, actual, expected;
+   var testResults = [], randomSource, actual, actualStringValue, expected;
 
    try{
    randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [4,1,1, 5,4,1]}]);  //sums 6, 10
    actual = GURPS.QuickContestedSuccessRoll(7, 9, randomSource);  //margins 1, -1
+   actualStringValue = actual.toString();
+   delete actual.toString;
    expected = {winner: 'Character 1', winnerSucceeded: true, loserSucceeded: false, margin: 2};
-   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: character 1'});
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: return value. character 1 wins'});
+   testResults.push({Expected: GURPS.QuickContestedSuccessRoll.Stringifier(expected), Actual: actualStringValue, Description: 'Happy path: string value. character 1 wins'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
@@ -334,6 +337,7 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
    try{
    randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5,4,1, 4,1,1]}]);  //sums 10, 6
    actual = GURPS.QuickContestedSuccessRoll(8, 6, randomSource);  //margins -2, 0
+   delete actual.toString;
    expected = {winner: 'Character 2', winnerSucceeded: true, loserSucceeded: false, margin: 2};
    testResults.push({Expected: expected, Actual: actual, Description: 'Character 2 wins'});
    } catch(e){testResults.push({Error: e, Description: 'Character 2 wins'});}
@@ -341,6 +345,7 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
    try{
    randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1,1,1, 1,1,1]}]);  //sums 3, 3
    actual = GURPS.QuickContestedSuccessRoll(5, 4, randomSource);  //margins 2, 1
+   delete actual.toString;
    expected = {winner: 'Character 1', winnerSucceeded: true, loserSucceeded: true, margin: 1};
    testResults.push({Expected: expected, Actual: actual, Description: 'Both succeed. Character 1 wins'});
    } catch(e){testResults.push({Error: e, Description: 'Both succeed. Character 1 wins'});}
@@ -348,6 +353,7 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
    try{
    randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [6,6,6, 6,6,6]}]);  //sums 18, 18
    actual = GURPS.QuickContestedSuccessRoll(10, 12, randomSource);  //margins -8, -6
+   delete actual.toString;
    expected = {winner: 'Character 2', winnerSucceeded: false, loserSucceeded: false, margin: 2};
    testResults.push({Expected: expected, Actual: actual, Description: 'Both failed. Character 2 wins'});
    } catch(e){testResults.push({Error: e, Description: 'Both failed. Character 2 wins'});}
@@ -355,11 +361,64 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
    try{
    randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1,1,1, 1,1,1]}]);  //sums 3, 3
    actual = GURPS.QuickContestedSuccessRoll(5, 5, randomSource);  //margins 2, 2
+   actualStringValue = actual.toString();
+   delete actual.toString;
    expected = {winner: 'Tie', winnerSucceeded: true, loserSucceeded: true, margin: 0};
-   testResults.push({Expected: expected, Actual: actual, Description: 'Both succeed. Tie'});
+   testResults.push({Expected: expected, Actual: actual, Description: 'Both succeed. Tie. return value'});
+   testResults.push({Expected: GURPS.QuickContestedSuccessRoll.Stringifier(expected), Actual: actualStringValue, Description: 'Both succeed. Tie. string value'});
    } catch(e){testResults.push({Error: e, Description: 'Both succeed. Tie'});}
 
    return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll', testResults, isFirst);
+};
+TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], input, actual, expected;
+
+   try{
+   input = {winner: 'Character 1', winnerSucceeded: true, loserSucceeded: false, margin: 10};
+   actual = GURPS.QuickContestedSuccessRoll.Stringifier(input);
+   expected = 'Character 1 succeeded by 10.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Character 1 succeeded'});
+   } catch(e){testResults.push({Error: e, Description: 'Character 1 succeeded'});}
+
+   try{
+   input = {winner: 'Character 2', winnerSucceeded: true, loserSucceeded: false, margin: 2};
+   actual = GURPS.QuickContestedSuccessRoll.Stringifier(input);
+   expected = 'Character 2 succeeded by 2.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Character 2 succeeded'});
+   } catch(e){testResults.push({Error: e, Description: 'Character 2 succeeded'});}
+
+   try{
+   input = {winner: 'Character 1', winnerSucceeded: false, loserSucceeded: false, margin: 4};
+   actual = GURPS.QuickContestedSuccessRoll.Stringifier(input);
+   expected = 'Character 1 was 4 points closer.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Character 1 was closer'});
+   } catch(e){testResults.push({Error: e, Description: 'Character 1 was closer'});}
+
+   try{
+   input = {winner: 'Character 2', winnerSucceeded: false, loserSucceeded: false, margin: 2};
+   actual = GURPS.QuickContestedSuccessRoll.Stringifier(input);
+   expected = 'Character 2 was 2 points closer.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Character 2 was closer'});
+   } catch(e){testResults.push({Error: e, Description: 'Character 2 was closer'});}
+
+   try{
+   input = {winner: 'Tie', winnerSucceeded: true, loserSucceeded: true, margin: 0};
+   actual = GURPS.QuickContestedSuccessRoll.Stringifier(input);
+   expected = 'Tie: both succeeded by the same amount.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Tie: both succeeded.'});
+   } catch(e){testResults.push({Error: e, Description: 'Tie: both succeeded'});}
+
+   try{
+   input = {winner: 'Tie', winnerSucceeded: false, loserSucceeded: false, margin: 0};
+   actual = GURPS.QuickContestedSuccessRoll.Stringifier(input);
+   expected = 'Tie: both failed by the same amount.';
+   testResults.push({Expected: expected, Actual: actual, Description: 'Tie: both failed.'});
+   } catch(e){testResults.push({Error: e, Description: 'Tie: both failed'});}
+
+   return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll.Stringifier', testResults, isFirst);
 };
 TestSuite.GURPS._parseDamageString = function(isFirst)
 {
