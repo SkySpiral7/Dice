@@ -106,15 +106,12 @@ GURPS.QuickContestedSuccessRoll.Stringifier = function(contestResults)
    if(contestResults.winnerSucceeded) return 'Tie: both succeeded by the same amount.';
    return 'Tie: both failed by the same amount.';
 };
-GURPS.beta = {};
-GURPS.beta.RegularContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, randomSource)
+GURPS.RegularContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, randomSource)
 {
-   throw new Error('Not finished');  //TODO: finishing this is blocked by question below?
-   //3e page 2. 4e page 3
    Validation.requireInteger(effectiveSkill1);
    Validation.requireInteger(effectiveSkill2);
-   //4e doesn't look like it uses the reduction
    //TODO: ask Tim: does 3e always reduce like this or is it a GM judgement call? The answer will prompt a boolean passed in or a GURPS version passed in
+   //TODO: ask 4e: does this exist (not mentioned in the lite rules) and if so is it always?
    if (effectiveSkill1 > 14 && effectiveSkill2 > 14)
    {
       var max = Math.max(effectiveSkill1, effectiveSkill2);
@@ -124,11 +121,12 @@ GURPS.beta.RegularContestedSuccessRoll = function(effectiveSkill1, effectiveSkil
    }
    var characterResult1 = GURPS._noCritSuccessRoll(effectiveSkill1, randomSource);
    var characterResult2 = GURPS._noCritSuccessRoll(effectiveSkill2, randomSource);
-   if(characterResult1.success && !characterResult2.success) return 'Character 1';  //whether or not character 1 succeeded is ignored
-   if(!characterResult1.success && characterResult2.success) return 'Character 2';
-   //note that neither edition needs to know the margin of victory and I doubt there's any difference between "both succeeded" and "both failed"
-   return 'Tie';
+   if(characterResult1.success && !characterResult2.success) return {winner: 'Character 1', success: true};
+   if(!characterResult1.success && characterResult2.success) return {winner: 'Character 2', success: true};
+   //note that neither edition needs to know the margin of victory
+   return {winner: 'Tie', success: characterResult1.success};
 };
+GURPS.beta = {};
 /**Not compatable with 4e if Tim says that min basic damage is different. Otherwise it can do both. Could still do both if given gurps version*/
 GURPS.beta.Attack3e = function(attackEffectiveSkill, defenseEffectiveSkill, damageString, damageReduction, randomSource)
 {
@@ -149,7 +147,7 @@ GURPS.beta.Attack3e = function(attackEffectiveSkill, defenseEffectiveSkill, dama
       //TODO: ask Tim: All-Out Defense with fencing weapon and fencing skill says defend any number of times. Is it still only twice per attack?
       //TODO: All-Out Attack and others have no defense roll (if there's no passive defense)
    }
-   if(3 === attackResult) return 'Max damage';
+   if(3 === attackResult) return 'Max damage';  //TODO: return the damage amount
    //TODO: ask Tim: "Add the 50% damage bonus for a cutting weapon" (after DR). Is this the only damage percent boost? If not are they all +50%? Is there any damage percent reduction?
    //TODO: in 4e "wounding modifier." apply after DR. Small piercing is x0.5 (min of 1), Cutting and large piercing is x1.5, Impaling is x2. Notice cutting is the same in 3e
    //TODO: some weapons half a half damage range (divide before DR)
@@ -180,4 +178,8 @@ GURPS._parseDamageString = function(debugString)
       return eval(''+sum+workingString);  //workingString may be the empty string
    }
 };
-//actually important questions: 14+ reduction rule, minimum damage before DR, rule of 16 (follow up: margin of failure for sum 17)
+/*actually important questions:
+-14+ reduction rule (always 3e? exists in 4e?)
+-3e minimum damage before DR (different for crushing?)
+-rule of 16 (always 3e? 4e? follow up: 4e margin of failure for sum 17)
+*/

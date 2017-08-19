@@ -368,6 +368,14 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
    testResults.push({Expected: GURPS.QuickContestedSuccessRoll.Stringifier(expected), Actual: actualStringValue, Description: 'Both succeed. Tie. string value'});
    } catch(e){testResults.push({Error: e, Description: 'Both succeed. Tie'});}
 
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5,4,1, 5,4,1]}]);  //sums 10, 10
+   actual = GURPS.QuickContestedSuccessRoll(5, 5, randomSource);  //margins 5, 5
+   delete actual.toString;
+   expected = {winner: 'Tie', winnerSucceeded: false, loserSucceeded: false, margin: 0};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Both failed. Tie'});
+   } catch(e){testResults.push({Error: e, Description: 'Both failed. Tie'});}
+
    return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll', testResults, isFirst);
 };
 TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(isFirst)
@@ -419,6 +427,76 @@ TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Tie: both failed'});}
 
    return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll.Stringifier', testResults, isFirst);
+};
+TestSuite.GURPS.RegularContestedSuccessRoll = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], randomSource, actual, expected;
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [4,1,1, 5,4,1]}]);  //sums 6, 10
+   actual = GURPS.RegularContestedSuccessRoll(7, 9, randomSource);  //pass, fail
+   expected = {winner: 'Character 1', success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: character 1 wins'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   GURPS.RegularContestedSuccessRoll('ham');
+   TestRunner.failedToThrow(testResults, 'Invalid effectiveSkill1');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(Validation.requireInteger, ['ham']),
+         Actual: e, Description: 'Invalid effectiveSkill1'});
+   }
+
+   try{
+   GURPS.RegularContestedSuccessRoll(2, 'pork');
+   TestRunner.failedToThrow(testResults, 'Invalid effectiveSkill2');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(Validation.requireInteger, ['pork']),
+         Actual: e, Description: 'Invalid effectiveSkill2'});
+   }
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5,5,4, 5,5,3]}]);  //sums 14, 13
+   actual = GURPS.RegularContestedSuccessRoll(18, 16, randomSource);  //reduced to 14, 12
+   expected = {winner: 'Character 1', success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Reduced character 1 wins'});
+   } catch(e){testResults.push({Error: e, Description: 'Reduced character 1 wins'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5,5,6, 5,5,4]}]);  //sums 16, 14
+   actual = GURPS.RegularContestedSuccessRoll(15, 20, randomSource);  //reduced to 9, 14
+   expected = {winner: 'Character 2', success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Reduced character 2 wins'});
+   } catch(e){testResults.push({Error: e, Description: 'Reduced character 2 wins'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5,4,1, 4,1,1]}]);  //sums 10, 6
+   actual = GURPS.RegularContestedSuccessRoll(8, 6, randomSource);  //fail, pass
+   expected = {winner: 'Character 2', success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Character 2 wins'});
+   } catch(e){testResults.push({Error: e, Description: 'Character 2 wins'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1,1,1, 1,1,1]}]);  //sums 3, 3
+   actual = GURPS.RegularContestedSuccessRoll(5, 6, randomSource);
+   expected = {winner: 'Tie', success: true};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Tie: passed'});
+   } catch(e){testResults.push({Error: e, Description: 'Tie: passed'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5,4,1, 5,4,1]}]);  //sums 10, 10
+   actual = GURPS.RegularContestedSuccessRoll(5, 6, randomSource);
+   expected = {winner: 'Tie', success: false};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Tie: failed'});
+   } catch(e){testResults.push({Error: e, Description: 'Tie: failed'});}
+
+   return TestRunner.displayResults('GURPS GURPS.RegularContestedSuccessRoll', testResults, isFirst);
 };
 TestSuite.GURPS._parseDamageString = function(isFirst)
 {
