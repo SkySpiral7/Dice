@@ -179,7 +179,7 @@ GURPS._parseDamageString = function(debugString)
    }
 };
 /*actually important questions:
--14+ reduction rule (always 3e? exists in 4e?)
--3e minimum damage before DR (different for crushing?)
--rule of 16 (always 3e? 4e? follow up: 4e margin of failure for sum 17)
+14+ reduction rule (always 3e? exists in 4e?)
+3e minimum damage before DR (different for crushing?)
+rule of 16 (always 3e? 4e? follow up: 4e margin of failure for sum 17)
 */
