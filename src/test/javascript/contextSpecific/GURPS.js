@@ -269,6 +269,98 @@ TestSuite.GURPS.SuccessRoll = function(isFirst)
 
    return TestRunner.displayResults('GURPS GURPS.SuccessRoll', testResults, isFirst);
 };
+TestSuite.GURPS._noCritSuccessRoll = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], randomSource, actual, expected;
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1,1,1]}]);
+   actual = GURPS._noCritSuccessRoll(5, randomSource);
+   expected = {success: true, margin: 2};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: success'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [6,6,6]}]);
+   actual = GURPS._noCritSuccessRoll(10, randomSource);
+   expected = {success: false, margin: -8};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: failure'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1,4,5]}]);
+   actual = GURPS._noCritSuccessRoll(10, randomSource);
+   expected = {success: true, margin: 0};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Margin 0 is a success'});
+   } catch(e){testResults.push({Error: e, Description: 'Margin 0 is a success'});}
+
+   return TestRunner.displayResults('GURPS GURPS._noCritSuccessRoll', testResults, isFirst);
+};
+TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], randomSource, actual, expected;
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [4,1,1, 5,4,1]}]);  //sums 6, 10
+   actual = GURPS.QuickContestedSuccessRoll(7, 9, randomSource);  //margins 1, -1
+   expected = {winner: 'Character 1', winnerSucceeded: true, loserSucceeded: false, margin: 2};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: character 1'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   GURPS.QuickContestedSuccessRoll('ham');
+   TestRunner.failedToThrow(testResults, 'Invalid effectiveSkill1');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(Validation.requireInteger, ['ham']),
+         Actual: e, Description: 'Invalid effectiveSkill1'});
+   }
+
+   try{
+   GURPS.QuickContestedSuccessRoll(2, 'pork');
+   TestRunner.failedToThrow(testResults, 'Invalid effectiveSkill2');
+   }
+   catch(e)
+   {
+      testResults.push({Expected: getError(Validation.requireInteger, ['pork']),
+         Actual: e, Description: 'Invalid effectiveSkill2'});
+   }
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5,4,1, 4,1,1]}]);  //sums 10, 6
+   actual = GURPS.QuickContestedSuccessRoll(8, 6, randomSource);  //margins -2, 0
+   expected = {winner: 'Character 2', winnerSucceeded: true, loserSucceeded: false, margin: 2};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Character 2 wins'});
+   } catch(e){testResults.push({Error: e, Description: 'Character 2 wins'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1,1,1, 1,1,1]}]);  //sums 3, 3
+   actual = GURPS.QuickContestedSuccessRoll(5, 4, randomSource);  //margins 2, 1
+   expected = {winner: 'Character 1', winnerSucceeded: true, loserSucceeded: true, margin: 1};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Both succeed. Character 1 wins'});
+   } catch(e){testResults.push({Error: e, Description: 'Both succeed. Character 1 wins'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [6,6,6, 6,6,6]}]);  //sums 18, 18
+   actual = GURPS.QuickContestedSuccessRoll(10, 12, randomSource);  //margins -8, -6
+   expected = {winner: 'Character 2', winnerSucceeded: false, loserSucceeded: false, margin: 2};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Both failed. Character 2 wins'});
+   } catch(e){testResults.push({Error: e, Description: 'Both failed. Character 2 wins'});}
+
+   try{
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [1,1,1, 1,1,1]}]);  //sums 3, 3
+   actual = GURPS.QuickContestedSuccessRoll(5, 5, randomSource);  //margins 2, 2
+   expected = {winner: 'Tie', winnerSucceeded: true, loserSucceeded: true, margin: 0};
+   testResults.push({Expected: expected, Actual: actual, Description: 'Both succeed. Tie'});
+   } catch(e){testResults.push({Error: e, Description: 'Both succeed. Tie'});}
+
+   return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll', testResults, isFirst);
+};
 TestSuite.GURPS._parseDamageString = function(isFirst)
 {
    TestRunner.clearResults(isFirst);

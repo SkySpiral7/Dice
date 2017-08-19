@@ -91,7 +91,7 @@ Pathfinder.Attack = function(input)
    return output;
 };
 /**
-@param {!object} rollResults the results of Pathfinder.Attack
+@param {!object} attackResults the results of Pathfinder.Attack
 @returns {!string} a human readable description of those results
 */
 Pathfinder.Attack.Stringifier = function(attackResults)
