@@ -81,8 +81,7 @@ Warhammer.AttackUnit.Statistics = function(input)
    /**Rolling to hit and rolling to wound are 2 phases that would each call this function.*/
    function nextPhase(previousStats, passCriteria)
    {
-      var workingExpression = new DiceExpression([{coefficient: 1, exponent: 1}], true);
-      workingExpression.addTerm({coefficient: -1, exponent: 1});  //it is now empty
+      var workingExpression = new DiceExpression(true);
       for (var i = 0; i < previousStats.length; ++i)
       {
          if (0 === previousStats[i].result)  //i = 0 is the only one that might have a result of 0

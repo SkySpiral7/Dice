@@ -118,7 +118,7 @@ TestSuite.DiceExpression.clone = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Clone returns a copy'});}
 
    try{
-   expression = DiceExpression.empty();
+   expression = new DiceExpression();
    expected = expression.toJSON();
    actual = expression.clone();
    expression.addTerm({coefficient: 5, exponent: 1});
@@ -126,19 +126,6 @@ TestSuite.DiceExpression.clone = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Can clone an empty one'});}
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().clone()', testResults, isFirst);
-};
-TestSuite.DiceExpression.empty = function(isFirst)
-{
-   TestRunner.clearResults(isFirst);
-
-   var testResults = [], actual;
-
-   try{
-   actual = DiceExpression.empty().toJSON();
-   testResults.push({Expected: [], Actual: actual, Description: 'Creates an empty expression'});
-   } catch(e){testResults.push({Error: e, Description: 'Creates an empty expression'});}
-
-   return TestRunner.displayResults('DiceExpression DiceExpression.empty()', testResults, isFirst);
 };
 TestSuite.DiceExpression.multiply = function(isFirst)
 {
@@ -306,6 +293,11 @@ TestSuite.DiceExpression._constructor = function(isFirst)
    {
        testResults.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
    }
+
+   try{
+   actual = new DiceExpression().toJSON();
+   testResults.push({Expected: [], Actual: actual, Description: 'Creates an empty expression'});
+   } catch(e){testResults.push({Error: e, Description: 'Creates an empty expression'});}
 
    try{
    actual = new DiceExpression(new Die('dF')).toJSON();

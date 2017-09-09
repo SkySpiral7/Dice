@@ -9,7 +9,7 @@ Statistics.calculateDiceSums(new DicePool('3d170 drop lowest'));
 */
 function expressionForASingleDie(sideCount, smallestSide)  //f1 of se. should be replaced by DiceExpression.everyValue
 {
-   var result = DiceExpression.empty();
+   var result = new DiceExpression();
    for (var i=smallestSide; i <= sideCount; ++i)
    {
       result.addTerm({exponent: i, coefficient: 1});

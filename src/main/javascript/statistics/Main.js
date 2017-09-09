@@ -172,10 +172,7 @@ Statistics.passFailBinomial = function(die, diceCount, passCriteria, failCriteri
    //I'm allowing reroll because there are no implications of it. even though I don't know why you would
 
    var tempExpressionJson = DiceExpression.everyValue(die, 0);
-   var singleDieExpression = new DiceExpression([{coefficient: 1, exponent: 1}], false);
-   singleDieExpression.addTerm({coefficient: -1, exponent: 1});  //it is now empty
-   //TODO: I should be able to create an empty one directly (no arg)
-   //currently possible to create an empty one via an empty array but future validation will prevent that
+   var singleDieExpression = new DiceExpression();
    for (var i = 0; i < tempExpressionJson.length; ++i)
    {
       var passed = eval(tempExpressionJson[i].exponent + passCriteria);
