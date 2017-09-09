@@ -552,3 +552,17 @@ TestSuite.GURPS._parseDamageString = function(isFirst)
 
    return TestRunner.displayResults('GURPS GURPS._parseDamageString', testResults, isFirst);
 };
+TestSuite.GURPS.RandomHitLocation = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], randomSource;
+
+   try{
+   randomSource = betterNonRandomNumberGenerator.dice(6, [6,5,1, 6,6,6]);  //sums 12, 18
+   testResults.push({Expected: 'Far Leg', Actual: GURPS.RandomHitLocation.roll(randomSource), Description: 'Happy path: exact'});
+   testResults.push({Expected: 'Vital Organs', Actual: GURPS.RandomHitLocation.roll(randomSource), Description: 'Happy path: max'});
+   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   return TestRunner.displayResults('GURPS GURPS.RandomHitLocation', testResults, isFirst);
+};

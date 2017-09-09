@@ -18,7 +18,7 @@ CustomDice.CustomDie = function(possibleValues)
    {
       return possibleValues[die.roll(randomSource)[0] - 1];
    };
-}
+};
 /**
  * A type of die that picks between one of the possibleValues then removes that value so that it can't be picked again.
  * Note that it only supports drawing cards. It does not do things like looking at the top card etc.
@@ -45,4 +45,49 @@ CustomDice.DeckOfCards = function(possibleValues)
     * Alias for roll.
     */
    this.draw = this.roll;
-}
+};
+/**
+ * An object with a single function named roll.
+ * It holds on to a shallow copy of possibleValues.
+ * @param dicePool the DicePool that will be used to roll against the table
+ * @param rawRows the table rows. Each must be an object with min (number), and value (anything).
+ *                The rows must be in order with the smallest min being first.
+ *                If the first element is not an object then it will be assumed to have a min of -Infinity.
+ * 
+ * Examples:
+new CustomDice.RollTable(new DicePool('1d%'), [
+'Armor and shields',
+{min: 11, value: 'Weapons'},
+{min: 21, value: 'Potions'},
+{min: 31, value: 'Rings'},
+{min: 41, value: 'Rods'},
+{min: 51, value: 'Scrolls'},
+{min: 66, value: 'Staves'},
+{min: 69, value: 'Wands'},
+{min: 84, value: 'Wondrous items'}
+]);
+ */
+CustomDice.RollTable = function(dicePool, rawRows)
+{
+   var rows = [];
+   if('object' === typeof(rawRows[0])) rows.push({min: rawRows[0].min, value: rawRows[0].value});
+   else rows.push({min: -Infinity, value: rawRows[0]});
+   for (var i = 1; i < rawRows.length; ++i)
+   {
+      rows.push({min: rawRows[i].min, value: rawRows[i].value});
+   }
+   /**
+    * @param randomSource passed to DicePool.sumRoll
+    * @returns the value of the last row that has a min less than or equal to the sum rolled.
+    *          undefined if there is no acceptable row.
+    */
+   this.roll = function(randomSource)
+   {
+      var sum = dicePool.sumRoll(randomSource);
+      for (var i = (rows.length - 1); i >= 0; --i)
+      {
+         if(rows[i].min <= sum) return rows[i].value;
+      }
+      return;
+   };
+};

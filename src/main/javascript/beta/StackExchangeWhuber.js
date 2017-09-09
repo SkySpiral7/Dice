@@ -29,8 +29,9 @@ function expressionForMultipleDice(dieCount, sideCount, smallestSide)  //f2 of s
 function expressionForDropLowestIsExactlyResult(dieCount, sideCount, smallestSide)  //f3 of se with x^-k
 {
    var result = expressionForMultipleDice(dieCount, sideCount, smallestSide);
-   result.subtract(expressionForMultipleDice(dieCount, sideCount, smallestSide+1));  //this ignores all sums that are greater
-   result.multiply(new DiceExpression([{exponent: -smallestSide, coefficient: 1}]));  //I think this drops the lowest die. It can't be moved to f2 because it needs to be x^-k for k+1 as well
+   result.subtract(expressionForMultipleDice(dieCount, sideCount, smallestSide+1));  //This ignores all sums that are greater.
+   result.multiply(new DiceExpression([{exponent: -smallestSide, coefficient: 1}]));  //This drops the lowest die. It can't be moved to f2 because it needs to be x^-k for k+1 as well.
+   //dropping 2 dice is not: *-smallestSide*-smallestSide, *(-smallestSide*2), *-smallestSide*-(smallestSide+1)
    return result;
 }
 function diceResultsForASingleDrop(dieCount, sideCount)  //f4 of se with moved x^-k

@@ -38,7 +38,7 @@ function nonRandomNumberGenerator(numberArray)
       return numberArray.shift();
    };
 }
-//TODO: make this better, test this, convert everything to use this
+//TODO: test this, convert everything to use this, remove others, rename this
 function betterNonRandomNumberGenerator(input)
 {
    var numberArray = [];
@@ -46,14 +46,14 @@ function betterNonRandomNumberGenerator(input)
    {
       if(undefined != input[i].dieSides) numberArray = numberArray.concat(dieResultsToNonRandomArray(input[i].dieSides, input[i].values));
       else if(undefined != input[i].deckSize) numberArray = numberArray.concat(deckResultsToNonRandomArray(input[i].deckSize, input[i].values));
-      else numberArray = numberArray.concat(input[i].values);
+      else numberArray = numberArray.concat(input[i]);
    }
-   return function()
-   {
-      if(0 === numberArray.length) throw new Error('Ran out of numbers');
-      return numberArray.shift();
-   };
+   return nonRandomNumberGenerator(numberArray);
 }
+//these names are easier
+betterNonRandomNumberGenerator.dice = dieResultsToNonRandomGenerator;
+betterNonRandomNumberGenerator.deck = deckResultsToNonRandomGenerator;
+betterNonRandomNumberGenerator.values = nonRandomNumberGenerator;
 
 //TODO: consider moving these tests to a new file:
 TestSuite.Util = {};

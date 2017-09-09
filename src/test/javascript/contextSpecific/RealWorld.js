@@ -11,6 +11,11 @@ TestSuite.RealWorld.Coin = function(isFirst)
    testResults.push({Expected: 'Heads', Actual: RealWorld.Coin.roll(nonRandomGenerator), Description: 'Happy path'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
+   try{
+   nonRandomGenerator = dieResultsToNonRandomGenerator(2, [2]);
+   testResults.push({Expected: 'Tails', Actual: RealWorld.Coin.flip(nonRandomGenerator), Description: 'flip is alias for roll'});
+   } catch(e){testResults.push({Error: e, Description: 'flip is alias for roll'});}
+
    return TestRunner.displayResults('RealWorld RealWorld.Coin', testResults, isFirst);
 };
 TestSuite.RealWorld.MagicEightBall = function(isFirst)
@@ -23,6 +28,16 @@ TestSuite.RealWorld.MagicEightBall = function(isFirst)
    nonRandomGenerator = dieResultsToNonRandomGenerator(20, [20]);
    testResults.push({Expected: 'Very doubtful', Actual: RealWorld.MagicEightBall.roll(nonRandomGenerator), Description: 'Happy path'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+
+   try{
+   nonRandomGenerator = dieResultsToNonRandomGenerator(20, [1]);
+   testResults.push({Expected: 'As I see it, yes', Actual: RealWorld.MagicEightBall.shake(nonRandomGenerator), Description: 'shake is alias for roll'});
+   } catch(e){testResults.push({Error: e, Description: 'shake is alias for roll'});}
+
+   try{
+   nonRandomGenerator = dieResultsToNonRandomGenerator(20, [19]);
+   testResults.push({Expected: 'Outlook not so good', Actual: RealWorld.MagicEightBall.ask(nonRandomGenerator), Description: 'ask is alias for roll'});
+   } catch(e){testResults.push({Error: e, Description: 'ask is alias for roll'});}
 
    return TestRunner.displayResults('RealWorld RealWorld.MagicEightBall', testResults, isFirst);
 };

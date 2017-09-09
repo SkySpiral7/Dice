@@ -347,14 +347,14 @@ TestSuite.Warhammer.RollScatterDice = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Direct Hit'});}
 
    try{
-   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5]}, {dieSides: 3, values: [1]}, {values: [125/360]}]);
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5]}, {dieSides: 3, values: [1]}, [125/360]]);
    actual = Warhammer.RollScatterDice(false, randomSource);
    expected = {result: 'Scatter', angleInDegrees: 125, distance: 10};
    testResults.push({Expected: expected, Actual: actual, Description: 'Decides to scatter'});
    } catch(e){testResults.push({Error: e, Description: 'Decides to scatter'});}
 
    try{
-   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [2]}, {values: [35.156752/360]}]);
+   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [2]}, [35.156752/360]]);
    actual = Warhammer.RollScatterDice(true, randomSource);
    expected = {result: 'Scatter', angleInDegrees: 35.156752, distance: 4};
    testResults.push({Expected: expected, Actual: actual, Description: 'Forced to scatter'});
