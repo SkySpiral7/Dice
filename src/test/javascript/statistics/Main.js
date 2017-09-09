@@ -300,24 +300,68 @@ TestSuite.Statistics.useBruteForce = function(isFirst)
 
    try{
    actual = Statistics.useBruteForce(new DicePool('3d2').toJSON().pool[0]);
-   expected = Statistics.useNonDroppingAlgorithm(new DicePool('3d2').toJSON().pool[0]);
-   //TODO: move tests so that BruteForce is the one directly tested for all and used by others
-   //need to test more than 2 dice for useBruteForce. trust useNonDroppingAlgorithm for this because 2+ isn't special to it
+   expected = [
+      {result: 3, frequency: 1},  //1+1+1
+      {result: 4, frequency: 3},  //1+1+2, 1+2+1, 2+1+1
+      {result: 5, frequency: 3},  //2+2+1, 2+1+2, 1+2+2
+      {result: 6, frequency: 1}  //2+2+2
+   ];
+   //need to test more than 2 dice for useBruteForce
    testResults.push({Expected: expected, Actual: actual, Description: '3d2'});
    } catch(e){testResults.push({Error: e, Description: '3d2'});}
 
    try{
+   actual = Statistics.useBruteForce(new DicePool('2d6').toJSON().pool[0]);
+   expected = [  //I used 2d6 because the results are well known
+      {result: 2, frequency: 1},
+      {result: 3, frequency: 2},
+      {result: 4, frequency: 3},
+      {result: 5, frequency: 4},
+      {result: 6, frequency: 5},
+      {result: 7, frequency: 6},
+      {result: 8, frequency: 5},
+      {result: 9, frequency: 4},
+      {result: 10, frequency: 3},
+      {result: 11, frequency: 2},
+      {result: 12, frequency: 1}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
+   } catch(e){testResults.push({Error: e, Description: '2d6'});}
+   
+   try{
    actual = Statistics.useBruteForce(new DicePool('2d2!').toJSON().pool[0], 0);
-   expected = Statistics.useNonDroppingAlgorithm(new DicePool('2d2!').toJSON().pool[0], 0);
-   //useBruteForce is complicated. useNonDroppingAlgorithm is easy to prove correct for all cases
+   expected = [
+      {result: 2, frequency: 1},  //1+1
+      {result: 3, frequency: 2},  //1+2, 2+1
+      {result: 4, frequency: 1}  //2+2
+   ];
    testResults.push({Expected: expected, Actual: actual, Description: '2d2! explodeCount 0'});
    } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 0'});}
 
    try{
    actual = Statistics.useBruteForce(new DicePool('2d2!').toJSON().pool[0], 1);
-   expected = Statistics.useNonDroppingAlgorithm(new DicePool('2d2!').toJSON().pool[0], 1);
+   expected = [
+      {result: 2, probability: ((1/2)*(1/2))},  //1+1
+      {result: 4, probability: ((1/2)*(1/4)*2)},  //1+(2+1), (2+1)+1
+      {result: 5, probability: ((1/2)*(1/4)*2)},  //1+(2+2), (2+2)+1
+      {result: 6, probability: ((1/4)*(1/4))},  //(2+1)+(2+1)
+      {result: 7, probability: ((1/4)*(1/4)*2)},  //(2+2)+(2+1), (2+1)+(2+2)
+      {result: 8, probability: ((1/4)*(1/4))}  //(2+2)+(2+2)
+   ];
    testResults.push({Expected: expected, Actual: actual, Description: '2d2! explodeCount 1'});
    } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 1'});}
+
+   try{
+   actual = Statistics.useBruteForce(new DicePool('1d3!').toJSON().pool[0], 1);
+   expected = [
+      {result: 1, probability: (1/3)},
+      {result: 2, probability: (1/3)},
+      {result: (3+1), probability: ((1/3) * (1/3))},
+      {result: (3+2), probability: ((1/3) * (1/3))},
+      {result: (3+3), probability: ((1/3) * (1/3))}  //doesn't explode again
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
+   } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
    try{
    actual = Statistics.useBruteForce(new DicePool('2d2 drop 1').toJSON().pool[0], 0);
@@ -387,41 +431,19 @@ TestSuite.Statistics.useNonDroppingAlgorithm = function(isFirst)
 
    try{
    actual = Statistics.useNonDroppingAlgorithm(new DicePool('2d6').toJSON().pool[0]);
-   expected = [  //I used 2d6 because the results are well known
-      {result: 2, frequency: 1},
-      {result: 3, frequency: 2},
-      {result: 4, frequency: 3},
-      {result: 5, frequency: 4},
-      {result: 6, frequency: 5},
-      {result: 7, frequency: 6},
-      {result: 8, frequency: 5},
-      {result: 9, frequency: 4},
-      {result: 10, frequency: 3},
-      {result: 11, frequency: 2},
-      {result: 12, frequency: 1}
-   ];
+   expected = Statistics.useBruteForce(new DicePool('2d6').toJSON().pool[0]);
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
    actual = Statistics.useNonDroppingAlgorithm(new DicePool('1d3!').toJSON().pool[0], 1);
-   expected = [
-      {result: 1, probability: (1/3)},
-      {result: 2, probability: (1/3)},
-      {result: (3+1), probability: ((1/3) * (1/3))},
-      {result: (3+2), probability: ((1/3) * (1/3))},
-      {result: (3+3), probability: ((1/3) * (1/3))}  //doesn't explode again
-   ];
+   expected = Statistics.useBruteForce(new DicePool('1d3!').toJSON().pool[0], 1);
    testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
    try{
    actual = Statistics.useNonDroppingAlgorithm(new DicePool('-d3').toJSON().pool[0]);
-   expected = [
-      {result: -3, frequency: 1},
-      {result: -2, frequency: 1},
-      {result: -1, frequency: 1}
-   ];
+   expected = Statistics.useBruteForce(new DicePool('-d3').toJSON().pool[0]);
    testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
    } catch(e){testResults.push({Error: e, Description: '-d3'});}
 
