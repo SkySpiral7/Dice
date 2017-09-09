@@ -7,7 +7,7 @@ TestSuite.DiceExpression.add = function(isFirst)
    var testResults = [], expression, actual, expected;
 
    try{
-   new DiceExpression(new Die()).add(2);
+   new DiceExpression().add(2);
    TestRunner.failedToThrow(testResults, 'Illegal arg');
    }
    catch(e)
@@ -32,7 +32,7 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
    var testResults = [], expression, actual, expected;
 
    try{
-   expression = new DiceExpression(new Die('dF'));
+   expression = new DiceExpression();
    expression.addTerm({coefficient: 'sd', exponent: 0});
    TestRunner.failedToThrow(testResults, 'Invalid coefficient');
    }
@@ -43,7 +43,7 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
    }
 
    try{
-   expression = new DiceExpression(new Die('dF'));
+   expression = new DiceExpression();
    expression.addTerm({coefficient: 2, exponent: 'sd2'});
    TestRunner.failedToThrow(testResults, 'Invalid exponent');
    }
@@ -148,7 +148,7 @@ TestSuite.DiceExpression.multiply = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2dF'});}
 
    try{
-   new DiceExpression(new Die()).multiply(2);
+   new DiceExpression().multiply(2);
    TestRunner.failedToThrow(testResults, 'Illegal arg');
    }
    catch(e)
@@ -166,7 +166,7 @@ TestSuite.DiceExpression.negateExponents = function(isFirst)
    var testResults = [], expression, actual, expected;
 
    try{
-   expression = new DiceExpression(new Die('d3'));
+   expression = new DiceExpression(new Die(3));
    expression.addTerm({coefficient: 1, exponent: 2});
    expression.negateExponents();
    actual = expression.toJSON();
@@ -203,7 +203,7 @@ TestSuite.DiceExpression.subtract = function(isFirst)
    var testResults = [], expression, actual, expected;
 
    try{
-   new DiceExpression(new Die()).subtract(2);
+   new DiceExpression().subtract(2);
    TestRunner.failedToThrow(testResults, 'Illegal arg');
    }
    catch(e)
@@ -286,7 +286,7 @@ TestSuite.DiceExpression._constructor = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Happy fudge die'});}
 
    try{
-   new DiceExpression(new Die())._constructor();
+   new DiceExpression()._constructor();
    TestRunner.failedToThrow(testResults, 'Call _constructor');
    }
    catch(e)

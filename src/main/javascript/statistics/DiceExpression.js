@@ -148,14 +148,15 @@ function DiceExpression(arg1, arg2)
       }
 
       //TODO: make DiceExpression._validate
-      var die = arg1;
+      if(arg1 instanceof Die) arg1 = {die: arg1, dieCount: 1, areDiceNegative: false};
+      var diceGroup = arg1;
       var explodeCount = arg2;
       var hasExplosions = (undefined !== explodeCount && explodeCount > 0);
       //notice how an exploding die with explodeCount 0 uses frequency
-      hasExplosions = hasExplosions && (undefined !== die.toJSON().explodeType);
+      hasExplosions = hasExplosions && (undefined !== diceGroup.die.toJSON().explodeType);
       if(!hasExplosions) explodeCount = 0;
       useProbability = hasExplosions;
-      termArray = DiceExpression.everyValue(die, explodeCount);
+      termArray = DiceExpression.everyValue(diceGroup, explodeCount);
       DiceExpression.combineValues(termArray);
       termArray.sort(DiceExpression.exponentDescending);
 
@@ -175,9 +176,10 @@ DiceExpression.combineValues = function(everyValue)
    }
 };
 //TODO: doc DiceExpression.everyValue and move some tests
-DiceExpression.everyValue = function(die, explodeCount)
+DiceExpression.everyValue = function(diceGroup, explodeCount)
 {
-   die = die.toJSON();  //this is the only thing I need the die for
+   if(diceGroup instanceof Die) diceGroup = {die: diceGroup, dieCount: 1, areDiceNegative: false};
+   var die = diceGroup.die.toJSON();  //this is the only thing I need the die for
    var hasExplosions = (explodeCount > 0);
    var minValue = 1 + die.constantModifier;
    var maxValue = die.sideCount + die.constantModifier;
@@ -228,6 +230,12 @@ DiceExpression.everyValue = function(die, explodeCount)
                //unused because the algorithm for compound works for all
          }
       }
+   }
+   if (diceGroup.areDiceNegative)
+   {
+      var tempExpression = new DiceExpression(result, false);  //TODO: this is pretty scary. needs refactoring
+      tempExpression.negateExponents();
+      result = tempExpression.toJSON();
    }
    return result;
 };

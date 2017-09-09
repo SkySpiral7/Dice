@@ -1,9 +1,9 @@
 'use strict';
 var Statistics = {};
 /*TODO: refactoring:
--move eplosions down into DiceExpression.everyValue (no explode count, just %)
+-move explosions down into DiceExpression.everyValue (no explode count, just %)
+-have the algorithms take in a group and every value
 -have Algorithm.analyze return an algorithm without using it
--have the algorithms take in every value and die count?
 */
 /**
 Note that a single die (that doesn't explode) has no mean or standardDeviation for the same

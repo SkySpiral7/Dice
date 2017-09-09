@@ -35,10 +35,8 @@ Algorithm.useBruteForce = function(diceGroup, explodeCount)
    var everyValue = [];
    for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
-      var everyDieValue = DiceExpression.everyValue(diceGroup.die, explodeCount);
+      var everyDieValue = DiceExpression.everyValue(diceGroup, explodeCount);
       var newExpression = new DiceExpression(everyDieValue, (0 !== explodeCount));  //TODO: consider explodeCount 0 to use prob
-      //TODO: consider having DiceExpression and DiceExpression.everyValue take isNegative
-      if(diceGroup.areDiceNegative) newExpression.negateExponents();
 
       var stats = newExpression.toDiceResults();
       if(0 !== explodeCount) Statistics.determineProbability(stats);  //safe because it doesn't touch results
@@ -92,15 +90,12 @@ The algorithm is faster than brute force but can't support drop/keep.
 Algorithm.useNonDroppingAlgorithm = function(diceGroup, explodeCount)
 {
    //assert: no drop/keep
-   var workingExpression = new DiceExpression(diceGroup.die, explodeCount);
-   if(diceGroup.areDiceNegative) workingExpression.negateExponents();
+   var workingExpression = new DiceExpression(diceGroup, explodeCount);
    for (var dieCount = 1; dieCount < diceGroup.dieCount; ++dieCount)
    {
       //dice are immutable so it's ok to reuse the same one
-      var newExpression = new DiceExpression(diceGroup.die, explodeCount);
       //TODO: faster: since all dice are the same I can get json and reuse it a bunch
-      if(diceGroup.areDiceNegative) newExpression.negateExponents();
-      workingExpression.multiply(newExpression);
+      workingExpression.multiply(new DiceExpression(diceGroup, explodeCount));
    }
    return workingExpression.toDiceResults();
 };
