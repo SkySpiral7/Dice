@@ -36,7 +36,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6, 1, 5]);  //the 5 is ignored
+   input.randomSource = numberGenerator.dice(6, [6, 6, 1, 5]);  //the 5 is ignored
    actual = Warhammer.AttackUnit(input);
    stringValue = actual.toString();
    delete actual.toString;
@@ -57,7 +57,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [1]);
+   input.randomSource = numberGenerator.dice(6, [1]);
    actual = Warhammer.AttackUnit(input);
    stringValue = actual.toString();
    delete actual.toString;
@@ -68,7 +68,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [3, 1]);
+   input.randomSource = numberGenerator.dice(6, [3, 1]);
    actual = Warhammer.AttackUnit(input);
    stringValue = actual.toString();
    delete actual.toString;
@@ -79,7 +79,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [3, 4, 6]);
+   input.randomSource = numberGenerator.dice(6, [3, 4, 6]);
    actual = Warhammer.AttackUnit(input);
    stringValue = actual.toString();
    delete actual.toString;
@@ -90,7 +90,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 1, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [3, 4, 1, 6]);
+   input.randomSource = numberGenerator.dice(6, [3, 4, 1, 6]);
    actual = Warhammer.AttackUnit(input);
    delete actual.toString;
    expected = {hit: 1, wounded: 1, unsavedWounds: 0};
@@ -99,7 +99,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 3, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 7};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 1, 3].concat([4, 2]).concat([6]));
+   input.randomSource = numberGenerator.dice(6, [6, 1, 3].concat([4, 2]).concat([6]));
    actual = Warhammer.AttackUnit(input);
    delete actual.toString;
    expected = {hit: 2, wounded: 1, unsavedWounds: 0};
@@ -108,7 +108,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 2, maxWounds: 1, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 6};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 3].concat([4, 6]).concat([1, 5, 6]));
+   input.randomSource = numberGenerator.dice(6, [6, 3].concat([4, 6]).concat([1, 5, 6]));
    actual = Warhammer.AttackUnit(input);
    delete actual.toString;
    expected = {hit: 2, wounded: 2, unsavedWounds: 0};
@@ -117,7 +117,7 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
 
    try{
    input = {diceCount: 5, maxWounds: 2, toHitValue: 3, toWoundValue: 3, saveValue: 4, reanimateOrNoPainValue: 7};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6, 5, 6, 6].concat([6, 6, 5, 6, 6]).concat([1, 2, 1, 1, 1]));
+   input.randomSource = numberGenerator.dice(6, [6, 6, 5, 6, 6].concat([6, 6, 5, 6, 6]).concat([1, 2, 1, 1, 1]));
    actual = Warhammer.AttackUnit(input);
    delete actual.toString;
    expected = {hit: 5, wounded: 5, unsavedWounds: 2};
@@ -304,14 +304,14 @@ TestSuite.Warhammer.RollScatterDice = function(isFirst)
    var testResults = [], randomSource, expected, actual;
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(6, [6]);
+   randomSource = numberGenerator.dice(6, [6]);
    actual = Warhammer.RollScatterDice(false, randomSource);
    expected = {result: 'Misfire'};
    testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, all values, misfire'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path, all values, misfire'});}
 
    try{
-   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [2]}, {dieSides: 3, values: [3]}]);
+   randomSource = numberGenerator([{dieSides: 6, values: [2]}, {dieSides: 3, values: [3]}]);
    actual = Warhammer.RollScatterDice(undefined, randomSource);
    expected = {result: 'Direct Hit'};
    testResults.push({Expected: expected, Actual: actual, Description: 'alwaysScatter defaults to false'});
@@ -333,28 +333,28 @@ TestSuite.Warhammer.RollScatterDice = function(isFirst)
    }
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(6, [6]);
+   randomSource = numberGenerator.dice(6, [6]);
    actual = Warhammer.RollScatterDice(true, randomSource);
    expected = {result: 'Misfire'};
    testResults.push({Expected: expected, Actual: actual, Description: 'Misfire ignores alwaysScatter'});
    } catch(e){testResults.push({Error: e, Description: 'Misfire ignores alwaysScatter'});}
 
    try{
-   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [4]}, {dieSides: 3, values: [3]}]);
+   randomSource = numberGenerator([{dieSides: 6, values: [4]}, {dieSides: 3, values: [3]}]);
    actual = Warhammer.RollScatterDice(false, randomSource);
    expected = {result: 'Direct Hit'};
    testResults.push({Expected: expected, Actual: actual, Description: 'Direct Hit ignores distance'});
    } catch(e){testResults.push({Error: e, Description: 'Direct Hit'});}
 
    try{
-   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [5]}, {dieSides: 3, values: [1]}, [125/360]]);
+   randomSource = numberGenerator([{dieSides: 6, values: [5]}, {dieSides: 3, values: [1]}, [125/360]]);
    actual = Warhammer.RollScatterDice(false, randomSource);
    expected = {result: 'Scatter', angleInDegrees: 125, distance: 10};
    testResults.push({Expected: expected, Actual: actual, Description: 'Decides to scatter'});
    } catch(e){testResults.push({Error: e, Description: 'Decides to scatter'});}
 
    try{
-   randomSource = betterNonRandomNumberGenerator([{dieSides: 6, values: [2]}, [35.156752/360]]);
+   randomSource = numberGenerator([{dieSides: 6, values: [2]}, [35.156752/360]]);
    actual = Warhammer.RollScatterDice(true, randomSource);
    expected = {result: 'Scatter', angleInDegrees: 35.156752, distance: 4};
    testResults.push({Expected: expected, Actual: actual, Description: 'Forced to scatter'});

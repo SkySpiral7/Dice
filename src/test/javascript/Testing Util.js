@@ -5,41 +5,8 @@ function getError(functionToCall, args)
    try{functionToCall.apply(undefined, args);}
    catch(e){return e;}
 }
-function dieResultsToNonRandomArray(sides, numberArray)
-{
-   for (var i = 0; i < numberArray.length; ++i)
-   {
-      numberArray[i] = (numberArray[i] - 1) / sides;
-   }
-   return numberArray;
-}
-function deckResultsToNonRandomArray(initialSize, numberArray)
-{
-   for (var i = 0; i < numberArray.length; ++i)
-   {
-      numberArray[i] = (numberArray[i] - 1) / initialSize;
-      --initialSize;
-   }
-   return numberArray;
-}
-function dieResultsToNonRandomGenerator(sides, numberArray)
-{
-   return nonRandomNumberGenerator(dieResultsToNonRandomArray(sides, numberArray));
-}
-function deckResultsToNonRandomGenerator(initialSize, numberArray)
-{
-   return nonRandomNumberGenerator(deckResultsToNonRandomArray(initialSize, numberArray));
-}
-function nonRandomNumberGenerator(numberArray)
-{
-   return function()
-   {
-      if(0 === numberArray.length) throw new Error('Ran out of numbers');
-      return numberArray.shift();
-   };
-}
-//TODO: test this, convert everything to use this, remove others, rename this
-function betterNonRandomNumberGenerator(input)
+//TODO: test this more
+function numberGenerator(input)
 {
    var numberArray = [];
    for (var i=0; i < input.length; ++i)
@@ -48,54 +15,69 @@ function betterNonRandomNumberGenerator(input)
       else if(undefined != input[i].deckSize) numberArray = numberArray.concat(deckResultsToNonRandomArray(input[i].deckSize, input[i].values));
       else numberArray = numberArray.concat(input[i]);
    }
-   return nonRandomNumberGenerator(numberArray);
+   return function()
+   {
+      if(0 === numberArray.length) throw new Error('Ran out of numbers');
+      return numberArray.shift();
+   };
+
+   function dieResultsToNonRandomArray(sides, numberArray)
+   {
+      for (var i = 0; i < numberArray.length; ++i)
+      {
+         numberArray[i] = (numberArray[i] - 1) / sides;
+      }
+      return numberArray;
+   }
+   function deckResultsToNonRandomArray(initialSize, numberArray)
+   {
+      for (var i = 0; i < numberArray.length; ++i)
+      {
+         numberArray[i] = (numberArray[i] - 1) / initialSize;
+         --initialSize;
+      }
+      return numberArray;
+   }
 }
-//these names are easier
-betterNonRandomNumberGenerator.dice = dieResultsToNonRandomGenerator;
-betterNonRandomNumberGenerator.deck = deckResultsToNonRandomGenerator;
-betterNonRandomNumberGenerator.values = nonRandomNumberGenerator;
+numberGenerator.dice = function(sides, numberArray)
+{
+   return numberGenerator([{dieSides: sides, values: numberArray}]);
+};
+numberGenerator.deck = function(initialSize, numberArray)
+{
+   return numberGenerator([{deckSize: initialSize, values: numberArray}]);
+};
+numberGenerator.values = function(numberArray)
+{
+   return numberGenerator([numberArray]);
+};
 
 //TODO: consider moving these tests to a new file:
 TestSuite.Util = {};
-TestSuite.Util.dieResultsToNonRandomArray = function(isFirst)
-{
-   TestRunner.clearResults(isFirst);
-
-   var testResults = [], actual;
-
-   try{
-   actual = dieResultsToNonRandomArray(8, [5, 7]);
-   testResults.push({Expected: [(4/8), (6/8)], Actual: actual, Description: 'Quick test'});
-   } catch(e){testResults.push({Error: e, Description: 'Quick test'});}
-
-   return TestRunner.displayResults('Testing Util dieResultsToNonRandomArray', testResults, isFirst);
-};
-TestSuite.Util.dieResultsToNonRandomGenerator = function(isFirst)
+TestSuite.Util.numberGenerator_dice = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
    var testResults = [], generator;
 
    try{
-   generator = dieResultsToNonRandomGenerator(8, [5]);
+   generator = numberGenerator.dice(8, [5]);
    testResults.push({Expected: (4/8), Actual: generator(), Description: 'Quick test'});
    } catch(e){testResults.push({Error: e, Description: 'Quick test'});}
 
-   return TestRunner.displayResults('Testing Util dieResultsToNonRandomGenerator', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util numberGenerator.dice', testResults, isFirst);
 };
-TestSuite.Util.nonRandomNumberGenerator = function(isFirst)
+TestSuite.Util.numberGenerator_values = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
    var testResults = [], generator;
 
    try{
-   generator = nonRandomNumberGenerator([1,2,3,4,Infinity]);
+   generator = numberGenerator.values([1,2,Infinity]);
    testResults.push({Expected: 1, Actual: generator(), Description: 'Happy path 0'});
    testResults.push({Expected: 2, Actual: generator(), Description: 'Happy path 1'});
-   testResults.push({Expected: 3, Actual: generator(), Description: 'Happy path 2'});
-   testResults.push({Expected: 4, Actual: generator(), Description: 'Happy path 3'});
-   testResults.push({Expected: Infinity, Actual: generator(), Description: 'Happy path 4'});
+   testResults.push({Expected: Infinity, Actual: generator(), Description: 'Happy path 2'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
@@ -107,5 +89,5 @@ TestSuite.Util.nonRandomNumberGenerator = function(isFirst)
       testResults.push({Expected: new Error('Ran out of numbers'), Actual: e, Description: 'End'});
    }
 
-   return TestRunner.displayResults('Testing Util nonRandomNumberGenerator', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util numberGenerator.values', testResults, isFirst);
 };

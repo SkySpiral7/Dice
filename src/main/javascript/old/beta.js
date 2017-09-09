@@ -129,14 +129,12 @@ TestSuite.Prebuilt.L5RContestedRoll = function(isFirst)
    try{
    inputA = {circumstanceBonus: 1, numberOfRaises: 1, diceRolled: 2, diceKept: 1, hasEmphasis: true};
    //the die can't be optimized to 9 sided because of compound exploding:
-   randomSource = dieResultsToNonRandomArray(10, [1, 10, 10, 3, 6, 2]);  //reroll, explosions
+   randomSource = numberGenerator.dice(10, [1, 10,10,3, 6, 2,  5, 6]);  //reroll, explosions, last is ignored
    resultA = {valuesKept: [6,23], totalValue: 30, voidPointsRecovered: 1, valuesDropped: [2], success: true};
 
    inputB = {diceRolled: 1, diceKept: 1};
-   randomSource = randomSource.concat(dieResultsToNonRandomArray(10, [5, 6]));  //6 is ignored
    resultB = {valuesKept: [5], totalValue: 5, voidPointsRecovered: 0, valuesDropped: [], success: true};
 
-   randomSource = nonRandomNumberGenerator(randomSource);
    actual = Prebuilt.L5RContestedRoll(inputA, inputB, randomSource);
    expected = {resultA: resultA, resultB: resultB, didTie: false, contestDifference: 20};
    testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, all values, clear winner'});

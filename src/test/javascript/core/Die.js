@@ -67,43 +67,43 @@ TestSuite.Die.roll = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Do not call randomSource for d1'});}
 
    try{
-   generator = nonRandomNumberGenerator([0]);
+   generator = numberGenerator.values([0]);
    actual = new Die().roll(generator);
    testResults.push({Expected: [1], Actual: actual, Description: 'Random exactly 0 is 1'});
    } catch(e){testResults.push({Error: e, Description: 'Random exactly 0 is 1'});}
 
    try{
-   generator = nonRandomNumberGenerator([(1 - Number.EPSILON)]);
+   generator = numberGenerator.values([(1 - Number.EPSILON)]);
    actual = new Die(1000000).roll(generator);
    testResults.push({Expected: [1000000], Actual: actual, Description: 'Random almost 1 is max'});
    } catch(e){testResults.push({Error: e, Description: 'Random almost 1 is max'});}
 
    try{
-   generator = dieResultsToNonRandomGenerator(8, [3, 5]);
+   generator = numberGenerator.dice(8, [3, 5]);
    actual = new Die({sideCount: 8, constantModifier: 10, rerollCriteria: '===13'}).roll(generator);
    testResults.push({Expected: [15], Actual: actual, Description: 'Reroll uses constantModifier'});
    } catch(e){testResults.push({Error: e, Description: 'Reroll uses constantModifier'});}
 
    try{
-   generator = dieResultsToNonRandomGenerator(8, [8, 3, 8, 5]);
+   generator = numberGenerator.dice(8, [8, 3, 8, 5]);
    actual = new Die('d8!r3').roll(generator);
    testResults.push({Expected: [8, 8, 5], Actual: actual, Description: 'Regular explode with reroll'});
    } catch(e){testResults.push({Error: e, Description: 'Regular explode with reroll'});}
 
    try{
-   generator = dieResultsToNonRandomGenerator(8, [8, 3, 8, 5]);
+   generator = numberGenerator.dice(8, [8, 3, 8, 5]);
    actual = new Die('d8r3!p').roll(generator);
    testResults.push({Expected: [8, 7, 4], Actual: actual, Description: 'Penetrating explode then reroll'});
    } catch(e){testResults.push({Error: e, Description: 'Penetrating explode then reroll'});}
 
    try{
-   generator = dieResultsToNonRandomGenerator(8, [3, 8, 5]);
+   generator = numberGenerator.dice(8, [3, 8, 5]);
    actual = new Die('d8r3!p').roll(generator);
    testResults.push({Expected: [8, 4], Actual: actual, Description: 'Reroll then penetrating explode'});
    } catch(e){testResults.push({Error: e, Description: 'Reroll then penetrating explode'});}
 
    try{
-   generator = dieResultsToNonRandomGenerator(8, [8, 8, 1, 8, 1]);
+   generator = numberGenerator.dice(8, [8, 8, 1, 8, 1]);
    actual = new Die('d8!!r17').roll(generator);
    testResults.push({Expected: [9], Actual: actual, Description: 'Reroll with compound explode'});
    } catch(e){testResults.push({Error: e, Description: 'Reroll with compound explode'});}

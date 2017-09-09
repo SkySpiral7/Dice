@@ -8,7 +8,7 @@ TestSuite.client.Pathfinder.parseCharacterData = function(isFirst)
    var testResults = [];
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = '[{name: "Alice", initiative: 0, attacks: []}, {name: \'Bob\', initiative: 0, attacks: []}]';
    //don't test an object with getter/setter or anything crazy because while it is allowed it isn't intentionally supported
    document.getElementById('parseCharacterButton').onclick();
@@ -16,7 +16,7 @@ TestSuite.client.Pathfinder.parseCharacterData = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Parsing is more forgiving than JSON'});}
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', notes: 'Is noteworthy', initiative: 0, attacks: []}]);
    document.getElementById('parseCharacterButton').onclick();
    testResults.push({Expected: '', Actual: characters[0].notes, Description: 'Defaults notes to ""'});
@@ -33,13 +33,13 @@ TestSuite.client.Pathfinder.initiative = function(isFirst)
 
    try{
    document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', initiative: 1, attacks: []}]);
-   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
+   randomSource = numberGenerator.dice(20, [5, 15]);
    document.getElementById('parseCharacterButton').onclick();
 
    testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').options[0].text, Description: 'parseCharacterButton initiative: Character.Option[0].text'});
    testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[1].text, Description: 'parseCharacterButton initiative: Character.Option[1].text'});
 
-   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
+   randomSource = numberGenerator.dice(20, [5, 15]);
    document.getElementById('initiativeButton').onclick();
 
    testResults.push({Expected: 'Alice', Actual: document.getElementById('attacker').options[0].text, Description: 'initiativeButton: Character.Option[0].text'});
@@ -55,7 +55,7 @@ TestSuite.client.Pathfinder.createCharacterOptions = function(isFirst)
    var testResults = [];
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', notes: 'Is noteworthy', initiative: 0, attacks: []}, {name: 'Bob', initiative: 0, attacks: []}]);
    document.getElementById('parseCharacterButton').onclick();
 
@@ -79,7 +79,7 @@ TestSuite.client.Pathfinder.createAttackOptions = function(isFirst)
    var testResults = [];
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', notes: 'Starts with A', initiative: 0, attacks: [{name: 'Punch'}, {name: 'Kick'}]},
       {name: 'Bob', notes: 'Ends with B', initiative: 0, attacks: [{name: 'Stab'}, {name: 'Slash'}]}]);
    document.getElementById('parseCharacterButton').onclick();
@@ -113,7 +113,7 @@ TestSuite.client.Pathfinder.displayNotes = function(isFirst)
    var testResults = [];
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', notes: 'Starts with A', initiative: 0, attacks: []},
       {name: 'Bob', notes: 'Ends with B', initiative: 0, attacks: []}]);
    document.getElementById('parseCharacterButton').onclick();
@@ -141,7 +141,7 @@ TestSuite.client.Pathfinder.updateNotes = function(isFirst)
    var testResults = [];
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}, {name: 'Bob', initiative: 0, attacks: []}]);
    document.getElementById('parseCharacterButton').onclick();
    document.getElementById('target').selectedIndex = 1;
@@ -166,7 +166,7 @@ TestSuite.client.Pathfinder.updateNotes = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Different characters'});}
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([{name: 'Alice', initiative: 0, attacks: []}]);
    document.getElementById('parseCharacterButton').onclick();
 
@@ -197,7 +197,7 @@ TestSuite.client.Pathfinder.attack = function(isFirst)
    var testResults = [];
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([
       {name: 'Alice', initiative: 0, attacks: [
          {name: 'Punch', attackBonus: 1, minimumCritical: 18, criticalMultiplier: 2, damageString: '1d8', flatDamageModifer: 1, extraDamageDiceString: '1d6', isTouchAttack: false}
@@ -209,7 +209,7 @@ TestSuite.client.Pathfinder.attack = function(isFirst)
    document.getElementById('parseCharacterButton').onclick();
    document.getElementById('target').selectedIndex = 1;  //target is Bob
 
-   randomSource = dieResultsToNonRandomGenerator(20, [1]);
+   randomSource = numberGenerator.dice(20, [1]);
    document.getElementById('result').value = '';
    document.getElementById('attackButton').onclick();
 
@@ -225,7 +225,7 @@ TestSuite.client.Pathfinder.createAttackInput = function(isFirst)
    var testResults = [], expected, actual;
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    var weapon = {name: 'Punch', attackBonus: 'attackBonus', weapon: 'weapon'};
    document.getElementById('characterData').value = JSON.stringify([
       {name: 'Alice', initiative: 0, attacks: [
@@ -246,7 +246,7 @@ TestSuite.client.Pathfinder.createAttackInput = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Normal AC'});}
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([
       {name: 'Alice', initiative: 0, attacks: [
          {name: 'Punch', isTouchAttack: true}
@@ -264,7 +264,7 @@ TestSuite.client.Pathfinder.createAttackInput = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Touch attack'});}
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([
       {name: 'Alice', initiative: 0, attacks: [
          {name: 'Punch', isTouchAttack: false}
@@ -282,7 +282,7 @@ TestSuite.client.Pathfinder.createAttackInput = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Flat-footed'});}
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [2, 1]);
+   randomSource = numberGenerator.dice(20, [2, 1]);
    document.getElementById('characterData').value = JSON.stringify([
       {name: 'Alice', initiative: 0, attacks: [
          {name: 'Punch', isTouchAttack: true}

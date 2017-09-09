@@ -190,7 +190,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
    try{
    input = {circumstanceBonus: 1, numberOfRaises: 1, targetNumber: 5, diceRolled: 2, diceKept: 1, hasEmphasis: true};
    //the die can't be optimized to 9 sided because of compound exploding:
-   input.randomSource = dieResultsToNonRandomGenerator(10, [1, 10, 2, 3, 5]);  //reroll, explosion, and 5 is ignored
+   input.randomSource = numberGenerator.dice(10, [1, 10, 2, 3, 5]);  //reroll, explosion, and 5 is ignored
    //so the results are 12 and 3 with 12 kept (TN=10)
    actual = L5R.GeneralRoll(input);
    stringValue = actual.toString();
@@ -296,7 +296,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
 
    try{
    input = {targetNumber: 5, diceRolled: 2, diceKept: 2, hasEmphasis: 'Fred'};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [1, 6]);
+   input.randomSource = numberGenerator.dice(10, [1, 6]);
    actual = L5R.GeneralRoll(input);
    delete actual.toString;
    expected = {valuesKept: [1, 6], totalValue: 7, voidPointsRecovered: 0, valuesDropped: [], success: true};
@@ -305,7 +305,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
 
    try{
    input = {targetNumber: 5, diceRolled: 2, diceKept: 2};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [1, 6]);
+   input.randomSource = numberGenerator.dice(10, [1, 6]);
    actual = L5R.GeneralRoll(input);
    delete actual.toString;
    expected = {valuesKept: [1, 6], totalValue: 7, voidPointsRecovered: 0, valuesDropped: [], success: true};
@@ -314,14 +314,14 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
 
    try{
    input = {numberOfRaises: 1, targetNumber: 5, diceRolled: 2, diceKept: 2};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [3, 6]);
+   input.randomSource = numberGenerator.dice(10, [3, 6]);
    actual = L5R.GeneralRoll(input);
    delete actual.toString;
    expected = {valuesKept: [3, 6], totalValue: 9, voidPointsRecovered: 0, valuesDropped: [], success: false};
    testResults.push({Expected: expected, Actual: actual, Description: 'numberOfRaises increases TN by 5: failure'});
 
    input = {numberOfRaises: 1, targetNumber: 5, diceRolled: 2, diceKept: 2};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [4, 6]);
+   input.randomSource = numberGenerator.dice(10, [4, 6]);
    actual = L5R.GeneralRoll(input);
    delete actual.toString;
    expected = {valuesKept: [4, 6], totalValue: 10, voidPointsRecovered: 0, valuesDropped: [], success: true};
@@ -333,7 +333,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
 
    try{
    input = {targetNumber: 5, diceRolled: 1, diceKept: 1};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 10, 2]);
+   input.randomSource = numberGenerator.dice(10, [10, 10, 2]);
    actual = L5R.GeneralRoll(input);
    delete actual.toString;
    expected = {valuesKept: [22], totalValue: 22, voidPointsRecovered: 1, valuesDropped: [], success: true};
@@ -342,21 +342,21 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
 
    try{
    input = {targetNumber: 5, diceRolled: 2, diceKept: 2};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 1, 10, 2]);
+   input.randomSource = numberGenerator.dice(10, [10, 1, 10, 2]);
    actual = L5R.GeneralRoll(input).voidPointsRecovered;
    testResults.push({Expected: 1, Actual: actual, Description: 'voidPointsRecovered: 2 dice'});
    } catch(e){testResults.push({Error: e, Description: 'voidPointsRecovered: 2 dice'});}
 
    try{
    input = {targetNumber: 5, diceRolled: 1, diceKept: 1};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 10, 10, 2]);
+   input.randomSource = numberGenerator.dice(10, [10, 10, 10, 2]);
    actual = L5R.GeneralRoll(input).voidPointsRecovered;
    testResults.push({Expected: 1, Actual: actual, Description: 'voidPointsRecovered: every other explode, round down'});
    } catch(e){testResults.push({Error: e, Description: 'voidPointsRecovered: every other explode, round down'});}
 
    try{
    input = {targetNumber: 5, diceRolled: 2, diceKept: 1};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [10, 1, 10, 2]);
+   input.randomSource = numberGenerator.dice(10, [10, 1, 10, 2]);
    actual = L5R.GeneralRoll(input).voidPointsRecovered;
    testResults.push({Expected: 1, Actual: actual, Description: 'voidPointsRecovered: counts dropped dice'});
    } catch(e){testResults.push({Error: e, Description: 'voidPointsRecovered: counts dropped dice'});}
@@ -364,7 +364,7 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
    //positive circumstanceBonus was tested by Happy path
    try{
    input = {circumstanceBonus: -1, targetNumber: 5, diceRolled: 1, diceKept: 1};
-   input.randomSource = dieResultsToNonRandomGenerator(10, [6]);
+   input.randomSource = numberGenerator.dice(10, [6]);
    actual = L5R.GeneralRoll(input);
    delete actual.toString;
    expected = {valuesKept: [6], totalValue: 5, voidPointsRecovered: 0, valuesDropped: [], success: true};
