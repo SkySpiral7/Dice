@@ -16,7 +16,7 @@ function expressionForASingleDie(sideCount, smallestSide)  //f1 of se. should be
    }
    return result;
 }
-function expressionForMultipleDice(dieCount, sideCount, smallestSide)  //f2 of se. should be replaced by Statistics.useNonDroppingAlgorithm
+function expressionForMultipleDice(dieCount, sideCount, smallestSide)  //f2 of se. should be replaced by Algorithm.useNonDroppingAlgorithm
 {
    var base = expressionForASingleDie(sideCount, smallestSide);
    var result = base.clone();
