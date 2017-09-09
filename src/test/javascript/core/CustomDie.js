@@ -86,5 +86,17 @@ TestSuite.CustomDice.RollTable = function(isFirst)
    testResults.push({Expected: {name: 'head', description: 'big'}, Actual: table.roll(randomSource), Description: 'Returns objects'});
    } catch(e){testResults.push({Error: e, Description: 'Undefined and returns objects'});}
  
+   try{
+   input = [{min: 1, table: new CustomDice.CustomDie(['a', 'b'])}];
+   table = new CustomDice.RollTable(new DicePool('1d1'), input);
+   randomSource = numberGenerator.dice(2, [1]);
+   testResults.push({Expected: 'a', Actual: table.roll(randomSource), Description: 'Simple nesting'});
+
+   input = ['n', {min: 1, table: new CustomDice.RollTable(new DicePool('1d2'), ['a', {min: 2, value: 'b'}])}];
+   table = new CustomDice.RollTable(new DicePool('1d1'), input);
+   randomSource = numberGenerator.dice(2, [2]);
+   testResults.push({Expected: 'b', Actual: table.roll(randomSource), Description: 'Table in table'});
+   } catch(e){testResults.push({Error: e, Description: 'nesting'});}
+ 
    return TestRunner.displayResults('CustomDice CustomDice.RollTable', testResults, isFirst);
 };

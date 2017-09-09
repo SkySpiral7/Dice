@@ -564,5 +564,13 @@ TestSuite.GURPS.RandomHitLocation = function(isFirst)
    testResults.push({Expected: 'Vital Organs', Actual: GURPS.RandomHitLocation.roll(randomSource), Description: 'Happy path: max'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
+   try{
+   randomSource = numberGenerator([{dieSides: 6, values: [1,1,5]}, {dieSides: 2, values: [1]}]);
+   testResults.push({Expected: 'Left Hand', Actual: GURPS.RandomHitLocation.roll(randomSource), Description: '7 is nested'});
+
+   randomSource = numberGenerator([{dieSides: 6, values: [6,6,3]}, {dieSides: 2, values: [2]}]);
+   testResults.push({Expected: 'Right Foot', Actual: GURPS.RandomHitLocation.roll(randomSource), Description: '15 is nested'});
+   } catch(e){testResults.push({Error: e, Description: 'nested'});}
+
    return TestRunner.displayResults('GURPS GURPS.RandomHitLocation', testResults, isFirst);
 };

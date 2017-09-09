@@ -293,11 +293,11 @@ GURPS.RandomHitLocation = new CustomDice.RollTable(new DicePool('3d6'), [
    'Brain',
    {min: 5, value: 'Head'},
    {min: 6, value: 'Shield (far) Arm'},
-   {min: 7, value: 'Hand (roll for left or right)'},
+   {min: 7, table: new CustomDice.CustomDie(['Left Hand', 'Right Hand'])},
    {min: 8, value: 'Weapon (near) Arm'},
    {min: 9, value: 'Body (i.e., Torso)'},
    {min: 12, value: 'Far Leg'},
    {min: 13, value: 'Near Leg'},
-   {min: 15, value: 'Foot (roll for left or right)'},
+   {min: 15, table: new CustomDice.CustomDie(['Left Foot', 'Right Foot'])},
    {min: 17, value: 'Vital Organs'}
 ]);

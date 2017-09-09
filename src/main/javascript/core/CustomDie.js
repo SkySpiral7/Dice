@@ -1,5 +1,4 @@
 'use strict';
-
 var CustomDice = {};
 
 /**
@@ -50,7 +49,8 @@ CustomDice.DeckOfCards = function(possibleValues)
  * An object with a single function named roll.
  * It holds on to a shallow copy of possibleValues.
  * @param dicePool the DicePool that will be used to roll against the table
- * @param rawRows the table rows. Each must be an object with min (number), and value (anything).
+ * @param rawRows the table rows. Each must be an object with min (number), and value (anything) or table.
+ *                The table property trumps value and the result of the roll method will be returned.
  *                The rows must be in order with the smallest min being first.
  *                If the first element is not an object then it will be assumed to have a min of -Infinity.
  * 
@@ -70,11 +70,11 @@ new CustomDice.RollTable(new DicePool('1d%'), [
 CustomDice.RollTable = function(dicePool, rawRows)
 {
    var rows = [];
-   if('object' === typeof(rawRows[0])) rows.push({min: rawRows[0].min, value: rawRows[0].value});
+   if('object' === typeof(rawRows[0])) rows.push({min: rawRows[0].min, value: rawRows[0].value, table: rawRows[0].table});
    else rows.push({min: -Infinity, value: rawRows[0]});
    for (var i = 1; i < rawRows.length; ++i)
    {
-      rows.push({min: rawRows[i].min, value: rawRows[i].value});
+      rows.push({min: rawRows[i].min, value: rawRows[i].value, table: rawRows[i].table});
    }
    /**
     * @param randomSource passed to DicePool.sumRoll
@@ -86,6 +86,7 @@ CustomDice.RollTable = function(dicePool, rawRows)
       var sum = dicePool.sumRoll(randomSource);
       for (var i = (rows.length - 1); i >= 0; --i)
       {
+         if(rows[i].min <= sum && undefined !== rows[i].table) return rows[i].table.roll(randomSource);
          if(rows[i].min <= sum) return rows[i].value;
       }
       return;
