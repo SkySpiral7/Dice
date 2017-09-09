@@ -196,6 +196,38 @@ TestSuite.DiceExpression.negateExponents = function(isFirst)
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
 };
+TestSuite.DiceExpression.power = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], expression, actual, expected;
+
+   try{
+   expression = new DiceExpression(new Die('dF'));
+   expression.power(2);
+   actual = expression.toJSON();
+   expected = [
+      {coefficient: 1, exponent: 2},
+      {coefficient: 2, exponent: 1},
+      {coefficient: 3, exponent: 0},
+      {coefficient: 2, exponent: -1},
+      {coefficient: 1, exponent: -2}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '2dF'});
+   } catch(e){testResults.push({Error: e, Description: '2dF'});}
+
+   try{
+   new DiceExpression().power('ham');
+   TestRunner.failedToThrow(testResults, 'Illegal arg');
+   }
+   catch(e)
+   {
+       testResults.push({Expected: getError(Validation.requireNaturalNumber, ['ham']),
+         Actual: e, Description: 'Illegal arg'});
+   }
+
+   return TestRunner.displayResults('DiceExpression new DiceExpression().power()', testResults, isFirst);
+};
 TestSuite.DiceExpression.subtract = function(isFirst)
 {
    TestRunner.clearResults(isFirst);

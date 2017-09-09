@@ -161,16 +161,8 @@ Statistics.passFailBinomial = function(die, diceCount, passCriteria, failCriteri
       else if(failed) singleDieExpression.addTerm({coefficient: 1, exponent: -1});
       else singleDieExpression.addTerm({coefficient: 1, exponent: 0});
    }
-   var singleDieJson = singleDieExpression.toJSON();
-
-   //TODO: not DRY. this is the 3rd place with the non-dropping algorithm
-   var workingExpression = new DiceExpression(singleDieJson, false);  //no need to clone json because DiceExpression doesn't corrupt it
-   for (var dieIndex = 1; dieIndex < diceCount; ++dieIndex)
-   {
-      var newExpression = new DiceExpression(singleDieJson, false);
-      workingExpression.multiply(newExpression);
-   }
-   return workingExpression.toDiceResults();
+   singleDieExpression.power(diceCount);
+   return singleDieExpression.toDiceResults();
 };
 //TODO: test all sort orders
 /**Pass this into Array.prototype.sort for the order result: -Infinity to result: Infinity.*/

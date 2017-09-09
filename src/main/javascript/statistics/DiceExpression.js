@@ -90,6 +90,16 @@ function DiceExpression(arg1, arg2)
       }
       termArray.reverse();  //works in this case
    };
+   /** Used to multiply by itself a given number of times.*/
+   this.power = function(raisedTo)
+   {
+      Validation.requireNaturalNumber(raisedTo);
+      --raisedTo;
+      for (var multiplier = this.clone(); raisedTo > 0; --raisedTo)
+      {
+         this.multiply(multiplier);
+      }
+   };
    /**This function lets you subtract another DiceExpression from this Expression (this Expression is mutated to be the result).*/
    this.subtract = function(otherExpression)
    {

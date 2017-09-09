@@ -35,6 +35,7 @@ Algorithm.useBruteForce = function(diceGroup, explodeCount)
    var everyValue = [];
    for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
+      //DiceExpression.everyValue is called so that the results aren't summed together
       var everyDieValue = DiceExpression.everyValue(diceGroup, explodeCount);
       var newExpression = new DiceExpression(everyDieValue, (0 !== explodeCount));  //TODO: consider explodeCount 0 to use prob
 
@@ -91,11 +92,6 @@ Algorithm.useNonDroppingAlgorithm = function(diceGroup, explodeCount)
 {
    //assert: no drop/keep
    var workingExpression = new DiceExpression(diceGroup, explodeCount);
-   for (var dieCount = 1; dieCount < diceGroup.dieCount; ++dieCount)
-   {
-      //dice are immutable so it's ok to reuse the same one
-      //TODO: faster: since all dice are the same I can get json and reuse it a bunch
-      workingExpression.multiply(new DiceExpression(diceGroup, explodeCount));
-   }
+   workingExpression.power(diceGroup.dieCount);
    return workingExpression.toDiceResults();
 };
