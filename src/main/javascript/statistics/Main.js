@@ -1,10 +1,5 @@
 'use strict';
 var Statistics = {};
-/*TODO: refactoring:
--move explosions down into DiceExpression.everyValue (no explode count, just %)
--have the algorithms take in a group and every value
--have Algorithm.analyze return an algorithm without using it
-*/
 /**
 Note that a single die (that doesn't explode) has no mean or standardDeviation for the same
 reason that a single item has no average. There's no way for this function to detect a single die
@@ -70,7 +65,7 @@ Statistics.calculateDiceSums = function(dicePool)
    var results = [], useProbability = dicePool.toJSON().hasExplosions;
    for (var i = 0; i < pool.length; ++i)
    {
-      var stats = Algorithm.analyze(pool[i]);  //TODO: test
+      var stats = Algorithm.analyze(pool[i])(pool[i], DiceExpression.everyValue(pool[i]));  //TODO: test
       if(useProbability) Statistics.determineProbability(stats);  //if any of them have probability then they all need it
       results.push(stats);
    }

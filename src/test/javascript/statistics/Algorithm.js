@@ -4,48 +4,19 @@ TestSuite.Algorithm.analyze = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], actual, expected, diceGroup;
+   var testResults = [], actual, expected;
 
    try{
-   diceGroup = new DicePool('2d6').toJSON().pool[0];
-   actual = Algorithm.analyze(diceGroup);
-   expected = Algorithm.useNonDroppingAlgorithm(diceGroup, DiceExpression.everyValue(diceGroup));
+   actual = Algorithm.analyze(new DicePool('2d6').toJSON().pool[0]);
+   expected = Algorithm.useNonDroppingAlgorithm;
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
-   diceGroup = new DicePool('2d2 drop 1').toJSON().pool[0];
-   actual = Algorithm.analyze(diceGroup);
-   expected = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+   actual = Algorithm.analyze(new DicePool('2d2 drop 1').toJSON().pool[0]);
+   expected = Algorithm.useBruteForce;
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 DropLowest 1'});
    } catch(e){testResults.push({Error: e, Description: '2d2 DropLowest 1'});}
-
-   try{
-   //1d2! is the smallest output for explode
-   //also being a power of 2 means better accuracy (perfect until converting to base 10 string)
-   actual = Algorithm.analyze(new DicePool('1d2!').toJSON().pool[0]);
-   expected = [
-      {result: 1, probability: (1/2)},
-      {result: (2+1), probability: Math.pow((1/2), 2)},
-      {result: (2*2+1), probability: Math.pow((1/2), 3)},
-      {result: (2*3+1), probability: Math.pow((1/2), 4)},
-      {result: (2*4+1), probability: Math.pow((1/2), 5)},
-      {result: (2*5+1), probability: Math.pow((1/2), 6)},
-      {result: (2*6+1), probability: Math.pow((1/2), 7)},
-      {result: (2*7+1), probability: Math.pow((1/2), 8)},
-      {result: (2*8+1), probability: Math.pow((1/2), 9)},
-      {result: (2*9+1), probability: Math.pow((1/2), 10)},
-      {result: (2*10+1), probability: Math.pow((1/2), 11)},
-      {result: (2*11+1), probability: Math.pow((1/2), 12)},
-      {result: (2*12+1), probability: Math.pow((1/2), 13)},
-      {result: (2*13+1), probability: Math.pow((1/2), 14)},
-      {result: (2*14+1), probability: Math.pow((1/2), 15)},
-      {result: (2*15+1), probability: Math.pow((1/2), 16)},  //0.0000152587890625
-      {result: (2*16+1), probability: Math.pow((1/2), 17)},  //toFixed rounds 0.00000762939453125 up to 0.00001
-      {result: (2*17+1), probability: Math.pow((1/2), 18)}  //toFixed rounds 0.000003814697265625 down to 0.00000
-   ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d2!'});
-   } catch(e){testResults.push({Error: e, Description: '1d2!'});}
 
    return TestRunner.displayResults('Algorithm Algorithm.analyze', testResults, isFirst);
 };

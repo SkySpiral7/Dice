@@ -1,19 +1,17 @@
 'use strict';
 var Algorithm = {};
 /**
-This function analyzes the diceGroup given and returns the result of the best possible algorithm.
+This function analyzes the diceGroup given and returns the best possible algorithm.
 @param {object} diceGroup an element of DicePool.toJSON().pool
-@returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).
+@returns {function} that takes a diceGroup and everyValue
+and returns objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).
 It will not include frequency of 0 or probability of less than 0.00000 (5) and will be in result ascending order.
 */
 Algorithm.analyze = function(diceGroup)
 {
-   var algorithm;
-   if(undefined === diceGroup.dropKeepType) algorithm = Algorithm.useNonDroppingAlgorithm;
+   if(undefined === diceGroup.dropKeepType) return Algorithm.useNonDroppingAlgorithm;
    //later useDroppingAlgorithm
-   else algorithm = Algorithm.useBruteForce;  //if any gaps then useBruteForce
-
-   return algorithm(diceGroup, DiceExpression.everyValue(diceGroup));
+   return Algorithm.useBruteForce;  //if any gaps then useBruteForce
 };
 //TODO: make a brute force for every combination and also for every sum (currently only sum)
 Algorithm.useBruteForce = function(diceGroup, everyDieValue)

@@ -35,6 +35,28 @@ TestSuite.Statistics.calculateAggregates = function(isFirst)
 
    return TestRunner.displayResults('Statistics Statistics.calculateAggregates', testResults, isFirst);
 };
+TestSuite.Statistics.calculateDiceSums = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], actual, expected, diceGroup;
+
+   try{
+   diceGroup = new DicePool('2d6').toJSON().pool[0];
+   actual = Statistics.calculateDiceSums(new DicePool('2d6'));
+   expected = Algorithm.useNonDroppingAlgorithm(diceGroup, DiceExpression.everyValue(diceGroup));
+   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
+   } catch(e){testResults.push({Error: e, Description: '2d6'});}
+
+   try{
+   diceGroup = new DicePool('2d2 drop 1').toJSON().pool[0];
+   actual = Statistics.calculateDiceSums(new DicePool('2d2 drop 1'));
+   expected = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+   testResults.push({Expected: expected, Actual: actual, Description: '2d2 DropLowest 1'});
+   } catch(e){testResults.push({Error: e, Description: '2d2 DropLowest 1'});}
+
+   return TestRunner.displayResults('Statistics Statistics.calculateDiceSums', testResults, isFirst);
+};
 TestSuite.Statistics.combineResults = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
