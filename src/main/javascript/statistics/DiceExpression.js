@@ -190,6 +190,7 @@ DiceExpression.everyValue = function(diceGroup, explodeCount)
 {
    if(diceGroup instanceof Die) diceGroup = {die: diceGroup, dieCount: 1, areDiceNegative: false};
    var die = diceGroup.die.toJSON();  //this is the only thing I need the die for
+   if(undefined === die.explodeType) explodeCount = 0;
    var hasExplosions = (explodeCount > 0);
    var minValue = 1 + die.constantModifier;
    var maxValue = die.sideCount + die.constantModifier;
@@ -211,6 +212,7 @@ DiceExpression.everyValue = function(diceGroup, explodeCount)
             //check for compound explode must be before reroll check and the other explodes after
          if(undefined !== die.rerollCriteria && eval('' + actualValue + die.rerollCriteria)) continue;  //exclude reroll values
          ++sidesPossible;
+         if(diceGroup.areDiceNegative) actualValue = -actualValue;
          actualValue = [actualValue];
          if(Die.explodeTypes.Normal === die.explodeType) actualValue = actualValue.concat(new Array(explodeIndex).fill(maxValue));
          else if (Die.explodeTypes.Penetrating === die.explodeType && 0 !== explodeIndex)
@@ -240,12 +242,6 @@ DiceExpression.everyValue = function(diceGroup, explodeCount)
                //unused because the algorithm for compound works for all
          }
       }
-   }
-   if (diceGroup.areDiceNegative)
-   {
-      var tempExpression = new DiceExpression(result, false);  //TODO: this is pretty scary. needs refactoring
-      tempExpression.negateExponents();
-      result = tempExpression.toJSON();
    }
    return result;
 };
