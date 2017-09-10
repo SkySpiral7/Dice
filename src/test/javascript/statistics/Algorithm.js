@@ -4,19 +4,19 @@ TestSuite.Algorithm.analyze = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], diceGroup, actual, expected;
+   var testResults = [], actual, expected, diceGroup;
 
    try{
    diceGroup = new DicePool('2d6').toJSON().pool[0];
    actual = Algorithm.analyze(diceGroup);
-   expected = Algorithm.useNonDroppingAlgorithm(diceGroup, 0);
+   expected = Algorithm.useNonDroppingAlgorithm(diceGroup, DiceExpression.everyValue(diceGroup));
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
    diceGroup = new DicePool('2d2 drop 1').toJSON().pool[0];
-   actual = Algorithm.analyze(diceGroup, 0);
-   expected = Algorithm.useBruteForce(diceGroup, 0);
+   actual = Algorithm.analyze(diceGroup);
+   expected = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 DropLowest 1'});
    } catch(e){testResults.push({Error: e, Description: '2d2 DropLowest 1'});}
 
@@ -42,8 +42,7 @@ TestSuite.Algorithm.analyze = function(isFirst)
       {result: (2*14+1), probability: Math.pow((1/2), 15)},
       {result: (2*15+1), probability: Math.pow((1/2), 16)},  //0.0000152587890625
       {result: (2*16+1), probability: Math.pow((1/2), 17)},  //toFixed rounds 0.00000762939453125 up to 0.00001
-      {result: (2*17+1), probability: Math.pow((1/2), 18)},  //this can't be the last one because it isn't divisible by 2
-      {result: (2*18), probability: Math.pow((1/2), 18)}  //toFixed rounds 0.000003814697265625 down to 0.00000
+      {result: (2*17+1), probability: Math.pow((1/2), 18)}  //toFixed rounds 0.000003814697265625 down to 0.00000
    ];
    testResults.push({Expected: expected, Actual: actual, Description: '1d2!'});
    } catch(e){testResults.push({Error: e, Description: '1d2!'});}
@@ -54,10 +53,11 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], actual, expected;
+   var testResults = [], actual, expected, diceGroup, everyDieValue;
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2').toJSON().pool[0]);
+   diceGroup = new DicePool('2d2').toJSON().pool[0];
+   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
@@ -67,7 +67,8 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('-d3').toJSON().pool[0]);
+   diceGroup = new DicePool('-d3').toJSON().pool[0];
+   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: -3, frequency: 1},
       {result: -2, frequency: 1},
@@ -77,7 +78,8 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '-d3'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('3d2').toJSON().pool[0]);
+   diceGroup = new DicePool('3d2').toJSON().pool[0];
+   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: 3, frequency: 1},  //1+1+1
       {result: 4, frequency: 3},  //1+1+2, 1+2+1, 2+1+1
@@ -89,7 +91,8 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '3d2'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d6').toJSON().pool[0]);
+   diceGroup = new DicePool('2d6').toJSON().pool[0];
+   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [  //I used 2d6 because the results are well known
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
@@ -105,19 +108,15 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    ];
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
-   
-   try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2!').toJSON().pool[0], 0);
-   expected = [
-      {result: 2, frequency: 1},  //1+1
-      {result: 3, frequency: 2},  //1+2, 2+1
-      {result: 4, frequency: 1}  //2+2
-   ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2! explodeCount 0'});
-   } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 0'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2!').toJSON().pool[0], 1);
+   diceGroup = new DicePool('2d2!').toJSON().pool[0];
+   everyDieValue = [
+      {exponent: [1], coefficient: (1/2)},
+      {exponent: [1,2], coefficient: Math.pow((1/2), 2)},
+      {exponent: [2,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
+   ];
+   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
    expected = [
       {result: 2, probability: ((1/2)*(1/2))},  //1+1
       {result: 4, probability: ((1/2)*(1/4)*2)},  //1+(2+1), (2+1)+1
@@ -130,7 +129,15 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 1'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('1d3!').toJSON().pool[0], 1);
+   diceGroup = new DicePool('1d3!').toJSON().pool[0];
+   everyDieValue = [
+      {exponent: [1], coefficient: (1/3)},
+      {exponent: [2], coefficient: (1/3)},
+      {exponent: [1,3], coefficient: ((1/3) * (1/3))},
+      {exponent: [2,3], coefficient: ((1/3) * (1/3))},
+      {exponent: [3,3], coefficient: ((1/3) * (1/3))}  //only let it explode once
+   ];
+   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
    expected = [
       {result: 1, probability: (1/3)},
       {result: 2, probability: (1/3)},
@@ -142,7 +149,8 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2 drop 1').toJSON().pool[0], 0);
+   diceGroup = new DicePool('2d2 drop 1').toJSON().pool[0];
+   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: 1, frequency: 1},  //1+1
       {result: 2, frequency: 3}  //1+2 or 2+1 or 2+2
@@ -151,7 +159,13 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2 DropLowest 1'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2!! drop 1').toJSON().pool[0], 1);
+   diceGroup = new DicePool('2d2!! drop 1').toJSON().pool[0];
+   everyDieValue = [
+      {exponent: [1], coefficient: (1/2)},
+      {exponent: [1+2], coefficient: Math.pow((1/2), 2)},
+      {exponent: [2+2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
+   ];
+   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+3, 1+4, 3+1, 3+3, 3+4, 4+1, 4+3, 4+4
       //note that 1 is 1/2 and 3 and 4 are (1/2)*(1/2)=(1/4)
@@ -164,7 +178,13 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2!! DropLowest 1 explodeCount 1'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2! drop 1').toJSON().pool[0], 1);
+   diceGroup = new DicePool('2d2! drop 1').toJSON().pool[0];
+   everyDieValue = [
+      {exponent: [1], coefficient: (1/2)},
+      {exponent: [1,2], coefficient: Math.pow((1/2), 2)},
+      {exponent: [2,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
+   ];
+   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+(2+1), 1+(2+2), (2+1)+1, (2+1)+(2+1), (2+1)+(2+2), (2+2)+1, (2+2)+(2+1), (2+2)+(2+2)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -177,7 +197,13 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2! DropLowest 1 explodeCount 1'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2!p drop 1').toJSON().pool[0], 1);
+   diceGroup = new DicePool('2d2!p drop 1').toJSON().pool[0];
+   everyDieValue = [
+      {exponent: [1], coefficient: (1/2)},
+      {exponent: [0,2], coefficient: Math.pow((1/2), 2)},
+      {exponent: [1,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
+   ];
+   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+(2+0), 1+(2+1), (2+0)+1, (2+0)+(2+0), (2+0)+(2+1), (2+1)+1, (2+1)+(2+0), (2+1)+(2+1)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -189,7 +215,13 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d2!p DropLowest 1 explodeCount 1'});}
 
    try{
-   actual = Algorithm.useBruteForce(new DicePool('2d2! keep 1').toJSON().pool[0], 1);
+   diceGroup = new DicePool('2d2! keep 1').toJSON().pool[0];
+   everyDieValue = [
+      {exponent: [1], coefficient: (1/2)},
+      {exponent: [1,2], coefficient: Math.pow((1/2), 2)},
+      {exponent: [2,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
+   ];
+   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+(2+1), 1+(2+2), (2+1)+1, (2+1)+(2+1), (2+1)+(2+2), (2+2)+1, (2+2)+(2+1), (2+2)+(2+2)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -199,31 +231,37 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2! KeepHighest 1 explodeCount 1'});
    } catch(e){testResults.push({Error: e, Description: '2d2! KeepHighest 1 explodeCount 1'});}
 
-   return TestRunner.displayResults('Statistics Algorithm.useBruteForce', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.useBruteForce', testResults, isFirst);
 };
 TestSuite.Algorithm.useNonDroppingAlgorithm = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], actual, expected;
+   var testResults = [], actual, expected, diceGroup, everyDieValue;
 
    try{
-   actual = Algorithm.useNonDroppingAlgorithm(new DicePool('2d6').toJSON().pool[0]);
-   expected = Algorithm.useBruteForce(new DicePool('2d6').toJSON().pool[0]);
+   diceGroup = new DicePool('2d6').toJSON().pool[0];
+   everyDieValue = DiceExpression.everyValue(diceGroup);
+   actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
+   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
    try{
-   actual = Algorithm.useNonDroppingAlgorithm(new DicePool('1d3!').toJSON().pool[0], 1);
-   expected = Algorithm.useBruteForce(new DicePool('1d3!').toJSON().pool[0], 1);
+   diceGroup = new DicePool('1d3!').toJSON().pool[0];
+   everyDieValue = DiceExpression.everyValue(diceGroup);
+   actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
+   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
    testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
 
    try{
-   actual = Algorithm.useNonDroppingAlgorithm(new DicePool('-d3').toJSON().pool[0]);
-   expected = Algorithm.useBruteForce(new DicePool('-d3').toJSON().pool[0]);
+   diceGroup = new DicePool('-d3').toJSON().pool[0];
+   everyDieValue = DiceExpression.everyValue(diceGroup);
+   actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
+   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
    testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
    } catch(e){testResults.push({Error: e, Description: '-d3'});}
 
-   return TestRunner.displayResults('Statistics Algorithm.useNonDroppingAlgorithm', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.useNonDroppingAlgorithm', testResults, isFirst);
 };

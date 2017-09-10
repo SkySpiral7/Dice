@@ -270,16 +270,21 @@ TestSuite.DiceExpression.toDiceResults = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'dF'});}
 
    try{
-   actual = new DiceExpression(new Die('1d3!'), 1).toDiceResults();
-   expected = [
-      {result: 1, probability: (1/3)},
-      {result: 2, probability: (1/3)},
-      {result: (3+1), probability: ((1/3) * (1/3))},
-      {result: (3+2), probability: ((1/3) * (1/3))},
-      {result: (3+3), probability: ((1/3) * (1/3))}  //doesn't explode again
+   var input = [
+      {exponent: 1, coefficient: (1/2)},
+      {exponent: 2, coefficient: (1/2)},
+      {exponent: 3, coefficient: ((1/2) * (1/2))},
+      {exponent: 4, coefficient: ((1/2) * (1/2))}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
-   } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
+   actual = new DiceExpression(input, true).toDiceResults();
+   expected = [
+      {result: 1, probability: (1/2)},
+      {result: 2, probability: (1/2)},
+      {result: 3, probability: ((1/2) * (1/2))},
+      {result: 4, probability: ((1/2) * (1/2))}
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: 'Use probability'});
+   } catch(e){testResults.push({Error: e, Description: 'Use probability'});}
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, isFirst);
 };
@@ -393,60 +398,179 @@ TestSuite.DiceExpression._constructor = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'd6r3'});
    } catch(e){testResults.push({Error: e, Description: 'd6r3'});}
 
-   try{
-   actual = new DiceExpression(new Die('1d4!r3'), 0).toJSON();
-   expected = [
-      {exponent: 1, coefficient: 1},
-      {exponent: 2, coefficient: 1},
-      //no 3
-      {exponent: 4, coefficient: 1}  //doesn't explode due to explode count 0
-   ];
-   expected.reverse();
-   testResults.push({Expected: expected, Actual: actual, Description: '1d4!r3 explode: 0'});
-   } catch(e){testResults.push({Error: e, Description: '1d4!r3 explode: 0'});}
+   return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, isFirst);
+};
+TestSuite.DiceExpression.everyValue = function(isFirst)
+{
+   TestRunner.clearResults(isFirst);
+
+   var testResults = [], expression, actual, expected;
 
    try{
-   actual = new DiceExpression(new Die('1d4!pr3'), 1).toJSON();
+   //1d2! is the smallest output for explode
+   //also being a power of 2 means better accuracy (perfect until converting to base 10 string)
+   actual = DiceExpression.everyValue(new DicePool('1d2!').toJSON().pool[0]);
    expected = [
-      {exponent: 1, coefficient: (1/3)},
-      {exponent: 2, coefficient: (1/3)},
-      //no 3 (reroll) or 4 (explode)
-      {exponent: (4+1-1), coefficient: ((1/3) * (1/3))},
-      {exponent: (4+2-1), coefficient: ((1/3) * (1/3))},
-      //no 4+3-1 due to reroll
-      {exponent: (4+4-1), coefficient: ((1/3) * (1/3))}  //doesn't explode again
+      {exponent: [1], coefficient: (1/2)},
+      {exponent: [1,2], coefficient: Math.pow((1/2), 2)},
+      {exponent: [1,2,2], coefficient: Math.pow((1/2), 3)},
+      {exponent: [1,2,2,2], coefficient: Math.pow((1/2), 4)},
+      {exponent: [1,2,2,2,2], coefficient: Math.pow((1/2), 5)},
+      {exponent: [1,2,2,2,2,2], coefficient: Math.pow((1/2), 6)},
+      {exponent: [1,2,2,2,2,2,2], coefficient: Math.pow((1/2), 7)},
+      {exponent: [1,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 8)},
+      {exponent: [1,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 9)},
+      {exponent: [1,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 10)},
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 11)},
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 12)},
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 13)},
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 14)},
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 15)},
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 16)},  //0.0000152587890625
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 17)},  //toFixed rounds 0.00000762939453125 up to 0.00001
+      {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 18)}  //toFixed rounds 0.000003814697265625 down to 0.00000
    ];
-   expected.reverse();
+   testResults.push({Expected: expected, Actual: actual, Description: '1d2!'});
+   } catch(e){testResults.push({Error: e, Description: '1d2!'});}
+
+   try{
+   actual = DiceExpression.everyValue(new DicePool('1d4!r3').toJSON().pool[0]);
+   expected = [
+      {exponent: [1], coefficient: (1/3)},
+      {exponent: [2], coefficient: (1/3)},
+      //no 3 (reroll)
+      {exponent: [1,4], coefficient: Math.pow((1/3), 2)},
+      {exponent: [2,4], coefficient: Math.pow((1/3), 2)},
+      {exponent: [1,4,4], coefficient: Math.pow((1/3), 3)},
+      {exponent: [2,4,4], coefficient: Math.pow((1/3), 3)},
+      {exponent: [1,4,4,4], coefficient: Math.pow((1/3), 4)},
+      {exponent: [2,4,4,4], coefficient: Math.pow((1/3), 4)},
+      {exponent: [1,4,4,4,4], coefficient: Math.pow((1/3), 5)},
+      {exponent: [2,4,4,4,4], coefficient: Math.pow((1/3), 5)},
+      {exponent: [1,4,4,4,4,4], coefficient: Math.pow((1/3), 6)},
+      {exponent: [2,4,4,4,4,4], coefficient: Math.pow((1/3), 6)},
+      {exponent: [1,4,4,4,4,4,4], coefficient: Math.pow((1/3), 7)},
+      {exponent: [2,4,4,4,4,4,4], coefficient: Math.pow((1/3), 7)},
+      {exponent: [1,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 8)},
+      {exponent: [2,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 8)},
+      {exponent: [1,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 9)},
+      {exponent: [2,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 9)},
+      {exponent: [1,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 10)},
+      {exponent: [2,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 10)},
+      {exponent: [1,4,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 11)},
+      {exponent: [2,4,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 11)},  //toFixed rounds 0.000005645029269476762 to 0.00001
+      {exponent: [1,4,4,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 12)},  //it can't stop here
+      {exponent: [2,4,4,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 12)}  //toFixed rounds 0.0000018816764231589208 to 0.00000
+   ];
+   testResults.push({Expected: expected, Actual: actual, Description: '1d4!r3'});
+   } catch(e){testResults.push({Error: e, Description: '1d4!r3'});}
+
+   try{
+   actual = DiceExpression.everyValue(new DicePool('1d4!pr3').toJSON().pool[0]);
+   expected = [
+      {exponent: [1], coefficient: (1/3)},
+      {exponent: [2], coefficient: (1/3)},
+      //no 3 (reroll)
+      {exponent: [4,0], coefficient: Math.pow((1/3), 2)},
+      {exponent: [4,1], coefficient: Math.pow((1/3), 2)},
+      //no 2 because reroll is before subtraction
+      {exponent: [4,3,0], coefficient: Math.pow((1/3), 3)},
+      {exponent: [4,3,1], coefficient: Math.pow((1/3), 3)},
+      {exponent: [4,3,3,0], coefficient: Math.pow((1/3), 4)},
+      {exponent: [4,3,3,1], coefficient: Math.pow((1/3), 4)},
+      {exponent: [4,3,3,3,0], coefficient: Math.pow((1/3), 5)},
+      {exponent: [4,3,3,3,1], coefficient: Math.pow((1/3), 5)},
+      {exponent: [4,3,3,3,3,0], coefficient: Math.pow((1/3), 6)},
+      {exponent: [4,3,3,3,3,1], coefficient: Math.pow((1/3), 6)},
+      {exponent: [4,3,3,3,3,3,0], coefficient: Math.pow((1/3), 7)},
+      {exponent: [4,3,3,3,3,3,1], coefficient: Math.pow((1/3), 7)},
+      {exponent: [4,3,3,3,3,3,3,0], coefficient: Math.pow((1/3), 8)},
+      {exponent: [4,3,3,3,3,3,3,1], coefficient: Math.pow((1/3), 8)},
+      {exponent: [4,3,3,3,3,3,3,3,0], coefficient: Math.pow((1/3), 9)},
+      {exponent: [4,3,3,3,3,3,3,3,1], coefficient: Math.pow((1/3), 9)},
+      {exponent: [4,3,3,3,3,3,3,3,3,0], coefficient: Math.pow((1/3), 10)},
+      {exponent: [4,3,3,3,3,3,3,3,3,1], coefficient: Math.pow((1/3), 10)},
+      {exponent: [4,3,3,3,3,3,3,3,3,3,0], coefficient: Math.pow((1/3), 11)},
+      {exponent: [4,3,3,3,3,3,3,3,3,3,1], coefficient: Math.pow((1/3), 11)},  //toFixed rounds 0.000005645029269476762 to 0.00001
+      {exponent: [4,3,3,3,3,3,3,3,3,3,3,0], coefficient: Math.pow((1/3), 12)},  //it can't stop here
+      {exponent: [4,3,3,3,3,3,3,3,3,3,3,1], coefficient: Math.pow((1/3), 12)}  //toFixed rounds 0.0000018816764231589208 to 0.00000
+   ];
    testResults.push({Expected: expected, Actual: actual, Description: '1d4!pr3 explode: 1'});
    } catch(e){testResults.push({Error: e, Description: '1d4!pr3 explode: 1'});}
 
    try{
-   actual = new DiceExpression(new Die('1d4!!r3'), 1).toJSON();
+   actual = DiceExpression.everyValue(new DicePool('1d4!!r3').toJSON().pool[0]);
    expected = [
-      {exponent: 1, coefficient: (1/3)},
-      {exponent: 2, coefficient: (1/3)},
-      //no 3 (reroll) or 4 (explode)
-      {exponent: (4+1), coefficient: ((1/3) * (1/4))},
-      {exponent: (4+2), coefficient: ((1/3) * (1/4))},
-      {exponent: (4+3), coefficient: ((1/3) * (1/4))},  //doesn't reroll due to compound
-      {exponent: (4+4), coefficient: ((1/3) * (1/4))}  //doesn't explode again
+      {exponent: [1], coefficient: (1/3)},
+      {exponent: [2], coefficient: (1/3)},
+      //no 3 (reroll)
+      {exponent: [4+1], coefficient: ((1/3) * (1/4))},
+      {exponent: [4+2], coefficient: ((1/3) * (1/4))},
+      //3 is not rerolled because the explode is compound
+      {exponent: [4+3], coefficient: ((1/3) * (1/4))},
+      {exponent: [4*2+1], coefficient: ((1/3) * Math.pow((1/4), 2))},
+      {exponent: [4*2+2], coefficient: ((1/3) * Math.pow((1/4), 2))},
+      {exponent: [4*2+3], coefficient: ((1/3) * Math.pow((1/4), 2))},
+      {exponent: [4*3+1], coefficient: ((1/3) * Math.pow((1/4), 3))},
+      {exponent: [4*3+2], coefficient: ((1/3) * Math.pow((1/4), 3))},
+      {exponent: [4*3+3], coefficient: ((1/3) * Math.pow((1/4), 3))},
+      {exponent: [4*4+1], coefficient: ((1/3) * Math.pow((1/4), 4))},
+      {exponent: [4*4+2], coefficient: ((1/3) * Math.pow((1/4), 4))},
+      {exponent: [4*4+3], coefficient: ((1/3) * Math.pow((1/4), 4))},
+      {exponent: [4*5+1], coefficient: ((1/3) * Math.pow((1/4), 5))},
+      {exponent: [4*5+2], coefficient: ((1/3) * Math.pow((1/4), 5))},
+      {exponent: [4*5+3], coefficient: ((1/3) * Math.pow((1/4), 5))},
+      {exponent: [4*6+1], coefficient: ((1/3) * Math.pow((1/4), 6))},
+      {exponent: [4*6+2], coefficient: ((1/3) * Math.pow((1/4), 6))},
+      {exponent: [4*6+3], coefficient: ((1/3) * Math.pow((1/4), 6))},
+      {exponent: [4*7+1], coefficient: ((1/3) * Math.pow((1/4), 7))},
+      {exponent: [4*7+2], coefficient: ((1/3) * Math.pow((1/4), 7))},
+      {exponent: [4*7+3], coefficient: ((1/3) * Math.pow((1/4), 7))},
+      {exponent: [4*8+1], coefficient: ((1/3) * Math.pow((1/4), 8))},
+      {exponent: [4*8+2], coefficient: ((1/3) * Math.pow((1/4), 8))},
+      {exponent: [4*8+3], coefficient: ((1/3) * Math.pow((1/4), 8))},  //toFixed rounds 0.000005086263020833333 to 0.00001
+      {exponent: [4*9+1], coefficient: ((1/3) * Math.pow((1/4), 9))},  //can't stop here
+      {exponent: [4*9+2], coefficient: ((1/3) * Math.pow((1/4), 9))},
+      {exponent: [4*9+3], coefficient: ((1/3) * Math.pow((1/4), 9))}  //toFixed rounds 0.0000012715657552083333 to 0.00000
    ];
-   expected.reverse();
    testResults.push({Expected: expected, Actual: actual, Description: '1d4!!r3 explode: 1'});
    } catch(e){testResults.push({Error: e, Description: '1d4!!r3 explode: 1'});}
 
    try{
-   actual = new DiceExpression(new Die('1d4!!r<=3'), 1).toJSON();
+   actual = DiceExpression.everyValue(new DicePool('1d4!!r<=3').toJSON().pool[0]);
    expected = [
-      //no 1-3 (reroll) or 4 (explode)
-      {exponent: (4+1), coefficient: (1/4)},
-      {exponent: (4+2), coefficient: (1/4)},
-      {exponent: (4+3), coefficient: (1/4)},
-      {exponent: (4+4), coefficient: (1/4)}  //doesn't explode again
+      //no 1-3 (reroll)
+      {exponent: [4+1], coefficient: (1/4)},
+      {exponent: [4+2], coefficient: (1/4)},
+      //3 is not rerolled because the explode is compound
+      {exponent: [4+3], coefficient: (1/4)},
+      {exponent: [4*2+1], coefficient: Math.pow((1/4), 2)},
+      {exponent: [4*2+2], coefficient: Math.pow((1/4), 2)},
+      {exponent: [4*2+3], coefficient: Math.pow((1/4), 2)},
+      {exponent: [4*3+1], coefficient: Math.pow((1/4), 3)},
+      {exponent: [4*3+2], coefficient: Math.pow((1/4), 3)},
+      {exponent: [4*3+3], coefficient: Math.pow((1/4), 3)},
+      {exponent: [4*4+1], coefficient: Math.pow((1/4), 4)},
+      {exponent: [4*4+2], coefficient: Math.pow((1/4), 4)},
+      {exponent: [4*4+3], coefficient: Math.pow((1/4), 4)},
+      {exponent: [4*5+1], coefficient: Math.pow((1/4), 5)},
+      {exponent: [4*5+2], coefficient: Math.pow((1/4), 5)},
+      {exponent: [4*5+3], coefficient: Math.pow((1/4), 5)},
+      {exponent: [4*6+1], coefficient: Math.pow((1/4), 6)},
+      {exponent: [4*6+2], coefficient: Math.pow((1/4), 6)},
+      {exponent: [4*6+3], coefficient: Math.pow((1/4), 6)},
+      {exponent: [4*7+1], coefficient: Math.pow((1/4), 7)},
+      {exponent: [4*7+2], coefficient: Math.pow((1/4), 7)},
+      {exponent: [4*7+3], coefficient: Math.pow((1/4), 7)},
+      {exponent: [4*8+1], coefficient: Math.pow((1/4), 8)},
+      {exponent: [4*8+2], coefficient: Math.pow((1/4), 8)},
+      {exponent: [4*8+3], coefficient: Math.pow((1/4), 8)},  //toFixed rounds 0.0000152587890625 to 0.00002
+      {exponent: [4*9+1], coefficient: Math.pow((1/4), 9)},  //can't stop here
+      {exponent: [4*9+2], coefficient: Math.pow((1/4), 9)},
+      {exponent: [4*9+3], coefficient: Math.pow((1/4), 9)}  //toFixed rounds 0.000003814697265625 to 0.00000
    ];
-   expected.reverse();
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: minimum compound explodes'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: minimum compound explodes'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression DiceExpression.everyValue()', testResults, isFirst);
 };

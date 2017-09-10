@@ -148,7 +148,7 @@ Statistics.passFailBinomial = function(die, diceCount, passCriteria, failCriteri
    if(undefined !== die.toJSON().explodeType) throw new Error('Exploding not supported: ' + JSON.stringify(die));
    //I'm allowing reroll because there are no implications of it. even though I don't know why you would
 
-   var tempExpressionJson = DiceExpression.everyValue(die, 0);
+   var tempExpressionJson = DiceExpression.everyValue(die);
    var singleDieExpression = new DiceExpression();
    for (var i = 0; i < tempExpressionJson.length; ++i)
    {

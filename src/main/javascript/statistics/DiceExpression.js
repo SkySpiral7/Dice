@@ -158,15 +158,11 @@ function DiceExpression(arg1, arg2)
       }
 
       //TODO: make DiceExpression._validate
+      if(undefined !== arg2) throw new Error('No explode count');
       if(arg1 instanceof Die) arg1 = {die: arg1, dieCount: 1, areDiceNegative: false};
       var diceGroup = arg1;
-      var explodeCount = arg2;
-      var hasExplosions = (undefined !== explodeCount && explodeCount > 0);
-      //notice how an exploding die with explodeCount 0 uses frequency
-      hasExplosions = hasExplosions && (undefined !== diceGroup.die.toJSON().explodeType);
-      if(!hasExplosions) explodeCount = 0;
-      useProbability = hasExplosions;
-      termArray = DiceExpression.everyValue(diceGroup, explodeCount);
+      useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
+      termArray = DiceExpression.everyValue(diceGroup);
       DiceExpression.combineValues(termArray);
       termArray.sort(DiceExpression.exponentDescending);
 
@@ -186,22 +182,22 @@ DiceExpression.combineValues = function(everyValue)
    }
 };
 //TODO: doc DiceExpression.everyValue and move some tests
-DiceExpression.everyValue = function(diceGroup, explodeCount)
+DiceExpression.everyValue = function(diceGroup)
 {
    if(diceGroup instanceof Die) diceGroup = {die: diceGroup, dieCount: 1, areDiceNegative: false};
    var die = diceGroup.die.toJSON();  //this is the only thing I need the die for
-   if(undefined === die.explodeType) explodeCount = 0;
-   var hasExplosions = (explodeCount > 0);
+   var hasExplosions = (undefined !== die.explodeType);
    var minValue = 1 + die.constantModifier;
    var maxValue = die.sideCount + die.constantModifier;
    var runningPossibilities = 1;
    var result = [];
-   for (var explodeIndex = 0; explodeIndex <= explodeCount; ++explodeIndex)
+   var explodeIndex = 0;
+   do
    {
       var sidesPossible = 0, thisExplodeValues = [];
       for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
       {
-         if (hasExplosions && explodeIndex < explodeCount && currentValue === maxValue)
+         if (hasExplosions && currentValue === maxValue)
          {
             //value explodes so it isn't a possibility unless we reach the explode limit
             ++sidesPossible;  //increment because this does affect the runningPossibilities
@@ -241,8 +237,10 @@ DiceExpression.everyValue = function(diceGroup, explodeCount)
             //formula for coefficient of non-compound explode: Math.pow((1/sidesPossible), (explodeIndex+1))
                //unused because the algorithm for compound works for all
          }
+         ++explodeIndex;
       }
-   }
+      else break;
+   } while(0 === result.length || 0 !== Number(result.last().coefficient.toFixed(5)));
    return result;
 };
 /**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: -Infinity.*/

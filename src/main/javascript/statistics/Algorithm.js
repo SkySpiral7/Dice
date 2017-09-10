@@ -13,29 +13,13 @@ Algorithm.analyze = function(diceGroup)
    //later useDroppingAlgorithm
    else algorithm = Algorithm.useBruteForce;  //if any gaps then useBruteForce
 
-   if(undefined === diceGroup.die.toJSON().explodeType) return algorithm(diceGroup, 0);
-   //if(does explode):
-   var stats = [], explodeCount = 0;  //200,001 sided die is the smallest that will end with 0 explodes
-   //TODO: should be math for predicting # explodes
-   do
-   {
-      stats = algorithm(diceGroup, explodeCount);
-      if(0 === explodeCount) Statistics.determineProbability(stats);
-      ++explodeCount;
-      //the only way for stats to be empty is if the explodeCount < the minimum number of explodes enforced by reroll
-      //when the percent would be < 0.000% then stop
-   } while(0 === stats.length || 0 !== Number(stats.last().probability.toFixed(5)));
-   //TODO: consider pushing 0% check down to DiceExpression
-   return stats;
+   return algorithm(diceGroup, DiceExpression.everyValue(diceGroup));
 };
 //TODO: make a brute force for every combination and also for every sum (currently only sum)
-Algorithm.useBruteForce = function(diceGroup, explodeCount)
+Algorithm.useBruteForce = function(diceGroup, everyDieValue)
 {
-   if(undefined === explodeCount) explodeCount = 0;
-   var useProbability = (0 !== explodeCount);
-   //should (but can't) be: var useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
-   //DiceExpression.everyValue is called so that the results aren't summed together
-   var everyDieValue = DiceExpression.everyValue(diceGroup, explodeCount);
+   var useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
+   //don't call DiceExpression.combineValues so that the results aren't summed together
    var newExpression = new DiceExpression(everyDieValue, useProbability);  //TODO: consider explodeCount 0 to use prob
 
    var stats = newExpression.toDiceResults();
@@ -90,10 +74,12 @@ The algorithm is faster than brute force but can't support drop/keep.
 @param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
 @returns {object[]} the dice results
 */
-Algorithm.useNonDroppingAlgorithm = function(diceGroup, explodeCount)
+Algorithm.useNonDroppingAlgorithm = function(diceGroup, everyDieValue)
 {
    //assert: no drop/keep
-   var workingExpression = new DiceExpression(diceGroup, explodeCount);
+   var useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
+   DiceExpression.combineValues(everyDieValue);
+   var workingExpression = new DiceExpression(everyDieValue, useProbability);
    workingExpression.power(diceGroup.dieCount);
    return workingExpression.toDiceResults();
 };
