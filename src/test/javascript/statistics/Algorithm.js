@@ -114,7 +114,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
       {result: 2, probability: (1/3)},
       {result: (3+1), probability: ((1/3) * (1/3))},
       {result: (3+2), probability: ((1/3) * (1/3))},
-      {result: (3+3), probability: ((1/3) * (1/3))}  //doesn't explode again
+      {result: (3+3), probability: ((1/3) * (1/3))}  //only let it explode once
    ];
    testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
    } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
@@ -209,30 +209,18 @@ TestSuite.Algorithm.useNonDroppingAlgorithm = function(isFirst)
    TestRunner.clearResults(isFirst);
 
    var testResults = [], actual, expected, diceGroup, everyDieValue;
+   var testStrings = ['2d6', '-d3', '1d3!r2', '1d3!pr1', '2d2!!r1'];
 
-   try{
-   diceGroup = new DicePool('2d6').toJSON().pool[0];
-   everyDieValue = DiceExpression.everyValue(diceGroup);
-   actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
-   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
-   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
-   } catch(e){testResults.push({Error: e, Description: '2d6'});}
-
-   try{
-   diceGroup = new DicePool('1d3!').toJSON().pool[0];
-   everyDieValue = DiceExpression.everyValue(diceGroup);
-   actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
-   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
-   testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
-   } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
-
-   try{
-   diceGroup = new DicePool('-d3').toJSON().pool[0];
-   everyDieValue = DiceExpression.everyValue(diceGroup);
-   actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
-   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
-   testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
-   } catch(e){testResults.push({Error: e, Description: '-d3'});}
+   for (var i = 0; i < testStrings.length; ++i)
+   {
+      try{
+      diceGroup = new DicePool(testStrings[i]).toJSON().pool[0];
+      everyDieValue = DiceExpression.everyValue(diceGroup);
+      actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
+      expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
+      testResults.push({Expected: expected, Actual: actual, Description: testStrings[i]});
+      } catch(e){testResults.push({Error: e, Description: testStrings[i]});}
+   }
 
    return TestRunner.displayResults('Algorithm Algorithm.useNonDroppingAlgorithm', testResults, isFirst);
 };

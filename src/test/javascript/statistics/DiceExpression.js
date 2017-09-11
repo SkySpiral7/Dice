@@ -495,8 +495,8 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
       {exponent: [4,3,3,3,3,3,3,3,3,3,3,0], coefficient: Math.pow((1/3), 12)},  //it can't stop here
       {exponent: [4,3,3,3,3,3,3,3,3,3,3,1], coefficient: Math.pow((1/3), 12)}  //toFixed rounds 0.0000018816764231589208 to 0.00000
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d4!pr3 explode: 1'});
-   } catch(e){testResults.push({Error: e, Description: '1d4!pr3 explode: 1'});}
+   testResults.push({Expected: expected, Actual: actual, Description: '1d4!pr3'});
+   } catch(e){testResults.push({Error: e, Description: '1d4!pr3'});}
 
    try{
    actual = DiceExpression.everyValue(new DicePool('1d4!!r3').toJSON().pool[0]);
@@ -533,8 +533,8 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
       {exponent: [4*9+2], coefficient: ((1/3) * Math.pow((1/4), 9))},
       {exponent: [4*9+3], coefficient: ((1/3) * Math.pow((1/4), 9))}  //toFixed rounds 0.0000012715657552083333 to 0.00000
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d4!!r3 explode: 1'});
-   } catch(e){testResults.push({Error: e, Description: '1d4!!r3 explode: 1'});}
+   testResults.push({Expected: expected, Actual: actual, Description: '1d4!!r3'});
+   } catch(e){testResults.push({Error: e, Description: '1d4!!r3'});}
 
    try{
    actual = DiceExpression.everyValue(new DicePool('1d4!!r<=3').toJSON().pool[0]);

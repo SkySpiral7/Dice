@@ -185,14 +185,13 @@ DiceExpression.combineValues = function(everyValue)
 DiceExpression.everyValue = function(diceGroup)
 {
    if(diceGroup instanceof Die) diceGroup = {die: diceGroup, dieCount: 1, areDiceNegative: false};
-   var die = diceGroup.die.toJSON();  //this is the only thing I need the die for
+   var die = diceGroup.die.toJSON();
    var hasExplosions = (undefined !== die.explodeType);
    var minValue = 1 + die.constantModifier;
    var maxValue = die.sideCount + die.constantModifier;
    var runningPossibilities = 1;
    var result = [];
-   var explodeIndex = 0;
-   do
+   for (var explodeIndex = 0; 0 === result.length || 0 !== Number(result.last().coefficient.toFixed(5)); ++explodeIndex)
    {
       var sidesPossible = 0, thisExplodeValues = [];
       for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
@@ -237,10 +236,9 @@ DiceExpression.everyValue = function(diceGroup)
             //formula for coefficient of non-compound explode: Math.pow((1/sidesPossible), (explodeIndex+1))
                //unused because the algorithm for compound works for all
          }
-         ++explodeIndex;
       }
       else break;
-   } while(0 === result.length || 0 !== Number(result.last().coefficient.toFixed(5)));
+   }
    return result;
 };
 /**Pass this into Array.prototype.sort for the order exponent: Infinity to exponent: -Infinity.*/

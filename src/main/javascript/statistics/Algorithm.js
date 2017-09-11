@@ -62,8 +62,10 @@ Algorithm.useBruteForce = function(diceGroup, everyDieValue)
 
    return finalExpression.toDiceResults();
 };
-Algorithm.useDroppingAlgorithm = function()
+Algorithm.dropLowest = function(diceGroup, everyDieValue)
 {
+   //This currently doesn't support enough dice features so it's here but requires a manual import.
+   return diceResultsForASingleDrop(diceGroup, everyDieValue);
 };
 /**
 Returns the statistics for a given element of DicePool.toJSON().pool using a Polynomial based algorithm.
