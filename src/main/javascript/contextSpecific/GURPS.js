@@ -22,14 +22,19 @@ GURPS.ReactionRoll = function(reactionModifier, randomSource)
 };
 /**A "success roll" is a die roll made when you need to "test" one of your skills or abilities.
 You may not attempt a success roll if your effective skill is less than 3 unless you are attempting a defense roll.
-This function assumes that you are allowed to make a success roll.
+This function assumes that you are allowed to make a success roll and that you have already accounted for "the rule
+of 16" (which exists in 3e and 4e but only applies to magic and other supernatural attacks).
+Note that if you somehow get an effective defense skill of -13 or less then rolling a sum of 3 counts as a critical success
+rather than a critical failure even though your roll was 10 more than your skill.
+
+This function doesn't support 3e disadvantage checks which fail when the sum is 14+ (I don't know if 4e has this).
 
 @param {number} effectiveSkill an integer which is the sum of your base skill (including defense) and all modifiers.
 @param {?function} randomSource optional. Will be passed to DicePool.sumRoll
 @returns {object} with {boolean} success, {boolean} critical, and {number} margin the absolute value of the difference between
 your effectiveSkill and the dice sum. Used by 4e (margin of success and margin of failure).
-margin is undefined for criticals since they ignore the difference between the sum and effectiveSkill (and would be non-sense for effective defense < 3).
-margin is undefined for a sum of 17 which always fails (not sure if the "rule of 16" applies globally).
+margin is undefined for criticals since they ignore the difference between the sum and effectiveSkill (and would sometimes be negative).
+margin is undefined for a sum of 17 which always fails even when it isn't a critical failure and even when "the rule of 16" doesn't apply.
 */
 GURPS.SuccessRoll = function(effectiveSkill, randomSource)
 {
@@ -37,13 +42,11 @@ GURPS.SuccessRoll = function(effectiveSkill, randomSource)
    var sumRolled = new DicePool('3d6').sumRoll(randomSource);
 
    //TODO: page 30: disadvantages fail at 14+
-   //TODO: ask 4e: is the margin defined for crits? If so it can be negative? Eg defense skill 2 sum 3 margin: -1
    if (sumRolled <= 4
       || (5 === sumRolled && effectiveSkill >= 15)
       || (6 === sumRolled && effectiveSkill >= 16)) return {success: true, critical: true};
 
    if(18 === sumRolled) return {success: false, critical: true};
-   //TODO: ask 4e: what is the margin of failure for sum 17 skill 17+?
    else if(17 === sumRolled) return {success: false, critical: (effectiveSkill < 16)};  //sum 17 is the reason I don't || them together
    else if(sumRolled >= (effectiveSkill + 10)) return {success: false, critical: true};
 
@@ -59,7 +62,9 @@ GURPS._noCritSuccessRoll = function(effectiveSkill, randomSource)
    var sumRolled = new DicePool('3d6').sumRoll(randomSource);
    return {success: (sumRolled <= effectiveSkill), margin: (effectiveSkill - sumRolled)};
 };
-/**A "Quick Contest" is a competition that is over in very little time – often in one second, perhaps even instantly.
+/**A "Quick Contest" is a competition that is over in very little time -- often in one second, perhaps even instantly.
+
+This does not support the 4e special quick contest used for some resistance rolls.
 
 @param {number} effectiveSkill1 an integer which is the sum of character 1's base skill (including defense) and all modifiers.
 @param {number} effectiveSkill2 an integer which is the sum of character 2's base skill (including defense) and all modifiers.
@@ -69,6 +74,7 @@ GURPS._noCritSuccessRoll = function(effectiveSkill, randomSource)
 {boolean} winnerSucceeded true if the character who won or tied also succeeded
 {boolean} loserSucceeded true if the character who lost or tied also succeeded
 {number} margin the absolute value of the difference between your effectiveSkill and the dice sum. Used by 4e (margin of success and margin of failure).
+{function} toString = GURPS.QuickContestedSuccessRoll.Stringifier
 */
 GURPS.QuickContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, randomSource)
 {
@@ -97,6 +103,8 @@ GURPS.QuickContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, ran
    return result;
 };
 /**
+Used by GURPS.QuickContestedSuccessRoll but can also be called directly.
+
 @param {!object} contestResults the results of GURPS.QuickContestedSuccessRoll
 @returns {!string} a human readable description of those results
 */
@@ -107,11 +115,23 @@ GURPS.QuickContestedSuccessRoll.Stringifier = function(contestResults)
    if(contestResults.winnerSucceeded) return 'Tie: both succeeded by the same amount.';
    return 'Tie: both failed by the same amount.';
 };
+/**
+A "Regular Contest" is a slow competition with much give and take.
+
+This function does not support the Extreme scores rules of 4e but does reduce high scores according to the 3e rules.
+Note that they are not compatible.
+
+@param {number} effectiveSkill1 an integer which is the sum of character 1's base skill (including defense) and all modifiers.
+@param {number} effectiveSkill2 an integer which is the sum of character 2's base skill (including defense) and all modifiers.
+@param {?function} randomSource optional. Will be passed to DicePool.sumRoll
+@returns {object} with:
+{string} winner of either Character 1, Character 2, or Tie
+{boolean} success true if the winner of the contest succeeded at the roll (always true if it was not a tie)
+*/
 GURPS.RegularContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, randomSource)
 {
    Validation.requireInteger(effectiveSkill1);
    Validation.requireInteger(effectiveSkill2);
-   //TODO: ask 4e: does this exist (not mentioned in the lite rules) and if so is it always?
    if (effectiveSkill1 > 14 && effectiveSkill2 > 14)
    {
       var max = Math.max(effectiveSkill1, effectiveSkill2);
@@ -127,7 +147,7 @@ GURPS.RegularContestedSuccessRoll = function(effectiveSkill1, effectiveSkill2, r
    return {winner: 'Tie', success: characterResult1.success};
 };
 GURPS.beta = {};
-/**Not compatable with 4e if Tim says that min basic damage is different. Otherwise it can do both. Could still do both if given gurps version*/
+/**Compatible with 4e... Failing to parry barehanded doesn't make sense if there's another defense... Not sure if that exists in 3e*/
 //the rules are unclear but it seems like passive defense is not rolled vs crit hit
 GURPS.beta.Attack3e = function(attackEffectiveSkill, defenseEffectiveSkill, damageString, damageReduction, randomSource)
 {
@@ -141,7 +161,7 @@ GURPS.beta.Attack3e = function(attackEffectiveSkill, defenseEffectiveSkill, dama
       if(defenseResult.success) return 'Dodge';  //TODO: crit success matters
       //TODO: All-Out Defense gets 2+ defense rolls
       //TODO: if there's 2+ defense they need to know whether parry succeeded because it has an auto counter attack
-      //TODO: failing to parry bare-handed lets them attack your arms instead of torso. 4e doesn't have this?
+      //TODO: failing to parry bare-handed lets them attack your arms instead of torso
       //TODO: All-Out Attack and others have no defense roll
    }
    if(3 === attackResult) return 'Max damage';  //TODO: return the damage amount. TODO: this or a crit table
@@ -149,7 +169,7 @@ GURPS.beta.Attack3e = function(attackEffectiveSkill, defenseEffectiveSkill, dama
    //TODO: in 4e "wounding modifier." apply after DR. Small piercing is x0.5 (min of 1), Cutting and large piercing is x1.5, Impaling is x2. Notice cutting is the same in 3e
    //TODO: some weapons have a half damage range (divide before DR)
    //TODO: ask Tim: Does non-lethal damage exist? If so how does it work?
-   //TODO: explosion roll damage as-is (no attack or defense) and have damage precent reduction
+   //TODO: explosion roll damage as-is (no attack or defense) and have damage percent reduction
    //TODO: crushing has a min damage of 0 (before DR) and everything else has a min damage of 1 (before DR)
    var damageAmount = (GURPS._parseDamageString(damageString)(randomSource) - damageReduction);
    if(damageAmount <= 0) return 'No damage';
@@ -184,13 +204,13 @@ Critical Hit Table (B202)
 7          Normal damage, and foe is stunned until he makes his HT roll
 8 If blow hit an arm, leg, hand, or foot it does normal damage and that 
             body part is crippled regardless of the damage done. However, this 
-            is only a “funny-bone” injury, and will wear off in six turns (unless 
+            is only a "funny-bone" injury, and will wear off in six turns (unless 
             enough damage was done to cripple the body part anyway). 
             Otherwise, the blow does normal damage
 9-11     Normal damage only
 12        If blow hit an arm, leg, hand, or foot it does normal damage and that 
             body part is crippled regardless of the damage done. However, this 
-            is only a “funny-bone” injury, and will wear off in six turns (unless 
+            is only a "funny-bone" injury, and will wear off in six turns (unless 
             enough damage was done to cripple the body part anyway). 
             Otherwise, the blow does normal damage
 13        The blow bypasses all armor and does normal damage
@@ -231,17 +251,17 @@ Critical Miss Table (B202)
 16         You fall down (Ranged weapon users see #7 instead)
 17, 18   Your weapon breaks (see #3)
 
-Unarmed fighters: any “weapon breaks”, “weapon drops”, or “weapon turns in hand” should be ignored; take 1d-3 damage to the hand or foot you were striking with instead
+Unarmed fighters: any "weapon breaks", "weapon drops", or "weapon turns in hand" should be ignored; take 1d-3 damage to the hand or foot you were striking with instead
 
 Critical Head Blow Table (B202)
 Use this table only when a critical hit is rolled on a head blow.
 3          Foe is killed instantly!
 4, 5      Foe knocked unconscious. Roll vs. HT every 30 minutes to recover
-6 Foe is hit across both eyes and blinded. Use “crippling” rules to         
+6 Foe is hit across both eyes and blinded. Use "crippling" rules to         
             determine whether eyes can heal (roll separately for each).  Foe is  
             stunned and fights at -10 DX for the rest of the battle
-7 Foe is blinded in one eye. Use “crippling” rules to determine if it 
-            heals. Target is stunned; will fight at –2 DX for rest of the battle
+7 Foe is blinded in one eye. Use "crippling" rules to determine if it 
+            heals. Target is stunned; will fight at -2 DX for rest of the battle
 8 Foe is knocked off balance; he may defend normally next turn but
             may do nothing else. Attack also does normal head blow damage
 9-11     Normal head-blow damage only
@@ -249,7 +269,7 @@ Use this table only when a critical hit is rolled on a head blow.
             and the foe will be deaf for 24 hours. If it was a cutting or impaling  
             blow, it does only 1 hit damage, but the foe’s face is scarred
 13 If the attack was a crushing blow, it does normal head-blow damage  
-            and foe may be permanently deafened (use “crippling” rules). If it  
+            and foe may be permanently deafened (use "crippling" rules). If it  
             was a cutting or impaling blow, it does only 2 hits damage, but the  
             foe’s face is badly scarred
 14        Normal head-blow damage. Foe flinches and drops one weapon
