@@ -13,11 +13,11 @@ dice have no actual maximum (unless enforced externally).
 */
 Statistics.calculateAggregates = function(stats)
 {
-   var min = Infinity, max = -Infinity, count = 0, sum = 0;
+   var min = Infinity, max = -Infinity, count = 0, sum = 0, i;
    Validation.requireInstanceOf(Array, stats);
    if(0 === stats.length) throw new Error('stats must not be an empty array');
    //an empty array would return {minimum: Infinity, maximum: -Infinity, mean: NaN, standardDeviation: NaN}
-   for (var i = 0; i < stats.length; ++i)
+   for (i = 0; i < stats.length; ++i)
    {
       //stats[i].frequency of 0 means the result is impossible which shouldn't exist in the array
       //if it does exist (garbage in) it will only affect min/max (garbage out)
@@ -38,7 +38,7 @@ Statistics.calculateAggregates = function(stats)
    }
    var deviationSquareSum = 0;
    var mean = sum / count;
-   for (var i = 0; i < stats.length; ++i)
+   for (i = 0; i < stats.length; ++i)
    {
       var dev = stats[i].result - mean;
       dev *= dev;  //squared
@@ -101,12 +101,12 @@ Statistics.determineProbability = function(stats)
 {
    //TODO: add null safe validate
    if(undefined !== stats[0].probability) return;  //already done
-   var sum = 0;
-   for (var i = 0; i < stats.length; ++i)
+   var sum = 0, i;
+   for (i = 0; i < stats.length; ++i)
    {
       sum += stats[i].frequency;
    }
-   for (var i = 0; i < stats.length; ++i)
+   for (i = 0; i < stats.length; ++i)
    {
       stats[i].probability = (stats[i].frequency / sum);
       //delete stats[i].frequency;  //nah. leave it there since frequency has perfect precision

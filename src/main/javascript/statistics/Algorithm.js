@@ -1,7 +1,7 @@
 'use strict';
 var Algorithm = {};
 /**
-This function analyzes the diceGroup given and returns the best possible algorithm.
+This function analyzes the diceGroup given and returns the fastest possible algorithm.
 @param {object} diceGroup an element of DicePool.toJSON().pool
 @returns {function} that takes a diceGroup and everyValue
 and returns objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).
@@ -9,8 +9,17 @@ It will not include frequency of 0 or probability of less than 0.00000 (5) and w
 */
 Algorithm.analyze = function(diceGroup)
 {
+   //check them in order from fastest to slowest
    if(undefined === diceGroup.dropKeepType) return Algorithm.useNonDroppingAlgorithm;
-   //later useDroppingAlgorithm
+   if (Die.explodeTypes.Penetrating !== diceGroup.die.toJSON().explodeType)
+   {
+      if(DicePool.dropKeepTypes.DropLowest === diceGroup.dropKeepType && 1 === diceGroup.dropKeepCount) return Algorithm.dropLowest;
+      if(DicePool.dropKeepTypes.KeepHighest === diceGroup.dropKeepType && (diceGroup.dieCount - 1) === diceGroup.dropKeepCount
+         && Die.explodeTypes.Normal !== diceGroup.die.toJSON().explodeType) return Algorithm.dropLowest;
+         //Keeping all but the lowest with compound or no explode is the same as drop lowest.
+         //The actual algorithm doesn't need the diceGroup to be converted.
+      //else fall through
+   }
    return Algorithm.useBruteForce;  //if any gaps then useBruteForce
 };
 //TODO: make a brute force for every combination and also for every sum (currently only sum)
@@ -21,7 +30,7 @@ Algorithm.useBruteForce = function(diceGroup, everyDieValue)
    var newExpression = new DiceExpression(everyDieValue, useProbability);  //TODO: consider explodeCount 0 to use prob
 
    var stats = newExpression.toDiceResults();
-   if(useProbability) Statistics.determineProbability(stats);  //safe because it doesn't touch results
+   if(useProbability) Statistics.determineProbability(stats);  //safe because it doesn't touch stats[].results
    var everyValue = [];
    for (var dieCount = 0; dieCount < diceGroup.dieCount; ++dieCount)
    {
@@ -62,19 +71,14 @@ Algorithm.useBruteForce = function(diceGroup, everyDieValue)
 
    return finalExpression.toDiceResults();
 };
-Algorithm.dropLowest = function(diceGroup, everyDieValue)
-{
-   //This currently doesn't support enough dice features so it's here but requires a manual import.
-   return diceResultsForASingleDrop(diceGroup, everyDieValue);
-};
 /**
 Returns the statistics for a given element of DicePool.toJSON().pool using a Polynomial based algorithm.
 The algorithm is faster than brute force but can't support drop/keep.
 @param {object} diceGroup
-@param {number} explodeCount the maximum number of times a die can explode (ignored for those that don't explode)
+@param {number} everyDieValue the results of DiceExpression.everyValue
 @returns {object[]} the dice results
 */
-Algorithm.useNonDroppingAlgorithm = function(diceGroup, everyDieValue)
+Algorithm.useNonDroppingAlgorithm = function(diceGroup, everyDieValue)  //TODO: rename this and bruteForce
 {
    //assert: no drop/keep
    var useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
@@ -82,4 +86,45 @@ Algorithm.useNonDroppingAlgorithm = function(diceGroup, everyDieValue)
    var workingExpression = new DiceExpression(everyDieValue, useProbability);
    workingExpression.power(diceGroup.dieCount);
    return workingExpression.toDiceResults();
+};
+/**Based on: http://stats.stackexchange.com/questions/130025/formula-for-dropping-dice-non-brute-force/242857#242857
+ The group MUST be drop lowest 1. Does not support penetrating explosions.
+ The algorithm supports everything else and is faster than brute force.*/
+Algorithm.dropLowest = function(diceGroup, everyDieValue)
+{
+   //TODO: should be able to reverse this so that it also supports drop highest 1
+   return diceResultsForASingleDrop(diceGroup, everyDieValue);
+
+   function expressionForMultipleDice(dieCount, everyDieValue)  //f2 of se. uses Algorithm.useNonDroppingAlgorithm but returns expression
+   {
+      if(0 === everyDieValue.length) return new DiceExpression();  //not needed but this fast path adds clarity
+      everyDieValue = JSON.clone(everyDieValue);  //I don't want the combine to mutate everyDieValue
+      DiceExpression.combineValues(everyDieValue);
+      var workingExpression = new DiceExpression(everyDieValue);
+      workingExpression.power(dieCount);
+      return workingExpression;
+   }
+   function expressionForDropLowestIsExactlyResult(dieCount, everyDieValue)  //f3 of se with x^-k
+   {
+      var smallestSide = Math.min.apply(null, everyDieValue[0].exponent);
+      //if(everyDieValue[0].exponent.length > 1 && diceGroup.die.toJSON().explodeType === Die.explodeTypes.Penetrating) ++smallestSide;
+      //assuming the next smallest is 1 higher (ie no rerolls) the answer is still wrong
+      var result = expressionForMultipleDice(dieCount, everyDieValue);
+      everyDieValue.shift();
+      result.subtract(expressionForMultipleDice(dieCount, everyDieValue));  //This ignores all sums that are greater.
+      result.multiply(new DiceExpression([{exponent: -smallestSide, coefficient: 1}]));  //This drops the lowest die. It can't be moved to f2 because it needs to be x^-k for k+1 as well.
+      //dropping 2 dice is not: *-smallestSide*-smallestSide, *(-smallestSide*2), *-smallestSide*-(smallestSide+1)
+      return result;
+   }
+   function diceResultsForASingleDrop(diceGroup, everyDieValue)  //f4 of se with moved x^-k
+   {
+      var useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
+      if(diceGroup.areDiceNegative) everyDieValue.reverse();
+      var workingExpression = new DiceExpression(useProbability);
+      while (0 !== everyDieValue.length)
+      {
+         workingExpression.add(expressionForDropLowestIsExactlyResult(diceGroup.dieCount, everyDieValue));
+      }
+      return workingExpression.toDiceResults();
+   }
 };
