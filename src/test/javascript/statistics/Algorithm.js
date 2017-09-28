@@ -8,7 +8,7 @@ TestSuite.Algorithm.analyze = function(isFirst)
 
    try{
    actual = Algorithm.analyze(new DicePool('2d6').toJSON().pool[0]);
-   expected = Algorithm.useNonDroppingAlgorithm;
+   expected = Algorithm.nonDropping;
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
@@ -26,7 +26,7 @@ TestSuite.Algorithm.analyze = function(isFirst)
 
    try{
    actual = Algorithm.analyze(new DicePool('2d2!p drop Lowest 1').toJSON().pool[0]);
-   expected = Algorithm.useBruteForce;
+   expected = Algorithm.bruteForce;
    testResults.push({Expected: expected, Actual: actual, Description: '2d2!p Drop Lowest 1'});
    } catch(e){testResults.push({Error: e, Description: '2d2!p Drop Lowest 1'});}
 
@@ -56,19 +56,19 @@ TestSuite.Algorithm.analyze = function(isFirst)
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2! keep highest 3').toJSON().pool[0]);
-   expected = Algorithm.useBruteForce;
+   expected = Algorithm.bruteForce;
    testResults.push({Expected: expected, Actual: actual, Description: '4d2! keep highest 3'});
    } catch(e){testResults.push({Error: e, Description: '4d2! keep highest 3'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2! keep lowest 3').toJSON().pool[0]);
-   expected = Algorithm.useBruteForce;
+   expected = Algorithm.bruteForce;
    testResults.push({Expected: expected, Actual: actual, Description: '4d2! keep lowest 3'});
    } catch(e){testResults.push({Error: e, Description: '4d2! keep lowest 3'});}
 
    return TestRunner.displayResults('Algorithm Algorithm.analyze', testResults, isFirst);
 };
-TestSuite.Algorithm.useBruteForce = function(isFirst)
+TestSuite.Algorithm.bruteForce = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
@@ -76,7 +76,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
 
    try{
    diceGroup = new DicePool('2d2').toJSON().pool[0];
-   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+   actual = Algorithm.bruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: 2, frequency: 1},  //1+1
       {result: 3, frequency: 2},  //1+2, 2+1
@@ -87,7 +87,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
 
    try{
    diceGroup = new DicePool('-d3').toJSON().pool[0];
-   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+   actual = Algorithm.bruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: -3, frequency: 1},
       {result: -2, frequency: 1},
@@ -98,20 +98,30 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
 
    try{
    diceGroup = new DicePool('3d2').toJSON().pool[0];
-   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+   actual = Algorithm.bruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: 3, frequency: 1},  //1+1+1
       {result: 4, frequency: 3},  //1+1+2, 1+2+1, 2+1+1
       {result: 5, frequency: 3},  //2+2+1, 2+1+2, 1+2+2
       {result: 6, frequency: 1}   //2+2+2
    ];
-   //need to test more than 2 dice for useBruteForce
+   //Handling more than 2 dice is an edge case for bruteForce
    testResults.push({Expected: expected, Actual: actual, Description: '3d2'});
    } catch(e){testResults.push({Error: e, Description: '3d2'});}
 
    try{
    diceGroup = new DicePool('2d6').toJSON().pool[0];
-   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+   actual = Algorithm.bruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+/*
+    1  2  3  4  5  6
+  +-----------------
+1 | 2  3  4  5  6  7
+2 | 3  4  5  6  7  8
+3 | 4  5  6  7  8  9
+4 | 5  6  7  8  9 10
+5 | 6  7  8  9 10 11
+6 | 7  8  9 10 11 12
+*/
    expected = [  //I used 2d6 because the results are well known
       {result: 2, frequency: 1},
       {result: 3, frequency: 2},
@@ -135,7 +145,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
       {exponent: [1,2], coefficient: Math.pow((1/2), 2)},
       {exponent: [2,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
    ];
-   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
+   actual = Algorithm.bruteForce(diceGroup, everyDieValue);
    expected = [
       {result: 2, probability: ((1/2)*(1/2))},  //1+1
       {result: 4, probability: ((1/2)*(1/4)*2)},  //1+(2+1), (2+1)+1
@@ -156,7 +166,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
       {exponent: [2,3], coefficient: ((1/3) * (1/3))},
       {exponent: [3,3], coefficient: ((1/3) * (1/3))}  //only let it explode once
    ];
-   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
+   actual = Algorithm.bruteForce(diceGroup, everyDieValue);
    expected = [
       {result: 1, probability: (1/3)},
       {result: 2, probability: (1/3)},
@@ -169,7 +179,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
 
    try{
    diceGroup = new DicePool('2d2 drop 1').toJSON().pool[0];
-   actual = Algorithm.useBruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
+   actual = Algorithm.bruteForce(diceGroup, DiceExpression.everyValue(diceGroup));
    expected = [
       {result: 1, frequency: 1},  //1+1
       {result: 2, frequency: 3}  //1+2, 2+1, 2+2
@@ -184,7 +194,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
       {exponent: [1+2], coefficient: Math.pow((1/2), 2)},
       {exponent: [2+2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
    ];
-   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
+   actual = Algorithm.bruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+3, 1+4, 3+1, 3+3, 3+4, 4+1, 4+3, 4+4
       //note that 1 is 1/2 and 3 and 4 are (1/2)*(1/2)=(1/4)
@@ -203,7 +213,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
       {exponent: [1,2], coefficient: Math.pow((1/2), 2)},
       {exponent: [2,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
    ];
-   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
+   actual = Algorithm.bruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+(2+1), 1+(2+2), (2+1)+1, (2+1)+(2+1), (2+1)+(2+2), (2+2)+1, (2+2)+(2+1), (2+2)+(2+2)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -222,7 +232,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
       {exponent: [0,2], coefficient: Math.pow((1/2), 2)},
       {exponent: [1,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
    ];
-   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
+   actual = Algorithm.bruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+(2+0), 1+(2+1), (2+0)+1, (2+0)+(2+0), (2+0)+(2+1), (2+1)+1, (2+1)+(2+0), (2+1)+(2+1)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -240,7 +250,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
       {exponent: [1,2], coefficient: Math.pow((1/2), 2)},
       {exponent: [2,2], coefficient: Math.pow((1/2), 2)}  //only let it explode once
    ];
-   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
+   actual = Algorithm.bruteForce(diceGroup, everyDieValue);
    expected = [
       //all: 1+1, 1+(2+1), 1+(2+2), (2+1)+1, (2+1)+(2+1), (2+1)+(2+2), (2+2)+1, (2+2)+(2+1), (2+2)+(2+2)
       {result: 1, probability: ((1/2)*(1/2))},  //1+1
@@ -253,7 +263,7 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    try{
    diceGroup = {die: new Die({sideCount: 2, constantModifier: 10}), dieCount: 2, areDiceNegative: false};
    everyDieValue = DiceExpression.everyValue(diceGroup);
-   actual = Algorithm.useBruteForce(diceGroup, everyDieValue);
+   actual = Algorithm.bruteForce(diceGroup, everyDieValue);
    expected = [
       {result: 22, frequency: 1},  //11+11
       {result: 23, frequency: 2},  //11+12, 12+11
@@ -262,9 +272,9 @@ TestSuite.Algorithm.useBruteForce = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
    } catch(e){testResults.push({Error: e, Description: '2d2 + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.useBruteForce', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.bruteForce', testResults, isFirst);
 };
-TestSuite.Algorithm.useNonDroppingAlgorithm = function(isFirst)
+TestSuite.Algorithm.nonDropping = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
@@ -276,8 +286,8 @@ TestSuite.Algorithm.useNonDroppingAlgorithm = function(isFirst)
       try{
       diceGroup = new DicePool(testStrings[i]).toJSON().pool[0];
       everyDieValue = DiceExpression.everyValue(diceGroup);
-      actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
-      expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
+      actual = Algorithm.nonDropping(diceGroup, JSON.clone(everyDieValue));
+      expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
       testResults.push({Expected: expected, Actual: actual, Description: testStrings[i]});
       } catch(e){testResults.push({Error: e, Description: testStrings[i]});}
    }
@@ -285,12 +295,12 @@ TestSuite.Algorithm.useNonDroppingAlgorithm = function(isFirst)
    try{
    diceGroup = {die: new Die({sideCount: 2, constantModifier: 10}), dieCount: 2, areDiceNegative: false};
    everyDieValue = DiceExpression.everyValue(diceGroup);
-   actual = Algorithm.useNonDroppingAlgorithm(diceGroup, JSON.clone(everyDieValue));
-   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
+   actual = Algorithm.nonDropping(diceGroup, JSON.clone(everyDieValue));
+   expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
    } catch(e){testResults.push({Error: e, Description: '2d2 + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.useNonDroppingAlgorithm', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.nonDropping', testResults, isFirst);
 };
 TestSuite.Algorithm.singleDrop = function(isFirst)
 {
@@ -305,7 +315,7 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
       diceGroup = new DicePool(testStrings[i] + ' drop lowest').toJSON().pool[0];
       everyDieValue = DiceExpression.everyValue(diceGroup);
       actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
-      expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
+      expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
       testResults.push({Expected: expected, Actual: actual, Description: testStrings[i] + ' drop lowest'});
       } catch(e){testResults.push({Error: e, Description: testStrings[i] + ' drop lowest'});}
 
@@ -313,7 +323,7 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
       diceGroup = new DicePool(testStrings[i] + ' drop highest').toJSON().pool[0];
       everyDieValue = DiceExpression.everyValue(diceGroup);
       actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
-      expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
+      expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
       testResults.push({Expected: expected, Actual: actual, Description: testStrings[i] + ' drop highest'});
       } catch(e){testResults.push({Error: e, Description: testStrings[i] + ' drop highest'});}
    }
@@ -324,7 +334,7 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
       areDiceNegative: false};
    everyDieValue = DiceExpression.everyValue(diceGroup);
    actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
-   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
+   expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 drop lowest + constantModifier 10'});
    } catch(e){testResults.push({Error: e, Description: '2d2 drop lowest + constantModifier 10'});}
 
@@ -334,7 +344,7 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
       areDiceNegative: false};
    everyDieValue = DiceExpression.everyValue(diceGroup);
    actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
-   expected = Algorithm.useBruteForce(diceGroup, JSON.clone(everyDieValue));
+   expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 drop highest + constantModifier 10'});
    } catch(e){testResults.push({Error: e, Description: '2d2 drop highest + constantModifier 10'});}
 
@@ -346,15 +356,15 @@ the largest values of dieCount and sides that will complete in less than 30 seco
 all algorithms must beat brute force which can do everything
 last tested 2017-09-24
 
-runStressTest(Algorithm.useNonDroppingAlgorithm, new DicePool('261d10'));
-   vs runStressTest(Algorithm.useBruteForce, new DicePool('6d10'));
-runStressTest(Algorithm.useNonDroppingAlgorithm, new DicePool('3d1574'));
-   vs runStressTest(Algorithm.useBruteForce, new DicePool('3d199'));
+runStressTest(Algorithm.nonDropping, new DicePool('261d10'));
+   vs runStressTest(Algorithm.bruteForce, new DicePool('6d10'));
+runStressTest(Algorithm.nonDropping, new DicePool('3d1574'));
+   vs runStressTest(Algorithm.bruteForce, new DicePool('3d199'));
 
 runStressTest(Algorithm.singleDrop, new DicePool('180d10 drop lowest'));
-   vs runStressTest(Algorithm.useBruteForce, new DicePool('6d10 drop lowest'));
+   vs runStressTest(Algorithm.bruteForce, new DicePool('6d10 drop lowest'));
 runStressTest(Algorithm.singleDrop, new DicePool('3d265 drop lowest'));
-   vs runStressTest(Algorithm.useBruteForce, new DicePool('3d198 drop lowest'));
+   vs runStressTest(Algorithm.bruteForce, new DicePool('3d198 drop lowest'));
 */
 function runStressTest(algorithm, dicePool)
 {

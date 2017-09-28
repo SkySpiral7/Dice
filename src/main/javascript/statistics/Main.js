@@ -82,7 +82,7 @@ the returned value being the statistics for the sum of them.
 Statistics.combineResults = function(statsArray, useProbability)
 {
    //TODO: validate alot in this file
-   //uses the non dropping algorithm (see Algorithm.useNonDroppingAlgorithm)
+   //uses the non dropping algorithm (see Algorithm.nonDropping)
    var workingExpression = new DiceExpression(statsArray[0], useProbability);
    for (var i = 1; i < statsArray.length; ++i)
    {
