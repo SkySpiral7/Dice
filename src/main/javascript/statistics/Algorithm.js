@@ -13,9 +13,9 @@ Algorithm.analyze = function(diceGroup)
    if(undefined === diceGroup.dropKeepType) return Algorithm.useNonDroppingAlgorithm;
    if (Die.explodeTypes.Penetrating !== diceGroup.die.toJSON().explodeType)
    {
-      if(DicePool.dropKeepTypes.DropLowest === diceGroup.dropKeepType && 1 === diceGroup.dropKeepCount) return Algorithm.dropLowest;
-      if(DicePool.dropKeepTypes.KeepHighest === diceGroup.dropKeepType && (diceGroup.dieCount - 1) === diceGroup.dropKeepCount
-         && Die.explodeTypes.Normal !== diceGroup.die.toJSON().explodeType) return Algorithm.dropLowest;
+      var isDropping = (DicePool.dropKeepTypes.DropLowest === diceGroup.dropKeepType || DicePool.dropKeepTypes.DropHighest === diceGroup.dropKeepType);
+      if(isDropping && 1 === diceGroup.dropKeepCount) return Algorithm.singleDrop;
+      if(!isDropping && (diceGroup.dieCount - 1) === diceGroup.dropKeepCount && Die.explodeTypes.Normal !== diceGroup.die.toJSON().explodeType) return Algorithm.singleDrop;
          //Keeping all but the lowest with compound or no explode is the same as drop lowest.
          //The actual algorithm doesn't need the diceGroup to be converted.
       //else fall through
@@ -88,12 +88,13 @@ Algorithm.useNonDroppingAlgorithm = function(diceGroup, everyDieValue)  //TODO: 
    return workingExpression.toDiceResults();
 };
 /**Based on: http://stats.stackexchange.com/questions/130025/formula-for-dropping-dice-non-brute-force/242857#242857
- The group MUST be drop lowest 1. Does not support penetrating explosions.
+ The group MUST be drop lowest 1 or drop highest 1. Does not support penetrating explosions.
  The algorithm supports everything else and is faster than brute force.*/
-Algorithm.dropLowest = function(diceGroup, everyDieValue)
+Algorithm.singleDrop = function(diceGroup, everyDieValue)
 {
-   //TODO: should be able to reverse this so that it also supports drop highest 1
-   return diceResultsForASingleDrop(diceGroup, everyDieValue);
+   //TODO: test KeepHighest etc
+   var dropLowest = (DicePool.dropKeepTypes.DropLowest === diceGroup.dropKeepType || DicePool.dropKeepTypes.KeepHighest === diceGroup.dropKeepType);
+   return diceResultsForASingleDrop(dropLowest, diceGroup, JSON.clone(everyDieValue));
 
    function expressionForMultipleDice(dieCount, everyDieValue)  //f2 of se. uses Algorithm.useNonDroppingAlgorithm but returns expression
    {
@@ -104,26 +105,29 @@ Algorithm.dropLowest = function(diceGroup, everyDieValue)
       workingExpression.power(dieCount);
       return workingExpression;
    }
-   function expressionForDropLowestIsExactlyResult(dieCount, everyDieValue)  //f3 of se with x^-k
+   function expressionForSingleDropIsExactlyResult(dropLowest, diceGroup, everyDieValue)  //f3 of se with x^-k
    {
-      var smallestSide = Math.min.apply(null, everyDieValue[0].exponent);
-      //if(everyDieValue[0].exponent.length > 1 && diceGroup.die.toJSON().explodeType === Die.explodeTypes.Penetrating) ++smallestSide;
-      //assuming the next smallest is 1 higher (ie no rerolls) the answer is still wrong
-      var result = expressionForMultipleDice(dieCount, everyDieValue);
+      var excludedValue = dropLowest ?
+         Math.min.apply(null, everyDieValue[0].exponent) :
+         Math.max.apply(null, everyDieValue[0].exponent);
+      //if(everyDieValue[0].exponent.length > 1 && diceGroup.die.toJSON().explodeType === Die.explodeTypes.Penetrating) ++excludedValue;
+         //assuming DropLowest and the next smallest is 1 higher (ie no rerolls) the answer is still wrong
+      var result = expressionForMultipleDice(diceGroup.dieCount, everyDieValue);
       everyDieValue.shift();
-      result.subtract(expressionForMultipleDice(dieCount, everyDieValue));  //This ignores all sums that are greater.
-      result.multiply(new DiceExpression([{exponent: -smallestSide, coefficient: 1}]));  //This drops the lowest die. It can't be moved to f2 because it needs to be x^-k for k+1 as well.
-      //dropping 2 dice is not: *-smallestSide*-smallestSide, *(-smallestSide*2), *-smallestSide*-(smallestSide+1)
+      result.subtract(expressionForMultipleDice(diceGroup.dieCount, everyDieValue));  //This ignores all sums that are greater.
+      result.multiply(new DiceExpression([{exponent: -excludedValue, coefficient: 1}]));  //This drops the die. It can't be moved to f2 because it needs to be x^-k for k+1 as well.
+      //dropping 2 dice is not: *-excludedValue*-excludedValue, *(-excludedValue*2), *-excludedValue*-(excludedValue+1)
       return result;
    }
-   function diceResultsForASingleDrop(diceGroup, everyDieValue)  //f4 of se with moved x^-k
+   function diceResultsForASingleDrop(dropLowest, diceGroup, everyDieValue)  //f4 of se with moved x^-k
    {
       var useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
-      if(diceGroup.areDiceNegative) everyDieValue.reverse();
+      if(diceGroup.areDiceNegative && dropLowest) everyDieValue.reverse();
+      else if(!diceGroup.areDiceNegative && !dropLowest) everyDieValue.reverse();
       var workingExpression = new DiceExpression(useProbability);
       while (0 !== everyDieValue.length)
       {
-         workingExpression.add(expressionForDropLowestIsExactlyResult(diceGroup.dieCount, everyDieValue));
+         workingExpression.add(expressionForSingleDropIsExactlyResult(dropLowest, diceGroup, everyDieValue));
       }
       return workingExpression.toDiceResults();
    }
