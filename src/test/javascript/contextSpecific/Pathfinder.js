@@ -8,7 +8,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 4, weapon: {damageString: '1d8', flatDamageModifer: 3}, opposingAc: 12};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [19]).concat(dieResultsToNonRandomArray(8, [5])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [19]}, {dieSides: 8, values: [5]}]);
    actual = Pathfinder.Attack(input);
    actualStringValue = actual.toString();
    delete actual.toString;
@@ -146,7 +146,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 12};
-   input.randomSource = dieResultsToNonRandomGenerator(20, [1]);
+   input.randomSource = numberGenerator.dice(20, [1]);
    actual = Pathfinder.Attack(input);
    actualStringValue = actual.toString();
    delete actual.toString;
@@ -157,7 +157,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 100};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 1]).concat(dieResultsToNonRandomArray(8, [5])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [20, 1]}, {dieSides: 8, values: [5]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 5}};
@@ -166,7 +166,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {minimumCritical: 15, damageString: '1d8'}, opposingAc: 100};
-   input.randomSource = dieResultsToNonRandomGenerator(20, [16]);
+   input.randomSource = numberGenerator.dice(20, [16]);
    actual = Pathfinder.Attack(input);
    actualStringValue = actual.toString();
    delete actual.toString;
@@ -177,7 +177,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 100};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 20]).concat(dieResultsToNonRandomArray(8, [5])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [20, 20]}, {dieSides: 8, values: [5]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 5}};
@@ -186,7 +186,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {minimumCritical: 18, damageString: '1d8'}, opposingAc: 11};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [18, 11]).concat(dieResultsToNonRandomArray(8, [5, 3])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [18, 11]}, {dieSides: 8, values: [5, 3]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 0, lethal: 8}};
@@ -195,7 +195,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: 2, extraDamageDiceString: '1d6'}, opposingAc: 11};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 20]).concat(dieResultsToNonRandomArray(8, [5, 7, 6])).concat(dieResultsToNonRandomArray(6, [5])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [20, 20]}, {dieSides: 8, values: [5, 7, 6]}, {dieSides: 6, values: [5]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    //29 === (5+2)+(7+2)+(6+2)+5
@@ -205,7 +205,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: -2}, opposingAc: 11};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 20]).concat(dieResultsToNonRandomArray(8, [1, 2, 3])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [20, 20]}, {dieSides: 8, values: [1, 2, 3]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 2, lethal: 1}};
@@ -214,7 +214,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {damageString: '1d8', flatDamageModifer: -1}, opposingAc: 11, damageReduction: 5};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 10]).concat(dieResultsToNonRandomArray(8, [8, 1])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [20, 10]}, {dieSides: 8, values: [8, 1]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 1, lethal: 2}};
@@ -223,7 +223,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 11, damageReduction: 5};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [10]).concat(dieResultsToNonRandomArray(8, [5])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [10]}, {dieSides: 8, values: [5]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 0}};
@@ -232,7 +232,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {damageString: '1d8'}, opposingAc: 11, damageReduction: 5};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [10]).concat(dieResultsToNonRandomArray(8, [3])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [10]}, {dieSides: 8, values: [3]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Hit', damage: {nonLethal: 0, lethal: 0}};
@@ -241,7 +241,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: -1}, opposingAc: 11, damageReduction: 3};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 10]).concat(dieResultsToNonRandomArray(8, [1, 1, 3])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [20, 10]}, {dieSides: 8, values: [1, 1, 3]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 1, lethal: 0}};
@@ -250,7 +250,7 @@ TestSuite.Pathfinder.Attack = function(isFirst)
 
    try{
    input = {attackBonus: 1, weapon: {criticalMultiplier: 3, damageString: '1d8', flatDamageModifer: -1}, opposingAc: 11, damageReduction: 5};
-   input.randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 10]).concat(dieResultsToNonRandomArray(8, [1, 1, 3])));
+   input.randomSource = numberGenerator([{dieSides: 20, values: [20, 10]}, {dieSides: 8, values: [1, 1, 3]}]);
    actual = Pathfinder.Attack(input);
    delete actual.toString;
    expected = {attack: 'Critical Hit', damage: {nonLethal: 0, lethal: 0}};
@@ -316,7 +316,7 @@ TestSuite.Pathfinder.RollInitiative = function(isFirst)
    var testResults = [], actual, expected, randomSource;
 
    try{
-   randomSource = dieResultsToNonRandomGenerator(20, [5, 15]);
+   randomSource = numberGenerator.dice(20, [5, 15]);
    var characterInput = [{name: 'Alice', initiative: 0}, {name: 'Bob', initiative: 1}];
    actual = Pathfinder.RollInitiative(characterInput, randomSource);
 
@@ -326,7 +326,7 @@ TestSuite.Pathfinder.RollInitiative = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
-   randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [15, 15, 2]).concat(dieResultsToNonRandomArray(2, [2])));
+   randomSource = numberGenerator([{dieSides: 20, values: [15, 15, 2]}, {dieSides: 2, values: [2]}]);
    actual = Pathfinder.RollInitiative([{name: 'Alice', initiative: 1}, {name: 'Bob', initiative: 1}, {name: 'Clara', initiative: 1}], randomSource);
 
    testResults.push({Expected: 'Bob', Actual: actual[0].name, Description: 'Double tied initiative character[0]'});
@@ -335,8 +335,10 @@ TestSuite.Pathfinder.RollInitiative = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: 'Double tied initiative'});}
 
    try{
-   randomSource = nonRandomNumberGenerator(dieResultsToNonRandomArray(20, [20, 15, 15, 15, 10, 10])
-   .concat(deckResultsToNonRandomArray(3, [2, 2])).concat(deckResultsToNonRandomArray(2, [1])));
+   randomSource = numberGenerator([{dieSides: 20, values: [20, 15, 15, 15, 10, 10]},
+      //all roll init but 3 tie at 16 and 2 tie at 11
+      //the decks don't have a final 1 because d1 doesn't use randomSource
+   {deckSize: 3, values: [2, 2]}, {deckSize: 2, values: [1]}]);
    actual = Pathfinder.RollInitiative([{name: 'Alice', initiative: 0},
       {name: 'Bob', initiative: 1}, {name: 'Clara', initiative: 1}, {name: 'Dan', initiative: 1},
       {name: 'Edward', initiative: 1}, {name: 'Frank', initiative: 1}], randomSource);
@@ -383,29 +385,29 @@ TestSuite.Pathfinder.DeckOfIllusions = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], nonRandomGenerator, deck;
+   var testResults = [], randomSource, deck;
 
    try{
-   nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
-   deck = new Pathfinder.DeckOfIllusions(false, nonRandomGenerator);
-   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(nonRandomGenerator), Description: 'Happy path: keep all cards'});
-   nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
+   randomSource = numberGenerator.dice(34, [34]);
+   deck = new Pathfinder.DeckOfIllusions(false, randomSource);
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(randomSource), Description: 'Happy path: keep all cards'});
+   randomSource = numberGenerator.dice(34, [34]);
    deck = new Pathfinder.DeckOfIllusions();
-   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(nonRandomGenerator), Description: 'Keep all cards is default'});
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(randomSource), Description: 'Keep all cards is default'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
-   nonRandomGenerator = dieResultsToNonRandomGenerator(10, [2]);
-   deck = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
-   nonRandomGenerator = dieResultsToNonRandomGenerator(34, [34]);
-   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(nonRandomGenerator), Description: 'Randomly kept all cards'});
+   randomSource = numberGenerator.dice(10, [2]);
+   deck = new Pathfinder.DeckOfIllusions(true, randomSource);
+   randomSource = numberGenerator.dice(34, [34]);
+   testResults.push({Expected: 'Illusion of deck\'s owner (sex reversed)', Actual: deck.draw(randomSource), Description: 'Randomly kept all cards'});
 
-   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(10, [1]).concat(dieResultsToNonRandomArray(20, [2]))  //remove 2 cards
-   .concat(dieResultsToNonRandomArray(34, [1])).concat(dieResultsToNonRandomArray(33, [33])));  //remove first then last
-   deck = new Pathfinder.DeckOfIllusions(true, nonRandomGenerator);
-   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(32, [1]).concat(dieResultsToNonRandomArray(31, [31])));  //draw new first then last
-   testResults.push({Expected: 'Male human fighter and four guards', Actual: deck.draw(nonRandomGenerator), Description: 'Removed first card'});
-   testResults.push({Expected: 'Illusion of deck\'s owner', Actual: deck.draw(nonRandomGenerator), Description: 'Removed last card'});
+   randomSource = numberGenerator([{dieSides: 10, values: [1]}, {dieSides: 20, values: [2]},  //2 cards will be removed
+   {deckSize: 34, values: [1, 33]}]);  //remove first then last
+   deck = new Pathfinder.DeckOfIllusions(true, randomSource);
+   randomSource = numberGenerator.deck(32, [1,31]);  //draw new first then last
+   testResults.push({Expected: 'Male human fighter and four guards', Actual: deck.draw(randomSource), Description: 'Removed first card'});
+   testResults.push({Expected: 'Illusion of deck\'s owner', Actual: deck.draw(randomSource), Description: 'Removed last card'});
    } catch(e){testResults.push({Error: e, Description: 'allowRandomlyMissing'});}
 
    return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfIllusions', testResults, isFirst);
@@ -418,44 +420,44 @@ TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
 
    try{
    deck = new Pathfinder.DeckOfManyThings();
-   nonRandomGenerator = dieResultsToNonRandomGenerator(22, [1]);
+   nonRandomGenerator = numberGenerator.dice(22, [1]);
    expected = [{Plaque: 'Balance', Effect: 'Change alignment instantly.', Clarification: 'The character must change to a radically different alignment. If the character fails to act according to the new alignment, she gains a negative level.'}];
    testResults.push({Expected: expected, Actual: deck.draw(nonRandomGenerator), Description: 'Happy path'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
    try{
    deck = new Pathfinder.DeckOfManyThings();
-   nonRandomGenerator = dieResultsToNonRandomGenerator(22, [1, 1]);
+   nonRandomGenerator = numberGenerator.dice(22, [1, 1]);
    actual = [deck.draw(nonRandomGenerator)[0].Plaque, deck.draw(nonRandomGenerator)[0].Plaque];
    testResults.push({Expected: ['Balance', 'Balance'], Actual: actual, Description: 'Can draw same card again'});
    } catch(e){testResults.push({Error: e, Description: 'Can draw same card again'});}
 
    try{
    deck = new Pathfinder.DeckOfManyThings();
-   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [10]).concat(dieResultsToNonRandomArray(21, [10])));
+   nonRandomGenerator = numberGenerator.deck(22, [10, 10]);
    testResults.push({Expected: ['Jester', 'Key'], Actual: [deck.draw(nonRandomGenerator)[0].Plaque, deck.draw(nonRandomGenerator)[0].Plaque], Description: 'Jester gets removed'});
    } catch(e){testResults.push({Error: e, Description: 'Jester gets removed'});}
 
    try{
    deck = new Pathfinder.DeckOfManyThings();
-   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [7]).concat(dieResultsToNonRandomArray(21, [7])));
+   nonRandomGenerator = numberGenerator.deck(22, [7, 7]);
    expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.', Clarification: 'The payment of XP and the redraw are mandatory. This card is always discarded when drawn, unlike all others except the Jester.'},
       {Plaque: 'Gem', Effect: 'Gain your choice of 25 pieces of jewelry or 50 gems.', Clarification: 'This card indicates wealth. The jewelry is all gold set with gems, each piece worth 2,000 gp, and the gems are worth 1,000 gp each.'}]
    actual = deck.draw(nonRandomGenerator);
    testResults.push({Expected: expected, Actual: actual, Description: 'Fool gets removed and draws again'});
-   nonRandomGenerator = dieResultsToNonRandomGenerator(21, [7]);
+   nonRandomGenerator = numberGenerator.dice(21, [7]);
    testResults.push({Expected: 'Gem', Actual: deck.draw(nonRandomGenerator)[0].Plaque, Description: 'Is actually removed'});
    } catch(e){testResults.push({Error: e, Description: 'Fool gets removed and draws again'});}
 
    try{
    deck = new Pathfinder.DeckOfManyThings();
-   nonRandomGenerator = nonRandomNumberGenerator(dieResultsToNonRandomArray(22, [7]).concat(dieResultsToNonRandomArray(21, [9])));
+   nonRandomGenerator = numberGenerator.deck(22, [7, 9]);
    expected = [{Plaque: 'Fool', Effect: 'Lose 10,000 experience points and you must draw again.', Clarification: 'The payment of XP and the redraw are mandatory. This card is always discarded when drawn, unlike all others except the Jester.'},
       {Plaque: 'Jester', Effect: 'Gain 10,000 XP or two more draws from the deck.', Clarification: 'This card is always discarded when drawn, unlike all others except the Fool. The redraws are optional.'}]
    actual = deck.draw(nonRandomGenerator);
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: Fool can draw Jester'});
 
-   nonRandomGenerator = dieResultsToNonRandomGenerator(20, [9]);
+   nonRandomGenerator = numberGenerator.dice(20, [9]);
    testResults.push({Expected: 'Key', Actual: deck.draw(nonRandomGenerator)[0].Plaque, Description: 'And both are removed'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: Fool can draw Jester'});}
 
@@ -468,7 +470,7 @@ TestSuite.Pathfinder.HarrowDeckOfManyThings = function(isFirst)
    var testResults = [], nonRandomGenerator, expected;
 
    try{
-   nonRandomGenerator = dieResultsToNonRandomGenerator(54, [47]);
+   nonRandomGenerator = numberGenerator.dice(54, [47]);
    expected = {CardName: 'The Twin', Alignment: 'N', Suit: 'Crown', Effect: 'The character physically becomes a member of the opposite gender.'};
    testResults.push({Expected: expected, Actual: Pathfinder.HarrowDeckOfManyThings.draw(nonRandomGenerator), Description: 'Happy path'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}

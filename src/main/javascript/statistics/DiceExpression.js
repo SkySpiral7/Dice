@@ -41,7 +41,6 @@ function DiceExpression(arg1, arg2)
    /**@returns a copy of this object.*/
    this.clone = function()
    {
-      if(0 === termArray.length) return DiceExpression.empty(useProbability);  //to avoid edge case of constructor
       return new DiceExpression(termArray, useProbability);  //the constrcutor will do a defensive copy
    };
    /**@returns true if other is equal to this.*/
@@ -91,6 +90,16 @@ function DiceExpression(arg1, arg2)
       }
       termArray.reverse();  //works in this case
    };
+   /** Used to multiply by itself a given number of times.*/
+   this.power = function(raisedTo)
+   {
+      Validation.requireNaturalNumber(raisedTo);
+      --raisedTo;
+      for (var multiplier = this.clone(); raisedTo > 0; --raisedTo)
+      {
+         this.multiply(multiplier);
+      }
+   };
    /**This function lets you subtract another DiceExpression from this Expression (this Expression is mutated to be the result).*/
    this.subtract = function(otherExpression)
    {
@@ -125,10 +134,13 @@ function DiceExpression(arg1, arg2)
    this._constructor = function()
    {
       if(undefined !== termArray) throw new Error('Illegal access');
+      termArray = [];
+      if(undefined === arg1){useProbability = false; return;}
+      if('boolean' === typeof(arg1)){useProbability = arg1; return;}
       if (arg1 instanceof Array)
       {
          useProbability = arg2;
-         if (undefined !== arg1[0].result)
+         if (0 !== arg1.length && undefined !== arg1[0].result)
          {
             //convert arg1 from result array to term array
             for (var i = 0; i < arg1.length; ++i)
@@ -144,17 +156,13 @@ function DiceExpression(arg1, arg2)
          arg2 = undefined;
          return;
       }
-      termArray = [];
 
       //TODO: make DiceExpression._validate
-      var die = arg1;
-      var explodeCount = arg2;
-      var hasExplosions = (undefined !== explodeCount && explodeCount > 0);
-      //notice how an exploding die with explodeCount 0 uses frequency
-      hasExplosions = hasExplosions && (undefined !== die.toJSON().explodeType);
-      if(!hasExplosions) explodeCount = 0;
-      useProbability = hasExplosions;
-      termArray = DiceExpression.everyValue(die, explodeCount);
+      if(undefined !== arg2) throw new Error('No explode count');
+      if(arg1 instanceof Die) arg1 = {die: arg1, dieCount: 1, areDiceNegative: false};
+      var diceGroup = arg1;
+      useProbability = (undefined !== diceGroup.die.toJSON().explodeType);
+      termArray = DiceExpression.everyValue(diceGroup);
       DiceExpression.combineValues(termArray);
       termArray.sort(DiceExpression.exponentDescending);
 
@@ -173,29 +181,22 @@ DiceExpression.combineValues = function(everyValue)
       everyValue[i].exponent = Math.summation(everyValue[i].exponent);
    }
 };
-//TODO: doc DiceExpression.empty
-DiceExpression.empty = function(useProbability)
-{
-   if(undefined === useProbability) useProbability = false;
-   var result = new DiceExpression([{coefficient: 1, exponent: 1}], useProbability);
-   result.addTerm({coefficient: -1, exponent: 1});  //it is now empty
-   return result;
-};
 //TODO: doc DiceExpression.everyValue and move some tests
-DiceExpression.everyValue = function(die, explodeCount)
+DiceExpression.everyValue = function(diceGroup)
 {
-   die = die.toJSON();  //this is the only thing I need the die for
-   var hasExplosions = (explodeCount > 0);
+   if(diceGroup instanceof Die) diceGroup = {die: diceGroup, dieCount: 1, areDiceNegative: false};
+   var die = diceGroup.die.toJSON();
+   var hasExplosions = (undefined !== die.explodeType);
    var minValue = 1 + die.constantModifier;
    var maxValue = die.sideCount + die.constantModifier;
    var runningPossibilities = 1;
    var result = [];
-   for (var explodeIndex = 0; explodeIndex <= explodeCount; ++explodeIndex)
+   for (var explodeIndex = 0; 0 === result.length || 0 !== Number(result.last().coefficient.toFixed(5)); ++explodeIndex)
    {
       var sidesPossible = 0, thisExplodeValues = [];
       for (var currentValue = minValue; currentValue <= maxValue; ++currentValue)
       {
-         if (hasExplosions && explodeIndex < explodeCount && currentValue === maxValue)
+         if (hasExplosions && currentValue === maxValue)
          {
             //value explodes so it isn't a possibility unless we reach the explode limit
             ++sidesPossible;  //increment because this does affect the runningPossibilities
@@ -206,6 +207,7 @@ DiceExpression.everyValue = function(die, explodeCount)
             //check for compound explode must be before reroll check and the other explodes after
          if(undefined !== die.rerollCriteria && eval('' + actualValue + die.rerollCriteria)) continue;  //exclude reroll values
          ++sidesPossible;
+         if(diceGroup.areDiceNegative) actualValue = -actualValue;
          actualValue = [actualValue];
          if(Die.explodeTypes.Normal === die.explodeType) actualValue = actualValue.concat(new Array(explodeIndex).fill(maxValue));
          else if (Die.explodeTypes.Penetrating === die.explodeType && 0 !== explodeIndex)
@@ -235,6 +237,7 @@ DiceExpression.everyValue = function(die, explodeCount)
                //unused because the algorithm for compound works for all
          }
       }
+      else break;
    }
    return result;
 };

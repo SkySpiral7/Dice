@@ -57,25 +57,23 @@ TestSuite.DicePool.roll = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], actual, nonRandomNumbers;
+   var testResults = [], actual, randomSource;
 
    try{
-   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
-   nonRandomNumbers = nonRandomNumbers.concat(dieResultsToNonRandomArray(16, [12, 16]));
-   actual = new DicePool('2d8+2d16').roll(nonRandomNumberGenerator(nonRandomNumbers));
+   randomSource = numberGenerator([{dieSides: 8, values: [5,8]}, {dieSides: 16, values: [12,16]}]);
+   actual = new DicePool('2d8+2d16').roll(randomSource);
    testResults.push({Expected: [5, 8, 12, 16], Actual: actual, Description: 'Happy path 2d8+2d16'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
 
    try{
-   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
-   nonRandomNumbers = nonRandomNumbers.concat(dieResultsToNonRandomArray(16, [12, 16]));
-   actual = new DicePool('2d8-2d16').roll(nonRandomNumberGenerator(nonRandomNumbers));
+   randomSource = numberGenerator([{dieSides: 8, values: [5,8]}, {dieSides: 16, values: [12,16]}]);
+   actual = new DicePool('2d8-2d16').roll(randomSource);
    testResults.push({Expected: [5, 8, -12, -16], Actual: actual, Description: 'Negative 2d8-2d16'});
    } catch(e){testResults.push({Error: e, Description: 'Negative 2d8-2d16'});}
 
    try{
-   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
-   actual = new DicePool('2d8d1').roll(nonRandomNumberGenerator(nonRandomNumbers));
+   randomSource = numberGenerator.dice(8, [5,8]);
+   actual = new DicePool('2d8d1').roll(randomSource);
    testResults.push({Expected: [8], Actual: actual, Description: 'Hooked up to drop/keep'});
    } catch(e){testResults.push({Error: e, Description: 'Hooked up to drop/keep'});}
 
@@ -85,12 +83,11 @@ TestSuite.DicePool.sumRoll = function(isFirst)
 {
    TestRunner.clearResults(isFirst);
 
-   var testResults = [], actual, nonRandomNumbers;
+   var testResults = [], actual, randomSource;
 
    try{
-   nonRandomNumbers = dieResultsToNonRandomArray(8, [5, 8]);
-   nonRandomNumbers = nonRandomNumbers.concat(dieResultsToNonRandomArray(16, [12, 16]));
-   actual = new DicePool('2d8+2d16').sumRoll(nonRandomNumberGenerator(nonRandomNumbers));
+   randomSource = numberGenerator([{dieSides: 8, values: [5,8]}, {dieSides: 16, values: [12,16]}]);
+   actual = new DicePool('2d8+2d16').sumRoll(randomSource);
    testResults.push({Expected: 41, Actual: actual, Description: 'Happy path 2d8+2d16'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
 

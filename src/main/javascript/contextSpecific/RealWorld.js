@@ -1,6 +1,7 @@
 'use strict';
 var RealWorld = {};
 RealWorld.Coin = new CustomDice.CustomDie(['Heads', 'Tails']);
+RealWorld.Coin.flip = RealWorld.Coin.roll;
 /** Note that there are 10 "yes", 5 neutral, and 5 "no". Therefore whenever you roll it the "Outlook [is] good". */
 RealWorld.MagicEightBall = new CustomDice.CustomDie([
    'As I see it, yes',
@@ -24,6 +25,7 @@ RealWorld.MagicEightBall = new CustomDice.CustomDie([
    'Outlook not so good',
    'Very doubtful'
 ]);
+RealWorld.MagicEightBall.shake = RealWorld.MagicEightBall.ask = RealWorld.MagicEightBall.roll;
 /**
  * Based on the French playing cards this 52 card deck is the most common deck globally.
  * It contains 4 suits and 13 cards in each suit.

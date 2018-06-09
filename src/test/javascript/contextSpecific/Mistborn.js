@@ -8,7 +8,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
 
    try{
    input = {diceCount: 7, difficulty: 1, nudges: 1};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 3, 6, 3, 5, 2, 2]);
+   input.randomSource = numberGenerator.dice(6, [6, 3, 6, 3, 5, 2, 2]);
    actual = Mistborn.Challenge(input);
    expected = {outcome: 2, nudges: 3, allResults: [3, 2], success: true};
    testResults.push({Expected: expected, Actual: actual, Description: 'Happy path, return value'});
@@ -16,7 +16,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
 
    try{
    input = {diceCount: 3};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [1, 1, 1]);
+   input.randomSource = numberGenerator.dice(6, [1, 1, 1]);
    actual = Mistborn.Challenge(input);
    expected = {outcome: 0, nudges: 0, allResults: [1], success: true};
    testResults.push({Expected: expected, Actual: actual, Description: 'Nudge defaults to 0. difficulty defaults to 1. 3+ of a kind isn\'t special'});
@@ -57,7 +57,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
 
    try{
    input = {diceCount: 11, difficulty: 2};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 3, 6, 3, 5, 2, 2, 1, 2, 2]);
+   input.randomSource = numberGenerator.dice(6, [6, 3, 6, 3, 5, 2, 2, 1, 2, 2]);
    actual = Mistborn.Challenge(input);
    expected = {outcome: 1, nudges: 3, allResults: [3, 2], success: true};
    testResults.push({Expected: expected, Actual: actual, Description: '10+ become nudges'});
@@ -65,7 +65,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
 
    try{
    input = {diceCount: -1};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [2, 2]);
+   input.randomSource = numberGenerator.dice(6, [2, 2]);
    actual = Mistborn.Challenge(input);
    expected = {outcome: -2, nudges: 0, allResults: [2], success: false};
    testResults.push({Expected: expected, Actual: actual, Description: 'X < 2 lowers result and causes failure'});
@@ -73,7 +73,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
 
    try{
    input = {diceCount: 2};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [1, 5]);
+   input.randomSource = numberGenerator.dice(6, [1, 5]);
    actual = Mistborn.Challenge(input);
    expected = {outcome: -1, nudges: 0, allResults: [], success: false};
    testResults.push({Expected: expected, Actual: actual, Description: 'No pairs means 0'});
@@ -81,7 +81,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
 
    try{
    input = {diceCount: 0, difficulty: 5};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [1, 5]);
+   input.randomSource = numberGenerator.dice(6, [1, 5]);
    actual = Mistborn.Challenge(input);
    expected = {outcome: -7, nudges: 0, allResults: [], success: false};
    testResults.push({Expected: expected, Actual: actual, Description: 'Allows outcome to be < -6'});
@@ -91,7 +91,7 @@ TestSuite.Mistborn.Challenge = function(isFirst)
 
    try{
    input = {diceCount: 2};
-   input.randomSource = dieResultsToNonRandomGenerator(6, [6, 6]);
+   input.randomSource = numberGenerator.dice(6, [6, 6]);
    actual = Mistborn.Challenge(input);
    expected = {outcome: -1, nudges: 2, allResults: [], success: false};
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: pair of 6 is result 0'});
@@ -108,7 +108,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 3, difficulty: 1, nudges: 1};
    character2 = {diceCount: 3, difficulty: 1, nudges: 1};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [6, 4, 4, 6, 3, 3]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [6, 4, 4, 6, 3, 3]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 1', outcome: 1, character1: {result: 3, nudges: 2, success: true}, character2: {result: 2, nudges: 2, success: true}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Happy path (character 1 wins by result), return value'});
@@ -117,7 +117,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2};
    character2 = {diceCount: 2};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [6, 3, 2, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [6, 3, 2, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 2', outcome: 2, character1: {result: 0, nudges: 1}, character2: {result: 2, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Default difficulty to 0. success undefined. character 2 wins by result'});
@@ -126,7 +126,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2, difficulty: 5};
    character2 = {diceCount: 2, difficulty: 5};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [3, 3, 2, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [3, 3, 2, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Both failed', character1: {result: -2, nudges: 0, success: false}, character2: {result: -3, nudges: 0, success: false}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Both failed'});
@@ -135,7 +135,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2};
    character2 = {diceCount: 2};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [6, 3, 1, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [6, 3, 1, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 1', outcome: 0, character1: {result: 0, nudges: 1}, character2: {result: 0, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Character 1 wins by nudges'});
@@ -144,7 +144,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 3};
    character2 = {diceCount: 3};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [2, 2, 1, 6, 2, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [2, 2, 1, 6, 2, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 2', outcome: 0, character1: {result: 2, nudges: 0}, character2: {result: 2, nudges: 1}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Character 2 wins by nudges'});
@@ -153,7 +153,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 3};
    character2 = {diceCount: 3};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [2, 1, 6, 6, 3, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [2, 1, 6, 6, 3, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Tie', character1: {result: 0, nudges: 1}, character2: {result: 0, nudges: 1}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Tie'});
@@ -162,7 +162,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2};
    character2 = {diceCount: 0};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [5, 5, 1, 3]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [5, 5, 1, 3]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 1', outcome: 7, character1: {result: 5, nudges: 0}, character2: {result: -2, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Allows an outcome of more than 6'});
@@ -171,7 +171,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2, difficulty: 3};
    character2 = {diceCount: 2, difficulty: 3};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [4, 4, 2, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [4, 4, 2, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 1', outcome: 2, character1: {result: 1, nudges: 0, success: true}, character2: {result: -1, nudges: 0, success: false}};
    testResults.push({Expected: expected, Actual: actual, Description: 'Only 1 succeeded'});
@@ -180,7 +180,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2, difficulty: 3};
    character2 = {diceCount: 2};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [4, 4, 2, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [4, 4, 2, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 2', outcome: 1, character1: {result: 1, nudges: 0, success: true}, character2: {result: 2, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'difficulty:pass, other:positive'});
@@ -189,7 +189,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2, difficulty: 3};
    character2 = {diceCount: 2};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [2, 2, 2, 2]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [2, 2, 2, 2]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 2', outcome: 3, character1: {result: -1, nudges: 0, success: false}, character2: {result: 2, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'difficulty:fail, other:positive'});
@@ -198,7 +198,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2, difficulty: 3};
    character2 = {diceCount: 1};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [4, 4, 2, 1]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [4, 4, 2, 1]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 1', outcome: 2, character1: {result: 1, nudges: 0, success: true}, character2: {result: -1, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'difficulty:pass, other:negative'});
@@ -207,7 +207,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2, difficulty: 3};
    character2 = {diceCount: 0};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [2, 2, 2, 1]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [2, 2, 2, 1]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 1', outcome: 1, character1: {result: -1, nudges: 0, success: false}, character2: {result: -2, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'difficulty:fail, other:negative, winner:1'});
@@ -216,7 +216,7 @@ TestSuite.Mistborn.Contest = function(isFirst)
    try{
    character1 = {diceCount: 2, difficulty: 3};
    character2 = {diceCount: 1};
-   character1.randomSource = character2.randomSource = dieResultsToNonRandomGenerator(6, [2, 1, 2, 1]);
+   character1.randomSource = character2.randomSource = numberGenerator.dice(6, [2, 1, 2, 1]);
    actual = Mistborn.Contest(character1, character2);
    expected = {winner: 'Character 2', outcome: 2, character1: {result: -3, nudges: 0, success: false}, character2: {result: -1, nudges: 0}};
    testResults.push({Expected: expected, Actual: actual, Description: 'difficulty:fail, other:negative, winner:2'});
