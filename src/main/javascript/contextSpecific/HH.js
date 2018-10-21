@@ -1,5 +1,6 @@
 'use strict';
 var HH = {};
+//TODO: needs tests
 HH.SkillCheck = function(effectiveSkill, difficultyClass, randomSource)
 {
    var diceSum = new DicePool('3dF').sumRoll(randomSource);
@@ -30,10 +31,10 @@ HH.Damage = function(attack, activeDefense, damageRank, toughness, randomSource)
       if (undefined !== activeDefense)
       {
          diceSum = new DicePool('3dF').sumRoll(randomSource);
-         if(-3 === diceSum) activeDefenseResults = -Infinity;  //Critical Failure is an Automatic failure
-         else activeDefenseResults = diceSum + activeDefense;
+         if(-3 === diceSum) activeDefenseResult = -Infinity;  //Critical Failure is an Automatic failure
+         else activeDefenseResult = diceSum + activeDefense;
       }
-      normalHit = (attackResult >= activeDefense);
+      normalHit = (attackResult >= activeDefenseResult);
       if(!attackThreat && !normalHit) return 'Miss';
    }
    diceSum = new DicePool('3dF').sumRoll(randomSource);

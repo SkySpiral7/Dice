@@ -123,7 +123,7 @@ function DiceExpression(arg1, arg2)
       result.reverse();  //works in this case
       return result;
    };
-   /**@returns an object formatted for JsonReviver.reviveWith(). return.value has this DiceExpression's termArray*/
+   /**@returns an object with this DiceExpression's termArray elements in it in a format that can be passed into the constructor*/
    this.toJSON = function()
    {
       //TODO: doesn't include useProbability
