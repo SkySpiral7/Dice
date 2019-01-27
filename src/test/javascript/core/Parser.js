@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Parser = {};
-TestSuite.Parser.dicePool = function(testState={})
+TestSuite.Parser.dicePool = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -109,7 +109,7 @@ TestSuite.Parser.dicePool = function(testState={})
 
    return TestRunner.displayResults('Parser Parser.dicePool', testResults, testState);
 };
-TestSuite.Parser._diceGroup = function(testState={})
+TestSuite.Parser._diceGroup = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -266,7 +266,7 @@ TestSuite.Parser._diceGroup = function(testState={})
 
    return TestRunner.displayResults('Parser Parser._diceGroup', testResults, testState);
 };
-TestSuite.Parser._shortHand = function(testState={})
+TestSuite.Parser._shortHand = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -380,7 +380,7 @@ TestSuite.Parser._shortHand = function(testState={})
 
    return TestRunner.displayResults('Parser Parser._shortHand', testResults, testState);
 };
-TestSuite.Parser._longHand = function(testState={})
+TestSuite.Parser._longHand = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

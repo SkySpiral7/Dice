@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Mistborn = {};
-TestSuite.Mistborn.Challenge = function(testState={})
+TestSuite.Mistborn.Challenge = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -99,7 +99,7 @@ TestSuite.Mistborn.Challenge = function(testState={})
 
    return TestRunner.displayResults('Mistborn Mistborn.Challenge', testResults, testState);
 };
-TestSuite.Mistborn.Contest = function(testState={})
+TestSuite.Mistborn.Contest = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

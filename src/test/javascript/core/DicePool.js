@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.DicePool = {};
-TestSuite.DicePool.equals = function(testState={})
+TestSuite.DicePool.equals = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -53,7 +53,7 @@ TestSuite.DicePool.equals = function(testState={})
 
    return TestRunner.displayResults('DicePool new DicePool().equals()', testResults, testState);
 };
-TestSuite.DicePool.roll = function(testState={})
+TestSuite.DicePool.roll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -79,7 +79,7 @@ TestSuite.DicePool.roll = function(testState={})
 
    return TestRunner.displayResults('DicePool new DicePool().roll()', testResults, testState);
 };
-TestSuite.DicePool.sumRoll = function(testState={})
+TestSuite.DicePool.sumRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -93,7 +93,7 @@ TestSuite.DicePool.sumRoll = function(testState={})
 
    return TestRunner.displayResults('DicePool new DicePool().sumRoll()', testResults, testState);
 };
-TestSuite.DicePool.toJSON = function(testState={})
+TestSuite.DicePool.toJSON = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -129,7 +129,7 @@ TestSuite.DicePool.toJSON = function(testState={})
 
    return TestRunner.displayResults('DicePool new DicePool().toJSON()', testResults, testState);
 };
-TestSuite.DicePool._constructor = function(testState={})
+TestSuite.DicePool._constructor = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -235,7 +235,7 @@ TestSuite.DicePool._constructor = function(testState={})
 
    return TestRunner.displayResults('DicePool new DicePool()._constructor()', testResults, testState);
 };
-TestSuite.DicePool.dropKeepTypes = function(testState={})
+TestSuite.DicePool.dropKeepTypes = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -291,7 +291,7 @@ TestSuite.DicePool.dropKeepTypes = function(testState={})
 
    return TestRunner.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', testResults, testState);
 };
-TestSuite.DicePool._validate = function(testState={})
+TestSuite.DicePool._validate = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

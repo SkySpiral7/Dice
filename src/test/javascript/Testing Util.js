@@ -54,7 +54,7 @@ numberGenerator.values = function(numberArray)
 
 //TODO: consider moving these tests to a new file:
 TestSuite.Util = {};
-TestSuite.Util.numberGenerator_dice = function(testState={})
+TestSuite.Util.numberGenerator_dice = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -67,7 +67,7 @@ TestSuite.Util.numberGenerator_dice = function(testState={})
 
    return TestRunner.displayResults('Testing Util numberGenerator.dice', testResults, testState);
 };
-TestSuite.Util.numberGenerator_values = function(testState={})
+TestSuite.Util.numberGenerator_values = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

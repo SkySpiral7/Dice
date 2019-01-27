@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Warhammer = {};
-TestSuite.Warhammer.AttackUnit_Stringifier = function(testState={})
+TestSuite.Warhammer.AttackUnit_Stringifier = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -28,7 +28,7 @@ TestSuite.Warhammer.AttackUnit_Stringifier = function(testState={})
 
    return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Stringifier', testResults, testState);
 };
-TestSuite.Warhammer.AttackUnit = function(testState={})
+TestSuite.Warhammer.AttackUnit = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -126,7 +126,7 @@ TestSuite.Warhammer.AttackUnit = function(testState={})
 
    return TestRunner.displayResults('Warhammer Warhammer.AttackUnit', testResults, testState);
 };
-TestSuite.Warhammer.AttackUnit_Statistics = function(testState={})
+TestSuite.Warhammer.AttackUnit_Statistics = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -203,7 +203,7 @@ TestSuite.Warhammer.AttackUnit_Statistics = function(testState={})
 
    return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Statistics', testResults, testState);
 };
-TestSuite.Warhammer.AttackUnit_validateInput = function(testState={})
+TestSuite.Warhammer.AttackUnit_validateInput = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -297,7 +297,7 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(testState={})
 
    return TestRunner.displayResults('Warhammer Warhammer.AttackUnit._validateInput', testResults, testState);
 };
-TestSuite.Warhammer.RollScatterDice = function(testState={})
+TestSuite.Warhammer.RollScatterDice = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

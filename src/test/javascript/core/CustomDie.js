@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.CustomDice = {};
-TestSuite.CustomDice.CustomDie = function(testState={})
+TestSuite.CustomDice.CustomDie = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -20,7 +20,7 @@ TestSuite.CustomDice.CustomDie = function(testState={})
 
    return TestRunner.displayResults('CustomDice CustomDice.CustomDie', testResults, testState);
 };
-TestSuite.CustomDice.DeckOfCards = function(testState={})
+TestSuite.CustomDice.DeckOfCards = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -51,7 +51,7 @@ TestSuite.CustomDice.DeckOfCards = function(testState={})
 
    return TestRunner.displayResults('CustomDice CustomDice.DeckOfCards', testResults, testState);
 };
-TestSuite.CustomDice.RollTable = function(testState={})
+TestSuite.CustomDice.RollTable = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.DiceExpression = {};
-TestSuite.DiceExpression.add = function(testState={})
+TestSuite.DiceExpression.add = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -25,7 +25,7 @@ TestSuite.DiceExpression.add = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().add()', testResults, testState);
 };
-TestSuite.DiceExpression.addTerm = function(testState={})
+TestSuite.DiceExpression.addTerm = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -103,7 +103,7 @@ TestSuite.DiceExpression.addTerm = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, testState);
 };
-TestSuite.DiceExpression.clone = function(testState={})
+TestSuite.DiceExpression.clone = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -127,7 +127,7 @@ TestSuite.DiceExpression.clone = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().clone()', testResults, testState);
 };
-TestSuite.DiceExpression.multiply = function(testState={})
+TestSuite.DiceExpression.multiply = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -159,7 +159,7 @@ TestSuite.DiceExpression.multiply = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().multiply()', testResults, testState);
 };
-TestSuite.DiceExpression.negateExponents = function(testState={})
+TestSuite.DiceExpression.negateExponents = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -196,7 +196,7 @@ TestSuite.DiceExpression.negateExponents = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, testState);
 };
-TestSuite.DiceExpression.power = function(testState={})
+TestSuite.DiceExpression.power = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -228,7 +228,7 @@ TestSuite.DiceExpression.power = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().power()', testResults, testState);
 };
-TestSuite.DiceExpression.subtract = function(testState={})
+TestSuite.DiceExpression.subtract = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -253,7 +253,7 @@ TestSuite.DiceExpression.subtract = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().subtract()', testResults, testState);
 };
-TestSuite.DiceExpression.toDiceResults = function(testState={})
+TestSuite.DiceExpression.toDiceResults = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -288,7 +288,7 @@ TestSuite.DiceExpression.toDiceResults = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, testState);
 };
-TestSuite.DiceExpression.toJSON = function(testState={})
+TestSuite.DiceExpression.toJSON = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -306,7 +306,7 @@ TestSuite.DiceExpression.toJSON = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().toJSON()', testResults, testState);
 };
-TestSuite.DiceExpression._constructor = function(testState={})
+TestSuite.DiceExpression._constructor = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -400,7 +400,7 @@ TestSuite.DiceExpression._constructor = function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, testState);
 };
-TestSuite.DiceExpression.everyValue = function(testState={})
+TestSuite.DiceExpression.everyValue = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

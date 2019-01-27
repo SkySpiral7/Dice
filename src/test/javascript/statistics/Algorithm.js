@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Algorithm = {};
-TestSuite.Algorithm.analyze = function(testState={})
+TestSuite.Algorithm.analyze = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -68,7 +68,7 @@ TestSuite.Algorithm.analyze = function(testState={})
 
    return TestRunner.displayResults('Algorithm Algorithm.analyze', testResults, testState);
 };
-TestSuite.Algorithm.bruteForce = function(testState={})
+TestSuite.Algorithm.bruteForce = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -274,7 +274,7 @@ TestSuite.Algorithm.bruteForce = function(testState={})
 
    return TestRunner.displayResults('Algorithm Algorithm.bruteForce', testResults, testState);
 };
-TestSuite.Algorithm.nonDropping = function(testState={})
+TestSuite.Algorithm.nonDropping = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -302,7 +302,7 @@ TestSuite.Algorithm.nonDropping = function(testState={})
 
    return TestRunner.displayResults('Algorithm Algorithm.nonDropping', testResults, testState);
 };
-TestSuite.Algorithm.singleDrop = function(testState={})
+TestSuite.Algorithm.singleDrop = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

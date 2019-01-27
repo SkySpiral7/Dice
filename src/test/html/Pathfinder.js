@@ -1,7 +1,7 @@
 'use strict';
 TestConfig.betweenEach=function(){randomSource = undefined;};
 TestSuite.client = {Pathfinder: {}};
-TestSuite.client.Pathfinder.parseCharacterData = function(testState={})
+TestSuite.client.Pathfinder.parseCharacterData = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -25,7 +25,7 @@ TestSuite.client.Pathfinder.parseCharacterData = function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html parseCharacterData', testResults, testState);
 };
-TestSuite.client.Pathfinder.initiative = function(testState={})
+TestSuite.client.Pathfinder.initiative = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -48,7 +48,7 @@ TestSuite.client.Pathfinder.initiative = function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html initiative', testResults, testState);
 };
-TestSuite.client.Pathfinder.createCharacterOptions = function(testState={})
+TestSuite.client.Pathfinder.createCharacterOptions = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -72,7 +72,7 @@ TestSuite.client.Pathfinder.createCharacterOptions = function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html createCharacterOptions', testResults, testState);
 };
-TestSuite.client.Pathfinder.createAttackOptions = function(testState={})
+TestSuite.client.Pathfinder.createAttackOptions = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -106,7 +106,7 @@ TestSuite.client.Pathfinder.createAttackOptions = function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html createAttackOptions', testResults, testState);
 };
-TestSuite.client.Pathfinder.displayNotes = function(testState={})
+TestSuite.client.Pathfinder.displayNotes = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -134,7 +134,7 @@ TestSuite.client.Pathfinder.displayNotes = function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html displayNotes', testResults, testState);
 };
-TestSuite.client.Pathfinder.updateNotes = function(testState={})
+TestSuite.client.Pathfinder.updateNotes = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -190,7 +190,7 @@ TestSuite.client.Pathfinder.updateNotes = function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html updateNotes', testResults, testState);
 };
-TestSuite.client.Pathfinder.attack = function(testState={})
+TestSuite.client.Pathfinder.attack = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -218,7 +218,7 @@ TestSuite.client.Pathfinder.attack = function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html attack', testResults, testState);
 };
-TestSuite.client.Pathfinder.createAttackInput = function(testState={})
+TestSuite.client.Pathfinder.createAttackInput = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

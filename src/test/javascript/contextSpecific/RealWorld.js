@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.RealWorld = {};
-TestSuite.RealWorld.Coin = function(testState={})
+TestSuite.RealWorld.Coin = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -18,7 +18,7 @@ TestSuite.RealWorld.Coin = function(testState={})
 
    return TestRunner.displayResults('RealWorld RealWorld.Coin', testResults, testState);
 };
-TestSuite.RealWorld.MagicEightBall = function(testState={})
+TestSuite.RealWorld.MagicEightBall = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -41,7 +41,7 @@ TestSuite.RealWorld.MagicEightBall = function(testState={})
 
    return TestRunner.displayResults('RealWorld RealWorld.MagicEightBall', testResults, testState);
 };
-TestSuite.RealWorld.StandardAmericanPlayingCards = function(testState={})
+TestSuite.RealWorld.StandardAmericanPlayingCards = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -74,7 +74,7 @@ TestSuite.RealWorld.StandardAmericanPlayingCards = function(testState={})
 
    return TestRunner.displayResults('RealWorld RealWorld.StandardAmericanPlayingCards', testResults, testState);
 };
-TestSuite.RealWorld.RiderWaiteTarotDeck = function(testState={})
+TestSuite.RealWorld.RiderWaiteTarotDeck = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

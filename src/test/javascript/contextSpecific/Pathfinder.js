@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Pathfinder = {};
-TestSuite.Pathfinder.Attack = function(testState={})
+TestSuite.Pathfinder.Attack = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -259,7 +259,7 @@ TestSuite.Pathfinder.Attack = function(testState={})
 
    return TestRunner.displayResults('Pathfinder Pathfinder.Attack', testResults, testState);
 };
-TestSuite.Pathfinder.Attack_Stringifier = function(testState={})
+TestSuite.Pathfinder.Attack_Stringifier = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -309,7 +309,7 @@ TestSuite.Pathfinder.Attack_Stringifier = function(testState={})
 
    return TestRunner.displayResults('Pathfinder Pathfinder.Attack.Stringifier', testResults, testState);
 };
-TestSuite.Pathfinder.RollInitiative = function(testState={})
+TestSuite.Pathfinder.RollInitiative = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -353,7 +353,7 @@ TestSuite.Pathfinder.RollInitiative = function(testState={})
 
    return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative', testResults, testState);
 };
-TestSuite.Pathfinder.RollInitiative_initiativeComparator = function(testState={})
+TestSuite.Pathfinder.RollInitiative_initiativeComparator = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -381,7 +381,7 @@ TestSuite.Pathfinder.RollInitiative_initiativeComparator = function(testState={}
 
    return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative._initiativeComparator', testResults, testState);
 };
-TestSuite.Pathfinder.DeckOfIllusions = function(testState={})
+TestSuite.Pathfinder.DeckOfIllusions = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -412,7 +412,7 @@ TestSuite.Pathfinder.DeckOfIllusions = function(testState={})
 
    return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfIllusions', testResults, testState);
 };
-TestSuite.Pathfinder.DeckOfManyThings = function(testState={})
+TestSuite.Pathfinder.DeckOfManyThings = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -463,7 +463,7 @@ TestSuite.Pathfinder.DeckOfManyThings = function(testState={})
 
    return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfManyThings', testResults, testState);
 };
-TestSuite.Pathfinder.HarrowDeckOfManyThings = function(testState={})
+TestSuite.Pathfinder.HarrowDeckOfManyThings = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

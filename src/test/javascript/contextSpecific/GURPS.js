@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.GURPS = {};
-TestSuite.GURPS.ReactionRoll = function(testState={})
+TestSuite.GURPS.ReactionRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -128,7 +128,7 @@ TestSuite.GURPS.ReactionRoll = function(testState={})
 
    return TestRunner.displayResults('GURPS GURPS.ReactionRoll', testResults, testState);
 };
-TestSuite.GURPS.SuccessRoll = function(testState={})
+TestSuite.GURPS.SuccessRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -269,7 +269,7 @@ TestSuite.GURPS.SuccessRoll = function(testState={})
 
    return TestRunner.displayResults('GURPS GURPS.SuccessRoll', testResults, testState);
 };
-TestSuite.GURPS._noCritSuccessRoll = function(testState={})
+TestSuite.GURPS._noCritSuccessRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -298,7 +298,7 @@ TestSuite.GURPS._noCritSuccessRoll = function(testState={})
 
    return TestRunner.displayResults('GURPS GURPS._noCritSuccessRoll', testResults, testState);
 };
-TestSuite.GURPS.QuickContestedSuccessRoll = function(testState={})
+TestSuite.GURPS.QuickContestedSuccessRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -378,7 +378,7 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(testState={})
 
    return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll', testResults, testState);
 };
-TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(testState={})
+TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -428,7 +428,7 @@ TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(testState={})
 
    return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll.Stringifier', testResults, testState);
 };
-TestSuite.GURPS.RegularContestedSuccessRoll = function(testState={})
+TestSuite.GURPS.RegularContestedSuccessRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -498,7 +498,7 @@ TestSuite.GURPS.RegularContestedSuccessRoll = function(testState={})
 
    return TestRunner.displayResults('GURPS GURPS.RegularContestedSuccessRoll', testResults, testState);
 };
-TestSuite.GURPS._parseDamageString = function(testState={})
+TestSuite.GURPS._parseDamageString = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -552,7 +552,7 @@ TestSuite.GURPS._parseDamageString = function(testState={})
 
    return TestRunner.displayResults('GURPS GURPS._parseDamageString', testResults, testState);
 };
-TestSuite.GURPS.RandomHitLocation = function(testState={})
+TestSuite.GURPS.RandomHitLocation = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.prototypes = {Array: {}, JSON: {}, Math: {}, Number: {}, String: {}};
-TestSuite.prototypes.Array.contains = function(testState={})
+TestSuite.prototypes.Array.contains = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -12,7 +12,7 @@ TestSuite.prototypes.Array.contains = function(testState={})
 
    return TestRunner.displayResults('prototypes Array.prototype.contains', testResults, testState);
 };
-TestSuite.prototypes.Array.last = function(testState={})
+TestSuite.prototypes.Array.last = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -24,7 +24,7 @@ TestSuite.prototypes.Array.last = function(testState={})
 
    return TestRunner.displayResults('prototypes Array.prototype.last', testResults, testState);
 };
-TestSuite.prototypes.Array.removeByIndex = function(testState={})
+TestSuite.prototypes.Array.removeByIndex = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -109,7 +109,7 @@ TestSuite.prototypes.Array.removeByIndex = function(testState={})
 
    return TestRunner.displayResults('prototypes Array.prototype.removeByIndex', testResults, testState);
 };
-TestSuite.prototypes.Array.removeElement = function(testState={})
+TestSuite.prototypes.Array.removeElement = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -142,7 +142,7 @@ TestSuite.prototypes.Array.removeElement = function(testState={})
 
    return TestRunner.displayResults('prototypes Array.prototype.removeElement', testResults, testState);
 };
-TestSuite.prototypes.JSON.clone = function(testState={})
+TestSuite.prototypes.JSON.clone = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -157,7 +157,7 @@ TestSuite.prototypes.JSON.clone = function(testState={})
 
    return TestRunner.displayResults('prototypes JSON.clone', testResults, testState);
 };
-TestSuite.prototypes.Math.factorial = function(testState={})
+TestSuite.prototypes.Math.factorial = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -173,7 +173,7 @@ TestSuite.prototypes.Math.factorial = function(testState={})
 
    return TestRunner.displayResults('prototypes Math.factorial', testResults, testState);
 };
-TestSuite.prototypes.Math.summation = function(testState={})
+TestSuite.prototypes.Math.summation = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -186,7 +186,7 @@ TestSuite.prototypes.Math.summation = function(testState={})
 
    return TestRunner.displayResults('prototypes Math.summation', testResults, testState);
 };
-TestSuite.prototypes.Number.isInteger = function(testState={})
+TestSuite.prototypes.Number.isInteger = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -202,7 +202,7 @@ TestSuite.prototypes.Number.isInteger = function(testState={})
 
    return TestRunner.displayResults('prototypes Number.isInteger', testResults, testState);
 };
-TestSuite.prototypes.Number.isNatural = function(testState={})
+TestSuite.prototypes.Number.isNatural = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -218,7 +218,7 @@ TestSuite.prototypes.Number.isNatural = function(testState={})
 
    return TestRunner.displayResults('prototypes Number.isNatural', testResults, testState);
 };
-TestSuite.prototypes.String.contains = function(testState={})
+TestSuite.prototypes.String.contains = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

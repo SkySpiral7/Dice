@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.GenerateHtml = {};
-TestSuite.GenerateHtml.aggregates = function(testState={})
+TestSuite.GenerateHtml.aggregates = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -19,7 +19,7 @@ TestSuite.GenerateHtml.aggregates = function(testState={})
 
    return TestRunner.displayResults('GenerateHtml GenerateHtml.aggregates', testResults, testState);
 };
-TestSuite.GenerateHtml.statistics = function(testState={})
+TestSuite.GenerateHtml.statistics = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

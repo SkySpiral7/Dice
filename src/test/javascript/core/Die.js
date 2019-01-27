@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Die = {};
-TestSuite.Die.equals = function(testState={})
+TestSuite.Die.equals = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -39,7 +39,7 @@ TestSuite.Die.equals = function(testState={})
 
    return TestRunner.displayResults('Die new Die().equals()', testResults, testState);
 };
-TestSuite.Die.roll = function(testState={})
+TestSuite.Die.roll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -110,7 +110,7 @@ TestSuite.Die.roll = function(testState={})
 
    return TestRunner.displayResults('Die new Die().roll()', testResults, testState);
 };
-TestSuite.Die._constructor = function(testState={})
+TestSuite.Die._constructor = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -195,7 +195,7 @@ TestSuite.Die._constructor = function(testState={})
 
    return TestRunner.displayResults('Die new Die()._constructor', testResults, testState);
 };
-TestSuite.Die._optimizeReroll = function(testState={})
+TestSuite.Die._optimizeReroll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -225,7 +225,7 @@ TestSuite.Die._optimizeReroll = function(testState={})
 
    return TestRunner.displayResults('Die Die._optimizeReroll', testResults, testState);
 };
-TestSuite.Die._validate = function(testState={})
+TestSuite.Die._validate = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -328,7 +328,7 @@ TestSuite.Die._validate = function(testState={})
 
    return TestRunner.displayResults('Die Die._validate', testResults, testState);
 };
-TestSuite.Die._validateReroll = function(testState={})
+TestSuite.Die._validateReroll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

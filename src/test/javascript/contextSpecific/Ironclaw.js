@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Ironclaw = {};
-TestSuite.Ironclaw.DicePool = function(testState={})
+TestSuite.Ironclaw.DicePool = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

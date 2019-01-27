@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.Statistics = {};
-TestSuite.Statistics.calculateAggregates = function(testState={})
+TestSuite.Statistics.calculateAggregates = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -35,7 +35,7 @@ TestSuite.Statistics.calculateAggregates = function(testState={})
 
    return TestRunner.displayResults('Statistics Statistics.calculateAggregates', testResults, testState);
 };
-TestSuite.Statistics.calculateDiceSums = function(testState={})
+TestSuite.Statistics.calculateDiceSums = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -57,7 +57,7 @@ TestSuite.Statistics.calculateDiceSums = function(testState={})
 
    return TestRunner.displayResults('Statistics Statistics.calculateDiceSums', testResults, testState);
 };
-TestSuite.Statistics.combineResults = function(testState={})
+TestSuite.Statistics.combineResults = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -109,7 +109,7 @@ TestSuite.Statistics.combineResults = function(testState={})
 
    return TestRunner.displayResults('Statistics Statistics.combineResults', testResults, testState);
 };
-TestSuite.Statistics.determineProbability = function(testState={})
+TestSuite.Statistics.determineProbability = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -136,7 +136,7 @@ TestSuite.Statistics.determineProbability = function(testState={})
 
    return TestRunner.displayResults('Statistics Statistics.determineProbability', testResults, testState);
 };
-TestSuite.Statistics.passFailBinomial = function(testState={})
+TestSuite.Statistics.passFailBinomial = async function(testState={})
 {
    TestRunner.clearResults(testState);
 

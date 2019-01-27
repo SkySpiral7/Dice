@@ -1,6 +1,6 @@
 'use strict';
 TestSuite.L5R = {};
-TestSuite.L5R.DicePool = function(testState={})
+TestSuite.L5R.DicePool = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -80,7 +80,7 @@ TestSuite.L5R.DicePool = function(testState={})
 
    return TestRunner.displayResults('L5R L5R.DicePool', testResults, testState);
 };
-TestSuite.L5R.Parser = function(testState={})
+TestSuite.L5R.Parser = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -150,7 +150,7 @@ TestSuite.L5R.Parser = function(testState={})
 
    return TestRunner.displayResults('L5R L5R.Parser', testResults, testState);
 };
-TestSuite.L5R.GeneralRoll_Stringifier = function(testState={})
+TestSuite.L5R.GeneralRoll_Stringifier = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -181,7 +181,7 @@ TestSuite.L5R.GeneralRoll_Stringifier = function(testState={})
 
    return TestRunner.displayResults('L5R L5R.GeneralRoll.Stringifier', testResults, testState);
 };
-TestSuite.L5R.GeneralRoll = function(testState={})
+TestSuite.L5R.GeneralRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
