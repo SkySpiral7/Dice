@@ -4,7 +4,7 @@ TestSuite.GenerateHtml.aggregates = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], input, actual, expected;
+   var assertions = [], input, actual, expected;
 
    try{
    input = {minimum: -5, maximum: 12, mean: 7.001563, standardDeviation: 3.415523465};
@@ -14,16 +14,16 @@ TestSuite.GenerateHtml.aggregates = async function(testState={})
    expected += '<br />\nMax: 12';
    expected += '<br />\nMean: 7.00';
    expected += '<br />\nStandard Deviation: 3.416';
-   testResults.push({Expected: expected, Actual: actual, Description: 'Aggregates'});
-   } catch(e){testResults.push({Error: e, Description: 'Aggregates'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Aggregates'});
+   } catch(e){assertions.push({Error: e, Description: 'Aggregates'});}
 
-   return TestRunner.displayResults('GenerateHtml GenerateHtml.aggregates', testResults, testState);
+   return TestRunner.displayResults('GenerateHtml GenerateHtml.aggregates', assertions, testState);
 };
 TestSuite.GenerateHtml.statistics = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected;
+   var assertions = [], actual, expected;
 
    try{
    actual = GenerateHtml.statistics(Statistics.calculateDiceSums(new DicePool('2d2')));
@@ -40,8 +40,8 @@ TestSuite.GenerateHtml.statistics = async function(testState={})
    expected += '</td><td align="right" width="1%">25.000%</td><td valign="center"><div style="background-color: blue; ';
    expected += 'width:50.000%; height: 0.8em">&nbsp;</div></td></tr>\n';
    expected += '</table>\n';
-   testResults.push({Expected: expected, Actual: actual, Description: 'Happy path: 2d2'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy path: 2d2'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Happy path: 2d2'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy path: 2d2'});}
 
    try{
    var stats = [
@@ -59,8 +59,8 @@ TestSuite.GenerateHtml.statistics = async function(testState={})
    expected += '</td><td align="right" width="1%">25.000%</td><td valign="center"><div style="background-color: green; ';
    expected += 'width:100.000%; height: 0.8em">&nbsp;</div></td></tr>\n';
    expected += '</table>\n';
-   testResults.push({Expected: expected, Actual: actual, Description: 'Unfair probability <'});
-   } catch(e){testResults.push({Error: e, Description: 'Unfair probability <'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Unfair probability <'});
+   } catch(e){assertions.push({Error: e, Description: 'Unfair probability <'});}
 
-   return TestRunner.displayResults('GenerateHtml GenerateHtml.statistics', testResults, testState);
+   return TestRunner.displayResults('GenerateHtml GenerateHtml.statistics', assertions, testState);
 };

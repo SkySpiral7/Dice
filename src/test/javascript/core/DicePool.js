@@ -4,33 +4,33 @@ TestSuite.DicePool.equals = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], actual, inputA, inputB;
+   var assertions = [], actual, inputA, inputB;
 
    try{
    inputA = new DicePool('2d8');
    actual = inputA.equals(inputA);
-   testResults.push({Expected: true, Actual: actual, Description: 'Happy path 2d8 same'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8 same'});}
+   assertions.push({Expected: true, Actual: actual, Description: 'Happy path 2d8 same'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy path 2d8 same'});}
 
    try{
    actual = new DicePool('2d8').equals(new DicePool('2d8'));
-   testResults.push({Expected: true, Actual: actual, Description: 'Happy path 2d8 equal'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8 equal'});}
+   assertions.push({Expected: true, Actual: actual, Description: 'Happy path 2d8 equal'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy path 2d8 equal'});}
 
    try{
    actual = new DicePool('2d8').equals(5);
-   testResults.push({Expected: false, Actual: actual, Description: 'Not a DicePool'});
-   } catch(e){testResults.push({Error: e, Description: 'Not a DicePool'});}
+   assertions.push({Expected: false, Actual: actual, Description: 'Not a DicePool'});
+   } catch(e){assertions.push({Error: e, Description: 'Not a DicePool'});}
 
    try{
    actual = new DicePool('2d8').equals(null);
-   testResults.push({Expected: false, Actual: actual, Description: 'null'});
-   } catch(e){testResults.push({Error: e, Description: 'null'});}
+   assertions.push({Expected: false, Actual: actual, Description: 'null'});
+   } catch(e){assertions.push({Error: e, Description: 'null'});}
 
    try{
    actual = new DicePool('2d8').equals(undefined);
-   testResults.push({Expected: false, Actual: actual, Description: 'undefined'});
-   } catch(e){testResults.push({Error: e, Description: 'undefined'});}
+   assertions.push({Expected: false, Actual: actual, Description: 'undefined'});
+   } catch(e){assertions.push({Error: e, Description: 'undefined'});}
 
    try{
    inputA = new DicePool('2d8').toJSON();
@@ -42,62 +42,62 @@ TestSuite.DicePool.equals = async function(testState={})
    inputB = new DicePool(inputB);
 
    actual = inputA.equals(inputB);
-   testResults.push({Expected: true, Actual: actual, Description: 'Ignores name: equal'});
-   testResults.push({Expected: false, Actual: (inputA.toJSON().name === inputB.toJSON().name), Description: 'Ignores name: names are different'});
-   } catch(e){testResults.push({Error: e, Description: 'Ignores name'});}
+   assertions.push({Expected: true, Actual: actual, Description: 'Ignores name: equal'});
+   assertions.push({Expected: false, Actual: (inputA.toJSON().name === inputB.toJSON().name), Description: 'Ignores name: names are different'});
+   } catch(e){assertions.push({Error: e, Description: 'Ignores name'});}
 
    try{
    actual = new DicePool('2d8').equals(new DicePool('2d8+1d4'));
-   testResults.push({Expected: false, Actual: actual, Description: 'Not equal'});
-   } catch(e){testResults.push({Error: e, Description: 'Not equal'});}
+   assertions.push({Expected: false, Actual: actual, Description: 'Not equal'});
+   } catch(e){assertions.push({Error: e, Description: 'Not equal'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().equals()', testResults, testState);
+   return TestRunner.displayResults('DicePool new DicePool().equals()', assertions, testState);
 };
 TestSuite.DicePool.roll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], actual, randomSource;
+   var assertions = [], actual, randomSource;
 
    try{
    randomSource = numberGenerator([{dieSides: 8, values: [5,8]}, {dieSides: 16, values: [12,16]}]);
    actual = new DicePool('2d8+2d16').roll(randomSource);
-   testResults.push({Expected: [5, 8, 12, 16], Actual: actual, Description: 'Happy path 2d8+2d16'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
+   assertions.push({Expected: [5, 8, 12, 16], Actual: actual, Description: 'Happy path 2d8+2d16'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy path 2d8+2d16'});}
 
    try{
    randomSource = numberGenerator([{dieSides: 8, values: [5,8]}, {dieSides: 16, values: [12,16]}]);
    actual = new DicePool('2d8-2d16').roll(randomSource);
-   testResults.push({Expected: [5, 8, -12, -16], Actual: actual, Description: 'Negative 2d8-2d16'});
-   } catch(e){testResults.push({Error: e, Description: 'Negative 2d8-2d16'});}
+   assertions.push({Expected: [5, 8, -12, -16], Actual: actual, Description: 'Negative 2d8-2d16'});
+   } catch(e){assertions.push({Error: e, Description: 'Negative 2d8-2d16'});}
 
    try{
    randomSource = numberGenerator.dice(8, [5,8]);
    actual = new DicePool('2d8d1').roll(randomSource);
-   testResults.push({Expected: [8], Actual: actual, Description: 'Hooked up to drop/keep'});
-   } catch(e){testResults.push({Error: e, Description: 'Hooked up to drop/keep'});}
+   assertions.push({Expected: [8], Actual: actual, Description: 'Hooked up to drop/keep'});
+   } catch(e){assertions.push({Error: e, Description: 'Hooked up to drop/keep'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().roll()', testResults, testState);
+   return TestRunner.displayResults('DicePool new DicePool().roll()', assertions, testState);
 };
 TestSuite.DicePool.sumRoll = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], actual, randomSource;
+   var assertions = [], actual, randomSource;
 
    try{
    randomSource = numberGenerator([{dieSides: 8, values: [5,8]}, {dieSides: 16, values: [12,16]}]);
    actual = new DicePool('2d8+2d16').sumRoll(randomSource);
-   testResults.push({Expected: 41, Actual: actual, Description: 'Happy path 2d8+2d16'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
+   assertions.push({Expected: 41, Actual: actual, Description: 'Happy path 2d8+2d16'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy path 2d8+2d16'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().sumRoll()', testResults, testState);
+   return TestRunner.displayResults('DicePool new DicePool().sumRoll()', assertions, testState);
 };
 TestSuite.DicePool.toJSON = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], expected;
+   var assertions = [], expected;
 
    try{
    //the tested pool needs explode and drop to make sure they are both fine after copy
@@ -113,8 +113,8 @@ TestSuite.DicePool.toJSON = async function(testState={})
          dropKeepCount: 1
       }
    ]};
-   testResults.push({Expected: expected, Actual: dicePool.toJSON(), Description: 'Does a defensive copy'});
-   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
+   assertions.push({Expected: expected, Actual: dicePool.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){assertions.push({Error: e, Description: 'Does a defensive copy'});}
 
    try{
    var input = {name: '1d2', pool: [
@@ -124,16 +124,16 @@ TestSuite.DicePool.toJSON = async function(testState={})
    ]};
    var actual = new DicePool(input);
    expected = new DicePool('1d2');
-   testResults.push({Expected: expected, Actual: actual, Description: 'Bug check: order of properties normalized'});
-   } catch(e){testResults.push({Error: e, Description: 'Bug check: order of properties normalized'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Bug check: order of properties normalized'});
+   } catch(e){assertions.push({Error: e, Description: 'Bug check: order of properties normalized'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().toJSON()', testResults, testState);
+   return TestRunner.displayResults('DicePool new DicePool().toJSON()', assertions, testState);
 };
 TestSuite.DicePool._constructor = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], returned, expected;
+   var assertions = [], returned, expected;
 
    try{
    returned = new DicePool('2d4').toJSON();
@@ -146,8 +146,8 @@ TestSuite.DicePool._constructor = async function(testState={})
          dropKeepCount: undefined
       }
    ]};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Calls _parseString'});
-   } catch(e){testResults.push({Error: e, Description: 'Calls _parseString'});}
+   assertions.push({Expected: expected, Actual: returned, Description: 'Calls _parseString'});
+   } catch(e){assertions.push({Error: e, Description: 'Calls _parseString'});}
 
    try{
    returned = new DicePool('2d4').toJSON();
@@ -161,8 +161,8 @@ TestSuite.DicePool._constructor = async function(testState={})
          dropKeepCount: undefined
       }
    ]};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Allows value of toJSON'});
-   } catch(e){testResults.push({Error: e, Description: 'Allows value of toJSON'});}
+   assertions.push({Expected: expected, Actual: returned, Description: 'Allows value of toJSON'});
+   } catch(e){assertions.push({Error: e, Description: 'Allows value of toJSON'});}
 
    try{
    returned = new DicePool('2d4').toJSON();
@@ -176,25 +176,25 @@ TestSuite.DicePool._constructor = async function(testState={})
          dropKeepCount: undefined
       }
    ]};
-   testResults.push({Expected: expected, Actual: returned, Description: 'Allows pool'});
-   } catch(e){testResults.push({Error: e, Description: 'Allows pool'});}
+   assertions.push({Expected: expected, Actual: returned, Description: 'Allows pool'});
+   } catch(e){assertions.push({Error: e, Description: 'Allows pool'});}
 
    try{
    new DicePool('2d4')._constructor();
-   TestRunner.failedToThrow(testResults, 'Call _constructor');
+   TestRunner.failedToThrow(assertions, 'Call _constructor');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
+       assertions.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
    }
 
    try{
    new DicePool('2d4d3');
-   TestRunner.failedToThrow(testResults, 'Calls _validate');
+   TestRunner.failedToThrow(assertions, 'Calls _validate');
    }
    catch(e)
    {
-       testResults.push({Expected: true, Actual: true, Description: 'Calls _validate'});  //see validate tests
+       assertions.push({Expected: true, Actual: true, Description: 'Calls _validate'});  //see validate tests
    }
 
    try{
@@ -220,82 +220,82 @@ TestSuite.DicePool._constructor = async function(testState={})
          dropKeepCount: 1
       }
    ]};
-   testResults.push({Expected: expected, Actual: dicePool.toJSON(), Description: 'Does a defensive copy'});
-   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
+   assertions.push({Expected: expected, Actual: dicePool.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){assertions.push({Error: e, Description: 'Does a defensive copy'});}
 
    try{
    returned = new DicePool('d6+2d2dl').toJSON().hasDropKeep;
-   testResults.push({Expected: true, Actual: returned, Description: 'hasDropKeep'});
-   } catch(e){testResults.push({Error: e, Description: 'hasDropKeep'});}
+   assertions.push({Expected: true, Actual: returned, Description: 'hasDropKeep'});
+   } catch(e){assertions.push({Error: e, Description: 'hasDropKeep'});}
 
    try{
    returned = new DicePool('d2+d4!-d3').toJSON().hasExplosions;
-   testResults.push({Expected: true, Actual: returned, Description: 'hasExplosions'});
-   } catch(e){testResults.push({Error: e, Description: 'hasExplosions'});}
+   assertions.push({Expected: true, Actual: returned, Description: 'hasExplosions'});
+   } catch(e){assertions.push({Error: e, Description: 'hasExplosions'});}
 
-   return TestRunner.displayResults('DicePool new DicePool()._constructor()', testResults, testState);
+   return TestRunner.displayResults('DicePool new DicePool()._constructor()', assertions, testState);
 };
 TestSuite.DicePool.dropKeepTypes = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], input;
+   var assertions = [], input;
 
    try{
    input = [2, 1, 3, 1];
    DicePool.dropKeepTypes.DropLowest.perform(2, input);
-   testResults.push({Expected: [2, 3], Actual: input, Description: 'DropLowest'});
-   } catch(e){testResults.push({Error: e, Description: 'DropLowest'});}
+   assertions.push({Expected: [2, 3], Actual: input, Description: 'DropLowest'});
+   } catch(e){assertions.push({Error: e, Description: 'DropLowest'});}
 
    try{
    input = [2, 1, 3, 1];
    DicePool.dropKeepTypes.DropLowest.perform(20, input);
-   testResults.push({Expected: [], Actual: input, Description: 'DropLowest: extra'});
-   } catch(e){testResults.push({Error: e, Description: 'DropLowest: extra'});}
+   assertions.push({Expected: [], Actual: input, Description: 'DropLowest: extra'});
+   } catch(e){assertions.push({Error: e, Description: 'DropLowest: extra'});}
 
    try{
    input = [2, 1, 3, 4];
    DicePool.dropKeepTypes.DropHighest.perform(2, input);
-   testResults.push({Expected: [2, 1], Actual: input, Description: 'DropHighest'});
-   } catch(e){testResults.push({Error: e, Description: 'DropHighest'});}
+   assertions.push({Expected: [2, 1], Actual: input, Description: 'DropHighest'});
+   } catch(e){assertions.push({Error: e, Description: 'DropHighest'});}
 
    try{
    input = [2, 1, 3, 4];
    DicePool.dropKeepTypes.DropHighest.perform(4, input);
-   testResults.push({Expected: [], Actual: input, Description: 'DropHighest: extra'});
-   } catch(e){testResults.push({Error: e, Description: 'DropHighest: extra'});}
+   assertions.push({Expected: [], Actual: input, Description: 'DropHighest: extra'});
+   } catch(e){assertions.push({Error: e, Description: 'DropHighest: extra'});}
 
    try{
    input = [2, 1, 3, 4];
    DicePool.dropKeepTypes.KeepLowest.perform(2, input);
-   testResults.push({Expected: [2, 1], Actual: input, Description: 'KeepLowest'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepLowest'});}
+   assertions.push({Expected: [2, 1], Actual: input, Description: 'KeepLowest'});
+   } catch(e){assertions.push({Error: e, Description: 'KeepLowest'});}
 
    try{
    input = [2, 1, 3, 4];
    DicePool.dropKeepTypes.KeepLowest.perform(20, input);
-   testResults.push({Expected: [2, 1, 3, 4], Actual: input, Description: 'KeepLowest: all'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepLowest: all'});}
+   assertions.push({Expected: [2, 1, 3, 4], Actual: input, Description: 'KeepLowest: all'});
+   } catch(e){assertions.push({Error: e, Description: 'KeepLowest: all'});}
 
    try{
    input = [2, 1, 3, 1];
    DicePool.dropKeepTypes.KeepHighest.perform(2, input);
-   testResults.push({Expected: [2, 3], Actual: input, Description: 'KeepHighest'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepHighest'});}
+   assertions.push({Expected: [2, 3], Actual: input, Description: 'KeepHighest'});
+   } catch(e){assertions.push({Error: e, Description: 'KeepHighest'});}
 
    try{
    input = [2, 1, 3, 1];
    DicePool.dropKeepTypes.KeepHighest.perform(4, input);
-   testResults.push({Expected: [2, 1, 3, 1], Actual: input, Description: 'KeepHighest: all'});
-   } catch(e){testResults.push({Error: e, Description: 'KeepHighest: all'});}
+   assertions.push({Expected: [2, 1, 3, 1], Actual: input, Description: 'KeepHighest: all'});
+   } catch(e){assertions.push({Error: e, Description: 'KeepHighest: all'});}
 
-   return TestRunner.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', testResults, testState);
+   return TestRunner.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', assertions, testState);
 };
 TestSuite.DicePool._validate = async function(testState={})
 {
    TestRunner.clearResults(testState);
 
-   var testResults = [], input, expected;
+   var assertions = [], input, expected;
    var d6 = new Die();
 
    try{
@@ -318,8 +318,8 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('-3d6d2', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'Happy Path all'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy Path all'});}
+   assertions.push({Expected: expected, Actual: input, Description: 'Happy Path all'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy Path all'});}
 
    try{
    input = [{die: d6}];
@@ -333,35 +333,35 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('1d6', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'Happy Path min'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy Path min'});}
+   assertions.push({Expected: expected, Actual: input, Description: 'Happy Path min'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy Path min'});}
 
    try{
    input = [{die: d6}];
    DicePool._validate(undefined, input);
-   TestRunner.failedToThrow(testResults, 'Invalid name');
+   TestRunner.failedToThrow(assertions, 'Invalid name');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireTypeOf, ['string', undefined]), Actual: e, Description: 'Invalid name'});
+       assertions.push({Expected: getError(Validation.requireTypeOf, ['string', undefined]), Actual: e, Description: 'Invalid name'});
    }
 
    try{
    DicePool._validate('crap', NaN);
-   TestRunner.failedToThrow(testResults, 'Invalid pool');
+   TestRunner.failedToThrow(assertions, 'Invalid pool');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireInstanceOf, [Array, NaN]), Actual: e, Description: 'Invalid pool'});
+       assertions.push({Expected: getError(Validation.requireInstanceOf, [Array, NaN]), Actual: e, Description: 'Invalid pool'});
    }
 
    try{
    DicePool._validate('empty', []);
-   TestRunner.failedToThrow(testResults, 'Empty pool');
+   TestRunner.failedToThrow(assertions, 'Empty pool');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('empty\npool must not be empty'), Actual: e, Description: 'Empty pool'});
+       assertions.push({Expected: new Error('empty\npool must not be empty'), Actual: e, Description: 'Empty pool'});
    }
 
    try{
@@ -376,17 +376,17 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('1d6', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'Auto create Die'});
-   } catch(e){testResults.push({Error: e, Description: 'Auto create Die'});}
+   assertions.push({Expected: expected, Actual: input, Description: 'Auto create Die'});
+   } catch(e){assertions.push({Error: e, Description: 'Auto create Die'});}
 
    try{
    input = [{die: d6, dieCount: 'soup'}];
    DicePool._validate('bad', input);
-   TestRunner.failedToThrow(testResults, 'Invalid dieCount');
+   TestRunner.failedToThrow(assertions, 'Invalid dieCount');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('bad\ninvalid dieCount: soup'), Actual: e, Description: 'Invalid dieCount'});
+       assertions.push({Expected: new Error('bad\ninvalid dieCount: soup'), Actual: e, Description: 'Invalid dieCount'});
    }
 
    try{
@@ -407,8 +407,8 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('2d6dL', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'Default dropKeepCount'});
-   } catch(e){testResults.push({Error: e, Description: 'Default dropKeepCount'});}
+   assertions.push({Expected: expected, Actual: input, Description: 'Default dropKeepCount'});
+   } catch(e){assertions.push({Error: e, Description: 'Default dropKeepCount'});}
 
    try{
    input = [
@@ -420,11 +420,11 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('bad', input);
-   TestRunner.failedToThrow(testResults, 'Invalid dropKeepCount');
+   TestRunner.failedToThrow(assertions, 'Invalid dropKeepCount');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('bad\ninvalid dropKeepCount: 2.5'), Actual: e, Description: 'Invalid dropKeepCount'});
+       assertions.push({Expected: new Error('bad\ninvalid dropKeepCount: 2.5'), Actual: e, Description: 'Invalid dropKeepCount'});
    }
 
    try{
@@ -437,11 +437,11 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('2d6d3', input);
-   TestRunner.failedToThrow(testResults, 'dropKeepCount too large no explode');
+   TestRunner.failedToThrow(assertions, 'dropKeepCount too large no explode');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('2d6d3\ndropKeepCount (3) is too large. dieCount=2'),
+       assertions.push({Expected: new Error('2d6d3\ndropKeepCount (3) is too large. dieCount=2'),
          Actual: e, Description: 'dropKeepCount too large no explode'});
    }
 
@@ -455,11 +455,11 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('2d6!!d3', input);
-   TestRunner.failedToThrow(testResults, 'dropKeepCount too large compound explode');
+   TestRunner.failedToThrow(assertions, 'dropKeepCount too large compound explode');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('2d6!!d3\ndropKeepCount (3) is too large. dieCount=2'),
+       assertions.push({Expected: new Error('2d6!!d3\ndropKeepCount (3) is too large. dieCount=2'),
          Actual: e, Description: 'dropKeepCount too large compound explode'});
    }
 
@@ -482,8 +482,8 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('2d6!d3', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'dropKeepCount not too large due to explode'});
-   } catch(e){testResults.push({Error: e, Description: 'dropKeepCount not too large due to explode'});}
+   assertions.push({Expected: expected, Actual: input, Description: 'dropKeepCount not too large due to explode'});
+   } catch(e){assertions.push({Error: e, Description: 'dropKeepCount not too large due to explode'});}
 
    try{
    input = [
@@ -495,11 +495,11 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('bad', input);
-   TestRunner.failedToThrow(testResults, 'Invalid dropKeepType');
+   TestRunner.failedToThrow(assertions, 'Invalid dropKeepType');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('bad\ninvalid dropKeepType: 12'),
+       assertions.push({Expected: new Error('bad\ninvalid dropKeepType: 12'),
          Actual: e, Description: 'Invalid dropKeepType'});
    }
 
@@ -522,8 +522,8 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('2d6k2', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'keep all removes dropKeepType'});
-   } catch(e){testResults.push({Error: e, Description: 'keep all removes dropKeepType'});}
+   assertions.push({Expected: expected, Actual: input, Description: 'keep all removes dropKeepType'});
+   } catch(e){assertions.push({Error: e, Description: 'keep all removes dropKeepType'});}
 
    try{
    input = [
@@ -535,11 +535,11 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('2d6d2', input);
-   TestRunner.failedToThrow(testResults, 'drop all');
+   TestRunner.failedToThrow(assertions, 'drop all');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('2d6d2\nIllegal: all dice (2) are always dropped.'),
+       assertions.push({Expected: new Error('2d6d2\nIllegal: all dice (2) are always dropped.'),
          Actual: e, Description: 'drop all'});
    }
 
@@ -561,8 +561,8 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('1d6', input);
-   testResults.push({Expected: expected, Actual: input, Description: 'null dropKeep become undefined'});
-   } catch(e){testResults.push({Error: e, Description: 'null dropKeep become undefined'});}
+   assertions.push({Expected: expected, Actual: input, Description: 'null dropKeep become undefined'});
+   } catch(e){assertions.push({Error: e, Description: 'null dropKeep become undefined'});}
 
    try{
    input = [
@@ -572,13 +572,13 @@ TestSuite.DicePool._validate = async function(testState={})
       }
    ];
    DicePool._validate('bad', input);
-   TestRunner.failedToThrow(testResults, 'Invalid areDiceNegative');
+   TestRunner.failedToThrow(assertions, 'Invalid areDiceNegative');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('bad\ninvalid areDiceNegative: 3'),
+       assertions.push({Expected: new Error('bad\ninvalid areDiceNegative: 3'),
          Actual: e, Description: 'Invalid areDiceNegative'});
    }
 
-   return TestRunner.displayResults('DicePool DicePool._validate()', testResults, testState);
+   return TestRunner.displayResults('DicePool DicePool._validate()', assertions, testState);
 };
