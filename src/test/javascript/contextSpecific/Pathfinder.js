@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Pathfinder = {};
-TestSuite.Pathfinder.Attack = function(isFirst)
+TestSuite.Pathfinder.Attack = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected, actual, actualStringValue;
 
@@ -257,11 +257,11 @@ TestSuite.Pathfinder.Attack = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'DR for both'});
    } catch(e){testResults.push({Error: e, Description: 'DR for both'});}
 
-   return TestRunner.displayResults('Pathfinder Pathfinder.Attack', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.Attack', testResults, testState);
 };
-TestSuite.Pathfinder.Attack_Stringifier = function(isFirst)
+TestSuite.Pathfinder.Attack_Stringifier = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -307,11 +307,11 @@ TestSuite.Pathfinder.Attack_Stringifier = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Grammar'});
    } catch(e){testResults.push({Error: e, Description: 'Grammar'});}
 
-   return TestRunner.displayResults('Pathfinder Pathfinder.Attack.Stringifier', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.Attack.Stringifier', testResults, testState);
 };
-TestSuite.Pathfinder.RollInitiative = function(isFirst)
+TestSuite.Pathfinder.RollInitiative = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected, randomSource;
 
@@ -351,11 +351,11 @@ TestSuite.Pathfinder.RollInitiative = function(isFirst)
    testResults.push({Expected: 'Frank', Actual: actual[5].name, Description: 'Stress Double tied initiative character[5]'});
    } catch(e){testResults.push({Error: e, Description: 'Stress Double tied initiative'});}
 
-   return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative', testResults, testState);
 };
-TestSuite.Pathfinder.RollInitiative_initiativeComparator = function(isFirst)
+TestSuite.Pathfinder.RollInitiative_initiativeComparator = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], characters;
 
@@ -379,11 +379,11 @@ TestSuite.Pathfinder.RollInitiative_initiativeComparator = function(isFirst)
    testResults.push({Expected: 'Clara', Actual: characters[2].character.name, Description: 'tied initiative total: lowest bonus last'});
    } catch(e){testResults.push({Error: e, Description: 'tied initiative total'});}
 
-   return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative._initiativeComparator', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.RollInitiative._initiativeComparator', testResults, testState);
 };
-TestSuite.Pathfinder.DeckOfIllusions = function(isFirst)
+TestSuite.Pathfinder.DeckOfIllusions = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, deck;
 
@@ -410,11 +410,11 @@ TestSuite.Pathfinder.DeckOfIllusions = function(isFirst)
    testResults.push({Expected: 'Illusion of deck\'s owner', Actual: deck.draw(randomSource), Description: 'Removed last card'});
    } catch(e){testResults.push({Error: e, Description: 'allowRandomlyMissing'});}
 
-   return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfIllusions', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfIllusions', testResults, testState);
 };
-TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
+TestSuite.Pathfinder.DeckOfManyThings = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], nonRandomGenerator, deck, actual, expected;
 
@@ -461,11 +461,11 @@ TestSuite.Pathfinder.DeckOfManyThings = function(isFirst)
    testResults.push({Expected: 'Key', Actual: deck.draw(nonRandomGenerator)[0].Plaque, Description: 'And both are removed'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: Fool can draw Jester'});}
 
-   return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfManyThings', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.DeckOfManyThings', testResults, testState);
 };
-TestSuite.Pathfinder.HarrowDeckOfManyThings = function(isFirst)
+TestSuite.Pathfinder.HarrowDeckOfManyThings = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], nonRandomGenerator, expected;
 
@@ -475,5 +475,5 @@ TestSuite.Pathfinder.HarrowDeckOfManyThings = function(isFirst)
    testResults.push({Expected: expected, Actual: Pathfinder.HarrowDeckOfManyThings.draw(nonRandomGenerator), Description: 'Happy path'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
-   return TestRunner.displayResults('Pathfinder Pathfinder.HarrowDeckOfManyThings', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder Pathfinder.HarrowDeckOfManyThings', testResults, testState);
 };

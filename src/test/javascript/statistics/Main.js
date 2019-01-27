@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Statistics = {};
-TestSuite.Statistics.calculateAggregates = function(isFirst)
+TestSuite.Statistics.calculateAggregates = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -33,11 +33,11 @@ TestSuite.Statistics.calculateAggregates = function(isFirst)
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
    //TODO: test: probability
 
-   return TestRunner.displayResults('Statistics Statistics.calculateAggregates', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.calculateAggregates', testResults, testState);
 };
-TestSuite.Statistics.calculateDiceSums = function(isFirst)
+TestSuite.Statistics.calculateDiceSums = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected, diceGroup;
 
@@ -55,11 +55,11 @@ TestSuite.Statistics.calculateDiceSums = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 DropLowest 1'});
    } catch(e){testResults.push({Error: e, Description: '2d2 DropLowest 1'});}
 
-   return TestRunner.displayResults('Statistics Statistics.calculateDiceSums', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.calculateDiceSums', testResults, testState);
 };
-TestSuite.Statistics.combineResults = function(isFirst)
+TestSuite.Statistics.combineResults = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected, stats, input;
 
@@ -107,11 +107,11 @@ TestSuite.Statistics.combineResults = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '3d2 false'});
    } catch(e){testResults.push({Error: e, Description: '3d2 false'});}
 
-   return TestRunner.displayResults('Statistics Statistics.combineResults', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.combineResults', testResults, testState);
 };
-TestSuite.Statistics.determineProbability = function(isFirst)
+TestSuite.Statistics.determineProbability = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -134,11 +134,11 @@ TestSuite.Statistics.determineProbability = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
    } catch(e){testResults.push({Error: e, Description: '2d6'});}
 
-   return TestRunner.displayResults('Statistics Statistics.determineProbability', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.determineProbability', testResults, testState);
 };
-TestSuite.Statistics.passFailBinomial = function(isFirst)
+TestSuite.Statistics.passFailBinomial = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -242,5 +242,5 @@ TestSuite.Statistics.passFailBinomial = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Reroll allowed'});
    } catch(e){testResults.push({Error: e, Description: 'Reroll allowed'});}
 
-   return TestRunner.displayResults('Statistics Statistics.passFailBinomial', testResults, isFirst);
+   return TestRunner.displayResults('Statistics Statistics.passFailBinomial', testResults, testState);
 };

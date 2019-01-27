@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Algorithm = {};
-TestSuite.Algorithm.analyze = function(isFirst)
+TestSuite.Algorithm.analyze = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -66,11 +66,11 @@ TestSuite.Algorithm.analyze = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '4d2! keep lowest 3'});
    } catch(e){testResults.push({Error: e, Description: '4d2! keep lowest 3'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.analyze', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.analyze', testResults, testState);
 };
-TestSuite.Algorithm.bruteForce = function(isFirst)
+TestSuite.Algorithm.bruteForce = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected, diceGroup, everyDieValue;
 
@@ -272,11 +272,11 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
    } catch(e){testResults.push({Error: e, Description: '2d2 + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.bruteForce', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.bruteForce', testResults, testState);
 };
-TestSuite.Algorithm.nonDropping = function(isFirst)
+TestSuite.Algorithm.nonDropping = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected, diceGroup, everyDieValue;
    var testStrings = ['2d6', '-d3', '1d3!r2', '1d3!pr1', '2d2!!r1'];
@@ -300,11 +300,11 @@ TestSuite.Algorithm.nonDropping = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
    } catch(e){testResults.push({Error: e, Description: '2d2 + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.nonDropping', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.nonDropping', testResults, testState);
 };
-TestSuite.Algorithm.singleDrop = function(isFirst)
+TestSuite.Algorithm.singleDrop = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected, diceGroup, everyDieValue;
    var testStrings = ['3d6', '-2d3', '2d3!r2', '2d2!!r1'];
@@ -348,7 +348,7 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '2d2 drop highest + constantModifier 10'});
    } catch(e){testResults.push({Error: e, Description: '2d2 drop highest + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.singleDrop', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.singleDrop', testResults, testState);
 };
 /**
 Stress tests:

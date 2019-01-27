@@ -54,9 +54,9 @@ numberGenerator.values = function(numberArray)
 
 //TODO: consider moving these tests to a new file:
 TestSuite.Util = {};
-TestSuite.Util.numberGenerator_dice = function(isFirst)
+TestSuite.Util.numberGenerator_dice = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], generator;
 
@@ -65,11 +65,11 @@ TestSuite.Util.numberGenerator_dice = function(isFirst)
    testResults.push({Expected: (4/8), Actual: generator(), Description: 'Quick test'});
    } catch(e){testResults.push({Error: e, Description: 'Quick test'});}
 
-   return TestRunner.displayResults('Testing Util numberGenerator.dice', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util numberGenerator.dice', testResults, testState);
 };
-TestSuite.Util.numberGenerator_values = function(isFirst)
+TestSuite.Util.numberGenerator_values = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], generator;
 
@@ -89,5 +89,5 @@ TestSuite.Util.numberGenerator_values = function(isFirst)
       testResults.push({Expected: new Error('Ran out of numbers'), Actual: e, Description: 'End'});
    }
 
-   return TestRunner.displayResults('Testing Util numberGenerator.values', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util numberGenerator.values', testResults, testState);
 };

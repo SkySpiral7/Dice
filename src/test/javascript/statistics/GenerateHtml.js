@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.GenerateHtml = {};
-TestSuite.GenerateHtml.aggregates = function(isFirst)
+TestSuite.GenerateHtml.aggregates = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, actual, expected;
 
@@ -17,11 +17,11 @@ TestSuite.GenerateHtml.aggregates = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Aggregates'});
    } catch(e){testResults.push({Error: e, Description: 'Aggregates'});}
 
-   return TestRunner.displayResults('GenerateHtml GenerateHtml.aggregates', testResults, isFirst);
+   return TestRunner.displayResults('GenerateHtml GenerateHtml.aggregates', testResults, testState);
 };
-TestSuite.GenerateHtml.statistics = function(isFirst)
+TestSuite.GenerateHtml.statistics = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -62,5 +62,5 @@ TestSuite.GenerateHtml.statistics = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Unfair probability <'});
    } catch(e){testResults.push({Error: e, Description: 'Unfair probability <'});}
 
-   return TestRunner.displayResults('GenerateHtml GenerateHtml.statistics', testResults, isFirst);
+   return TestRunner.displayResults('GenerateHtml GenerateHtml.statistics', testResults, testState);
 };

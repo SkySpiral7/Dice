@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Parser = {};
-TestSuite.Parser.dicePool = function(isFirst)
+TestSuite.Parser.dicePool = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], returned, expected, string;
 
@@ -107,11 +107,11 @@ TestSuite.Parser.dicePool = function(isFirst)
    testResults.push({Expected: expected, Actual: returned, Description: 'Leading plus: +d4'});
    } catch(e){testResults.push({Error: e, Description: 'Leading plus: +d4'});}
 
-   return TestRunner.displayResults('Parser Parser.dicePool', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser.dicePool', testResults, testState);
 };
-TestSuite.Parser._diceGroup = function(isFirst)
+TestSuite.Parser._diceGroup = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expected, string, group;
 
@@ -264,11 +264,11 @@ TestSuite.Parser._diceGroup = function(isFirst)
        testResults.push({Expected: new Error('d3 reroll 1!\nUnparsable: !'), Actual: e, Description: 'Illegal: Long then short'});
    }
 
-   return TestRunner.displayResults('Parser Parser._diceGroup', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser._diceGroup', testResults, testState);
 };
-TestSuite.Parser._shortHand = function(isFirst)
+TestSuite.Parser._shortHand = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], returned, expected, string, group;
 
@@ -378,11 +378,11 @@ TestSuite.Parser._shortHand = function(isFirst)
        testResults.push({Expected: new Error('d1k1\nmultiple drop/keep criteria found. Max is 1'), Actual: e, Description: '2 dropKeep'});
    }
 
-   return TestRunner.displayResults('Parser Parser._shortHand', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser._shortHand', testResults, testState);
 };
-TestSuite.Parser._longHand = function(isFirst)
+TestSuite.Parser._longHand = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], returned, expected, string, group;
 
@@ -519,5 +519,5 @@ TestSuite.Parser._longHand = function(isFirst)
    testResults.push({Expected: string, Actual: returned, Description: 'Ignore keep alone: dropKeepCount'});
    } catch(e){testResults.push({Error: e, Description: 'Ignore keep alone'});}
 
-   return TestRunner.displayResults('Parser Parser._longHand', testResults, isFirst);
+   return TestRunner.displayResults('Parser Parser._longHand', testResults, testState);
 };

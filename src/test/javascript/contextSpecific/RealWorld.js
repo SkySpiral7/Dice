@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.RealWorld = {};
-TestSuite.RealWorld.Coin = function(isFirst)
+TestSuite.RealWorld.Coin = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], nonRandomGenerator;
 
@@ -16,11 +16,11 @@ TestSuite.RealWorld.Coin = function(isFirst)
    testResults.push({Expected: 'Tails', Actual: RealWorld.Coin.flip(nonRandomGenerator), Description: 'flip is alias for roll'});
    } catch(e){testResults.push({Error: e, Description: 'flip is alias for roll'});}
 
-   return TestRunner.displayResults('RealWorld RealWorld.Coin', testResults, isFirst);
+   return TestRunner.displayResults('RealWorld RealWorld.Coin', testResults, testState);
 };
-TestSuite.RealWorld.MagicEightBall = function(isFirst)
+TestSuite.RealWorld.MagicEightBall = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], nonRandomGenerator;
 
@@ -39,11 +39,11 @@ TestSuite.RealWorld.MagicEightBall = function(isFirst)
    testResults.push({Expected: 'Outlook not so good', Actual: RealWorld.MagicEightBall.ask(nonRandomGenerator), Description: 'ask is alias for roll'});
    } catch(e){testResults.push({Error: e, Description: 'ask is alias for roll'});}
 
-   return TestRunner.displayResults('RealWorld RealWorld.MagicEightBall', testResults, isFirst);
+   return TestRunner.displayResults('RealWorld RealWorld.MagicEightBall', testResults, testState);
 };
-TestSuite.RealWorld.StandardAmericanPlayingCards = function(isFirst)
+TestSuite.RealWorld.StandardAmericanPlayingCards = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], nonRandomGenerator, deck, expected;
 
@@ -72,11 +72,11 @@ TestSuite.RealWorld.StandardAmericanPlayingCards = function(isFirst)
    testResults.push({Expected: expected, Actual: deck.draw(nonRandomGenerator), Description: 'Include jokers'});
    } catch(e){testResults.push({Error: e, Description: 'Include jokers'});}
 
-   return TestRunner.displayResults('RealWorld RealWorld.StandardAmericanPlayingCards', testResults, isFirst);
+   return TestRunner.displayResults('RealWorld RealWorld.StandardAmericanPlayingCards', testResults, testState);
 };
-TestSuite.RealWorld.RiderWaiteTarotDeck = function(isFirst)
+TestSuite.RealWorld.RiderWaiteTarotDeck = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], nonRandomGenerator, deck, expected;
 
@@ -112,5 +112,5 @@ TestSuite.RealWorld.RiderWaiteTarotDeck = function(isFirst)
    testResults.push({Expected: expected, Actual: deck.draw(nonRandomGenerator), Description: 'The World'});
    } catch(e){testResults.push({Error: e, Description: 'The World'});}
 
-   return TestRunner.displayResults('RealWorld RealWorld.RiderWaiteTarotDeck', testResults, isFirst);
+   return TestRunner.displayResults('RealWorld RealWorld.RiderWaiteTarotDeck', testResults, testState);
 };

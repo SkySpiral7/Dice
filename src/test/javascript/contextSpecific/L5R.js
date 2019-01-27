@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.L5R = {};
-TestSuite.L5R.DicePool = function(isFirst)
+TestSuite.L5R.DicePool = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual;
 
@@ -78,11 +78,11 @@ TestSuite.L5R.DicePool = function(isFirst)
          Actual: e, Description: '11+ dice'});
    }
 
-   return TestRunner.displayResults('L5R L5R.DicePool', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.DicePool', testResults, testState);
 };
-TestSuite.L5R.Parser = function(isFirst)
+TestSuite.L5R.Parser = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -148,11 +148,11 @@ TestSuite.L5R.Parser = function(isFirst)
          Actual: e, Description: 'Includes drop'});
    }
 
-   return TestRunner.displayResults('L5R L5R.Parser', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.Parser', testResults, testState);
 };
-TestSuite.L5R.GeneralRoll_Stringifier = function(isFirst)
+TestSuite.L5R.GeneralRoll_Stringifier = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -179,11 +179,11 @@ TestSuite.L5R.GeneralRoll_Stringifier = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'None dropped'});
    } catch(e){testResults.push({Error: e, Description: 'None dropped'});}
 
-   return TestRunner.displayResults('L5R L5R.GeneralRoll.Stringifier', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.GeneralRoll.Stringifier', testResults, testState);
 };
-TestSuite.L5R.GeneralRoll = function(isFirst)
+TestSuite.L5R.GeneralRoll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected, actual, stringValue;
 
@@ -373,5 +373,5 @@ TestSuite.L5R.GeneralRoll = function(isFirst)
 
    //both success true/false was tested by numberOfRaises increases TN
 
-   return TestRunner.displayResults('L5R L5R.GeneralRoll', testResults, isFirst);
+   return TestRunner.displayResults('L5R L5R.GeneralRoll', testResults, testState);
 };

@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.DicePool = {};
-TestSuite.DicePool.equals = function(isFirst)
+TestSuite.DicePool.equals = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, inputA, inputB;
 
@@ -51,11 +51,11 @@ TestSuite.DicePool.equals = function(isFirst)
    testResults.push({Expected: false, Actual: actual, Description: 'Not equal'});
    } catch(e){testResults.push({Error: e, Description: 'Not equal'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().equals()', testResults, isFirst);
+   return TestRunner.displayResults('DicePool new DicePool().equals()', testResults, testState);
 };
-TestSuite.DicePool.roll = function(isFirst)
+TestSuite.DicePool.roll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, randomSource;
 
@@ -77,11 +77,11 @@ TestSuite.DicePool.roll = function(isFirst)
    testResults.push({Expected: [8], Actual: actual, Description: 'Hooked up to drop/keep'});
    } catch(e){testResults.push({Error: e, Description: 'Hooked up to drop/keep'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().roll()', testResults, isFirst);
+   return TestRunner.displayResults('DicePool new DicePool().roll()', testResults, testState);
 };
-TestSuite.DicePool.sumRoll = function(isFirst)
+TestSuite.DicePool.sumRoll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, randomSource;
 
@@ -91,11 +91,11 @@ TestSuite.DicePool.sumRoll = function(isFirst)
    testResults.push({Expected: 41, Actual: actual, Description: 'Happy path 2d8+2d16'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path 2d8+2d16'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().sumRoll()', testResults, isFirst);
+   return TestRunner.displayResults('DicePool new DicePool().sumRoll()', testResults, testState);
 };
-TestSuite.DicePool.toJSON = function(isFirst)
+TestSuite.DicePool.toJSON = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expected;
 
@@ -127,11 +127,11 @@ TestSuite.DicePool.toJSON = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Bug check: order of properties normalized'});
    } catch(e){testResults.push({Error: e, Description: 'Bug check: order of properties normalized'});}
 
-   return TestRunner.displayResults('DicePool new DicePool().toJSON()', testResults, isFirst);
+   return TestRunner.displayResults('DicePool new DicePool().toJSON()', testResults, testState);
 };
-TestSuite.DicePool._constructor = function(isFirst)
+TestSuite.DicePool._constructor = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], returned, expected;
 
@@ -233,11 +233,11 @@ TestSuite.DicePool._constructor = function(isFirst)
    testResults.push({Expected: true, Actual: returned, Description: 'hasExplosions'});
    } catch(e){testResults.push({Error: e, Description: 'hasExplosions'});}
 
-   return TestRunner.displayResults('DicePool new DicePool()._constructor()', testResults, isFirst);
+   return TestRunner.displayResults('DicePool new DicePool()._constructor()', testResults, testState);
 };
-TestSuite.DicePool.dropKeepTypes = function(isFirst)
+TestSuite.DicePool.dropKeepTypes = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input;
 
@@ -289,11 +289,11 @@ TestSuite.DicePool.dropKeepTypes = function(isFirst)
    testResults.push({Expected: [2, 1, 3, 1], Actual: input, Description: 'KeepHighest: all'});
    } catch(e){testResults.push({Error: e, Description: 'KeepHighest: all'});}
 
-   return TestRunner.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', testResults, isFirst);
+   return TestRunner.displayResults('DicePool DicePool.dropKeepTypes.?.perform()', testResults, testState);
 };
-TestSuite.DicePool._validate = function(isFirst)
+TestSuite.DicePool._validate = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected;
    var d6 = new Die();
@@ -580,5 +580,5 @@ TestSuite.DicePool._validate = function(isFirst)
          Actual: e, Description: 'Invalid areDiceNegative'});
    }
 
-   return TestRunner.displayResults('DicePool DicePool._validate()', testResults, isFirst);
+   return TestRunner.displayResults('DicePool DicePool._validate()', testResults, testState);
 };

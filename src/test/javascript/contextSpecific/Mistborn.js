@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Mistborn = {};
-TestSuite.Mistborn.Challenge = function(isFirst)
+TestSuite.Mistborn.Challenge = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected, actual;
 
@@ -97,11 +97,11 @@ TestSuite.Mistborn.Challenge = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: pair of 6 is result 0'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: pair of 6 is result 0'});}
 
-   return TestRunner.displayResults('Mistborn Mistborn.Challenge', testResults, isFirst);
+   return TestRunner.displayResults('Mistborn Mistborn.Challenge', testResults, testState);
 };
-TestSuite.Mistborn.Contest = function(isFirst)
+TestSuite.Mistborn.Contest = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], character1, character2, expected, actual;
 
@@ -222,5 +222,5 @@ TestSuite.Mistborn.Contest = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'difficulty:fail, other:negative, winner:2'});
    } catch(e){testResults.push({Error: e, Description: 'difficulty:fail, other:negative, winner:2'});}
 
-   return TestRunner.displayResults('Mistborn Mistborn.Contest', testResults, isFirst);
+   return TestRunner.displayResults('Mistborn Mistborn.Contest', testResults, testState);
 };

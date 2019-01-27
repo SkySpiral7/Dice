@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.DiceExpression = {};
-TestSuite.DiceExpression.add = function(isFirst)
+TestSuite.DiceExpression.add = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -23,11 +23,11 @@ TestSuite.DiceExpression.add = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '6x+4x^2 + (2x+x^2) = 8x+5x^2'});
    } catch(e){testResults.push({Error: e, Description: '6x+4x^2 + (2x+x^2) = 8x+5x^2'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().add()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().add()', testResults, testState);
 };
-TestSuite.DiceExpression.addTerm = function(isFirst)
+TestSuite.DiceExpression.addTerm = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -101,11 +101,11 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Don\'t add 0 coefficients'});
    } catch(e){testResults.push({Error: e, Description: 'Don\'t add 0 coefficients'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, testState);
 };
-TestSuite.DiceExpression.clone = function(isFirst)
+TestSuite.DiceExpression.clone = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -125,11 +125,11 @@ TestSuite.DiceExpression.clone = function(isFirst)
    testResults.push({Expected: expected, Actual: actual.toJSON(), Description: 'Can clone an empty one'});
    } catch(e){testResults.push({Error: e, Description: 'Can clone an empty one'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().clone()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().clone()', testResults, testState);
 };
-TestSuite.DiceExpression.multiply = function(isFirst)
+TestSuite.DiceExpression.multiply = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -157,11 +157,11 @@ TestSuite.DiceExpression.multiply = function(isFirst)
          Actual: e, Description: 'Illegal arg'});
    }
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().multiply()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().multiply()', testResults, testState);
 };
-TestSuite.DiceExpression.negateExponents = function(isFirst)
+TestSuite.DiceExpression.negateExponents = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -194,11 +194,11 @@ TestSuite.DiceExpression.negateExponents = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Negate array exponents'});
    } catch(e){testResults.push({Error: e, Description: 'Negate array exponents'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, testState);
 };
-TestSuite.DiceExpression.power = function(isFirst)
+TestSuite.DiceExpression.power = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -226,11 +226,11 @@ TestSuite.DiceExpression.power = function(isFirst)
          Actual: e, Description: 'Illegal arg'});
    }
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().power()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().power()', testResults, testState);
 };
-TestSuite.DiceExpression.subtract = function(isFirst)
+TestSuite.DiceExpression.subtract = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -251,11 +251,11 @@ TestSuite.DiceExpression.subtract = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});
    } catch(e){testResults.push({Error: e, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().subtract()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().subtract()', testResults, testState);
 };
-TestSuite.DiceExpression.toDiceResults = function(isFirst)
+TestSuite.DiceExpression.toDiceResults = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -286,11 +286,11 @@ TestSuite.DiceExpression.toDiceResults = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Use probability'});
    } catch(e){testResults.push({Error: e, Description: 'Use probability'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, testState);
 };
-TestSuite.DiceExpression.toJSON = function(isFirst)
+TestSuite.DiceExpression.toJSON = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -304,11 +304,11 @@ TestSuite.DiceExpression.toJSON = function(isFirst)
    testResults.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
    } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().toJSON()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().toJSON()', testResults, testState);
 };
-TestSuite.DiceExpression._constructor = function(isFirst)
+TestSuite.DiceExpression._constructor = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, expected;
 
@@ -398,11 +398,11 @@ TestSuite.DiceExpression._constructor = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'd6r3'});
    } catch(e){testResults.push({Error: e, Description: 'd6r3'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, testState);
 };
-TestSuite.DiceExpression.everyValue = function(isFirst)
+TestSuite.DiceExpression.everyValue = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expression, actual, expected;
 
@@ -572,5 +572,5 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: minimum compound explodes'});
    } catch(e){testResults.push({Error: e, Description: 'Edge case: minimum compound explodes'});}
 
-   return TestRunner.displayResults('DiceExpression DiceExpression.everyValue()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression DiceExpression.everyValue()', testResults, testState);
 };

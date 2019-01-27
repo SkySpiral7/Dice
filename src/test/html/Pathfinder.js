@@ -1,9 +1,9 @@
 'use strict';
 TestConfig.betweenEach=function(){randomSource = undefined;};
 TestSuite.client = {Pathfinder: {}};
-TestSuite.client.Pathfinder.parseCharacterData = function(isFirst)
+TestSuite.client.Pathfinder.parseCharacterData = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [];
 
@@ -23,11 +23,11 @@ TestSuite.client.Pathfinder.parseCharacterData = function(isFirst)
    testResults.push({Expected: 'Is noteworthy', Actual: characters[1].notes, Description: 'Without destroying notes'});
    } catch(e){testResults.push({Error: e, Description: 'Notes default to ""'});}
 
-   return TestRunner.displayResults('Pathfinder.html parseCharacterData', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html parseCharacterData', testResults, testState);
 };
-TestSuite.client.Pathfinder.initiative = function(isFirst)
+TestSuite.client.Pathfinder.initiative = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [];
 
@@ -46,11 +46,11 @@ TestSuite.client.Pathfinder.initiative = function(isFirst)
    testResults.push({Expected: 'Bob', Actual: document.getElementById('attacker').options[1].text, Description: 'initiativeButton: Character.Option[1].text'});
    } catch(e){testResults.push({Error: e, Description: 'initiative'});}
 
-   return TestRunner.displayResults('Pathfinder.html initiative', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html initiative', testResults, testState);
 };
-TestSuite.client.Pathfinder.createCharacterOptions = function(isFirst)
+TestSuite.client.Pathfinder.createCharacterOptions = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [];
 
@@ -70,11 +70,11 @@ TestSuite.client.Pathfinder.createCharacterOptions = function(isFirst)
    testResults.push({Expected: 'Is noteworthy', Actual: document.getElementById('targetNotes').value, Description: 'targetNotes.value'});
    } catch(e){testResults.push({Error: e, Description: 'parseCharacterButton'});}
 
-   return TestRunner.displayResults('Pathfinder.html createCharacterOptions', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html createCharacterOptions', testResults, testState);
 };
-TestSuite.client.Pathfinder.createAttackOptions = function(isFirst)
+TestSuite.client.Pathfinder.createAttackOptions = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [];
 
@@ -104,11 +104,11 @@ TestSuite.client.Pathfinder.createAttackOptions = function(isFirst)
    testResults.push({Expected: 'Ends with B', Actual: document.getElementById('attackerNotes').value, Description: 'attacker onchange: attackerNotes'});
    } catch(e){testResults.push({Error: e, Description: 'attacker onchange'});}
 
-   return TestRunner.displayResults('Pathfinder.html createAttackOptions', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html createAttackOptions', testResults, testState);
 };
-TestSuite.client.Pathfinder.displayNotes = function(isFirst)
+TestSuite.client.Pathfinder.displayNotes = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [];
 
@@ -132,11 +132,11 @@ TestSuite.client.Pathfinder.displayNotes = function(isFirst)
    testResults.push({Expected: 'Ends with B', Actual: document.getElementById('targetNotes').value, Description: 'targetNotes.value changed'});
    } catch(e){testResults.push({Error: e, Description: 'target onchange'});}
 
-   return TestRunner.displayResults('Pathfinder.html displayNotes', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html displayNotes', testResults, testState);
 };
-TestSuite.client.Pathfinder.updateNotes = function(isFirst)
+TestSuite.client.Pathfinder.updateNotes = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [];
 
@@ -188,11 +188,11 @@ TestSuite.client.Pathfinder.updateNotes = function(isFirst)
    testResults.push({Expected: 'Ends with B', Actual: document.getElementById('targetNotes').value, Description: 'Same character, change targetNotes: new targetNotes.value'});
    } catch(e){testResults.push({Error: e, Description: 'Same character'});}
 
-   return TestRunner.displayResults('Pathfinder.html updateNotes', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html updateNotes', testResults, testState);
 };
-TestSuite.client.Pathfinder.attack = function(isFirst)
+TestSuite.client.Pathfinder.attack = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [];
 
@@ -216,11 +216,11 @@ TestSuite.client.Pathfinder.attack = function(isFirst)
    testResults.push({Expected: false, Actual: '' === document.getElementById('result').innerHTML, Description: 'All values attack didn\'t throw'});
    } catch(e){testResults.push({Error: e, Description: 'attackButton'});}
 
-   return TestRunner.displayResults('Pathfinder.html attack', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html attack', testResults, testState);
 };
-TestSuite.client.Pathfinder.createAttackInput = function(isFirst)
+TestSuite.client.Pathfinder.createAttackInput = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], expected, actual;
 
@@ -299,5 +299,5 @@ TestSuite.client.Pathfinder.createAttackInput = function(isFirst)
    testResults.push({Expected: 4, Actual: actual.opposingAc, Description: 'Flat-footed touch attack'});
    } catch(e){testResults.push({Error: e, Description: 'Flat-footed touch attack'});}
 
-   return TestRunner.displayResults('Pathfinder.html createAttackInput', testResults, isFirst);
+   return TestRunner.displayResults('Pathfinder.html createAttackInput', testResults, testState);
 };

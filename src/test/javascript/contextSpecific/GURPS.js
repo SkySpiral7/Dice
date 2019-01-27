@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.GURPS = {};
-TestSuite.GURPS.ReactionRoll = function(isFirst)
+TestSuite.GURPS.ReactionRoll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, actual;
 
@@ -126,11 +126,11 @@ TestSuite.GURPS.ReactionRoll = function(isFirst)
    testResults.push({Expected: 'Excellent', Actual: actual, Description: 'High Excellent'});
    } catch(e){testResults.push({Error: e, Description: 'Excellent'});}
 
-   return TestRunner.displayResults('GURPS GURPS.ReactionRoll', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS.ReactionRoll', testResults, testState);
 };
-TestSuite.GURPS.SuccessRoll = function(isFirst)
+TestSuite.GURPS.SuccessRoll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, actual, expected;
 
@@ -267,11 +267,11 @@ TestSuite.GURPS.SuccessRoll = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: '10 more than effectiveSkill is critical failure: effectiveSkill 3'});
    } catch(e){testResults.push({Error: e, Description: '10 more than skill is critical failure'});}
 
-   return TestRunner.displayResults('GURPS GURPS.SuccessRoll', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS.SuccessRoll', testResults, testState);
 };
-TestSuite.GURPS._noCritSuccessRoll = function(isFirst)
+TestSuite.GURPS._noCritSuccessRoll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, actual, expected;
 
@@ -296,11 +296,11 @@ TestSuite.GURPS._noCritSuccessRoll = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Margin 0 is a success'});
    } catch(e){testResults.push({Error: e, Description: 'Margin 0 is a success'});}
 
-   return TestRunner.displayResults('GURPS GURPS._noCritSuccessRoll', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS._noCritSuccessRoll', testResults, testState);
 };
-TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
+TestSuite.GURPS.QuickContestedSuccessRoll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, actual, actualStringValue, expected;
 
@@ -376,11 +376,11 @@ TestSuite.GURPS.QuickContestedSuccessRoll = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Both failed. Tie'});
    } catch(e){testResults.push({Error: e, Description: 'Both failed. Tie'});}
 
-   return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll', testResults, testState);
 };
-TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(isFirst)
+TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, actual, expected;
 
@@ -426,11 +426,11 @@ TestSuite.GURPS.QuickContestedSuccessRoll_Stringifier = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Tie: both failed.'});
    } catch(e){testResults.push({Error: e, Description: 'Tie: both failed'});}
 
-   return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll.Stringifier', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS.QuickContestedSuccessRoll.Stringifier', testResults, testState);
 };
-TestSuite.GURPS.RegularContestedSuccessRoll = function(isFirst)
+TestSuite.GURPS.RegularContestedSuccessRoll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, actual, expected;
 
@@ -496,11 +496,11 @@ TestSuite.GURPS.RegularContestedSuccessRoll = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Tie: failed'});
    } catch(e){testResults.push({Error: e, Description: 'Tie: failed'});}
 
-   return TestRunner.displayResults('GURPS GURPS.RegularContestedSuccessRoll', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS.RegularContestedSuccessRoll', testResults, testState);
 };
-TestSuite.GURPS._parseDamageString = function(isFirst)
+TestSuite.GURPS._parseDamageString = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, actual;
 
@@ -550,11 +550,11 @@ TestSuite.GURPS._parseDamageString = function(isFirst)
    testResults.push({Expected: 40, Actual: actual, Description: 'Allows *'});
    } catch(e){testResults.push({Error: e, Description: 'Allows *'});}
 
-   return TestRunner.displayResults('GURPS GURPS._parseDamageString', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS._parseDamageString', testResults, testState);
 };
-TestSuite.GURPS.RandomHitLocation = function(isFirst)
+TestSuite.GURPS.RandomHitLocation = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource;
 
@@ -572,5 +572,5 @@ TestSuite.GURPS.RandomHitLocation = function(isFirst)
    testResults.push({Expected: 'Right Foot', Actual: GURPS.RandomHitLocation.roll(randomSource), Description: '15 is nested'});
    } catch(e){testResults.push({Error: e, Description: 'nested'});}
 
-   return TestRunner.displayResults('GURPS GURPS.RandomHitLocation', testResults, isFirst);
+   return TestRunner.displayResults('GURPS GURPS.RandomHitLocation', testResults, testState);
 };

@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Ironclaw = {};
-TestSuite.Ironclaw.DicePool = function(isFirst)
+TestSuite.Ironclaw.DicePool = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual;
 
@@ -56,5 +56,5 @@ TestSuite.Ironclaw.DicePool = function(isFirst)
    testResults.push({Expected: new DicePool('2d12+d6'), Actual: actual, Description: '12 => 2d12+d6'});
    } catch(e){testResults.push({Error: e, Description: '12 => 2d12+d6'});}
 
-   return TestRunner.displayResults('Ironclaw Ironclaw.DicePool', testResults, isFirst);
+   return TestRunner.displayResults('Ironclaw Ironclaw.DicePool', testResults, testState);
 };

@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Die = {};
-TestSuite.Die.equals = function(isFirst)
+TestSuite.Die.equals = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, inputA, inputB;
 
@@ -37,11 +37,11 @@ TestSuite.Die.equals = function(isFirst)
    testResults.push({Expected: false, Actual: actual, Description: 'Not equal'});
    } catch(e){testResults.push({Error: e, Description: 'Not equal'});}
 
-   return TestRunner.displayResults('Die new Die().equals()', testResults, isFirst);
+   return TestRunner.displayResults('Die new Die().equals()', testResults, testState);
 };
-TestSuite.Die.roll = function(isFirst)
+TestSuite.Die.roll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual, nonRandomNumbers, generator;
 
@@ -108,11 +108,11 @@ TestSuite.Die.roll = function(isFirst)
    testResults.push({Expected: [9], Actual: actual, Description: 'Reroll with compound explode'});
    } catch(e){testResults.push({Error: e, Description: 'Reroll with compound explode'});}
 
-   return TestRunner.displayResults('Die new Die().roll()', testResults, isFirst);
+   return TestRunner.displayResults('Die new Die().roll()', testResults, testState);
 };
-TestSuite.Die._constructor = function(isFirst)
+TestSuite.Die._constructor = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], die, input, expected;
 
@@ -193,11 +193,11 @@ TestSuite.Die._constructor = function(isFirst)
          Actual: e, Description: 'Negative die'});
    }
 
-   return TestRunner.displayResults('Die new Die()._constructor', testResults, isFirst);
+   return TestRunner.displayResults('Die new Die()._constructor', testResults, testState);
 };
-TestSuite.Die._optimizeReroll = function(isFirst)
+TestSuite.Die._optimizeReroll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected;
 
@@ -223,11 +223,11 @@ TestSuite.Die._optimizeReroll = function(isFirst)
    testResults.push({Expected: expected, Actual: input, Description: '=== max'});
    } catch(e){testResults.push({Error: e, Description: '=== max'});}
 
-   return TestRunner.displayResults('Die Die._optimizeReroll', testResults, isFirst);
+   return TestRunner.displayResults('Die Die._optimizeReroll', testResults, testState);
 };
-TestSuite.Die._validate = function(isFirst)
+TestSuite.Die._validate = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected;
 
@@ -326,11 +326,11 @@ TestSuite.Die._validate = function(isFirst)
        testResults.push({Expected: new Error('1d6\nInfinite exploding. sideCount: 1'), Actual: e, Description: 'infinite exploding'});
    }
 
-   return TestRunner.displayResults('Die Die._validate', testResults, isFirst);
+   return TestRunner.displayResults('Die Die._validate', testResults, testState);
 };
-TestSuite.Die._validateReroll = function(isFirst)
+TestSuite.Die._validateReroll = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected;
 
@@ -532,5 +532,5 @@ TestSuite.Die._validateReroll = function(isFirst)
          Actual: e, Description: 'infinite rerolling: !='});
    }
 
-   return TestRunner.displayResults('Die Die._validateReroll', testResults, isFirst);
+   return TestRunner.displayResults('Die Die._validateReroll', testResults, testState);
 };

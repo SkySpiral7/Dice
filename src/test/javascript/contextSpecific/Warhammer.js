@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.Warhammer = {};
-TestSuite.Warhammer.AttackUnit_Stringifier = function(isFirst)
+TestSuite.Warhammer.AttackUnit_Stringifier = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], actual;
 
@@ -26,11 +26,11 @@ TestSuite.Warhammer.AttackUnit_Stringifier = function(isFirst)
    testResults.push({Expected: 'Number hit: 5. Number wounded: 3. Unsaved Wounds: 2.', Actual: actual, Description: 'Unsaved Wounds'});
    } catch(e){testResults.push({Error: e, Description: 'Unsaved Wounds'});}
 
-   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Stringifier', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Stringifier', testResults, testState);
 };
-TestSuite.Warhammer.AttackUnit = function(isFirst)
+TestSuite.Warhammer.AttackUnit = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, expected, actual, stringValue;
 
@@ -124,11 +124,11 @@ TestSuite.Warhammer.AttackUnit = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Ignore excessive wounds'});
    } catch(e){testResults.push({Error: e, Description: 'Ignore excessive wounds'});}
 
-   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit', testResults, testState);
 };
-TestSuite.Warhammer.AttackUnit_Statistics = function(isFirst)
+TestSuite.Warhammer.AttackUnit_Statistics = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, actual, expected;
 
@@ -201,11 +201,11 @@ TestSuite.Warhammer.AttackUnit_Statistics = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Giant output unchanged'});
    } catch(e){testResults.push({Error: e, Description: 'Giant output unchanged'});}
 
-   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Statistics', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit.Statistics', testResults, testState);
 };
-TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
+TestSuite.Warhammer.AttackUnit_validateInput = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, actual, expected;
 
@@ -295,11 +295,11 @@ TestSuite.Warhammer.AttackUnit_validateInput = function(isFirst)
          Actual: e, Description: 'Invalid reanimateOrNoPainValue'});
    }
 
-   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit._validateInput', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.AttackUnit._validateInput', testResults, testState);
 };
-TestSuite.Warhammer.RollScatterDice = function(isFirst)
+TestSuite.Warhammer.RollScatterDice = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], randomSource, expected, actual;
 
@@ -360,5 +360,5 @@ TestSuite.Warhammer.RollScatterDice = function(isFirst)
    testResults.push({Expected: expected, Actual: actual, Description: 'Forced to scatter'});
    } catch(e){testResults.push({Error: e, Description: 'Forced to scatter'});}
 
-   return TestRunner.displayResults('Warhammer Warhammer.RollScatterDice', testResults, isFirst);
+   return TestRunner.displayResults('Warhammer Warhammer.RollScatterDice', testResults, testState);
 };

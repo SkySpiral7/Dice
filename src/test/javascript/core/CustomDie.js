@@ -1,8 +1,8 @@
 'use strict';
 TestSuite.CustomDice = {};
-TestSuite.CustomDice.CustomDie = function(isFirst)
+TestSuite.CustomDice.CustomDie = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, nonRandomGenerator, die;
 
@@ -18,11 +18,11 @@ TestSuite.CustomDice.CustomDie = function(isFirst)
    testResults.push({Expected: 'c', Actual: die.roll(nonRandomGenerator), Description: 'Makes defensive copy'});
    } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
 
-   return TestRunner.displayResults('CustomDice CustomDice.CustomDie', testResults, isFirst);
+   return TestRunner.displayResults('CustomDice CustomDice.CustomDie', testResults, testState);
 };
-TestSuite.CustomDice.DeckOfCards = function(isFirst)
+TestSuite.CustomDice.DeckOfCards = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, nonRandomGenerator, deck;
 
@@ -49,11 +49,11 @@ TestSuite.CustomDice.DeckOfCards = function(isFirst)
          Actual: e, Description: 'No more values'});
    }
 
-   return TestRunner.displayResults('CustomDice CustomDice.DeckOfCards', testResults, isFirst);
+   return TestRunner.displayResults('CustomDice CustomDice.DeckOfCards', testResults, testState);
 };
-TestSuite.CustomDice.RollTable = function(isFirst)
+TestSuite.CustomDice.RollTable = function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
    var testResults = [], input, randomSource, table;
 
@@ -98,5 +98,5 @@ TestSuite.CustomDice.RollTable = function(isFirst)
    testResults.push({Expected: 'b', Actual: table.roll(randomSource), Description: 'Table in table'});
    } catch(e){testResults.push({Error: e, Description: 'nesting'});}
  
-   return TestRunner.displayResults('CustomDice CustomDice.RollTable', testResults, isFirst);
+   return TestRunner.displayResults('CustomDice CustomDice.RollTable', testResults, testState);
 };
