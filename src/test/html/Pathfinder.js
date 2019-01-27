@@ -1,7 +1,9 @@
 'use strict';
+//this isn't included by Include.js because it is under html
+/**For this reason don't make these tests async*/
 TestConfig.betweenEach=function(){randomSource = undefined;};
 TestSuite.client = {Pathfinder: {}};
-TestSuite.client.Pathfinder.parseCharacterData = async function(testState={})
+TestSuite.client.Pathfinder.parseCharacterData = function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -25,7 +27,7 @@ TestSuite.client.Pathfinder.parseCharacterData = async function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html parseCharacterData', testResults, testState);
 };
-TestSuite.client.Pathfinder.initiative = async function(testState={})
+TestSuite.client.Pathfinder.initiative = function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -48,7 +50,7 @@ TestSuite.client.Pathfinder.initiative = async function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html initiative', testResults, testState);
 };
-TestSuite.client.Pathfinder.createCharacterOptions = async function(testState={})
+TestSuite.client.Pathfinder.createCharacterOptions = function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -72,7 +74,7 @@ TestSuite.client.Pathfinder.createCharacterOptions = async function(testState={}
 
    return TestRunner.displayResults('Pathfinder.html createCharacterOptions', testResults, testState);
 };
-TestSuite.client.Pathfinder.createAttackOptions = async function(testState={})
+TestSuite.client.Pathfinder.createAttackOptions = function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -106,7 +108,7 @@ TestSuite.client.Pathfinder.createAttackOptions = async function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html createAttackOptions', testResults, testState);
 };
-TestSuite.client.Pathfinder.displayNotes = async function(testState={})
+TestSuite.client.Pathfinder.displayNotes = function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -134,7 +136,7 @@ TestSuite.client.Pathfinder.displayNotes = async function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html displayNotes', testResults, testState);
 };
-TestSuite.client.Pathfinder.updateNotes = async function(testState={})
+TestSuite.client.Pathfinder.updateNotes = function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -190,7 +192,7 @@ TestSuite.client.Pathfinder.updateNotes = async function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html updateNotes', testResults, testState);
 };
-TestSuite.client.Pathfinder.attack = async function(testState={})
+TestSuite.client.Pathfinder.attack = function(testState={})
 {
    TestRunner.clearResults(testState);
 
@@ -218,7 +220,7 @@ TestSuite.client.Pathfinder.attack = async function(testState={})
 
    return TestRunner.displayResults('Pathfinder.html attack', testResults, testState);
 };
-TestSuite.client.Pathfinder.createAttackInput = async function(testState={})
+TestSuite.client.Pathfinder.createAttackInput = function(testState={})
 {
    TestRunner.clearResults(testState);
 
