@@ -54,40 +54,40 @@ numberGenerator.values = function(numberArray)
 
 //TODO: consider moving these tests to a new file:
 TestSuite.Util = {};
-TestSuite.Util.numberGenerator_dice = function(isFirst)
+TestSuite.Util.numberGenerator_dice = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], generator;
+   var assertions = [], generator;
 
    try{
    generator = numberGenerator.dice(8, [5]);
-   testResults.push({Expected: (4/8), Actual: generator(), Description: 'Quick test'});
-   } catch(e){testResults.push({Error: e, Description: 'Quick test'});}
+   assertions.push({Expected: (4/8), Actual: generator(), Description: 'Quick test'});
+   } catch(e){assertions.push({Error: e, Description: 'Quick test'});}
 
-   return TestRunner.displayResults('Testing Util numberGenerator.dice', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util numberGenerator.dice', assertions, testState);
 };
-TestSuite.Util.numberGenerator_values = function(isFirst)
+TestSuite.Util.numberGenerator_values = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], generator;
+   var assertions = [], generator;
 
    try{
    generator = numberGenerator.values([1,2,Infinity]);
-   testResults.push({Expected: 1, Actual: generator(), Description: 'Happy path 0'});
-   testResults.push({Expected: 2, Actual: generator(), Description: 'Happy path 1'});
-   testResults.push({Expected: Infinity, Actual: generator(), Description: 'Happy path 2'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy path'});}
+   assertions.push({Expected: 1, Actual: generator(), Description: 'Happy path 0'});
+   assertions.push({Expected: 2, Actual: generator(), Description: 'Happy path 1'});
+   assertions.push({Expected: Infinity, Actual: generator(), Description: 'Happy path 2'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy path'});}
 
    try{
    generator();
-   TestRunner.failedToThrow(testResults, 'End');
+   TestRunner.failedToThrow(assertions, 'End');
    }
    catch(e)
    {
-      testResults.push({Expected: new Error('Ran out of numbers'), Actual: e, Description: 'End'});
+      assertions.push({Expected: new Error('Ran out of numbers'), Actual: e, Description: 'End'});
    }
 
-   return TestRunner.displayResults('Testing Util numberGenerator.values', testResults, isFirst);
+   return TestRunner.displayResults('Testing Util numberGenerator.values', assertions, testState);
 };

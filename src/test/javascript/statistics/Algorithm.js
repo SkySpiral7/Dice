@@ -1,78 +1,78 @@
 'use strict';
 TestSuite.Algorithm = {};
-TestSuite.Algorithm.analyze = function(isFirst)
+TestSuite.Algorithm.analyze = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected;
+   var assertions = [], actual, expected;
 
    try{
    actual = Algorithm.analyze(new DicePool('2d6').toJSON().pool[0]);
    expected = Algorithm.nonDropping;
-   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
-   } catch(e){testResults.push({Error: e, Description: '2d6'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d6'});
+   } catch(e){assertions.push({Error: e, Description: '2d6'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('2d2 drop Lowest 1').toJSON().pool[0]);
    expected = Algorithm.singleDrop;
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2 Drop Lowest 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2 Drop Lowest 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2 Drop Lowest 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2 Drop Lowest 1'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('2d2 drop highest 1').toJSON().pool[0]);
    expected = Algorithm.singleDrop;
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2 Drop highest 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2 Drop highest 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2 Drop highest 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2 Drop highest 1'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('2d2!p drop Lowest 1').toJSON().pool[0]);
    expected = Algorithm.bruteForce;
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2!p Drop Lowest 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2!p Drop Lowest 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2!p Drop Lowest 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2!p Drop Lowest 1'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2 keep highest 3').toJSON().pool[0]);
    expected = Algorithm.singleDrop;
-   testResults.push({Expected: expected, Actual: actual, Description: '4d2 keep highest 3'});
-   } catch(e){testResults.push({Error: e, Description: '4d2 keep highest 3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '4d2 keep highest 3'});
+   } catch(e){assertions.push({Error: e, Description: '4d2 keep highest 3'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2 keep lowest 3').toJSON().pool[0]);
    expected = Algorithm.singleDrop;
-   testResults.push({Expected: expected, Actual: actual, Description: '4d2 keep lowest 3'});
-   } catch(e){testResults.push({Error: e, Description: '4d2 keep lowest 3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '4d2 keep lowest 3'});
+   } catch(e){assertions.push({Error: e, Description: '4d2 keep lowest 3'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2!! keep highest 3').toJSON().pool[0]);
    expected = Algorithm.singleDrop;
-   testResults.push({Expected: expected, Actual: actual, Description: '4d2!! keep highest 3'});
-   } catch(e){testResults.push({Error: e, Description: '4d2!! keep highest 3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '4d2!! keep highest 3'});
+   } catch(e){assertions.push({Error: e, Description: '4d2!! keep highest 3'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2!! keep lowest 3').toJSON().pool[0]);
    expected = Algorithm.singleDrop;
-   testResults.push({Expected: expected, Actual: actual, Description: '4d2!! keep lowest 3'});
-   } catch(e){testResults.push({Error: e, Description: '4d2!! keep lowest 3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '4d2!! keep lowest 3'});
+   } catch(e){assertions.push({Error: e, Description: '4d2!! keep lowest 3'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2! keep highest 3').toJSON().pool[0]);
    expected = Algorithm.bruteForce;
-   testResults.push({Expected: expected, Actual: actual, Description: '4d2! keep highest 3'});
-   } catch(e){testResults.push({Error: e, Description: '4d2! keep highest 3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '4d2! keep highest 3'});
+   } catch(e){assertions.push({Error: e, Description: '4d2! keep highest 3'});}
 
    try{
    actual = Algorithm.analyze(new DicePool('4d2! keep lowest 3').toJSON().pool[0]);
    expected = Algorithm.bruteForce;
-   testResults.push({Expected: expected, Actual: actual, Description: '4d2! keep lowest 3'});
-   } catch(e){testResults.push({Error: e, Description: '4d2! keep lowest 3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '4d2! keep lowest 3'});
+   } catch(e){assertions.push({Error: e, Description: '4d2! keep lowest 3'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.analyze', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.analyze', assertions, testState);
 };
-TestSuite.Algorithm.bruteForce = function(isFirst)
+TestSuite.Algorithm.bruteForce = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected, diceGroup, everyDieValue;
+   var assertions = [], actual, expected, diceGroup, everyDieValue;
 
    try{
    diceGroup = new DicePool('2d2').toJSON().pool[0];
@@ -82,8 +82,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 3, frequency: 2},  //1+2, 2+1
       {result: 4, frequency: 1}   //2+2
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2'});
-   } catch(e){testResults.push({Error: e, Description: '2d2'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2'});
+   } catch(e){assertions.push({Error: e, Description: '2d2'});}
 
    try{
    diceGroup = new DicePool('-d3').toJSON().pool[0];
@@ -93,8 +93,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: -2, frequency: 1},
       {result: -1, frequency: 1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '-d3'});
-   } catch(e){testResults.push({Error: e, Description: '-d3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '-d3'});
+   } catch(e){assertions.push({Error: e, Description: '-d3'});}
 
    try{
    diceGroup = new DicePool('3d2').toJSON().pool[0];
@@ -106,8 +106,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 6, frequency: 1}   //2+2+2
    ];
    //Handling more than 2 dice is an edge case for bruteForce
-   testResults.push({Expected: expected, Actual: actual, Description: '3d2'});
-   } catch(e){testResults.push({Error: e, Description: '3d2'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '3d2'});
+   } catch(e){assertions.push({Error: e, Description: '3d2'});}
 
    try{
    diceGroup = new DicePool('2d6').toJSON().pool[0];
@@ -135,8 +135,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 11, frequency: 2},
       {result: 12, frequency: 1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d6'});
-   } catch(e){testResults.push({Error: e, Description: '2d6'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d6'});
+   } catch(e){assertions.push({Error: e, Description: '2d6'});}
 
    try{
    diceGroup = new DicePool('2d2!').toJSON().pool[0];
@@ -154,8 +154,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 7, probability: ((1/4)*(1/4)*2)},  //(2+2)+(2+1), (2+1)+(2+2)
       {result: 8, probability: ((1/4)*(1/4))}  //(2+2)+(2+2)
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2! explodeCount 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2! explodeCount 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2! explodeCount 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2! explodeCount 1'});}
 
    try{
    diceGroup = new DicePool('1d3!').toJSON().pool[0];
@@ -174,8 +174,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: (3+2), probability: ((1/3) * (1/3))},
       {result: (3+3), probability: ((1/3) * (1/3))}  //only let it explode once
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
-   } catch(e){testResults.push({Error: e, Description: '1d3! explode: 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '1d3! explode: 1'});
+   } catch(e){assertions.push({Error: e, Description: '1d3! explode: 1'});}
 
    try{
    diceGroup = new DicePool('2d2 drop 1').toJSON().pool[0];
@@ -184,8 +184,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 1, frequency: 1},  //1+1
       {result: 2, frequency: 3}  //1+2, 2+1, 2+2
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2 DropLowest 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2 DropLowest 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2 DropLowest 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2 DropLowest 1'});}
 
    try{
    diceGroup = new DicePool('2d2!! drop 1').toJSON().pool[0];
@@ -203,8 +203,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 4, probability: ((1/2)*(1/4)*2 + (1/4)*(1/4)*3)}  //1+4, 3+4, 4+1, 4+3, 4+4
    ];
    //this is the same as 2d2!! KeepHighest 1 explodeCount 1
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2!! DropLowest 1 explodeCount 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2!! DropLowest 1 explodeCount 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2!! DropLowest 1 explodeCount 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2!! DropLowest 1 explodeCount 1'});}
 
    try{
    diceGroup = new DicePool('2d2! drop 1').toJSON().pool[0];
@@ -222,8 +222,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 5, probability: ((1/4)*(1/4))},  //(2+1)+(2+1)
       {result: 6, probability: ((1/4)*(1/4)*3)}  //(2+1)+(2+2), (2+2)+(2+1), (2+2)+(2+2)
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2! DropLowest 1 explodeCount 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2! DropLowest 1 explodeCount 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2! DropLowest 1 explodeCount 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2! DropLowest 1 explodeCount 1'});}
 
    try{
    diceGroup = new DicePool('2d2!p drop 1').toJSON().pool[0];
@@ -240,8 +240,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 4, probability: ((1/4)*(1/4))},  //(2+0)+(2+0)
       {result: 5, probability: ((1/4)*(1/4)*3)}  //(2+0)+(2+1), (2+1)+(2+0), (2+1)+(2+1)
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2!p DropLowest 1 explodeCount 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2!p DropLowest 1 explodeCount 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2!p DropLowest 1 explodeCount 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2!p DropLowest 1 explodeCount 1'});}
 
    try{
    diceGroup = new DicePool('2d2! keep 1').toJSON().pool[0];
@@ -257,8 +257,8 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 2, probability: ((1/2)*(1/4)*4 + (1/4)*(1/4)*4)}  //the rest
    ];
    //this is the same as 2d2 KeepHighest 1 determineProbability
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2! KeepHighest 1 explodeCount 1'});
-   } catch(e){testResults.push({Error: e, Description: '2d2! KeepHighest 1 explodeCount 1'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2! KeepHighest 1 explodeCount 1'});
+   } catch(e){assertions.push({Error: e, Description: '2d2! KeepHighest 1 explodeCount 1'});}
 
    try{
    diceGroup = {die: new Die({sideCount: 2, constantModifier: 10}), dieCount: 2, areDiceNegative: false};
@@ -269,16 +269,16 @@ TestSuite.Algorithm.bruteForce = function(isFirst)
       {result: 23, frequency: 2},  //11+12, 12+11
       {result: 24, frequency: 1}   //12+12
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
-   } catch(e){testResults.push({Error: e, Description: '2d2 + constantModifier 10'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
+   } catch(e){assertions.push({Error: e, Description: '2d2 + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.bruteForce', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.bruteForce', assertions, testState);
 };
-TestSuite.Algorithm.nonDropping = function(isFirst)
+TestSuite.Algorithm.nonDropping = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected, diceGroup, everyDieValue;
+   var assertions = [], actual, expected, diceGroup, everyDieValue;
    var testStrings = ['2d6', '-d3', '1d3!r2', '1d3!pr1', '2d2!!r1'];
 
    for (var i = 0; i < testStrings.length; ++i)
@@ -288,8 +288,8 @@ TestSuite.Algorithm.nonDropping = function(isFirst)
       everyDieValue = DiceExpression.everyValue(diceGroup);
       actual = Algorithm.nonDropping(diceGroup, JSON.clone(everyDieValue));
       expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
-      testResults.push({Expected: expected, Actual: actual, Description: testStrings[i]});
-      } catch(e){testResults.push({Error: e, Description: testStrings[i]});}
+      assertions.push({Expected: expected, Actual: actual, Description: testStrings[i]});
+      } catch(e){assertions.push({Error: e, Description: testStrings[i]});}
    }
 
    try{
@@ -297,16 +297,16 @@ TestSuite.Algorithm.nonDropping = function(isFirst)
    everyDieValue = DiceExpression.everyValue(diceGroup);
    actual = Algorithm.nonDropping(diceGroup, JSON.clone(everyDieValue));
    expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
-   } catch(e){testResults.push({Error: e, Description: '2d2 + constantModifier 10'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2 + constantModifier 10'});
+   } catch(e){assertions.push({Error: e, Description: '2d2 + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.nonDropping', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.nonDropping', assertions, testState);
 };
-TestSuite.Algorithm.singleDrop = function(isFirst)
+TestSuite.Algorithm.singleDrop = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected, diceGroup, everyDieValue;
+   var assertions = [], actual, expected, diceGroup, everyDieValue;
    var testStrings = ['3d6', '-2d3', '2d3!r2', '2d2!!r1'];
 
    for (var i = 0; i < testStrings.length; ++i)
@@ -316,16 +316,16 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
       everyDieValue = DiceExpression.everyValue(diceGroup);
       actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
       expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
-      testResults.push({Expected: expected, Actual: actual, Description: testStrings[i] + ' drop lowest'});
-      } catch(e){testResults.push({Error: e, Description: testStrings[i] + ' drop lowest'});}
+      assertions.push({Expected: expected, Actual: actual, Description: testStrings[i] + ' drop lowest'});
+      } catch(e){assertions.push({Error: e, Description: testStrings[i] + ' drop lowest'});}
 
       try{
       diceGroup = new DicePool(testStrings[i] + ' drop highest').toJSON().pool[0];
       everyDieValue = DiceExpression.everyValue(diceGroup);
       actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
       expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
-      testResults.push({Expected: expected, Actual: actual, Description: testStrings[i] + ' drop highest'});
-      } catch(e){testResults.push({Error: e, Description: testStrings[i] + ' drop highest'});}
+      assertions.push({Expected: expected, Actual: actual, Description: testStrings[i] + ' drop highest'});
+      } catch(e){assertions.push({Error: e, Description: testStrings[i] + ' drop highest'});}
    }
 
    try{
@@ -335,8 +335,8 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
    everyDieValue = DiceExpression.everyValue(diceGroup);
    actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
    expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2 drop lowest + constantModifier 10'});
-   } catch(e){testResults.push({Error: e, Description: '2d2 drop lowest + constantModifier 10'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2 drop lowest + constantModifier 10'});
+   } catch(e){assertions.push({Error: e, Description: '2d2 drop lowest + constantModifier 10'});}
 
    try{
    diceGroup = {die: new Die({sideCount: 2, constantModifier: 10}), dieCount: 2,
@@ -345,10 +345,10 @@ TestSuite.Algorithm.singleDrop = function(isFirst)
    everyDieValue = DiceExpression.everyValue(diceGroup);
    actual = Algorithm.singleDrop(diceGroup, JSON.clone(everyDieValue));
    expected = Algorithm.bruteForce(diceGroup, JSON.clone(everyDieValue));
-   testResults.push({Expected: expected, Actual: actual, Description: '2d2 drop highest + constantModifier 10'});
-   } catch(e){testResults.push({Error: e, Description: '2d2 drop highest + constantModifier 10'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2d2 drop highest + constantModifier 10'});
+   } catch(e){assertions.push({Error: e, Description: '2d2 drop highest + constantModifier 10'});}
 
-   return TestRunner.displayResults('Algorithm Algorithm.singleDrop', testResults, isFirst);
+   return TestRunner.displayResults('Algorithm Algorithm.singleDrop', assertions, testState);
 };
 /**
 Stress tests:

@@ -1,18 +1,18 @@
 'use strict';
 TestSuite.DiceExpression = {};
-TestSuite.DiceExpression.add = function(isFirst)
+TestSuite.DiceExpression.add = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    new DiceExpression().add(2);
-   TestRunner.failedToThrow(testResults, 'Illegal arg');
+   TestRunner.failedToThrow(assertions, 'Illegal arg');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
+       assertions.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
          Actual: e, Description: 'Illegal arg'});
    }
 
@@ -20,36 +20,36 @@ TestSuite.DiceExpression.add = function(isFirst)
    actual = new DiceExpression([{exponent: 1, coefficient: 6}, {exponent: 2, coefficient: 4}]);
    actual.add(new DiceExpression([{exponent: 1, coefficient: 2}, {exponent: 2, coefficient: 1}]));
    expected = new DiceExpression([{exponent: 1, coefficient: 8}, {exponent: 2, coefficient: 5}]);
-   testResults.push({Expected: expected, Actual: actual, Description: '6x+4x^2 + (2x+x^2) = 8x+5x^2'});
-   } catch(e){testResults.push({Error: e, Description: '6x+4x^2 + (2x+x^2) = 8x+5x^2'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '6x+4x^2 + (2x+x^2) = 8x+5x^2'});
+   } catch(e){assertions.push({Error: e, Description: '6x+4x^2 + (2x+x^2) = 8x+5x^2'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().add()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().add()', assertions, testState);
 };
-TestSuite.DiceExpression.addTerm = function(isFirst)
+TestSuite.DiceExpression.addTerm = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    expression = new DiceExpression();
    expression.addTerm({coefficient: 'sd', exponent: 0});
-   TestRunner.failedToThrow(testResults, 'Invalid coefficient');
+   TestRunner.failedToThrow(assertions, 'Invalid coefficient');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireTypeOf, ['number', 'sd']),
+       assertions.push({Expected: getError(Validation.requireTypeOf, ['number', 'sd']),
          Actual: e, Description: 'Invalid coefficient'});
    }
 
    try{
    expression = new DiceExpression();
    expression.addTerm({coefficient: 2, exponent: 'sd2'});
-   TestRunner.failedToThrow(testResults, 'Invalid exponent');
+   TestRunner.failedToThrow(assertions, 'Invalid exponent');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireTypeOf, ['number', 'sd2']),
+       assertions.push({Expected: getError(Validation.requireTypeOf, ['number', 'sd2']),
          Actual: e, Description: 'Invalid exponent'});
    }
 
@@ -62,8 +62,8 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
       {coefficient: 3, exponent: 0},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Existing term'});
-   } catch(e){testResults.push({Error: e, Description: 'Existing term'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Existing term'});
+   } catch(e){assertions.push({Error: e, Description: 'Existing term'});}
 
    try{
    expression = new DiceExpression(new Die('dF'));
@@ -75,8 +75,8 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
       {coefficient: 1, exponent: 0},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'New term'});
-   } catch(e){testResults.push({Error: e, Description: 'New term'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'New term'});
+   } catch(e){assertions.push({Error: e, Description: 'New term'});}
 
    try{
    expression = new DiceExpression(new Die('dF'));
@@ -86,8 +86,8 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
       {coefficient: 1, exponent: 1},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Remove 0 coefficients'});
-   } catch(e){testResults.push({Error: e, Description: 'Remove 0 coefficients'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Remove 0 coefficients'});
+   } catch(e){assertions.push({Error: e, Description: 'Remove 0 coefficients'});}
 
    try{
    expression = new DiceExpression(new Die('dF'));
@@ -98,40 +98,40 @@ TestSuite.DiceExpression.addTerm = function(isFirst)
       {coefficient: 1, exponent: 0},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Don\'t add 0 coefficients'});
-   } catch(e){testResults.push({Error: e, Description: 'Don\'t add 0 coefficients'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Don\'t add 0 coefficients'});
+   } catch(e){assertions.push({Error: e, Description: 'Don\'t add 0 coefficients'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().addTerm()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().addTerm()', assertions, testState);
 };
-TestSuite.DiceExpression.clone = function(isFirst)
+TestSuite.DiceExpression.clone = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    expression = new DiceExpression(new Die(3));
    expected = expression.toJSON();
    actual = expression.clone();
    expression.addTerm({coefficient: 5, exponent: 1});
-   testResults.push({Expected: expected, Actual: actual.toJSON(), Description: 'Clone returns a copy'});
-   } catch(e){testResults.push({Error: e, Description: 'Clone returns a copy'});}
+   assertions.push({Expected: expected, Actual: actual.toJSON(), Description: 'Clone returns a copy'});
+   } catch(e){assertions.push({Error: e, Description: 'Clone returns a copy'});}
 
    try{
    expression = new DiceExpression();
    expected = expression.toJSON();
    actual = expression.clone();
    expression.addTerm({coefficient: 5, exponent: 1});
-   testResults.push({Expected: expected, Actual: actual.toJSON(), Description: 'Can clone an empty one'});
-   } catch(e){testResults.push({Error: e, Description: 'Can clone an empty one'});}
+   assertions.push({Expected: expected, Actual: actual.toJSON(), Description: 'Can clone an empty one'});
+   } catch(e){assertions.push({Error: e, Description: 'Can clone an empty one'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().clone()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().clone()', assertions, testState);
 };
-TestSuite.DiceExpression.multiply = function(isFirst)
+TestSuite.DiceExpression.multiply = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    expression = new DiceExpression(new Die('dF'));
@@ -144,26 +144,26 @@ TestSuite.DiceExpression.multiply = function(isFirst)
       {coefficient: 2, exponent: -1},
       {coefficient: 1, exponent: -2}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2dF'});
-   } catch(e){testResults.push({Error: e, Description: '2dF'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2dF'});
+   } catch(e){assertions.push({Error: e, Description: '2dF'});}
 
    try{
    new DiceExpression().multiply(2);
-   TestRunner.failedToThrow(testResults, 'Illegal arg');
+   TestRunner.failedToThrow(assertions, 'Illegal arg');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
+       assertions.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
          Actual: e, Description: 'Illegal arg'});
    }
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().multiply()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().multiply()', assertions, testState);
 };
-TestSuite.DiceExpression.negateExponents = function(isFirst)
+TestSuite.DiceExpression.negateExponents = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    expression = new DiceExpression(new Die(3));
@@ -175,8 +175,8 @@ TestSuite.DiceExpression.negateExponents = function(isFirst)
       {coefficient: 2, exponent: -2},
       {coefficient: 1, exponent: -3}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Negate exponents of (d3 + x^2)'});
-   } catch(e){testResults.push({Error: e, Description: 'Negate exponents of (d3 + x^2)'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Negate exponents of (d3 + x^2)'});
+   } catch(e){assertions.push({Error: e, Description: 'Negate exponents of (d3 + x^2)'});}
 
    try{
    expression = new DiceExpression([
@@ -191,16 +191,16 @@ TestSuite.DiceExpression.negateExponents = function(isFirst)
       {coefficient: 2, exponent: [-2, -6]},
       {coefficient: 1, exponent: [-3, -7]}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Negate array exponents'});
-   } catch(e){testResults.push({Error: e, Description: 'Negate array exponents'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Negate array exponents'});
+   } catch(e){assertions.push({Error: e, Description: 'Negate array exponents'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', assertions, testState);
 };
-TestSuite.DiceExpression.power = function(isFirst)
+TestSuite.DiceExpression.power = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    expression = new DiceExpression(new Die('dF'));
@@ -213,34 +213,34 @@ TestSuite.DiceExpression.power = function(isFirst)
       {coefficient: 2, exponent: -1},
       {coefficient: 1, exponent: -2}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '2dF'});
-   } catch(e){testResults.push({Error: e, Description: '2dF'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '2dF'});
+   } catch(e){assertions.push({Error: e, Description: '2dF'});}
 
    try{
    new DiceExpression().power('ham');
-   TestRunner.failedToThrow(testResults, 'Illegal arg');
+   TestRunner.failedToThrow(assertions, 'Illegal arg');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireNaturalNumber, ['ham']),
+       assertions.push({Expected: getError(Validation.requireNaturalNumber, ['ham']),
          Actual: e, Description: 'Illegal arg'});
    }
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().power()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().power()', assertions, testState);
 };
-TestSuite.DiceExpression.subtract = function(isFirst)
+TestSuite.DiceExpression.subtract = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    new DiceExpression().subtract(2);
-   TestRunner.failedToThrow(testResults, 'Illegal arg');
+   TestRunner.failedToThrow(assertions, 'Illegal arg');
    }
    catch(e)
    {
-       testResults.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
+       assertions.push({Expected: getError(Validation.requireInstanceOf, [DiceExpression, 2]),
          Actual: e, Description: 'Illegal arg'});
    }
 
@@ -248,16 +248,16 @@ TestSuite.DiceExpression.subtract = function(isFirst)
    actual = new DiceExpression([{exponent: 1, coefficient: 6}, {exponent: 2, coefficient: 4}]);
    actual.subtract(new DiceExpression([{exponent: 1, coefficient: 2}, {exponent: 2, coefficient: 1}]));
    expected = new DiceExpression([{exponent: 1, coefficient: 4}, {exponent: 2, coefficient: 3}]);
-   testResults.push({Expected: expected, Actual: actual, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});
-   } catch(e){testResults.push({Error: e, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});
+   } catch(e){assertions.push({Error: e, Description: '6x+4x^2 - (2x+x^2) = 4x+3x^2'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().subtract()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().subtract()', assertions, testState);
 };
-TestSuite.DiceExpression.toDiceResults = function(isFirst)
+TestSuite.DiceExpression.toDiceResults = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected;
+   var assertions = [], actual, expected;
 
    try{
    actual = new DiceExpression(new Die('dF')).toDiceResults();
@@ -266,8 +266,8 @@ TestSuite.DiceExpression.toDiceResults = function(isFirst)
       {result: 0, frequency: 1},
       {result: 1, frequency: 1},
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'dF'});
-   } catch(e){testResults.push({Error: e, Description: 'dF'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'dF'});
+   } catch(e){assertions.push({Error: e, Description: 'dF'});}
 
    try{
    var input = [
@@ -283,16 +283,16 @@ TestSuite.DiceExpression.toDiceResults = function(isFirst)
       {result: 3, probability: ((1/2) * (1/2))},
       {result: 4, probability: ((1/2) * (1/2))}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Use probability'});
-   } catch(e){testResults.push({Error: e, Description: 'Use probability'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Use probability'});
+   } catch(e){assertions.push({Error: e, Description: 'Use probability'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().toDiceResults()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().toDiceResults()', assertions, testState);
 };
-TestSuite.DiceExpression.toJSON = function(isFirst)
+TestSuite.DiceExpression.toJSON = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected;
+   var assertions = [], actual, expected;
 
    try{
    var diceExpression = new DiceExpression(new Die(2));
@@ -301,16 +301,16 @@ TestSuite.DiceExpression.toJSON = function(isFirst)
       {exponent: 2, coefficient: 1},
       {exponent: 1, coefficient: 1}
    ];
-   testResults.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
-   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
+   assertions.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){assertions.push({Error: e, Description: 'Does a defensive copy'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression().toJSON()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression().toJSON()', assertions, testState);
 };
-TestSuite.DiceExpression._constructor = function(isFirst)
+TestSuite.DiceExpression._constructor = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], actual, expected;
+   var assertions = [], actual, expected;
 
    try{
    actual = new DiceExpression(new Die('dF')).toJSON();
@@ -319,22 +319,22 @@ TestSuite.DiceExpression._constructor = function(isFirst)
       {coefficient: 1, exponent: 0},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Happy fudge die'});
-   } catch(e){testResults.push({Error: e, Description: 'Happy fudge die'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Happy fudge die'});
+   } catch(e){assertions.push({Error: e, Description: 'Happy fudge die'});}
 
    try{
    new DiceExpression()._constructor();
-   TestRunner.failedToThrow(testResults, 'Call _constructor');
+   TestRunner.failedToThrow(assertions, 'Call _constructor');
    }
    catch(e)
    {
-       testResults.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
+       assertions.push({Expected: new Error('Illegal access'), Actual: e, Description: 'Call _constructor'});
    }
 
    try{
    actual = new DiceExpression().toJSON();
-   testResults.push({Expected: [], Actual: actual, Description: 'Creates an empty expression'});
-   } catch(e){testResults.push({Error: e, Description: 'Creates an empty expression'});}
+   assertions.push({Expected: [], Actual: actual, Description: 'Creates an empty expression'});
+   } catch(e){assertions.push({Error: e, Description: 'Creates an empty expression'});}
 
    try{
    actual = new DiceExpression(new Die('dF')).toJSON();
@@ -344,8 +344,8 @@ TestSuite.DiceExpression._constructor = function(isFirst)
       {coefficient: 1, exponent: 0},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Accepts json'});
-   } catch(e){testResults.push({Error: e, Description: 'Accepts json'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Accepts json'});
+   } catch(e){assertions.push({Error: e, Description: 'Accepts json'});}
 
    try{
    actual = new DiceExpression(new Die('dF')).toDiceResults();
@@ -356,8 +356,8 @@ TestSuite.DiceExpression._constructor = function(isFirst)
       {coefficient: 1, exponent: 0},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Accepts frequency dice results'});
-   } catch(e){testResults.push({Error: e, Description: 'Accepts frequency dice results'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Accepts frequency dice results'});
+   } catch(e){assertions.push({Error: e, Description: 'Accepts frequency dice results'});}
 
    try{
    actual = new DiceExpression(new Die('dF')).toDiceResults();
@@ -368,8 +368,8 @@ TestSuite.DiceExpression._constructor = function(isFirst)
       {coefficient: (1/3), exponent: 0},
       {coefficient: (1/3), exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Accepts probability dice results'});
-   } catch(e){testResults.push({Error: e, Description: 'Accepts probability dice results'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Accepts probability dice results'});
+   } catch(e){assertions.push({Error: e, Description: 'Accepts probability dice results'});}
 
    try{
    var input = new DiceExpression(new Die('dF')).toDiceResults();
@@ -382,8 +382,8 @@ TestSuite.DiceExpression._constructor = function(isFirst)
       {coefficient: 1, exponent: 0},
       {coefficient: 1, exponent: -1}
    ];
-   testResults.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
-   } catch(e){testResults.push({Error: e, Description: 'Does a defensive copy'});}
+   assertions.push({Expected: expected, Actual: diceExpression.toJSON(), Description: 'Does a defensive copy'});
+   } catch(e){assertions.push({Error: e, Description: 'Does a defensive copy'});}
 
    try{
    actual = new DiceExpression(new Die('d6r3')).toJSON();
@@ -395,16 +395,16 @@ TestSuite.DiceExpression._constructor = function(isFirst)
       {coefficient: 1, exponent: 2},
       {coefficient: 1, exponent: 1}
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'd6r3'});
-   } catch(e){testResults.push({Error: e, Description: 'd6r3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'd6r3'});
+   } catch(e){assertions.push({Error: e, Description: 'd6r3'});}
 
-   return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression new DiceExpression()._constructor()', assertions, testState);
 };
-TestSuite.DiceExpression.everyValue = function(isFirst)
+TestSuite.DiceExpression.everyValue = async function(testState={})
 {
-   TestRunner.clearResults(isFirst);
+   TestRunner.clearResults(testState);
 
-   var testResults = [], expression, actual, expected;
+   var assertions = [], expression, actual, expected;
 
    try{
    //1d2! is the smallest output for explode
@@ -430,8 +430,8 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
       {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 17)},  //toFixed rounds 0.00000762939453125 up to 0.00001
       {exponent: [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2], coefficient: Math.pow((1/2), 18)}  //toFixed rounds 0.000003814697265625 down to 0.00000
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d2!'});
-   } catch(e){testResults.push({Error: e, Description: '1d2!'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '1d2!'});
+   } catch(e){assertions.push({Error: e, Description: '1d2!'});}
 
    try{
    actual = DiceExpression.everyValue(new DicePool('1d4!r3').toJSON().pool[0]);
@@ -462,8 +462,8 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
       {exponent: [1,4,4,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 12)},  //it can't stop here
       {exponent: [2,4,4,4,4,4,4,4,4,4,4,4], coefficient: Math.pow((1/3), 12)}  //toFixed rounds 0.0000018816764231589208 to 0.00000
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d4!r3'});
-   } catch(e){testResults.push({Error: e, Description: '1d4!r3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '1d4!r3'});
+   } catch(e){assertions.push({Error: e, Description: '1d4!r3'});}
 
    try{
    actual = DiceExpression.everyValue(new DicePool('1d4!pr3').toJSON().pool[0]);
@@ -495,8 +495,8 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
       {exponent: [4,3,3,3,3,3,3,3,3,3,3,0], coefficient: Math.pow((1/3), 12)},  //it can't stop here
       {exponent: [4,3,3,3,3,3,3,3,3,3,3,1], coefficient: Math.pow((1/3), 12)}  //toFixed rounds 0.0000018816764231589208 to 0.00000
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d4!pr3'});
-   } catch(e){testResults.push({Error: e, Description: '1d4!pr3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '1d4!pr3'});
+   } catch(e){assertions.push({Error: e, Description: '1d4!pr3'});}
 
    try{
    actual = DiceExpression.everyValue(new DicePool('1d4!!r3').toJSON().pool[0]);
@@ -533,8 +533,8 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
       {exponent: [4*9+2], coefficient: ((1/3) * Math.pow((1/4), 9))},
       {exponent: [4*9+3], coefficient: ((1/3) * Math.pow((1/4), 9))}  //toFixed rounds 0.0000012715657552083333 to 0.00000
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: '1d4!!r3'});
-   } catch(e){testResults.push({Error: e, Description: '1d4!!r3'});}
+   assertions.push({Expected: expected, Actual: actual, Description: '1d4!!r3'});
+   } catch(e){assertions.push({Error: e, Description: '1d4!!r3'});}
 
    try{
    actual = DiceExpression.everyValue(new DicePool('1d4!!r<=3').toJSON().pool[0]);
@@ -569,8 +569,8 @@ TestSuite.DiceExpression.everyValue = function(isFirst)
       {exponent: [4*9+2], coefficient: Math.pow((1/4), 9)},
       {exponent: [4*9+3], coefficient: Math.pow((1/4), 9)}  //toFixed rounds 0.000003814697265625 to 0.00000
    ];
-   testResults.push({Expected: expected, Actual: actual, Description: 'Edge case: minimum compound explodes'});
-   } catch(e){testResults.push({Error: e, Description: 'Edge case: minimum compound explodes'});}
+   assertions.push({Expected: expected, Actual: actual, Description: 'Edge case: minimum compound explodes'});
+   } catch(e){assertions.push({Error: e, Description: 'Edge case: minimum compound explodes'});}
 
-   return TestRunner.displayResults('DiceExpression DiceExpression.everyValue()', testResults, isFirst);
+   return TestRunner.displayResults('DiceExpression DiceExpression.everyValue()', assertions, testState);
 };

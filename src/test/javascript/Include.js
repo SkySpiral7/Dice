@@ -10,6 +10,7 @@ addScripts();
 {
 fileNames = allCoreFiles.concat(fileNames);
 includePath = includePath.replace('main/', 'test/');
+//don't look in html test folders
 
 //these have no tests
 fileNames.removeElement('core/Validation');
@@ -24,7 +25,7 @@ addScripts();
 
 //another tool needed for testing
 includePath = '../../../../Miscellaneous/src/main/javascript/';
-fileNames = ['unstableSort']
+fileNames = ['unstableSort'];
 addScripts();
 
 TestConfig.defaultDelta = Number.EPSILON;  //since this program only deals with integers and statistics
