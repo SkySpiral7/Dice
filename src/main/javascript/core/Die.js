@@ -193,10 +193,12 @@ Die._validate = function(debugName, input)
 
    if (undefined != input.rerollCriteria)
    {
-      input.rerollCriteria = input.rerollCriteria.toString();  //unboxes or converts
-      if(!(/^(?:[<>]=?|[!=]?==?)?-?\d+$/).test(input.rerollCriteria)) throw new Error(debugName +
+      input.rerollCriteria = input.rerollCriteria.toString().trim();  //unboxes or converts
+      if(!(/^(?:[<>]=?|[!=]?==?)?\s*[-+]?\d+$/).test(input.rerollCriteria)) throw new Error(debugName +
          '\ninvalid rerollCriteria: ' + input.rerollCriteria);
-      if((/^-?\d+/).test(input.rerollCriteria)) input.rerollCriteria = '===' + input.rerollCriteria;  //default
+      //TODO: test removal of plus and spaces
+      input.rerollCriteria = input.rerollCriteria.replace(/[\s+]+/, '');
+      if((/^-?\d+$/).test(input.rerollCriteria)) input.rerollCriteria = '===' + input.rerollCriteria;  //default
       else input.rerollCriteria = input.rerollCriteria.replace(/^([!=])=*/, '$1==');  //forces !== and ===
    }
    else delete input.rerollCriteria;
