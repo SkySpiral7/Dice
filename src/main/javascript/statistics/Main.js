@@ -92,6 +92,7 @@ Statistics.combineResults = function(statsArray, useProbability)
 };
 Statistics.compareStatistics = function(stats1, stats2)
 {
+   //TODO: test
    stats1 = JSON.clone(stats1);
    stats2 = JSON.clone(stats2);
    Statistics.determineProbability(stats1);

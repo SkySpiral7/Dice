@@ -28,28 +28,28 @@ GenerateHtml.compareStatistics = function(diffStats, name1, name2)
 
    for (var i=0; i < diffStats.length; i++)
    {
-       out += '<tr><td align="center">' + diffStats[i].result;
-       out += '</td><td align="right">';
-       out += (100 * diffStats[i].diff).toFixed(3);  //non-freq is weighted but might not be the probability
-       out += '%</td>';
-       if(diffStats[i].diff!==0) out += '<td valign="center" align="right">';  //for both positive and negative
+      out += '<tr><td align="center">' + diffStats[i].result;
+      out += '</td><td align="right">';
+      out += (100 * diffStats[i].diff).toFixed(3);  //non-freq is weighted but might not be the probability
+      out += '%</td>';
+      if(0 !== diffStats[i].diff) out += '<td valign="center" align="right">';  //for both positive and negative
 
-       if(diffStats[i].diff===0) out += '<td colspan="2" align="center">Same';
+      if(0 === diffStats[i].diff) out += '<td colspan="2" align="center">Same';
       else if (diffStats[i].diff < 0)
       {
-          out += '</td><td valign="center">';
-          out += '<div style="background-color: blue; width:' + Math.abs(100 * diffStats[i].diff / absMax).toFixed(3)+'%; height: 0.8em">&nbsp;</div>';
+         out += '</td><td valign="center">';
+         out += '<div style="background-color: blue; width:' + Math.abs(100 * diffStats[i].diff / absMax).toFixed(3)+'%; height: 0.8em">&nbsp;</div>';
       }
       else
       {
-          out += '<div style="background-color: red; width:' + Math.abs(100 * diffStats[i].diff / absMax).toFixed(3)+'%; height: 0.8em">&nbsp;</div>';
-          out += '</td><td valign="center">';
+         out += '<div style="background-color: red; width:' + Math.abs(100 * diffStats[i].diff / absMax).toFixed(3)+'%; height: 0.8em">&nbsp;</div>';
+         out += '</td><td valign="center">';
       }
-       out += '</td></tr>';
-       out += "\n";
+      out += '</td></tr>';
+      out += "\n";
    }
-    out += '</table>';
-    return out;
+   out += '</table>';
+   return out;
 };
 GenerateHtml.statistics = function(stats, secondColumn)
 {

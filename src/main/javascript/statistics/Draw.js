@@ -5,6 +5,7 @@ Draw.compareDiceBellCurve = function(dicePoolLeft, dicePoolRight)
    var out = 'Right minus left<br />\n';
    out += '<b>Roll:</b> ' + dicePoolLeft.toJSON().name + ' vs ' + dicePoolRight.toJSON().name;
    var diffStats = Statistics.compareStatistics(Statistics.calculateDiceSums(dicePoolLeft), Statistics.calculateDiceSums(dicePoolRight));
+   //TODO: include diff of aggregates as well
    out += GenerateHtml.compareStatistics(diffStats, dicePoolLeft.toJSON().name, dicePoolRight.toJSON().name);
    document.getElementById('graphResults').innerHTML = out;
 };
