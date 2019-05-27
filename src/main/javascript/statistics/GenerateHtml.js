@@ -18,7 +18,10 @@ GenerateHtml.compareStatistics = function(diffStats)
 GenerateHtml.statistics = function(stats, secondColumn)
 {
    if(undefined === secondColumn) secondColumn = '>=';
-   //TODO: validate
+   Validation.requireTypeOf('string', secondColumn);
+   //TODO: this validation is also in Die and is meaty
+   if(!(/^(?:[<>]=?|[!=]?==?)?$/).test(secondColumn)) throw new Error('invalid comparison: ' + secondColumn);
+   if('=' === secondColumn || '==' === secondColumn) secondColumn = '===';
    Statistics.determineProbability(stats);
    var secondValues = [];
    var maxProbability = -Infinity;
@@ -27,6 +30,7 @@ GenerateHtml.statistics = function(stats, secondColumn)
    for (var currentIndex = 0; currentIndex < stats.length; ++currentIndex)
    {
       if(stats[currentIndex].probability > maxProbability) maxProbability = stats[currentIndex].probability;
+      //if('===' === secondColumn) continue;  //don't bother populating secondValues
       var secondSum = 0;
       for (var potentialIndex = 0; potentialIndex < stats.length; ++potentialIndex)
       {
@@ -42,7 +46,7 @@ GenerateHtml.statistics = function(stats, secondColumn)
    var out = '<table border="1" cellpadding="0" cellspacing="2" width="100%">\n';
    out += '<tr><th>Roll</th>';
    if(usesFreq) out += '<th>Freq</th>';
-   out += '<th>Chance</th><th>' + secondColumn.replace('>', '&gt;').replace('<', '&lt;') + '</th><th align="center">Bar</th></tr>\n';
+   out += '<th>Chance</th><th>' + secondColumn.replace('>', '&gt;').replace('<', '&lt;').replace(/=+/, '=') + '</th><th align="center">Bar</th></tr>\n';
 
    for (var i = 0; i < stats.length; ++i)
    {
