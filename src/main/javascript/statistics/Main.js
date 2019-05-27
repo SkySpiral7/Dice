@@ -92,6 +92,33 @@ Statistics.combineResults = function(statsArray, useProbability)
 };
 Statistics.compareStatistics = function(stats1, stats2)
 {
+   stats1 = JSON.clone(stats1);
+   stats2 = JSON.clone(stats2);
+   Statistics.determineProbability(stats1);
+   Statistics.determineProbability(stats2);
+   var diff = [];
+   var leftCursor = stats1.shift();
+   var rightCursor = stats2.shift();
+   while (undefined !== leftCursor || undefined !== rightCursor)
+   {
+      if (undefined === rightCursor || (undefined !== leftCursor && leftCursor.result < rightCursor.result))
+      {
+         diff.push({result: leftCursor.result, diff: leftCursor.probability});
+         leftCursor = stats1.shift();
+      }
+      else if (undefined === leftCursor || leftCursor.result > rightCursor.result)
+      {
+         diff.push({result: rightCursor.result, diff: -rightCursor.probability});
+         rightCursor = stats2.shift();
+      }
+      else  //equal
+      {
+         diff.push({result: leftCursor.result, diff: leftCursor.probability - rightCursor.probability});
+         leftCursor = stats1.shift();
+         rightCursor = stats2.shift();
+      }
+   }
+   return diff;
 };
 /**
 @param {object[]} stats created from a Statistics function that uses frequency

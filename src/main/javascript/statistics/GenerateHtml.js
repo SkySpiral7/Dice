@@ -10,10 +10,46 @@ GenerateHtml.aggregates = function(aggregate)
    out += '<br />\nStandard Deviation: ' + aggregate.standardDeviation.toFixed(3);
    return out;
 };
-GenerateHtml.compareStatistics = function(diffStats)
+GenerateHtml.compareStatistics = function(diffStats, name1, name2)
 {
-   //TODO: make GenerateHtml.compareStatistics
-   return '';
+   var out = '<table border="1" cellpadding="0" cellspacing="2" width="100%">';
+   out += "\n";
+   out += '<tr><th>Roll</th>';
+   out += '<th>Diff</th>';
+   out += '<th align="center" width="49%">'+name1+'</th>';
+   out += '<th align="center" width="49%">'+name2+'</th></tr>';
+   out += "\n";
+
+   var absMax = -Infinity;
+   for(var i=0; i < diffStats.length; i++)
+   {
+      if(absMax < Math.abs(diffStats[i].diff)) absMax = Math.abs(diffStats[i].diff);
+   }
+
+   for (var i=0; i < diffStats.length; i++)
+   {
+       out += '<tr><td align="center">' + diffStats[i].result;
+       out += '</td><td align="right">';
+       out += (100 * diffStats[i].diff).toFixed(3);  //non-freq is weighted but might not be the probability
+       out += '%</td>';
+       if(diffStats[i].diff!==0) out += '<td valign="center" align="right">';  //for both positive and negative
+
+       if(diffStats[i].diff===0) out += '<td colspan="2" align="center">Same';
+      else if (diffStats[i].diff < 0)
+      {
+          out += '</td><td valign="center">';
+          out += '<div style="background-color: blue; width:' + Math.abs(100 * diffStats[i].diff / absMax).toFixed(3)+'%; height: 0.8em">&nbsp;</div>';
+      }
+      else
+      {
+          out += '<div style="background-color: red; width:' + Math.abs(100 * diffStats[i].diff / absMax).toFixed(3)+'%; height: 0.8em">&nbsp;</div>';
+          out += '</td><td valign="center">';
+      }
+       out += '</td></tr>';
+       out += "\n";
+   }
+    out += '</table>';
+    return out;
 };
 GenerateHtml.statistics = function(stats, secondColumn)
 {
