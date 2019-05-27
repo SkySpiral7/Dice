@@ -10,6 +10,20 @@ GenerateHtml.aggregates = function(aggregate)
    out += '<br />\nStandard Deviation: ' + aggregate.standardDeviation.toFixed(3);
    return out;
 };
+GenerateHtml.compareAggregates = function(aggregate1, aggregate2)
+{
+   var out = '<b>Statistics</b>';
+   out += '<br />\nMin: ' + aggregate1.minimum + ' vs ' + aggregate2.minimum + ' (diff of ' +
+      Math.abs(aggregate1.minimum - aggregate2.minimum) + ')';
+   out += '<br />\nMax: ' + aggregate1.maximum + ' vs ' + aggregate2.maximum + ' (diff of ' +
+      Math.abs(aggregate1.maximum - aggregate2.maximum) + ')';
+   out += '<br />\nMean: ' + aggregate1.mean.toFixed(2) + ' vs ' + aggregate2.mean.toFixed(2) +
+      ' (diff of ' + Math.abs(aggregate1.mean - aggregate2.mean).toFixed(2) + ')';
+   out += '<br />\nStandard Deviation: ' + aggregate1.standardDeviation.toFixed(3) + ' vs ' +
+      aggregate2.standardDeviation.toFixed(3) + ' (diff of ' +
+      Math.abs(aggregate1.standardDeviation - aggregate2.standardDeviation).toFixed(3) + ')';
+   return out;
+};
 GenerateHtml.compareStatistics = function(diffStats, name1, name2)
 {
    var out = '<table border="1" cellpadding="0" cellspacing="2" width="100%">';
