@@ -9,7 +9,7 @@ HH.SkillCheck = function(effectiveSkill, difficultyClass, randomSource)
    var result = diceSum + effectiveSkill;
    return (result >= difficultyClass);
 };
-HH.PowerCheck = function(rank, difficultyClass, randomSource)
+HH.PowerCheckVsDc = function(rank, difficultyClass, randomSource)
 {
    var diceSum = new DicePool('3dF').sumRoll(randomSource);
    if(3 === diceSum) ++diceSum;
@@ -18,18 +18,20 @@ HH.PowerCheck = function(rank, difficultyClass, randomSource)
    return (result >= difficultyClass);
 };
 //TODO: other attacks are possible
+//TODO: input: {attacker: {attack: 0, damageRank: 0, lethal: true}, defender: {hp: 5, condition: null, activeDefense: 0, toughness: 0}}, randomSource
 HH.Damage = function(attack, activeDefense, damageRank, toughness, randomSource)  //TODO: non-lethal is possible but requires HP
 {
    var diceSum = 0, attackThreat = false, normalHit = true;
    var fudgePool = new DicePool('3dF');
-   if (undefined !== attack)
+   if (undefined !== attack)  //Perception range
    {
       diceSum = fudgePool.sumRoll(randomSource);
-      if(-3 === diceSum) return 'Critical Miss';  //Critical Failure is an Automatic failure
+      if(-3 === diceSum) return {attack: 'Critical Miss', toString: function(){return 'Critical Miss';}};  //Critical Failure is an Automatic failure
       attackThreat = (3 === diceSum);
       var attackResult = diceSum + attack;
       var activeDefenseResult = 0;  //defenseless uses 0
-      if (undefined !== activeDefense)  //TODO: why undefined instead of 0?
+      //TODO: also support vulnerable (half the result)
+      if (undefined !== activeDefense)
       {
          diceSum = fudgePool.sumRoll(randomSource);
          if(-3 === diceSum) activeDefenseResult = -Infinity;  //Critical Failure is an Automatic failure
@@ -37,14 +39,13 @@ HH.Damage = function(attack, activeDefense, damageRank, toughness, randomSource)
          else activeDefenseResult = diceSum + activeDefense;
       }
       normalHit = (attackResult >= activeDefenseResult);
-      if(!attackThreat && !normalHit) return 'Miss';
+      if(!attackThreat && !normalHit) return {attack: 'Miss', toString: function(){return 'Miss';}};
    }
    diceSum = fudgePool.sumRoll(randomSource);
    if(3 === diceSum) ++diceSum;
    else if(-3 === diceSum) --diceSum;
    var damageRolled = diceSum + damageRank;
    if(attackThreat && normalHit) ++damageRolled;  //critical hit confirmed. TODO: can also be used for Added Effect
-   //TODO: return JSON instead: {attack, damage, toString}
 
    diceSum = fudgePool.sumRoll(randomSource);
    if(3 === diceSum) ++diceSum;
@@ -52,7 +53,8 @@ HH.Damage = function(attack, activeDefense, damageRank, toughness, randomSource)
    var toughnessRolled = diceSum + toughness;
 
    var damageDealt = damageRolled - toughnessRolled;
-   if(damageDealt < 0) return 'Damage failed';
+   //TODO: include critical hit
+   if(damageDealt < 0) return {attack: 'Hit', toString: function(){return 'Damage failed';}};  //damage: undefined
 
-   return damageDealt + ' Damage';  //0 is ok
+   return {attack: 'Hit', damage: damageDealt, toString: function(){return damageDealt + ' Damage';}};  //0 is ok
 };

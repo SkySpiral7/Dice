@@ -13,9 +13,11 @@ Algorithm.analyze = function(diceGroup)
    if(undefined === diceGroup.dropKeepType) return Algorithm.nonDropping;
    if (Die.explodeTypes.Penetrating !== diceGroup.die.toJSON().explodeType)
    {
-      var isDropping = (DicePool.dropKeepTypes.DropLowest === diceGroup.dropKeepType || DicePool.dropKeepTypes.DropHighest === diceGroup.dropKeepType);
+      var isDropping = (DicePool.dropKeepTypes.DropLowest === diceGroup.dropKeepType ||
+         DicePool.dropKeepTypes.DropHighest === diceGroup.dropKeepType);
       if(isDropping && 1 === diceGroup.dropKeepCount) return Algorithm.singleDrop;
-      if(!isDropping && (diceGroup.dieCount - 1) === diceGroup.dropKeepCount && Die.explodeTypes.Normal !== diceGroup.die.toJSON().explodeType) return Algorithm.singleDrop;
+      if (!isDropping && (diceGroup.dieCount - 1) === diceGroup.dropKeepCount &&
+         Die.explodeTypes.Normal !== diceGroup.die.toJSON().explodeType) return Algorithm.singleDrop;
          //Keeping all but the lowest with compound or no explode is the same as drop lowest.
          //The actual algorithm doesn't need the diceGroup to be converted.
       //else fall through
