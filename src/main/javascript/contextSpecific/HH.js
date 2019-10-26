@@ -1,6 +1,6 @@
 'use strict';
-var HH = {};
 //TODO: needs tests
+var HH = {};
 HH.SkillCheck = function(effectiveSkill, difficultyClass, randomSource)
 {
    var diceSum = new DicePool('3dF').sumRoll(randomSource);
