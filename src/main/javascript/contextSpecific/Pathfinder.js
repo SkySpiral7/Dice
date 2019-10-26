@@ -17,6 +17,7 @@ Combat maneuvers can't score threats (use a criticalMultiplier of 1)
 
 It likewise assumes that the DR can be applied to all of the damage and applies DR to the lethal damage then the nonlethal damage (if any).
 This function assumes the attack is lethal, nonlethal damage can only appear when the minimum damage is used.
+It is possible to deal both lethal damage and nonlethal damage if it was a critical hit and strength modifier is negative.
 */
 Pathfinder.Attack = function(input)
 {
