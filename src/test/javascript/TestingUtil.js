@@ -11,7 +11,8 @@ function numberGenerator(input)
    var numberArray = [];
    for (var i=0; i < input.length; ++i)
    {
-      if(undefined != input[i].dieSides) numberArray = numberArray.concat(dieResultsToNonRandomArray(input[i].dieSides, input[i].values));
+      if('F' === input[i].dieSides || 'f' === input[i].dieSides) numberArray = numberArray.concat(fudgeResultsToNonRandomArray(input[i].values));
+      else if(undefined != input[i].dieSides) numberArray = numberArray.concat(dieResultsToNonRandomArray(input[i].dieSides, input[i].values));
       else if(undefined != input[i].deckSize) numberArray = numberArray.concat(deckResultsToNonRandomArray(input[i].deckSize, input[i].values));
       else numberArray = numberArray.concat(input[i]);
    }
@@ -26,6 +27,14 @@ function numberGenerator(input)
       for (var i = 0; i < numberArray.length; ++i)
       {
          numberArray[i] = (numberArray[i] - 1) / sides;
+      }
+      return numberArray;
+   }
+   function fudgeResultsToNonRandomArray(numberArray)
+   {
+      for (var i = 0; i < numberArray.length; ++i)
+      {
+         numberArray[i] = (numberArray[i] + 1) / 3;
       }
       return numberArray;
    }
@@ -65,7 +74,7 @@ TestSuite.Util.numberGenerator_dice = async function(testState={})
    assertions.push({Expected: (4/8), Actual: generator(), Description: 'Quick test'});
    } catch(e){assertions.push({Error: e, Description: 'Quick test'});}
 
-   return TestRunner.displayResults('Testing Util numberGenerator.dice', assertions, testState);
+   return TestRunner.displayResults('TestingUtil numberGenerator.dice', assertions, testState);
 };
 TestSuite.Util.numberGenerator_values = async function(testState={})
 {
@@ -89,5 +98,5 @@ TestSuite.Util.numberGenerator_values = async function(testState={})
       assertions.push({Expected: new Error('Ran out of numbers'), Actual: e, Description: 'End'});
    }
 
-   return TestRunner.displayResults('Testing Util numberGenerator.values', assertions, testState);
+   return TestRunner.displayResults('TestingUtil numberGenerator.values', assertions, testState);
 };

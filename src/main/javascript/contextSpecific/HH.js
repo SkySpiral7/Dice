@@ -23,20 +23,20 @@ HH.Damage = function(input, randomSource)
 {
    var diceSum = 0, criticalHit = false;
    var fudgePool = new DicePool('3dF');
-   if (undefined !== input.attack)  //Perception range
+   if (undefined !== input.attacker.attack)  //Perception range
    {
       diceSum = fudgePool.sumRoll(randomSource);
       if(-3 === diceSum) return {attack: 'Critical Miss', toString: function(){return 'Critical Miss';}};  //Critical Failure is an Automatic failure
       var attackThreat = (3 === diceSum);
-      var attackResult = diceSum + input.attack;
+      var attackResult = diceSum + input.attacker.attack;
       var activeDefenseResult = 0;  //defenseless uses 0
       //TODO: also support vulnerable (half the result)
-      if (undefined !== input.activeDefense)
+      if (undefined !== input.defender.activeDefense)
       {
          diceSum = fudgePool.sumRoll(randomSource);
          if(-3 === diceSum) activeDefenseResult = -Infinity;  //Critical Failure is an Automatic failure
          else if(3 === diceSum) activeDefenseResult = 4;  //Critical Success is +1
-         else activeDefenseResult = diceSum + input.activeDefense;
+         else activeDefenseResult = diceSum + input.defender.activeDefense;
       }
       var normalHit = (attackResult >= activeDefenseResult);
       if(!attackThreat && !normalHit) return {attack: 'Miss', toString: function(){return 'Miss';}};
@@ -45,7 +45,7 @@ HH.Damage = function(input, randomSource)
    diceSum = fudgePool.sumRoll(randomSource);
    if(3 === diceSum) ++diceSum;
    else if(-3 === diceSum) --diceSum;
-   var damageRolled = diceSum + input.damageRank;
+   var damageRolled = diceSum + input.attacker.damageRank;
    var attackString = criticalHit ? 'Critical Hit' : 'Hit';
    if(criticalHit) ++damageRolled;  //can also be used for Added Effect but uses Increased Effect by default.
    // Caller will have to check attack and -1 if they don't want the +1
@@ -56,10 +56,11 @@ HH.Damage = function(input, randomSource)
    diceSum = fudgePool.sumRoll(randomSource);
    if(3 === diceSum) ++diceSum;
    else if(-3 === diceSum) --diceSum;
-   var toughnessRolled = diceSum + input.toughness;
+   var toughnessRolled = diceSum + input.defender.toughness;
 
    var damageDealt = damageRolled - toughnessRolled;
    if(damageDealt < 0) return {attack: attackString, toString: function(){return 'Damage failed';}};  //damage: undefined
 
-   return {attack: attackString, damage: damageDealt, toString: function(){return damageDealt + ' Damage';}};  //0 is ok
+   //TODO: include bruised to make it easier to understand 0 damage
+   return {attack: attackString, damage: damageDealt, toString: function(){return damageDealt + ' damage';}};  //0 is ok
 };
