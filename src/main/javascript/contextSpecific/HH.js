@@ -59,8 +59,11 @@ HH.Damage = function(input, randomSource)
    var toughnessRolled = diceSum + input.defender.toughness;
 
    var damageDealt = damageRolled - toughnessRolled;
-   if(damageDealt < 0) return {attack: attackString, toString: function(){return 'Damage failed';}};  //damage: undefined
+   if(damageDealt < 0) return {attack: attackString, bruised: false,  //damage: undefined
+      toString: function(){return 'Damage failed (no bruised penalty)';}};
+   if(0 === damageDealt) return {attack: attackString, bruised: true, damage: 0,
+      toString: function(){return 'Target gets a bruised penalty.';}};
 
-   //TODO: include bruised to make it easier to understand 0 damage
-   return {attack: attackString, damage: damageDealt, toString: function(){return damageDealt + ' damage';}};  //0 is ok
+   return {attack: attackString, damage: damageDealt, bruised: true,
+      toString: function(){return 'Target loses ' + damageDealt + ' HP and gets a bruised penalty.';}};
 };

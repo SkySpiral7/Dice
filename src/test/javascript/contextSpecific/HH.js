@@ -14,10 +14,10 @@ TestSuite.HH.Damage = async function(testState={})
       actual = HH.Damage(input, randomSource);
       actualStringValue = actual.toString();
       delete actual.toString;
-      expected = {attack: 'Hit', damage: 2};
+      expected = {attack: 'Hit', bruised: true, damage: 2};
       assertions.push({Expected: expected, Actual: actual, Description: 'Happy path: perception, no crits, success. return value'});
-      assertions.push({Expected: '2 damage', Actual: actualStringValue, Description:
-         'Happy path: perception, no crits, success. string value'});
+      assertions.push({Expected: 'Target loses 2 HP and gets a bruised penalty.', Actual: actualStringValue,
+         Description: 'Happy path: perception, no crits, success. string value'});
    } catch(e){assertions.push({Error: e, Description: 'Happy path: perception, no crits, success.'});}
 
    try{
@@ -133,7 +133,7 @@ TestSuite.HH.Damage = async function(testState={})
       randomSource = numberGenerator([{dieSides: 'F', values: rolls}]);
       actual = HH.Damage(input, randomSource);
       delete actual.toString;
-      expected = {attack: 'Hit', damage: 1};
+      expected = {attack: 'Hit', bruised: true, damage: 1};
       assertions.push({Expected: expected, Actual: actual, Description: 'Crit success damage'});
    } catch(e){assertions.push({Error: e, Description: 'Crit success damage'});}
 
@@ -144,7 +144,7 @@ TestSuite.HH.Damage = async function(testState={})
       randomSource = numberGenerator([{dieSides: 'F', values: rolls}]);
       actual = HH.Damage(input, randomSource);
       delete actual.toString;
-      expected = {attack: 'Hit', damage: 1};
+      expected = {attack: 'Hit', bruised: true, damage: 1};
       assertions.push({Expected: expected, Actual: actual, Description: 'Crit fail damage'});
    } catch(e){assertions.push({Error: e, Description: 'Crit fail damage'});}
 
@@ -158,9 +158,10 @@ TestSuite.HH.Damage = async function(testState={})
       actual = HH.Damage(input, randomSource);
       actualStringValue = actual.toString();
       delete actual.toString;
-      expected = {attack: 'Critical Hit', damage: 2};
+      expected = {attack: 'Critical Hit', bruised: true, damage: 2};
       assertions.push({Expected: expected, Actual: actual, Description: 'Critical hit, +1 damage, return value'});
-      assertions.push({Expected: '2 damage', Actual: actualStringValue, Description: 'Critical hit, +1 damage, string value'});
+      assertions.push({Expected: 'Target loses 2 HP and gets a bruised penalty.', Actual: actualStringValue,
+         Description: 'Critical hit, +1 damage, string value'});
    } catch(e){assertions.push({Error: e, Description: 'Critical hit, +1 damage'});}
 
    try{
@@ -170,7 +171,7 @@ TestSuite.HH.Damage = async function(testState={})
       randomSource = numberGenerator([{dieSides: 'F', values: rolls}]);
       actual = HH.Damage(input, randomSource);
       delete actual.toString;
-      expected = {attack: 'Hit', damage: 6};
+      expected = {attack: 'Hit', bruised: true, damage: 6};
       assertions.push({Expected: expected, Actual: actual, Description: 'Crit success toughness'});
    } catch(e){assertions.push({Error: e, Description: 'Crit success toughness'});}
 
@@ -181,7 +182,7 @@ TestSuite.HH.Damage = async function(testState={})
       randomSource = numberGenerator([{dieSides: 'F', values: rolls}]);
       actual = HH.Damage(input, randomSource);
       delete actual.toString;
-      expected = {attack: 'Hit', damage: 14};
+      expected = {attack: 'Hit', bruised: true, damage: 14};
       assertions.push({Expected: expected, Actual: actual, Description: 'Crit fail toughness'});
    } catch(e){assertions.push({Error: e, Description: 'Crit fail toughness'});}
 
@@ -193,9 +194,10 @@ TestSuite.HH.Damage = async function(testState={})
       actual = HH.Damage(input, randomSource);
       actualStringValue = actual.toString();
       delete actual.toString;
-      expected = {attack: 'Hit'};
+      expected = {attack: 'Hit', bruised: false};
       assertions.push({Expected: expected, Actual: actual, Description: 'Damage failed with hit. return value'});
-      assertions.push({Expected: 'Damage failed', Actual: actualStringValue, Description: 'Damage failed with hit. string value'});
+      assertions.push({Expected: 'Damage failed (no bruised penalty)', Actual: actualStringValue,
+         Description: 'Damage failed with hit. string value'});
    } catch(e){assertions.push({Error: e, Description: 'Damage failed with hit'});}
 
    try{
@@ -208,9 +210,10 @@ TestSuite.HH.Damage = async function(testState={})
       actual = HH.Damage(input, randomSource);
       actualStringValue = actual.toString();
       delete actual.toString;
-      expected = {attack: 'Critical Hit'};
+      expected = {attack: 'Critical Hit', bruised: false};
       assertions.push({Expected: expected, Actual: actual, Description: 'Damage failed with critical hit. return value'});
-      assertions.push({Expected: 'Damage failed', Actual: actualStringValue, Description: 'Damage failed with critical hit. string value'});
+      assertions.push({Expected: 'Damage failed (no bruised penalty)', Actual: actualStringValue,
+         Description: 'Damage failed with critical hit. string value'});
    } catch(e){assertions.push({Error: e, Description: 'Damage failed with critical hit'});}
 
    try{
@@ -221,9 +224,10 @@ TestSuite.HH.Damage = async function(testState={})
       actual = HH.Damage(input, randomSource);
       actualStringValue = actual.toString();
       delete actual.toString;
-      expected = {attack: 'Hit', damage: 0};
+      expected = {attack: 'Hit', bruised: true, damage: 0};
       assertions.push({Expected: expected, Actual: actual, Description: '0 damage allowed. return value'});
-      assertions.push({Expected: '0 damage', Actual: actualStringValue, Description: '0 damage allowed. string value'});
+      assertions.push({Expected: 'Target gets a bruised penalty.', Actual: actualStringValue,
+         Description: '0 damage allowed. string value'});
    } catch(e){assertions.push({Error: e, Description: '0 damage allowed'});}
 
    return TestRunner.displayResults('H&H HH.Damage', assertions, testState);
