@@ -19,6 +19,7 @@ HH.PowerCheckVsDc = function(rank, difficultyClass, randomSource)
 };
 //TODO: other attacks are possible
 //TODO: input: {attacker: {attack: 0, damageRank: 0, lethal: true}, defender: {hp: 5, condition: null, activeDefense: 0, toughness: 0}}, randomSource
+//TODO: doc, eg strength based should be included in damageRank
 HH.Damage = function(input, randomSource)
 {
    var diceSum = 0, criticalHit = false;
@@ -26,6 +27,7 @@ HH.Damage = function(input, randomSource)
    if (undefined !== input.attacker.attack)  //Perception range
    {
       diceSum = fudgePool.sumRoll(randomSource);
+      //TODO: area attack is rank + 0 vs dodge
       if(-3 === diceSum) return {attack: 'Critical Miss', toString: function(){return 'Critical Miss';}};  //Critical Failure is an Automatic failure
       var attackThreat = (3 === diceSum);
       var attackResult = diceSum + input.attacker.attack;
