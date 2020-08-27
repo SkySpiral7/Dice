@@ -9,3 +9,5 @@ had at one point... I was at one point working on this functionality in the func
 The old version had: rolling dice, drawing dice distribution curves, dice and dicepool objects that
 allow any kind of custom die, convenience functions for common things like DnDAttack, IronClawOpposedRoll,
 and WarhammerAttackUnit.
+
+[Online version](http://skyspiral7.github.io/Dice/site-map.html)
