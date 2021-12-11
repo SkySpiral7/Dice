@@ -10,4 +10,4 @@ The old version had: rolling dice, drawing dice distribution curves, dice and di
 allow any kind of custom die, convenience functions for common things like DnDAttack, IronClawOpposedRoll,
 and WarhammerAttackUnit.
 
-[Online version](http://skyspiral7.github.io/Dice/site-map.html)
+[Online version](https://skyspiral7.github.io/Dice/site-map.html)
