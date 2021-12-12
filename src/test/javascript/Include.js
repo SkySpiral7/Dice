@@ -15,7 +15,6 @@ includePath = includePath.replace('main/', 'test/');
 
 //these have no tests
 fileNames.removeElement('core/Validation');
-fileNames.removeElement('statistics/Combination');
 fileNames.removeElement('statistics/Draw');
 
 //need this in order to test
