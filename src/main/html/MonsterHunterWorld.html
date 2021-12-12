@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+   <meta charset="UTF-8" />
+   <title>Material Hunt Stats - MHW</title>
+   <script id="DiceInclude" src="../javascript/Include.js"></script>
+   <style>
+      /*TODO: dark mode*/
+      .hoverInfo {
+         color: red;
+         border-bottom: 1px dotted red;
+      }
+      p {
+         max-width: 1000px;
+      }
+   </style>
+   <script>
+      'use strict';
+
+      //TODO: verify results via simulation (small numbers on table)
+      /**
+       * This is the entry point for the form: it's the top.
+       */
+      function readForm()
+      {
+         /*
+         far future: js html paser: https://stackoverflow.com/a/21870431
+         would need jquery to safely navigate a complex html (see first so answer)
+         */
+         const allFormNames = ['carve', 'hunt', 'quest', 'bronze', 'silver', 'gold', 'purple'];
+         const data = [];
+         for(let idPrefix of allFormNames)
+         {
+            const reward = Number.parseInt(document.getElementById(idPrefix + 'Reward').value);
+            const itemCount = Number.parseInt(document.getElementById(idPrefix + 'ItemCount').value);
+            const percent = Number.parseInt(document.getElementById(idPrefix + 'Percent').value);
+
+            if(0 !== reward && 0 !== itemCount && 0 !== percent)
+            {
+               data.push({
+                  tableCount: reward,
+                  itemCount: itemCount,
+                  probability: (percent / 100)
+               });
+            }
+         }
+         if(0 === data.length) alert('No data');
+         else crunchData(data, Number.parseInt(document.getElementById('huntCount').value));
+      }
+
+      /*
+      actual numbers from https://mhworld.kiranico.com/items/lpgmr/jyuratodus-scale
+      this item is low rank only
+      var data = [
+         //Carves/Capture
+         {tableCount: 4, itemCount: 1, probability: (36/100)},
+         //Hunt
+         {tableCount: 4, itemCount: 1, probability: (21/100)},
+         //this is assuming you have an investigation of just Jyuratodus that has 1 Bronze, 1 Silver, 1 Gold
+         //Investigation Reward (Bronze)
+         {tableCount: 1, itemCount: 1, probability: (21/100)},
+         //Investigation Reward (Silver)
+         {tableCount: 1, itemCount: 2, probability: (11/100)},
+         //Investigation Reward (Gold)
+         {tableCount: 1, itemCount: 3, probability: (8/100)}
+         //no Investigation Reward (Purple)
+      ];
+
+      crunchData(data, 1);
+      */
+
+      function crunchData(data, completeCount)
+      {
+         const eachTable = [];
+         for(let tableIndex = 0; tableIndex < data.length; ++tableIndex)
+         {
+            const thisTable = Combination.binomialDistribution(data[tableIndex].tableCount, data[tableIndex].probability);
+            for(let outcomeIndex = 0; outcomeIndex < thisTable.length; ++outcomeIndex)
+            {
+               //convert number of times got reward to number of items
+               thisTable[outcomeIndex].result *= data[tableIndex].itemCount;
+            }
+            eachTable.push(thisTable);
+         }
+
+         const everyHuntOutcome = calcEveryHuntOutcome(eachTable);
+         let finalResults = everyHuntOutcome;
+         if(1 !== completeCount)
+         {
+            const huntCartesianHolder = [];
+            for(let completeIndex = 1; completeIndex <= completeCount; ++completeIndex)
+            {
+               huntCartesianHolder.push(everyHuntOutcome.copy());
+            }
+            finalResults = calcEveryHuntOutcome(huntCartesianHolder);
+         }
+
+         let out = '<b>Monster material</b> ';
+         const aggregate = Statistics.calculateAggregates(finalResults);
+         out += GenerateHtml.aggregates(aggregate);
+         out += GenerateHtml.statistics(finalResults, '>='); //default col
+         out = out.replace('<th>Roll</th>', '<th>Count</th>');  //easier to just edit than some new arg etc
+         document.getElementById('graphResults').innerHTML = out;
+
+         function calcEveryHuntOutcome(eachTable)
+         {
+            if(1 === eachTable.length) return eachTable[0];  //if there's only 1 table then this already is every outcome
+            /*
+             * eachTable[0].length ^ eachTable.length == huntCartesianProduct.length
+             * magic number based on testing
+             * max: Math.log(16777216) / Math.log(eachTable[0].length)
+             * however 5 completeCount won't hit this and 5+ is unrealistic
+             */
+            const huntCartesianProduct = Combination.cartesianProduct(eachTable);
+            const everyHuntOutcomeObj = {};
+            for(let productIndex = 0; productIndex < huntCartesianProduct.length; ++productIndex)
+            {
+               let thisResult = 0;
+               let thisProbability = 1;
+               for(let resultIndex = 0; resultIndex < huntCartesianProduct[productIndex].length; ++resultIndex)
+               {
+                  thisResult += huntCartesianProduct[productIndex][resultIndex].result;
+                  thisProbability *= huntCartesianProduct[productIndex][resultIndex].probability;
+               }
+               if(everyHuntOutcomeObj[thisResult] === undefined) everyHuntOutcomeObj[thisResult] = 0;
+               everyHuntOutcomeObj[thisResult] += thisProbability;
+            }
+            const everyHuntOutcome = [];
+            for(let resultProp in everyHuntOutcomeObj)
+            {
+               if(everyHuntOutcomeObj.hasOwnProperty(resultProp))
+               {
+                  everyHuntOutcome.push({result: Number.parseInt(resultProp), probability: everyHuntOutcomeObj[resultProp]});
+               }
+            }
+            return everyHuntOutcome;
+         }
+      }
+   </script>
+</head>
+<body>
+<form action="javascript:readForm();">
+   <table>
+      <tr>
+         <th>Type</th>
+         <th>Reward Count</th>
+         <th>Item Count</th>
+         <th>Percent</th>
+      </tr>
+      <tr>
+         <td><span title="Carves: Carves" class="hoverInfo">Carve</span>/<span title="Rewards: Capture" class="hoverInfo">Capture</span></td>
+         <td>4<input type="hidden" value="4" id="carveReward" /></td>
+         <td><input type="number" min="1" value="1" max="5" id="carveItemCount" /></td>
+         <td><input type="number" min="0" max="100" value="0" id="carvePercent" />%</td>
+      </tr>
+      <tr>
+         <td><span title="Rewards: Hunt" class="hoverInfo">Hunt</span></td>
+         <td>4<input type="hidden" value="4" id="huntReward" /></td>
+         <td><input type="number" min="1" value="1" max="5" id="huntItemCount" /></td>
+         <td><input type="number" min="0" max="100" value="0" id="huntPercent" />%</td>
+      </tr>
+      <tr>
+         <td><span title="Quest Rewards" class="hoverInfo">Quest</span></td>
+         <td>3*<input type="hidden" value="3" id="questReward" /></td>
+         <td><input type="number" min="1" value="1" max="5" id="questItemCount" /></td>
+         <td><input type="number" min="0" max="100" value="0" id="questPercent" />%</td>
+      </tr>
+      <tr>
+         <td>Investigation: Bronze</td>
+         <td><input type="number" min="0" max="5" value="0" id="bronzeReward" /></td>
+         <td><input type="number" min="1" value="1" max="5" id="bronzeItemCount" /></td>
+         <td><input type="number" min="0" max="100" value="0" id="bronzePercent" />%</td>
+      </tr>
+      <tr>
+         <td>Investigation: Silver</td>
+         <td><input type="number" min="0" max="5" value="0" id="silverReward" /></td>
+         <td><input type="number" min="1" value="1" max="5" id="silverItemCount" /></td>
+         <td><input type="number" min="0" max="100" value="0" id="silverPercent" />%</td>
+      </tr>
+      <tr>
+         <td>Investigation: Gold</td>
+         <td><input type="number" min="0" max="5" value="0" id="goldReward" /></td>
+         <td><input type="number" min="1" value="1" max="5" id="goldItemCount" /></td>
+         <td><input type="number" min="0" max="100" value="0" id="goldPercent" />%</td>
+      </tr>
+      <tr>
+         <td>Investigation: Purple</td>
+         <td><input type="number" min="0" max="5" value="0" id="purpleReward" /></td>
+         <td><input type="number" min="1" value="1" max="5" id="purpleItemCount" /></td>
+         <td><input type="number" min="0" max="100" value="0" id="purplePercent" />%</td>
+      </tr>
+   </table>
+   Number of times you do will this hunt: <input type="number" min="1" value="1" max="5" id="huntCount" />
+   <br />
+   <input type="submit" value="Calculate" />
+</form>
+<br />
+<div id="graphResults"></div>
+
+<p>If you need a specific rare material in Monster Hunter World then input the stats of hunting a single monster and this will output the probability
+of each possible number of material you'll get.
+This programs calculates as much as possible and is pessimistic about the rest so that your actual odds should be better than reported.
+Refer to <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a> for all the info to fill in the form.
+Text with red underline will show the name of the table from <a href="https://mhworld.kiranico.com/">kiranico</a> when you hover over it.
+<span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span> are always identical tables the only difference is that you always carve 4 material but capturing will give
+4 or 5 material. However since I don't know the criteria/formula for when you would get 5 this calculator assumes you get 4 and
+thus they are completely identical. <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> you get whether you kill or capture and is 4-8 however I once again don't know the
+criteria/formula so this assumes 4. An expedition would give 3-4 from <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> table but this calculator assumes you aren't doing an expedition.
+<span title="Carves: Carves" class="hoverInfo">Carve</span>, <span title="Rewards: Capture" class="hoverInfo">Capture</span>, and <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> are based on the large monster (I don't know how expeditions or multiple large monsters are calculated)
+and those tables are found on the large monster's page. <span title="Quest Rewards" class="hoverInfo">Quest</span> is specific to the quest taken and this info can be found on
+<a href="https://mhworld.kiranico.com/">kiranico</a>. <span title="Quest Rewards" class="hoverInfo">Quest</span> will give 4-8 rewards but the first <span title="Quest Rewards" class="hoverInfo">Quest</span> reward is always 100%
+(and thus doesn't need to be calculated) thus the random reward this form uses is 3. Investigations do in fact have <span title="Quest Rewards" class="hoverInfo">Quest</span>
+rewards for them <a href="https://game8.co/games/Monster-Hunter-World/archives/306257#hm_4">click here</a>. You'll notice
+that (beside the 100%) they don't have percentages listed but this is the only place I could find the info. After a hunt the
+"Quest completion rewards" will have the rewards from both <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> and <span title="Quest Rewards" class="hoverInfo">Quest</span> the only way to tell them apart is that the <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
+rewards are first then the 100% <span title="Quest Rewards" class="hoverInfo">Quest</span> reward then the rest of the <span title="Quest Rewards" class="hoverInfo">Quest</span> rewards. The "Quest completion rewards" can hold a
+maximum of 20 reward slots (each might have multiple copies of the material) which is enough room for the max 16 for single
+monster hunts. The box below it "Bonus rewards" has 20 slots for materials from breaking monster parts then for Capture rewards (they will be labeled).
+After that are the Investigation slots then the 20 Palico slots and 20 Tailraider slots.</p>
+<p><a href="https://mhworld.kiranico.com/">Kiranico</a> also has info on Tailraider Safari, Bandit Mantle, Plunderblade, Items Gathered by Palicoes
+materials from Monster tracks, Dropped Material, and basically everything you can think of. The Dropped Material table is
+what a monster may drop when they are toppled or have their body parts broken (the white items you have to pick up). Not
+to be confused with the tables for "Break Rathalos's head" etc which are Bonus rewards for breaking monster parts at the end
+of a hunt. The calculator doesn't account for any of these however you should break as many parts are you can.</p>
+<p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in Redefining the "Power Couple" 2 monster quest which makes me think
+I was cheated out of the 4 possible remaining rewards. Supposedly a Lucky Voucher will guarantee the max of 8 <span title="Quest Rewards" class="hoverInfo">Quest</span> rewards, I can't disprove that since
+I always get 8 when I have 0 faints and I usually don't faint. It is possible that the Lucky Voucher's description of
+"to add bonus rewards" is only talking about doubling the money (and thus doesn't affect materials at all).
+Poogie does not affect any rewards (reward slots, material count, cash, or research points). Deal with it.
+Although if Poogie likes you (any amount) then you can use him to find treasure which are materials that could be sold.
+The armor skills Good Luck and Great Luck supposedly have a chance to increase the number of materials in a given slot but not
+the number of reward slots used and thus don't affect the chances of getting "at least 1" of the material desired. It would
+be very tedious to verify those skills since it would require doing a ton of hunts with the skill and comparing to the expected number
+of each material.</p>
+<br /><br /><br /><br />
+<script>document.getElementById('carveItemCount').focus();</script>
+</body>
+</html>
