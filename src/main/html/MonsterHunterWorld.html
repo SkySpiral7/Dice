@@ -26,107 +26,12 @@
       /**This disables jquery from requesting images when parsing html*/
       const virtualDocument = document.implementation.createHTMLDocument('virtual');
       const monstersNameToLink = {};
-
-      function readFromUrl()
-      {
-         //TODO: auto complete material
-         /*I would need to change readFromUrl to be on change event and have it
-         parse all material and rank into json then auto complete the material */
-
-         const monsterName = document.getElementById('monster').value.trim();
-         const monsterUrl = monstersNameToLink[monsterName];
-         const material = document.getElementById('material').value.trim();
-         const rank = document.getElementById('huntRank').value;
-
-         $.get(monsterUrl).fail(() =>
-         {
-            alert('Failed to load ' + monsterUrl);
-         })
-         .done(function(html)
-         {
-            function grabDataFromTable(sectionText, rankText, tableText, rewardCount, material)
-            {
-               const section = $(html, virtualDocument).find('h6:contains("' + sectionText + '") + div')[0];
-               const rankSearch = $(section, virtualDocument).find('h6:contains("' + rankText + '")');
-               if(0 === rankSearch.length)
-               {
-                  //monster can't be fought at this rank
-                  return undefined;
-               }
-               const rankCol = rankSearch[0].parentElement;
-               const tableSearch = $(rankCol, virtualDocument).find('td:contains("' + tableText + '")');
-               if(0 === tableSearch.length)
-               {
-                  //table not found (only possible with low rank purple investigation)
-                  return undefined;
-               }
-               const table = tableSearch[0].parentElement.parentElement.parentElement;
-               const materialSearch = $(table, virtualDocument).find('span:contains("' + material + '")');
-               if(0 === materialSearch.length)
-               {
-                  //material not found in this table
-                  return undefined;
-               }
-               const materialLink = materialSearch[0].parentElement;
-               let materialCount = 1;
-               if(null !== materialLink.nextSibling && 0 !== materialLink.nextSibling.textContent.trim().length)
-               {
-                  materialCount = Number.parseInt(materialLink.nextSibling.textContent.replace(' x', ''));
-               }
-               const materialPercent = materialLink.parentElement.nextElementSibling.textContent;
-               const materialProbability = Number.parseInt(materialPercent.replace('%', '')) / 100;
-               return {tableCount: rewardCount, itemCount: materialCount, probability: materialProbability};
-            }
-
-            const data = [];
-            [
-               //same as Rewards: Capture monster
-               {sectionText: 'Carves', tableText: 'Carves', rewardCount: 4},
-               {sectionText: 'Rewards', tableText: 'Hunt ' + monsterName, rewardCount: 4},
-               //quest table added below
-               {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Bronze)',
-                  rewardCount: Number.parseInt(document.getElementById('bronzeReward').value)
-               },
-               {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Silver)',
-                  rewardCount: Number.parseInt(document.getElementById('silverReward').value)
-               },
-               {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Gold)',
-                  rewardCount: Number.parseInt(document.getElementById('goldReward').value)
-               },
-               {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Purple)',
-                  rewardCount: Number.parseInt(document.getElementById('purpleReward').value)
-               }
-            ].forEach(it =>
-            {
-               //Investigations can be 0
-               if(0 !== it.rewardCount)
-               {
-                  const info = grabDataFromTable(it.sectionText, rank, it.tableText, it.rewardCount, material);
-                  if(info) data.push(info);
-               }
-            });
-
-            const questItemCount = Number.parseInt(document.getElementById('questItemCount').value);
-            const questPercent = Number.parseInt(document.getElementById('questPercent').value);
-            if(0 !== questItemCount && 0 !== questPercent)
-            {
-               data.push({tableCount: 3, itemCount: questItemCount, probability: questPercent / 100});
-            }
-
-            crunchData(data, Number.parseInt(document.getElementById('huntCount').value));
-         });
-      }
+      let monsterData = undefined;
 
       function makeMonsterAutoComplete()
       {
+         document.getElementById('monster').style.visibility = "hidden";
+         document.getElementById('promisePlaceholder').style.visibility = "visible";
          $.get('https://mhworld.kiranico.com/monsters').fail(() =>
          {
             alert('Failed to load https://mhworld.kiranico.com/monsters (the monster index).\nConnect to internet and refresh this page.');
@@ -137,15 +42,203 @@
             {
                monstersNameToLink[element.textContent] = element.href;
             });
+            const allMonsterNames = Object.keys(monstersNameToLink);
+            //monster names are already sorted but good to enforce that
+            allMonsterNames.sort();
             $('#monster').autocomplete({
-               source: Object.keys(monstersNameToLink)
+               source: allMonsterNames
             });
+            document.getElementById('monster').style.visibility = "visible";
+
+            //populate material on page load in case the monster doesn't change
+            makeMaterialAutoComplete();
          });
+      }
+
+      function makeMaterialAutoComplete()
+      {
+         const monsterName = document.getElementById('monster').value.trim();
+         const monsterUrl = monstersNameToLink[monsterName];
+         monsterData = undefined;
+
+         if(!monsterUrl)
+         {
+            alert(`No data for monster named "${monsterName}"`);
+            return;
+         }
+
+         document.getElementById('material').style.visibility = "hidden";
+         document.getElementById('promisePlaceholder').style.visibility = "visible";
+         $.get(monsterUrl).fail(() =>
+         {
+            alert('Failed to load ' + monsterUrl);
+         })
+         .done(function(html)
+         {
+            monsterData = {
+               "Low Rank": {Rewards: {}, Investigations: {}},
+               "High Rank": {Rewards: {}, Investigations: {}},
+               "Master Rank": {Rewards: {}, Investigations: {}}
+            };
+            const materialData = {};
+
+            [
+               //same as Carves: Carves but capture lets me track fewer sections
+               {sectionText: 'Rewards', tableText: 'Capture ' + monsterName},
+               {sectionText: 'Rewards', tableText: 'Hunt ' + monsterName},
+               //quest table not from this page
+               {
+                  sectionText: 'Investigations',
+                  tableText: 'Investigation Reward (Bronze)'
+               },
+               {
+                  sectionText: 'Investigations',
+                  tableText: 'Investigation Reward (Silver)'
+               },
+               {
+                  sectionText: 'Investigations',
+                  tableText: 'Investigation Reward (Gold)'
+               },
+               {
+                  sectionText: 'Investigations',
+                  tableText: 'Investigation Reward (Purple)'
+               }
+            ].forEach(it =>
+            {
+               const section = $(html, virtualDocument).find('h6:contains("' + it.sectionText + '") + div')[0];
+               $(section, virtualDocument).find('h6').each((index, rankSearch) =>
+               {
+                  const rankText = rankSearch.textContent;
+                  const rankCol = rankSearch.parentElement;
+                  const tableSearch = $(rankCol, virtualDocument).find('td:contains("' + it.tableText + '")');
+                  if(0 === tableSearch.length)
+                  {
+                     /* table not found
+                      * possible with low rank purple investigation
+                      * or if monster can't be fought at this rank */
+                     return;
+                  }
+                  const table = tableSearch[0].parentElement.parentElement.parentElement;
+
+                  monsterData[rankText][it.sectionText][it.tableText] = [];
+                  $(table, virtualDocument).find('span').each((index, materialSearch) =>
+                  {
+                     const material = materialSearch.textContent;
+                     materialData[material] = true;
+                     const materialLink = materialSearch.parentElement;
+                     let materialCount = 1;
+                     if(null !== materialLink.nextSibling && 0 !== materialLink.nextSibling.textContent.trim().length)
+                     {
+                        materialCount = Number.parseInt(materialLink.nextSibling.textContent.replace(' x', ''));
+                     }
+                     const materialPercent = materialLink.parentElement.nextElementSibling.textContent;
+                     const materialProbability = Number.parseInt(materialPercent.replace('%', '')) / 100;
+
+                     monsterData[rankText][it.sectionText][it.tableText].push({
+                        material: material,
+                        itemCount: materialCount,
+                        probability: materialProbability
+                     });
+                  });
+               });
+            });
+
+            const allMaterialNames = Object.keys(materialData);
+            allMaterialNames.sort();
+            $('#material').autocomplete({
+               source: allMaterialNames
+            });
+
+            //if old material name isn't valid then replace it with the first valid material
+            if(!allMaterialNames.includes(document.getElementById('material').value.trim()))
+            {
+               document.getElementById('material').value = allMaterialNames[0];
+            }
+
+            document.getElementById('material').style.visibility = "visible";
+            document.getElementById('promisePlaceholder').style.visibility = "hidden";
+         });
+      }
+
+      function readForm()
+      {
+         if('visible' === document.getElementById('promisePlaceholder').style.visibility)
+         {
+            alert('Keep waiting for internet data.');
+            return;
+         }
+
+         const monsterName = document.getElementById('monster').value.trim();
+         const material = document.getElementById('material').value.trim();
+         const rank = document.getElementById('huntRank').value;
+
+         if(0 === Object.keys(monsterData[rank].Rewards).length)
+         {
+            alert(`${monsterName} can't be fought at ${rank}`);
+            return;
+         }
+
+         const data = [];
+         //this table is too hard to make DRY since it uses the form
+         [
+            //same as Carves: Carves but capture lets me track fewer sections
+            {sectionText: 'Rewards', tableText: 'Capture ' + monsterName, rewardCount: 4},
+            {sectionText: 'Rewards', tableText: 'Hunt ' + monsterName, rewardCount: 4},
+            //quest table added below
+            {
+               sectionText: 'Investigations',
+               tableText: 'Investigation Reward (Bronze)',
+               rewardCount: Number.parseInt(document.getElementById('bronzeReward').value)
+            },
+            {
+               sectionText: 'Investigations',
+               tableText: 'Investigation Reward (Silver)',
+               rewardCount: Number.parseInt(document.getElementById('silverReward').value)
+            },
+            {
+               sectionText: 'Investigations',
+               tableText: 'Investigation Reward (Gold)',
+               rewardCount: Number.parseInt(document.getElementById('goldReward').value)
+            },
+            {
+               sectionText: 'Investigations',
+               tableText: 'Investigation Reward (Purple)',
+               rewardCount: Number.parseInt(document.getElementById('purpleReward').value)
+            }
+         ].forEach(it =>
+         {
+            //Investigations can be 0
+            if(0 !== it.rewardCount)
+            {
+               const materialData = monsterData[rank][it.sectionText][it.tableText].find(it => material === it.material);
+               if(materialData) data.push({
+                  tableCount: it.rewardCount,
+                  itemCount: materialData.itemCount,
+                  probability: materialData.probability
+               });
+            }
+         });
+
+         const questItemCount = Number.parseInt(document.getElementById('questItemCount').value);
+         const questPercent = Number.parseInt(document.getElementById('questPercent').value);
+         if(0 !== questItemCount && 0 !== questPercent)
+         {
+            data.push({tableCount: 3, itemCount: questItemCount, probability: questPercent / 100});
+         }
+
+         if(0 === data.length)
+         {
+            alert(`"${material}" can't be obtained from ${monsterName} at ${rank} with this form data.`);
+            return;
+         }
+
+         crunchData(data, Number.parseInt(document.getElementById('huntCount').value));
       }
 
       //TODO: verify results via simulation (small numbers on table)
       function crunchData(data, completeCount)
       {
+         if(0 === data.length) alert('No data');
          const eachTable = [];
          for(let tableIndex = 0; tableIndex < data.length; ++tableIndex)
          {
@@ -214,66 +307,109 @@
    </script>
 </head>
 <body>
-<form action="javascript:readFromUrl();">
-   <label>Monster to hunt: <input type="text" id="monster" value="Rathalos" /></label>
-   <label>Material: <input type="text" id="material" value="Rathalos Scale" /></label><br />
-   <select id="huntRank">
+<form action="javascript:readForm();">
+   <span id="promisePlaceholder">Waiting for data from
+      <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>.
+   </span><br />
+   <label>Monster to hunt:
+      <input type="text" id="monster" style="visibility: hidden" value="Rathalos" onchange="makeMaterialAutoComplete()" />
+   </label>
+   <label>Material:
+      <input type="text" id="material" style="visibility: hidden" value="Rathalos Scale" />
+   </label><br />
+
+   <label>Rank: <select id="huntRank">
       <option>Low Rank</option>
       <option>High Rank</option>
       <option>Master Rank</option>
-   </select><br />
+   </select></label><br />
+
    <h2><span title="Quest Rewards" class="hoverInfo">Quest</span></h2>
-   <label>Material per reward slot <input type="number" min="1" value="1" max="5" id="questItemCount" /></label><br />
+   <label>Material per reward slot <input type="number" min="1" value="1" max="5" id="questItemCount" /></label>
    <label>Chance <input type="number" min="0" max="100" value="0" id="questPercent" />%</label><br />
 
    <h2>Investigation reward slots</h2>
-   <label>Bronze <input type="number" min="0" max="5" value="0" id="bronzeReward" /></label><br />
-   <label>Silver <input type="number" min="0" max="5" value="0" id="silverReward" /></label><br />
-   <label>Gold <input type="number" min="0" max="5" value="0" id="goldReward" /></label><br />
-   <label>Purple <input type="number" min="0" max="5" value="0" id="purpleReward" /></label><br />
+   <table>
+      <tbody>
+      <tr>
+         <th><label for="bronzeReward">Bronze</label></th>
+         <th><label for="silverReward">Silver</label></th>
+         <th><label for="goldReward">Gold</label></th>
+         <th><label for="purpleReward">Purple</label></th>
+      </tr>
+      <tr>
+         <td><input type="number" min="0" max="5" value="0" id="bronzeReward" /></td>
+         <td><input type="number" min="0" max="5" value="0" id="silverReward" /></td>
+         <td><input type="number" min="0" max="5" value="0" id="goldReward" /></td>
+         <td><input type="number" min="0" max="5" value="0" id="purpleReward" /></td>
+      </tr>
+      </tbody>
+   </table>
    <br />
 
    <label>Number of times you do will this hunt: <input type="number" min="1" value="1" max="5" id="huntCount" /></label><br />
+
    <input type="submit" value="Calculate" />
 </form>
 <br />
 <div id="graphResults"></div>
-
-<p>If you need a specific rare material in Monster Hunter World then input the stats of hunting a single monster and this will output the probability
-of each possible number of material you'll get.
-This programs calculates as much as possible and is pessimistic about the rest so that your actual odds should be better than reported.
-Refer to <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a> for all the info to fill in the form.
-Text with red underline will show the name of the table from <a href="https://mhworld.kiranico.com/">kiranico</a> when you hover over it.
-<span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span> are always identical tables the only difference is that you always carve 4 material but capturing will give
-4 or 5 material. However since I don't know the criteria/formula for when you would get 5 this calculator assumes you get 4 and
-thus they are completely identical. <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> you get whether you kill or capture and is 4-8 however I once again don't know the
-criteria/formula so this assumes 4. An expedition would give 3-4 from <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> table but this calculator assumes you aren't doing an expedition.
-<span title="Carves: Carves" class="hoverInfo">Carve</span>, <span title="Rewards: Capture" class="hoverInfo">Capture</span>, and <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> are based on the large monster (I don't know how expeditions or multiple large monsters are calculated)
-and those tables are found on the large monster's page. <span title="Quest Rewards" class="hoverInfo">Quest</span> is specific to the quest taken and this info can be found on
-<a href="https://mhworld.kiranico.com/">kiranico</a>. <span title="Quest Rewards" class="hoverInfo">Quest</span> will give 4-8 rewards but the first <span title="Quest Rewards" class="hoverInfo">Quest</span> reward is always 100%
-(and thus doesn't need to be calculated) thus the random reward this form uses is 3. Investigations do in fact have <span title="Quest Rewards" class="hoverInfo">Quest</span>
-rewards for them <a href="https://game8.co/games/Monster-Hunter-World/archives/306257#hm_4">click here</a>. You'll notice
-that (beside the 100%) they don't have percentages listed but this is the only place I could find the info. After a hunt the
-"Quest completion rewards" will have the rewards from both <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> and <span title="Quest Rewards" class="hoverInfo">Quest</span> the only way to tell them apart is that the <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
-rewards are first then the 100% <span title="Quest Rewards" class="hoverInfo">Quest</span> reward then the rest of the <span title="Quest Rewards" class="hoverInfo">Quest</span> rewards. The "Quest completion rewards" can hold a
-maximum of 20 reward slots (each might have multiple copies of the material) which is enough room for the max 16 for single
-monster hunts. The box below it "Bonus rewards" has 20 slots for materials from breaking monster parts then for Capture rewards (they will be labeled).
-After that are the Investigation slots then the 20 Palico slots and 20 Tailraider slots.</p>
-<p><a href="https://mhworld.kiranico.com/">Kiranico</a> also has info on Tailraider Safari, Bandit Mantle, Plunderblade, Items Gathered by Palicoes
-materials from Monster tracks, Dropped Material, and basically everything you can think of. The Dropped Material table is
-what a monster may drop when they are toppled or have their body parts broken (the white items you have to pick up). Not
-to be confused with the tables for "Break Rathalos's head" etc which are Bonus rewards for breaking monster parts at the end
-of a hunt. The calculator doesn't account for any of these however you should break as many parts are you can.</p>
-<p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in Redefining the "Power Couple" 2 monster quest which makes me think
-I was cheated out of the 4 possible remaining rewards. Supposedly a Lucky Voucher will guarantee the max of 8 <span title="Quest Rewards" class="hoverInfo">Quest</span> rewards, I can't disprove that since
-I always get 8 when I have 0 faints and I usually don't faint. It is possible that the Lucky Voucher's description of
-"to add bonus rewards" is only talking about doubling the money (and thus doesn't affect materials at all).
-Poogie does not affect any rewards (reward slots, material count, cash, or research points). Deal with it.
-Although if Poogie likes you (any amount) then you can use him to find treasure which are materials that could be sold.
-The armor skills Good Luck and Great Luck supposedly have a chance to increase the number of materials in a given slot but not
-the number of reward slots used and thus don't affect the chances of getting "at least 1" of the material desired. It would
-be very tedious to verify those skills since it would require doing a ton of hunts with the skill and comparing to the expected number
-of each material.</p>
+<p>If you need a specific rare material in Monster Hunter World then input the stats of hunting a single monster and this will output the
+   probability of each possible number of material you'll get.
+   This programs calculates as much as possible and is pessimistic about the rest so that your actual odds should be better than reported.
+   This scrapes data from <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>.
+   Text with red underline will show the name of the table from <a href="https://mhworld.kiranico.com/">kiranico</a> when you hover over it.
+   First of all some terminology: a reward slot is a single square on the results page after a hunt. Each reward slot generally has 1
+   material but it can have more than 1.
+   <span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span> are
+   always identical tables the only difference is that you can always carve a dead monster 4 times, each of which puts in your box
+   the equivalent of a reward slot (it won't be on the results page), but capturing will give 4 or 5 reward slots.
+   However since I don't know the criteria/formula for when you would get 5 this calculator assumes you get 4 and
+   thus they are completely identical which is why there's no input to indicate if the monster was captured.
+   <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> you get whether you kill or capture and is 4-8 reward slots however I once
+   again don't know the criteria/formula so this assumes 4. An expedition would give 3-4 reward slots from the
+   <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> table but this calculator assumes you aren't doing an expedition.
+   <span title="Carves: Carves" class="hoverInfo">Carve</span>/<span title="Rewards: Capture" class="hoverInfo">Capture</span> and
+   <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> are based on the large monster (I don't know how expeditions or multiple large
+   monsters are calculated) and those tables are scraped from the large monster's page
+   (and thus are covered by the name and material inputs).
+   <span title="Quest Rewards" class="hoverInfo">Quest</span> is specific to the quest taken and this info can be found on
+   <a href="https://mhworld.kiranico.com/quests">kiranico</a> as well.
+   <span title="Quest Rewards" class="hoverInfo">Quest</span> will give 4-8 reward slots but the first
+   <span title="Quest Rewards" class="hoverInfo">Quest</span> reward slot is always 100%
+   (and thus doesn't need to be calculated) thus this calculator assumes 3.
+   You may input the info for <span title="Quest Rewards" class="hoverInfo">Quest</span> above however it's unlikely to have the desired
+   material.
+   Investigations do in fact have <span title="Quest Rewards" class="hoverInfo">Quest</span>
+   rewards which can be found <a href="https://game8.co/games/Monster-Hunter-World/archives/306257#hm_4">here</a>.
+   You'll notice that (beside the 100%) they don't have percentages listed but this is the only place I could find the info.
+   After a hunt the "Quest completion rewards" will have the rewards from both <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
+   and <span title="Quest Rewards" class="hoverInfo">Quest</span> the only way to tell them apart is that the
+   <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
+   rewards are first then the 100% <span title="Quest Rewards" class="hoverInfo">Quest</span> reward then the rest of the
+   <span title="Quest Rewards" class="hoverInfo">Quest</span> rewards. The "Quest completion rewards" can hold a
+   maximum of 20 reward slots (each might have multiple copies of the material) which is enough room for the max 16 slots for single
+   monster hunts. The box below it "Bonus rewards" has 20 slots for materials from breaking monster parts then for Capture rewards (they
+   will be labeled). After that are the Investigation slots (max of 5?) then the 20 Palico slots and 20 Tailraider slots
+   (10 gathered and 10 stolen each).</p>
+<p><a href="https://mhworld.kiranico.com/">Kiranico</a> also has info on Tailraider Safari, Bandit Mantle, Plunderblade,
+   Items Gathered by Palicoes,
+   materials from Monster tracks, Dropped Material, and basically everything you can think of. The Dropped Material table is
+   what a monster may drop when they are toppled or have their body parts broken (the white items you have to pick up), which is not
+   to be confused with the tables for "Break Rathalos's head" etc which are Bonus rewards for breaking monster parts at the end
+   of a hunt. The calculator doesn't account for any of these however you should break as many parts are you can.</p>
+<p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in
+   <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">Redefining the "Power Couple"</a> since it's a 2 monster
+   quest it makes me think I was cheated out of the 4 possible remaining reward slots.
+   Supposedly a Lucky Voucher will guarantee the max of 8 <span title="Quest Rewards" class="hoverInfo">Quest</span>
+   rewards, I can't disprove that since
+   I always get 8 when I have 0 faints and I usually don't faint. It is possible that the Lucky Voucher's description of
+   "to add bonus rewards" is only talking about doubling the money (and thus doesn't affect what I call "reward slots" at all).
+   Poogie does not affect the hunt at all (reward slots, material count, cash, or research points). Deal with it.
+   Although if Poogie likes you (any amount) then you can use him to find treasure which are materials that could be sold.
+   The armor skills Good Luck and Great Luck supposedly have a chance to increase the number of materials in a given reward slots but not
+   the number of reward slots used and thus don't affect the chances of getting "at least 1" of the material desired. It would
+   be very tedious to verify those skills since it would require doing a ton of hunts with the skill and comparing to the expected number
+   of each material.</p>
 <br /><br /><br /><br />
 <script>
    'use strict';
