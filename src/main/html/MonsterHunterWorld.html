@@ -4,21 +4,51 @@
    <meta charset="UTF-8" />
    <title>Material Hunt Stats - MHW</title>
    <script id="DiceInclude" src="../javascript/Include.js"></script>
+   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css" />
    <style>
-      /*TODO: dark mode*/
-      .hoverInfo {
-         color: red;
-         border-bottom: 1px dotted red;
+      /*Style based on the H&H css but with red hover and blue links*/
+
+      /*classes autocomplete etc are from jquery-ui*/
+      html, body, input, textarea, select, button,
+      .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
+         background-color: black;
+         border-color: #202020;
+         color: #A0A0A0;
+      }
+
+      .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+         background-color: #000040;
+      }
+
+      ::-webkit-scrollbar {
+         background-color: #101010;
+      }
+
+      ::-webkit-scrollbar-thumb {
+         background-color: #202020;
+      }
+
+      a:link, a:visited {
+         color: #79AAFF;
       }
 
       p {
          max-width: 1000px;
       }
+
+      h2 {
+         font-size: 28px;
+      }
+
+      .hoverInfo {
+         color: red;
+         border-bottom: 1px dotted red;
+      }
    </style>
    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
            crossorigin="anonymous"></script>
-   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+   <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA="
            crossorigin="anonymous"></script>
    <script>
       'use strict';
@@ -309,7 +339,7 @@
 <body>
 <form action="javascript:readForm();">
    <span id="promisePlaceholder">Waiting for data from
-      <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>.
+      <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>...
    </span><br />
    <label>Monster to hunt:
       <input type="text" id="monster" style="visibility: hidden" value="Rathalos" onchange="makeMaterialAutoComplete()" />
@@ -332,10 +362,10 @@
    <table>
       <tbody>
       <tr>
-         <th><label for="bronzeReward">Bronze</label></th>
+         <th><label for="bronzeReward" style="color: #993D00">Bronze</label></th>
          <th><label for="silverReward">Silver</label></th>
-         <th><label for="goldReward">Gold</label></th>
-         <th><label for="purpleReward">Purple</label></th>
+         <th><label for="goldReward" style="color: #E6E600">Gold</label></th>
+         <th><label for="purpleReward" style="color: #8000FF">Purple</label></th>
       </tr>
       <tr>
          <td><input type="number" min="0" max="5" value="0" id="bronzeReward" /></td>
