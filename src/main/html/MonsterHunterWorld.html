@@ -45,7 +45,6 @@
          border-bottom: 1px dotted red;
       }
    </style>
-   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
            crossorigin="anonymous"></script>
    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA="
@@ -56,6 +55,21 @@
       /**This disables jquery from requesting images when parsing html*/
       const virtualDocument = document.implementation.createHTMLDocument('virtual');
       const monstersNameToLink = {};
+      /* Data assumptions (things to validate):
+       * 1 The only way to break a tail is to sever and carve it
+       * 2 Only a tail can be severed
+       * 3 Rewards: Capture is same as Carves: Carves
+       * 4 each table adds up to 100% (won't affect calculations but would be good to verify)
+       * 5 Bandit Mantle only gives trade-in items (pretty sure the game says this). won't affect calc anyway
+       * 6 That the duplicate MR Capture tables are for guiding lands low, mid, high, and Tempered
+       * 7 some monsters are not in low rank (I know this 1)
+       * 8 some monsters are not in high rank (probably but not sure)
+       * 9 master rank can fight everything and high can fight all low (this would be game play not data validation)
+       * */
+      //TODO: store data offline (more legit) then validate it and correct Zorah
+      /* keep the parser so I can update it as needed (mark last date used) but might be too slow to loop all (chrome would kill?)
+       * so if that fails I'll have to break it up somehow. there's 71 monsters (including Zorah).
+       * make sure monsterData is in best structure before parsing */
       let monsterData = undefined;
 
       function makeMonsterAutoComplete()
@@ -75,6 +89,7 @@
             const allMonsterNames = Object.keys(monstersNameToLink);
             //monster names are already sorted but good to enforce that
             allMonsterNames.sort();
+            //Zorah Magdaros isn't removed from list so that people can see the alert message
             $('#monster').autocomplete({
                source: allMonsterNames
             });
@@ -91,13 +106,22 @@
          const monsterUrl = monstersNameToLink[monsterName];
          monsterData = undefined;
 
+         document.getElementById('material').style.visibility = "hidden";
+         document.getElementById('breakingSection').innerHTML = '';
+
+         if('Zorah Magdaros' === monsterName)
+         {
+            alert("Zorah Magdaros isn't currently supported (see reason below).");
+            /*If you aren't master rank and have no investigations then the calc would "just work"
+            * but I don't want that validation, the data is questionable, and no one will mind this being excluded.*/
+            return;
+         }
          if(!monsterUrl)
          {
-            alert(`No data for monster named "${monsterName}"`);
+            alert(`No data for monster named "${monsterName}". Check your spelling and try again.`);
             return;
          }
 
-         document.getElementById('material').style.visibility = "hidden";
          document.getElementById('promisePlaceholder').style.visibility = "visible";
          $.get(monsterUrl).fail(() =>
          {
@@ -105,69 +129,76 @@
          })
          .done(function(html)
          {
-            monsterData = {
-               "Low Rank": {Rewards: {}, Investigations: {}},
-               "High Rank": {Rewards: {}, Investigations: {}},
-               "Master Rank": {Rewards: {}, Investigations: {}}
-            };
+            monsterData =
+               {
+                  "Low Rank": {Carves: {}, Rewards: {}, Investigations: {}},
+                  "High Rank": {Carves: {}, Rewards: {}, Investigations: {}},
+                  "Master Rank": {Carves: {}, Rewards: {}, Investigations: {}}
+               };
             const materialData = {};
+            const allParts = {};
+            let canCarveTail = false;
 
-            [
-               //same as Carves: Carves but capture lets me track fewer sections
-               {sectionText: 'Rewards', tableText: 'Capture ' + monsterName},
-               {sectionText: 'Rewards', tableText: 'Hunt ' + monsterName},
-               //quest table not from this page
+            const sectionsToKeep =
                {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Bronze)'
-               },
-               {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Silver)'
-               },
-               {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Gold)'
-               },
-               {
-                  sectionText: 'Investigations',
-                  tableText: 'Investigation Reward (Purple)'
-               }
-            ].forEach(it =>
+                  'Carves': ['Carves', 'Tail Carved'],
+                  //Carves: Carves is same as Rewards: Capture but carve doesn't have a guiding lands bug in MR
+                  'Rewards': ['Hunt ' + monsterName],
+                  //quest table not from this page
+                  'Investigations':
+                     [
+                        'Investigation Reward (Bronze)',
+                        'Investigation Reward (Silver)',
+                        'Investigation Reward (Gold)',
+                        'Investigation Reward (Purple)'
+                     ]
+               };
+
+            $(html, virtualDocument).find('h6').each((index, sectionSearch) =>
             {
-               const section = $(html, virtualDocument).find('h6:contains("' + it.sectionText + '") + div')[0];
+               const sectionText = sectionSearch.textContent;
+               const tablesToKeep = sectionsToKeep[sectionText];
+               //if not a section to keep then continue
+               if(!tablesToKeep) return;
+
+               const section = sectionSearch.nextElementSibling;
                $(section, virtualDocument).find('h6').each((index, rankSearch) =>
                {
                   const rankText = rankSearch.textContent;
                   const rankCol = rankSearch.parentElement;
-                  const tableSearch = $(rankCol, virtualDocument).find('td:contains("' + it.tableText + '")');
-                  if(0 === tableSearch.length)
+                  //the table name is actually a td and not th
+                  $(rankCol, virtualDocument).find('td').each((index, tableSearch) =>
                   {
-                     /* table not found
-                      * possible with low rank purple investigation
-                      * or if monster can't be fought at this rank */
-                     return;
-                  }
-                  const table = tableSearch[0].parentElement.parentElement.parentElement;
+                     const tableText = tableSearch.textContent.trim();
+                     //I suppose I could hard code all possible part names but startsWith works fine
+                     if(tableText.startsWith('Break ' + monsterName + '\'s '))
+                        allParts[tableText.substring(('Break ' + monsterName + '\'s ').length)] = true;
+                     else if('Tail Carved' === tableText) canCarveTail = true;
+                     //if not a table to keep then continue
+                     else if(!tablesToKeep.includes(tableText)) return;
 
-                  monsterData[rankText][it.sectionText][it.tableText] = [];
-                  $(table, virtualDocument).find('span').each((index, materialSearch) =>
-                  {
-                     const material = materialSearch.textContent;
-                     materialData[material] = true;
-                     const materialLink = materialSearch.parentElement;
-                     let materialCount = 1;
-                     if(null !== materialLink.nextSibling && 0 !== materialLink.nextSibling.textContent.trim().length)
+                     // td -> tr -> tbody -> table
+                     const table = tableSearch.parentElement.parentElement.parentElement;
+
+                     monsterData[rankText][sectionText][tableText] = [];
+                     $(table, virtualDocument).find('span').each((index, materialSearch) =>
                      {
-                        materialCount = Number.parseInt(materialLink.nextSibling.textContent.replace(' x', ''));
-                     }
-                     const materialPercent = materialLink.parentElement.nextElementSibling.textContent;
-                     const materialProbability = Number.parseInt(materialPercent.replace('%', '')) / 100;
+                        const material = materialSearch.textContent;
+                        materialData[material] = true;
+                        const materialLink = materialSearch.parentElement;
+                        let materialCount = 1;
+                        if(null !== materialLink.nextSibling && 0 !== materialLink.nextSibling.textContent.trim().length)
+                        {
+                           materialCount = Number.parseInt(materialLink.nextSibling.textContent.replace(' x', ''));
+                        }
+                        const materialPercent = materialLink.parentElement.nextElementSibling.textContent;
+                        const materialProbability = Number.parseInt(materialPercent.replace('%', '')) / 100;
 
-                     monsterData[rankText][it.sectionText][it.tableText].push({
-                        material: material,
-                        itemCount: materialCount,
-                        probability: materialProbability
+                        monsterData[rankText][sectionText][tableText].push({
+                           material: material,
+                           itemCount: materialCount,
+                           probability: materialProbability
+                        });
                      });
                   });
                });
@@ -179,11 +210,36 @@
                source: allMaterialNames
             });
 
-            //if old material name isn't valid then replace it with the first valid material
+            /* if old material name isn't valid then replace it with the most common material.
+             * Rath Wingtalon exists for Low Rank Rathian and Rathalos so it is possible to stay but rare.
+             * I didn't want to replace it with the first material because that's typically
+             * Ancient Feystone which isn't monster specific (it's Purple investigation). */
             if(!allMaterialNames.includes(document.getElementById('material').value.trim()))
             {
-               document.getElementById('material').value = allMaterialNames[0];
+               let commonMaterial = '';
+               /* [0] will be the one with the highest %
+                * Have to check each rank because some monsters aren't at every rank */
+               if(monsterData['Low Rank'].Carves.Carves)
+                  commonMaterial = monsterData['Low Rank'].Carves.Carves[0].material;
+               else if(monsterData['High Rank'].Carves.Carves)
+                  commonMaterial = monsterData['High Rank'].Carves.Carves[0].material;
+               else if(monsterData['Master Rank'].Carves.Carves)
+                  commonMaterial = monsterData['Master Rank'].Carves.Carves[0].material;
+               document.getElementById('material').value = commonMaterial;
             }
+
+            let breakingSectionHtml = '';
+
+            Object.keys(allParts).forEach(it =>
+            {
+               breakingSectionHtml += `<label>Break ${it}: <input type="checkbox" checked="checked" value="${it}" /></label><br />`;
+            });
+
+            if(canCarveTail)
+               breakingSectionHtml += '<label>Sever and carve tail: <input type="checkbox" checked="checked" ' +
+                  'id="break-tail" value="tail" /></label><br />';
+
+            document.getElementById('breakingSection').innerHTML = breakingSectionHtml;
 
             document.getElementById('material').style.visibility = "visible";
             document.getElementById('promisePlaceholder').style.visibility = "hidden";
@@ -209,10 +265,10 @@
          }
 
          const data = [];
-         //this table is too hard to make DRY since it uses the form
-         [
-            //same as Carves: Carves but capture lets me track fewer sections
-            {sectionText: 'Rewards', tableText: 'Capture ' + monsterName, rewardCount: 4},
+         //this table is too hard to make DRY with above since this uses the form
+         const tablesToSearch = [
+            //Carves: Carves is same as Rewards: Capture
+            {sectionText: 'Carves', tableText: 'Carves', rewardCount: 4},
             {sectionText: 'Rewards', tableText: 'Hunt ' + monsterName, rewardCount: 4},
             //quest table added below
             {
@@ -235,7 +291,24 @@
                tableText: 'Investigation Reward (Purple)',
                rewardCount: Number.parseInt(document.getElementById('purpleReward').value)
             }
-         ].forEach(it =>
+         ];
+
+         if(document.getElementById('break-tail') && document.getElementById('break-tail').checked)
+            tablesToSearch.push({sectionText: 'Carves', tableText: 'Tail Carved', rewardCount: 1});
+
+         document.querySelectorAll('input[type="checkbox"]').forEach(it =>
+         {
+            if(it.checked && 'tail' !== it.value)
+            {
+               tablesToSearch.push({
+                  sectionText: 'Rewards',
+                  tableText: 'Break ' + monsterName + '\'s ' + it.value,
+                  rewardCount: 1
+               });
+            }
+         });
+
+         tablesToSearch.forEach(it =>
          {
             //Investigations can be 0
             if(0 !== it.rewardCount)
@@ -265,7 +338,7 @@
          crunchData(data, Number.parseInt(document.getElementById('huntCount').value));
       }
 
-      //TODO: verify results via simulation (small numbers on table)
+      //TODO: verify results via simulation (input small numbers)
       function crunchData(data, completeCount)
       {
          if(0 === data.length) alert('No data');
@@ -354,6 +427,9 @@
       <option>Master Rank</option>
    </select></label><br />
 
+   <h2>Breaking parts</h2>
+   <div id="breakingSection"></div>
+
    <h2><span title="Quest Rewards" class="hoverInfo">Quest</span></h2>
    <label>Material per reward slot <input type="number" min="1" value="1" max="5" id="questItemCount" /></label>
    <label>Chance <input type="number" min="0" max="100" value="0" id="questPercent" />%</label><br />
@@ -421,15 +497,28 @@
    monster hunts. The box below it "Bonus rewards" has 20 slots for materials from breaking monster parts then for Capture rewards (they
    will be labeled). After that are the Investigation slots (max of 5?) then the 20 Palico slots and 20 Tailraider slots
    (10 gathered and 10 stolen each).</p>
+<p>Some monster breaks involve multiple body parts, such as having 2 wings. In that case each wing has it's own HP but both wings
+   need to be broken to receive the reward slot for the break therefore you can only get 1 reward slot per break table per monster. This
+   is why the input for breaking is a checkbox instead of asking how many times.</p>
 <p><a href="https://mhworld.kiranico.com/">Kiranico</a> also has info on Tailraider Safari, Bandit Mantle, Plunderblade,
-   Items Gathered by Palicoes,
-   materials from Monster tracks, Dropped Material, and basically everything you can think of. The Dropped Material table is
+   Items Gathered by Palicoes, materials from Monster tracks, Dropped Material, Guiding lands, and basically everything you can think of.
+   The Dropped Material table is
    what a monster may drop when they are toppled or have their body parts broken (the white items you have to pick up), which is not
    to be confused with the tables for "Break Rathalos's head" etc which are Bonus rewards for breaking monster parts at the end
-   of a hunt. The calculator doesn't account for any of these however you should break as many parts are you can.</p>
+   of a hunt. The calculator doesn't account for any of these except breaking and you should break as many parts are you can.</p>
+<p><a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> is excluded for now because the page's data
+   is invalid: Carves master rank is missing, I don't know if it's ever possible to carve his corpse (so Carves: Carves should be N/A),
+   Carves: Dropped Material is obviously impossible (you can break parts but not run to his feet to get a white material drop),
+   Carves: Bandit Mantle is wrong since it lists non trade-in items, Carves: Plunderblade is impossible since your Palico won't help with
+   the magma cores, Carves: Items Gathered by Palicoes is wrong since it lists a Bandit Mantle material, master rank of Rewards and
+   Investigations are obviously wrong, Rewards: Capture Zorah Magdaros is probably impossible (ref:
+   <a href="https://mhworld.kiranico.com/quests/nXmB6/one-for-the-history-books">★4 One for the History Books</a>),
+   and Investigations doesn't apply to him at all (I think). Rewards: Break Zorah Magdaros's head, Rewards: Break Zorah Magdaros's chest,
+   and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle. In the future I might
+   add special logic for handling Zorah Magdaros.</p>
 <p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in
-   <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">Redefining the "Power Couple"</a> since it's a 2 monster
-   quest it makes me think I was cheated out of the 4 possible remaining reward slots.
+   <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">★5 Redefining the "Power Couple"</a> since it's a 2
+   monster quest it makes me think I was cheated out of the 4 possible remaining reward slots.
    Supposedly a Lucky Voucher will guarantee the max of 8 <span title="Quest Rewards" class="hoverInfo">Quest</span>
    rewards, I can't disprove that since
    I always get 8 when I have 0 faints and I usually don't faint. It is possible that the Lucky Voucher's description of
