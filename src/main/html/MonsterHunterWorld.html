@@ -55,21 +55,29 @@
       /**This disables jquery from requesting images when parsing html*/
       const virtualDocument = document.implementation.createHTMLDocument('virtual');
       const monstersNameToLink = {};
-      /* Data assumptions (things to validate):
+      /* Data validations:
        * 1 The only way to break a tail is to sever and carve it
        * 2 Only a tail can be severed
        * 3 Rewards: Capture is same as Carves: Carves
-       * 4 each table adds up to 100% (won't affect calculations but would be good to verify)
-       * 5 Bandit Mantle only gives trade-in items (pretty sure the game says this). won't affect calc anyway
-       * 6 That the duplicate MR Capture tables are for guiding lands low, mid, high, and Tempered
-       * 7 some monsters are not in low rank (I know this 1)
-       * 8 some monsters are not in high rank (probably but not sure)
-       * 9 master rank can fight everything and high can fight all low (this would be game play not data validation)
+       * 4 each table adds up to 100% (won't affect calculations but would be good to verify non bad data)
+       * 5 LR monsters will have HR and MR fights
+       * 6 HR monsters will have MR fights
+       * 7 if a monster can be fought at rank then it must have all tables I look for except tail/breaks
+       *
+       * Data corrections:
+       * 1 the duplicate MR Capture tables are for guiding lands low, mid, high, and tempered. they are ignored
+       * 2 Ruiner Nergigante ignored HR purple
+       * 3 Nergigante ignored LR and MR (also MR carve was missing)
+       *
+       * Assumptions (don't affect calc):
+       * 1 Bandit Mantle only gives trade-in items (pretty sure the game says this)
+       * 2 some monsters are not in low rank (I know this 1)
+       * 3 some monsters are not in high rank (probably but not sure). will ask data when complete
+       * 4 master rank can fight everything and high can fight all low
        * */
       //TODO: store data offline (more legit) then validate it and correct Zorah
       /* keep the parser so I can update it as needed (mark last date used) but might be too slow to loop all (chrome would kill?)
-       * so if that fails I'll have to break it up somehow. there's 71 monsters (including Zorah).
-       * make sure monsterData is in best structure before parsing */
+       * so if that fails I'll have to break it up somehow. there's 71 monsters (including Zorah). */
       let monsterData = undefined;
 
       function makeMonsterAutoComplete()
@@ -89,7 +97,7 @@
             const allMonsterNames = Object.keys(monstersNameToLink);
             //monster names are already sorted but good to enforce that
             allMonsterNames.sort();
-            //Zorah Magdaros isn't removed from list so that people can see the alert message
+            //Zorah Magdaros isn't removed from list so that people can see the alert message (see below)
             $('#monster').autocomplete({
                source: allMonsterNames
             });
@@ -112,8 +120,8 @@
          if('Zorah Magdaros' === monsterName)
          {
             alert("Zorah Magdaros isn't currently supported (see reason below).");
-            /*If you aren't master rank and have no investigations then the calc would "just work"
-            * but I don't want that validation, the data is questionable, and no one will mind this being excluded.*/
+            /* If you aren't master rank and have no investigations then the calc would "just work"
+             * but I don't want that validation, the data is questionable, and no one will mind this being excluded. */
             return;
          }
          if(!monsterUrl)
@@ -138,12 +146,13 @@
             const materialData = {};
             const allParts = {};
             let canCarveTail = false;
+            const hasRank = {};
 
             const sectionsToKeep =
                {
                   'Carves': ['Carves', 'Tail Carved'],
-                  //Carves: Carves is same as Rewards: Capture but carve doesn't have a guiding lands bug in MR
-                  'Rewards': ['Hunt ' + monsterName],
+                  //Carves: Carves is same as Rewards: Capture include both for validation
+                  'Rewards': ['Capture ' + monsterName, 'Hunt ' + monsterName],
                   //quest table not from this page
                   'Investigations':
                      [
@@ -165,6 +174,37 @@
                $(section, virtualDocument).find('h6').each((index, rankSearch) =>
                {
                   const rankText = rankSearch.textContent;
+                  if(('Ruiner Nergigante' === monsterName && 'Master Rank' !== rankText) ||
+                     ('Nergigante' === monsterName && 'High Rank' !== rankText))
+                  {
+                     //ignore some bad data
+                     delete monsterData[rankText];
+                     //hasRank won't be checked for
+                     return;
+                  }
+                  if(!rankSearch.nextElementSibling)
+                  {
+                     //don't trigger if hasRank[rankText] is undefined since that would be first pass
+                     if(true === hasRank[rankText])
+                     {
+                        alert(`Assumption violation: ${monsterName} has unacceptable bad data: partial data for ${rankText}`);
+                        throw new Error(`${monsterName} has unacceptable bad data: partial data for ${rankText}`);
+                     }
+
+                     /* all pages have the 3 rank cols but some are empty (can't be fought at that rank)
+                      * in which case delete the empty objects and continue */
+                     delete monsterData[rankText];
+                     hasRank[rankText] = false;
+                     return;
+                  }
+                  //don't trigger if hasRank[rankText] is undefined since that would be first pass
+                  if(false === hasRank[rankText])
+                  {
+                     alert(`Assumption violation: ${monsterName} has unacceptable bad data: partial data for ${rankText}`);
+                     throw new Error(`${monsterName} has unacceptable bad data: partial data for ${rankText}`);
+                  }
+                  hasRank[rankText] = true;
+
                   const rankCol = rankSearch.parentElement;
                   //the table name is actually a td and not th
                   $(rankCol, virtualDocument).find('td').each((index, tableSearch) =>
@@ -174,12 +214,22 @@
                      if(tableText.startsWith('Break ' + monsterName + '\'s '))
                         allParts[tableText.substring(('Break ' + monsterName + '\'s ').length)] = true;
                      else if('Tail Carved' === tableText) canCarveTail = true;
+                     else if(tableText.contains(' Carved'))
+                     {
+                        console.error(`Assumption violation: can sever non tail of ${monsterName}`);
+                        return;
+                     }
                      //if not a table to keep then continue
                      else if(!tablesToKeep.includes(tableText)) return;
+                     //there's a guiding lands bug in MR: they are instead labeled "Capture X" so ignore all but first capture
+                     else if('Capture ' + monsterName === tableText &&
+                        undefined !== monsterData[rankText][sectionText][tableText])
+                        return;
 
                      // td -> tr -> tbody -> table
                      const table = tableSearch.parentElement.parentElement.parentElement;
 
+                     let percentSum = 0;
                      monsterData[rankText][sectionText][tableText] = [];
                      $(table, virtualDocument).find('span').each((index, materialSearch) =>
                      {
@@ -191,8 +241,10 @@
                         {
                            materialCount = Number.parseInt(materialLink.nextSibling.textContent.replace(' x', ''));
                         }
-                        const materialPercent = materialLink.parentElement.nextElementSibling.textContent;
-                        const materialProbability = Number.parseInt(materialPercent.replace('%', '')) / 100;
+                        const materialPercentElement = materialLink.parentElement.nextElementSibling.textContent;
+                        const materialPercentNumber = Number.parseInt(materialPercentElement.replace('%', ''));
+                        percentSum += materialPercentNumber;
+                        const materialProbability = materialPercentNumber / 100;
 
                         monsterData[rankText][sectionText][tableText].push({
                            material: material,
@@ -200,9 +252,31 @@
                            probability: materialProbability
                         });
                      });
+
+                     if(100 !== percentSum)
+                        console.error(`Assumption violation: ${monsterName} ${rankText} ` +
+                           `${sectionText} ${tableText} doesn't add up to 100%`);
                   });
                });
             });
+
+            //have to wait for entire data because these are in different sections
+            ["Low Rank", "High Rank", "Master Rank"].forEach(it =>
+            {
+               //if has this rank but 2 tables are different
+               if(monsterData[it] &&
+                  JSON.stringify(monsterData[it].Carves.Carves) !==
+                  JSON.stringify(monsterData[it].Rewards['Capture ' + monsterName]))
+                  console.error(`Assumption violation: ${monsterName} carve/capture doesn't match`);
+            });
+
+            if(monsterData['Low Rank'] && !monsterData['High Rank'])
+               console.error(`Assumption violation: ${monsterName} can be fought at low rank but not high rank`);
+            if(monsterData['Low Rank'] && !monsterData['Master Rank'])
+               console.error(`Assumption violation: ${monsterName} can be fought at low rank but not master rank`);
+            //Nergigante violates assumption because of bad data so it doesn't count
+            if(monsterData['High Rank'] && !monsterData['Master Rank'] && 'Nergigante' !== monsterName)
+               console.error(`Assumption violation: ${monsterName} can be fought at high rank but not master rank`);
 
             const allMaterialNames = Object.keys(materialData);
             allMaterialNames.sort();
@@ -219,11 +293,11 @@
                let commonMaterial = '';
                /* [0] will be the one with the highest %
                 * Have to check each rank because some monsters aren't at every rank */
-               if(monsterData['Low Rank'].Carves.Carves)
+               if(monsterData['Low Rank'])
                   commonMaterial = monsterData['Low Rank'].Carves.Carves[0].material;
-               else if(monsterData['High Rank'].Carves.Carves)
+               else if(monsterData['High Rank'])
                   commonMaterial = monsterData['High Rank'].Carves.Carves[0].material;
-               else if(monsterData['Master Rank'].Carves.Carves)
+               else if(monsterData['Master Rank'])
                   commonMaterial = monsterData['Master Rank'].Carves.Carves[0].material;
                document.getElementById('material').value = commonMaterial;
             }
@@ -232,6 +306,7 @@
 
             Object.keys(allParts).forEach(it =>
             {
+               if('tail' === it.toLowerCase()) console.error(`Assumption violation: ${monsterName} has a broken tail`);
                breakingSectionHtml += `<label>Break ${it}: <input type="checkbox" checked="checked" value="${it}" /></label><br />`;
             });
 
@@ -258,7 +333,7 @@
          const material = document.getElementById('material').value.trim();
          const rank = document.getElementById('huntRank').value;
 
-         if(0 === Object.keys(monsterData[rank].Rewards).length)
+         if(!monsterData[rank])
          {
             alert(`${monsterName} can't be fought at ${rank}`);
             return;
@@ -341,7 +416,7 @@
       //TODO: verify results via simulation (input small numbers)
       function crunchData(data, completeCount)
       {
-         if(0 === data.length) alert('No data');
+         if(0 === data.length) alert('No data');  //unreachable through form
          const eachTable = [];
          for(let tableIndex = 0; tableIndex < data.length; ++tableIndex)
          {
@@ -410,7 +485,7 @@
    </script>
 </head>
 <body>
-<form action="javascript:readForm();">
+<form action="javascript:readForm();" onchange="document.getElementById('graphResults').innerHTML = ''">
    <span id="promisePlaceholder">Waiting for data from
       <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>...
    </span><br />
@@ -516,6 +591,10 @@
    and Investigations doesn't apply to him at all (I think). Rewards: Break Zorah Magdaros's head, Rewards: Break Zorah Magdaros's chest,
    and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle. In the future I might
    add special logic for handling Zorah Magdaros.</p>
+<p><a href="https://mhworld.kiranico.com/monsters/aYaUV/nergigante">Nergigante</a> and
+   <a href="https://mhworld.kiranico.com/monsters/oAnim/ruiner-nergigante">Ruiner Nergigante</a>
+   have had some bad data ignored and thus can be used at HR and MR respectively (and no other rank). Every monster under Rewards of
+   master rank has duplicate tables for Capture that seem to be guiding lands low, mid, high, and tempered: they are ignored.</p>
 <p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in
    <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">★5 Redefining the "Power Couple"</a> since it's a 2
    monster quest it makes me think I was cheated out of the 4 possible remaining reward slots.
