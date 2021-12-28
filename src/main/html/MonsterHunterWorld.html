@@ -119,13 +119,13 @@
       //markBadData for auto corrected issues and console.error for ones that are unexpected
       const badData = {monsters: []};
 
-      /** Builds monsterData via web scraping. It's faster than I expected but rarely if ever needs to be reran.
+      /** Builds monsterData via web scraping. It's faster than I expected but rarely if ever needs to be re-ran.
        *
-       * After running manually check:
+       * After running (network tab will say if any pending) manually check:
        * 1 that there are no console.error else add more corrections
-       * 2 run groomMonsterData then JSON.stringify(monsterData) chrome will offer to put in clipboard
+       * 2 run groomMonsterData (verify still no console.error). copy the console.log output into DB
        *
-       * Last run on 2021-12-23 ? the website says ver. 15.11
+       * Last run on 2021-12-? ? the website says ver. 15.11
        * Latest game version is 15.11.01 (2021-06-03) */
       function scrapeMonsterList()
       {
@@ -533,7 +533,15 @@
          verifyManualCorrection('wrong Investigation', noInvestigations);
          verifyManualCorrection('no rewards at Low Rank', ['Nergigante']);
 
-         //TODO: sort monsterData by making a new object that has keys in alpha order
+         //sort monsterData by making a new object that has keys in alpha order
+         const newData = {};
+         const allMonsterNames = Object.keys(monsterData);
+         allMonsterNames.sort();
+         allMonsterNames.forEach(monsterName =>
+         {
+            newData[monsterName] = monsterData[monsterName];
+         });
+         console.log(JSON.stringify(newData));
       }
 
       function verifyManualCorrection(manualCorrectionName, expectedValue)
@@ -947,6 +955,7 @@
    const allMonsterNames = Object.keys(monsterData);
    //Zorah Magdaros has no data but is in the list so that people can see the alert message (since they won't RTFM)
    allMonsterNames.push('Zorah Magdaros');
+   //already sorted since Zorah is last but enforce it anyway
    allMonsterNames.sort();
    $('#monster').autocomplete({
       source: allMonsterNames
