@@ -556,7 +556,6 @@
 
          if(!validateMonsterName(monsterName)) return;
 
-         const basicMonsterData = findLowestRank(monsterName);
          /* if old material name isn't valid then replace it with the most common material.
           * Rath Wingtalon exists for Low Rank Rathian and Rathalos so it is possible to stay but rare.
           * I didn't want to replace it with the first material because that's typically
@@ -566,7 +565,7 @@
             /* [0] will be the one with the highest %
              * Have to check each rank because some monsters aren't at every rank
              * But I want the lowest available rank */
-            document.getElementById('material').value = basicMonsterData.General.Kill[0].material;
+            document.getElementById('material').value = findLowestRankTable(monsterName, 'General', 'Kill')[0].material;
          }
 
          materialInput.autocomplete({
@@ -574,18 +573,15 @@
          });
 
          let breakingSectionHtml = '';
-
-         //highest rank would be fewer checks but then I couldn't reuse basicMonsterData
-         Object.keys(basicMonsterData.Break).forEach(partName =>
+         Object.keys(findHighestRankBreakSection(monsterName)).forEach(partName =>
          {
             //TODO: have break and investigation display x1 25% but only possible after rank based auto complete
             //break doesn't work until then for silver rathalos. or until I beat HR and exclude his HR
-            //TODO: actually silver rathalos throws because no HR kill
 
             //this handles some tail (break)
             breakingSectionHtml += `<label>Break ${partName}: <input type="checkbox" checked="checked" value="${partName}" /></label><br />`;
          });
-         if(basicMonsterData.Sever)
+         if(findLowestRankTable(monsterName, 'Sever', 'tail'))
          {
             breakingSectionHtml += '<label>Sever and carve tail: <input type="checkbox" checked="checked" ' +
                'id="sever-tail" value="tail" /></label><br />';
@@ -618,14 +614,29 @@
          return true;
       }
 
-      function findLowestRank(monsterName)
+      /** @returns {Array} table. not found will throw */
+      function findLowestRankTable(monsterName, section, table)
       {
-         if(monsterData[monsterName]['Low Rank'])
-            return monsterData[monsterName]['Low Rank'];
-         else if(monsterData[monsterName]['High Rank'])
-            return monsterData[monsterName]['High Rank'];
-         //else if(monsterData[monsterName]['Master Rank'])
-         return monsterData[monsterName]['Master Rank'];
+         //if the rank exists then all sections (except sever) will exist
+         const lowestRank = ['Low Rank', 'High Rank', 'Master Rank'].find(rank =>
+            monsterData[monsterName][rank] && monsterData[monsterName][rank][section] && monsterData[monsterName][rank][section][table]);
+         if(lowestRank) return monsterData[monsterName][lowestRank][section][table];
+
+         //must stop because it would cause NPE
+         alert(`Assumption violation: no table for any rank: ${monsterName} ${section} > ${table}`);
+         throw new Error(`Assumption violation: no table for any rank: ${monsterName} ${section} > ${table}`);
+      }
+
+      /** @returns {object} Break object. not found returns {} */
+      function findHighestRankBreakSection(monsterName)
+      {
+         //check highest first since all monsters should have MR
+         //const highestRank = ['Master Rank', 'High Rank', 'Low Rank'].find(rank =>
+         const highestRank = ['High Rank', 'Low Rank'].find(rank =>
+            monsterData[monsterName][rank] && 0 !== Object.keys(monsterData[monsterName][rank].Break).length);
+         if(highestRank) return monsterData[monsterName][highestRank].Break;
+
+         return {};
       }
 
       function readForm()
