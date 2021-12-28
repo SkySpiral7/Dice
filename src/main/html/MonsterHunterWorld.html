@@ -78,6 +78,9 @@
        * 4 if kill/capture tables don't match keep the kill (the capture tables I saw were all Monster Bone L 100%)
        * 5 Kushala Daora and Teostra don't have breakable forelimbs
        * 6 Safi'jiiva Master Rank Rewards > Capture Safi'jiiva Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match the Kill table
+       * 7 Ancient Leshen/Leshen don't have Investigations and are thus ignored. Leshen HR Bronze was the only one that looked valid anyway
+       * 8 Nergigante doesn't have LR rewards. Break might be possible but I can't confirm that
+       * 9 I made a list of LR monsters. LR data from a monster not in the list is ignored
        *
        * Assumptions (don't affect calc):
        * 1 Bandit Mantle only gives trade-in items (pretty sure the game says this)
@@ -88,15 +91,30 @@
        * Notes:
        * 71 total monsters (including Zorah)
        */
-      //TODO: Alatreon has no investigations. validate that has any rank
       //TODO: store data offline (more legit) then validate it and correct Zorah
       /** Elder Dragons can't be captured. LR Kirin stood on the trap without it triggering.
-       * Zorah is out and Nergigante so far is story only. Don't know if other Elder dragons have issues but Kirin has Investigations. */
+       * Zorah is out and Nergigante so far is story only. Don't know if other Elder dragons have other issues but they can get normal and purple Investigations.
+       * Currently this is only used to ignore capture table validation for which Zorah is ignored but he is in fact an ED and definitely can't be captured normally. */
       const elderDragons = [
-         "Alatreon", "Behemoth", "Blackveil Vaal Hazak", "Fatalis", "Kirin", "Kulve Taroth", "Kushala Daora", "Lunastra", "Namielle",
-         "Nergigante", "Ruiner Nergigante", "Safi'jiiva", "Shara Ishvalda", "Teostra", "Vaal Hazak", "Velkhana", "Xeno'jiiva",
-         "Zorah Magdaros"
+         'Alatreon', 'Behemoth', 'Blackveil Vaal Hazak', 'Fatalis', 'Kirin', 'Kulve Taroth', 'Kushala Daora', 'Lunastra', 'Namielle',
+         'Nergigante', 'Ruiner Nergigante', 'Safi\'jiiva', 'Shara Ishvalda', 'Teostra', 'Vaal Hazak', 'Velkhana', 'Xeno\'jiiva',
+         'Zorah Magdaros'
       ];
+      const noInvestigations = ['Ancient Leshen', 'Leshen'];
+      /** These are the only monsters that are possible for low rank. Kirin can get LR investigations in addition to the LR optional quest.
+       * Nergigante and Zorah Magdaros are story only (no LR investigations). Zorah is ignored and Nergigante is excluded since you can't
+       * get LR rewards from him (see data corrections) */
+      const lowRankMonsters = [
+         'Anjanath', 'Barroth', 'Diablos', 'Great Girros', 'Great Jagras', 'Jyuratodas', 'Kirin', 'Kulu-Ya-Ku', 'Legiana',
+         'Odogaron', 'Paolumu', 'Pukei-Pukei', 'Rabodaan', 'Rathalos', 'Rathian', 'Tobi-Kadachi', 'Tzitzi-Ya-Ku', 'Zorah Magdaros'
+      ];
+      //I haven't finished HR yet so there'll be more on this list later. ignore for now
+      /*
+      const highRankMonsters = [
+         'Anjanath', 'Barroth', 'Great Girros', 'Jyuratodas', 'Kulu-Ya-Ku',
+         'Paolumu', 'Pukei-Pukei', 'Rabodaan', 'Rathian', 'Tobi-Kadachi', 'Tzitzi-Ya-Ku', 'Zorah Magdaros'
+      ];
+      */
       const monsterData = {};
       //markBadData for auto corrected issues and console.error for ones that are unexpected
       const badData = {monsters: []};
@@ -104,12 +122,8 @@
       /** Builds monsterData via web scraping. It's faster than I expected but rarely if ever needs to be reran.
        *
        * After running manually check:
-       * 1 badData['Partial Low Rank'] if any are actual LR then update readForm()
-       * 2 badData['Manual Correction: wrong breakable part'] === ['Teostra', 'Kushala Daora'] else update that code
-       * 3 badData['Manual Correction: wrong material'] === ['Safi\'jiiva'] else update that code
-       * 4 that there are no console.error else add more corrections
-       * 5 that Object.keys(monsterData).length === 70 (Zorah is excluded)
-       * 6 run groomMonsterData then JSON.stringify(monsterData) chrome will offer to put in clipboard
+       * 1 that there are no console.error else add more corrections
+       * 2 run groomMonsterData then JSON.stringify(monsterData) chrome will offer to put in clipboard
        *
        * Last run on 2021-12-23 ? the website says ver. 15.11
        * Latest game version is 15.11.01 (2021-06-03) */
@@ -136,6 +150,7 @@
 
       /* Debug example:
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Nergigante', 'https://mhworld.kiranico.com/monsters/aYaUV/nergigante')
+       * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Alatreon', 'https://mhworld.kiranico.com/monsters/ErdcV/alatreon')
        */
       function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
       {
@@ -160,20 +175,17 @@
             */
             monsterData[monsterName] =
                {
-                  "Low Rank": {General: {}, Break: {}, Sever: {}, Investigation: {}},
-                  "High Rank": {General: {}, Break: {}, Sever: {}, Investigation: {}},
-                  "Master Rank": {General: {}, Break: {}, Sever: {}, Investigation: {}}
+                  'Low Rank': {General: {}, Break: {}, Sever: {}, Investigation: {}},
+                  'High Rank': {General: {}, Break: {}, Sever: {}, Investigation: {}},
+                  'Master Rank': {General: {}, Break: {}, Sever: {}, Investigation: {}}
                };
             const materialForMonster = {};
             //partsPerRank is for validation
             const partsPerRank = {
-               "Low Rank": {},
-               "High Rank": {},
-               "Master Rank": {}
+               'Low Rank': {},
+               'High Rank': {},
+               'Master Rank': {}
             };
-            //true when a rank has 1 table but not all of them
-            let partialRank = false;
-            const hasRank = {};
             const oldToNewStructure =
                {
                   'Carves': {'Carves': {section: 'General', table: 'Kill'}, 'Tail Carved': {section: 'Sever', table: 'tail'}},
@@ -192,6 +204,9 @@
                      }
                };
 
+            //delete unused structure
+            if(!lowRankMonsters.includes(monsterName)) delete monsterData[monsterName]['Low Rank'];
+
             $(html, virtualDocument).find('h6').each((index, sectionSearch) =>
             {
                const sectionText = sectionSearch.textContent;
@@ -202,35 +217,21 @@
                $(section, virtualDocument).find('h6').each((index, rankSearch) =>
                {
                   const rankText = rankSearch.textContent;
-                  /* Truth table:
-                   * this col empty, no previous col (first pass): enter here and continue
-                   * this col data, no previous col (first pass): don't enter and parse col normally
-                   * this col empty, previous col empty: enter here and continue
-                   * this col data, previous col empty: enter here, mark partial data, and continue
-                   * this col empty, previous col data: enter here, mark partial data, delete previous data, and continue
-                   * this col data, previous col data: don't enter and parse col normally */
-                  /* This triggers if this col is empty or if a previous col was empty.
-                   * don't trigger if hasRank[rankText] is undefined since that would be first pass */
-                  if(!rankSearch.nextElementSibling || false === hasRank[rankText])
+                  //ignore empty cols
+                  if(!rankSearch.nextElementSibling) return;  //section looping rankSearch
+                  //if data exists where it shouldn't
+                  if('Nergigante' === monsterName && 'Low Rank' === rankText)
                   {
-                     /* This triggers if this col isn't empty (but a previous col was) then mark partial data
-                      * and ignore this col (the delete will no-op).
-                      * This also triggers if this col is empty (but a previous col wasn't) then mark partial data
-                      * and delete the existing col data.*/
-                     if(rankSearch.nextElementSibling || true === hasRank[rankText])
-                     {
-                        partialRank = true;
-                        markBadData('Partial ' + rankText, monsterName);
-                     }
-
-                     /* all pages have the 3 rank cols but some are empty (ie can't be fought at that rank)
-                      * in which case delete the empty objects and continue
-                      * in the case of partial rank this also deletes the incomplete/bad data */
-                     delete monsterData[monsterName][rankText];
-                     hasRank[rankText] = false;
+                     markBadData(`Manual Correction: no rewards at Low Rank`, monsterName);
+                     //ignore table
                      return;  //section looping rankSearch
                   }
-                  hasRank[rankText] = true;
+                  if(!monsterData[monsterName][rankText])
+                  {
+                     markBadData(`Wrong rank data: monster can't be fought at ${rankText}`, monsterName);
+                     //ignore table
+                     return;  //section looping rankSearch
+                  }
 
                   const rankCol = rankSearch.parentElement;
                   //the table name is actually a td and not th
@@ -260,9 +261,15 @@
                      let percentSum = 0;
                      let dataLocation = undefined;
                      const newStructure = oldToNewStructure[sectionText][tableText];
+                     //non-breaks including sever tail is handled here
                      if(newStructure)
                      {
-                        //sever tail is handled here
+                        if(noInvestigations.includes(monsterName) && 'Investigation' === newStructure.section)
+                        {
+                           markBadData(`Manual Correction: wrong Investigation`, monsterName);
+                           //ignore this table
+                           return;  //rankCol looping tableSearch
+                        }
                         if(monsterData[monsterName][rankText][newStructure.section][newStructure.table])
                         {
                            //uses new table names so that it doesn't include monster name "Capture X"
@@ -279,9 +286,9 @@
 
                         dataLocation = monsterData[monsterName][rankText][newStructure.section][newStructure.table] = [];
                      }
+                     //all breaks including break tail is handled here
                      else if(thisPartName)
                      {
-                        //break tail is handled here
                         if(['Teostra', 'Kushala Daora'].includes(monsterName) && 'forelimbs' === thisPartName)
                         {
                            markBadData('Manual Correction: wrong breakable part', monsterName);
@@ -326,7 +333,7 @@
                            'Safi\'jiiva Shard' === material && 22 === materialPercentNumber)
                         {
                            /* correcting this also would cause Kill/capture to match so that bad data doesn't trigger
-                            * although it doesn't actually matter since this is an Elder Dragon */
+                            * although it wouldn't trigger anyway since this is an Elder Dragon */
                            material = 'Safi\'jiiva Cortex';
                            markBadData('Manual Correction: wrong material', monsterName);
                         }
@@ -352,10 +359,31 @@
                });
             });
 
+            //true when a rank has 1 table but not all of them
+            let partialRank = false;
             //have to wait for entire data because these are in different sections
-            ["Low Rank", "High Rank", "Master Rank"].forEach(rankText =>
+            ['Low Rank', 'High Rank', 'Master Rank'].forEach(rankText =>
             {
-               //if monster has this rank
+               /* If this rank might exist (non-LR) but has no data then delete rank.
+                * LR is already deleted for non-LR monsters so they won't enter here.
+                * Actual LR monsters shouldn't be missing everything.
+                * HR/MR needs to validate Purple and the rest.
+                * Therefore Purple doesn't need special handling. */
+               if(monsterData[monsterName][rankText] &&
+                  !hasTable(monsterName, rankText, 'General', 'Kill') &&
+                  !hasTable(monsterName, rankText, 'General', 'Capture') &&
+                  !hasTable(monsterName, rankText, 'General', 'Hunt') &&
+                  0 === Object.keys(monsterData[monsterName][rankText].Break).length &&
+                  !hasTable(monsterName, rankText, 'Sever', 'tail') &&
+                  !hasTable(monsterName, rankText, 'Investigation', 'Bronze') &&
+                  !hasTable(monsterName, rankText, 'Investigation', 'Silver') &&
+                  !hasTable(monsterName, rankText, 'Investigation', 'Gold') &&
+                  !hasTable(monsterName, rankText, 'Investigation', 'Purple'))
+               {
+                  delete monsterData[monsterName][rankText];
+               }
+
+               //if monster still has this rank. don't connect with else since LR is already deleted
                if(monsterData[monsterName][rankText])
                {
                   /* If these 2 tables are different. Elders can't be captured so ignore Capture table.
@@ -382,28 +410,21 @@
                   if(0 === Object.keys(monsterData[monsterName][rankText].Break).length)
                      console.error(`Assumption violation: ${monsterName} has no breaks`);
 
-                  //make sure the rank has all the data
-                  //TODO: instead null check each piece and give partial results
-                  if(!monsterData[monsterName][rankText].General.Kill ||
-                     0 === Object.keys(monsterData[monsterName][rankText].General.Kill).length ||
-                     //Capture is already deleted above
-                     !monsterData[monsterName][rankText].General.Hunt ||
-                     0 === Object.keys(monsterData[monsterName][rankText].General.Hunt).length ||
-                     //already validated Break and Sever above
-                     !monsterData[monsterName][rankText].Investigation.Bronze ||
-                     0 === Object.keys(monsterData[monsterName][rankText].Investigation.Bronze).length ||
-                     !monsterData[monsterName][rankText].Investigation.Silver ||
-                     0 === Object.keys(monsterData[monsterName][rankText].Investigation.Silver).length ||
-                     !monsterData[monsterName][rankText].Investigation.Gold ||
-                     0 === Object.keys(monsterData[monsterName][rankText].Investigation.Gold).length ||
-                     //Purple doesn't exist for LR but required for HR/MR
-                     ('Low Rank' !== rankText && (!monsterData[monsterName][rankText].Investigation.Purple ||
-                        0 === Object.keys(monsterData[monsterName][rankText].Investigation.Purple).length))
-                  )
+                  /* make sure the rank has all the data. always check each table which is why the funct is first
+                   * and it can't be a single line. Capture is already deleted above.
+                   * already validated Break and Sever above. */
+                  partialRank = requireTable(monsterName, rankText, 'General', 'Kill') || partialRank;
+                  partialRank = requireTable(monsterName, rankText, 'General', 'Hunt') || partialRank;
+
+                  if(!noInvestigations.includes(monsterName))
                   {
-                     partialRank = true;
-                     markBadData('Partial ' + rankText, monsterName);
-                     delete monsterData[monsterName][rankText];
+                     partialRank = requireTable(monsterName, rankText, 'Investigation', 'Bronze') || partialRank;
+                     partialRank = requireTable(monsterName, rankText, 'Investigation', 'Silver') || partialRank;
+                     partialRank = requireTable(monsterName, rankText, 'Investigation', 'Gold') || partialRank;
+
+                     //Purple doesn't exist for LR but required for HR/MR
+                     if('Low Rank' !== rankText)
+                        partialRank = requireTable(monsterName, rankText, 'Investigation', 'Purple') || partialRank;
                   }
                }
             });
@@ -413,39 +434,36 @@
             {
                if(monsterData[monsterName]['Low Rank'])
                {
-                  if(!monsterData[monsterName]['High Rank'])
-                     console.error(`Assumption violation: ${monsterName} can be fought at low rank but not high rank`);
-                  if(!monsterData[monsterName]['Master Rank'])
-                     console.error(`Assumption violation: ${monsterName} can be fought at low rank but not master rank`);
-               }
-               if(monsterData[monsterName]['High Rank'] && !monsterData[monsterName]['Master Rank'])
-                  console.error(`Assumption violation: ${monsterName} can be fought at high rank but not master rank`);
-            }
+                  if(monsterData[monsterName]['High Rank'])
+                  {
+                     //partsPerRank is a set: every value is true. so doing Object.keys excludes no data but is less for JSON
+                     if(JSON.stringify(Object.keys(partsPerRank['Low Rank'])) !==
+                        JSON.stringify(Object.keys(partsPerRank['High Rank'])))
+                        console.error(`Assumption violation: ${monsterName} has different part breaks at low/high rank`);
+                     validateSever(monsterName, 'Low Rank', 'High Rank');
+                  }
+                  else console.error(`Assumption violation: ${monsterName} can be fought at low rank but not high rank`);
 
-            if(monsterData[monsterName]['Low Rank'])
-            {
+                  if(monsterData[monsterName]['Master Rank'])
+                  {
+                     if(JSON.stringify(Object.keys(partsPerRank['Low Rank'])) !==
+                        JSON.stringify(Object.keys(partsPerRank['Master Rank'])))
+                        console.error(`Assumption violation: ${monsterName} has different part breaks at low/master rank`);
+                     validateSever(monsterName, 'Low Rank', 'Master Rank');
+                  }
+                  else console.error(`Assumption violation: ${monsterName} can be fought at low rank but not master rank`);
+               }
                if(monsterData[monsterName]['High Rank'])
                {
-                  //partsPerRank is a set: every value is true. so doing Object.keys excludes no data but is less for JSON
-                  if(JSON.stringify(Object.keys(partsPerRank['Low Rank'])) !==
-                     JSON.stringify(Object.keys(partsPerRank['High Rank'])))
-                     console.error(`Assumption violation: ${monsterName} has different part breaks at low/high rank`);
-                  validateSever(monsterName, 'Low Rank', 'High Rank');
+                  if(monsterData[monsterName]['Master Rank'])
+                  {
+                     if(JSON.stringify(Object.keys(partsPerRank['High Rank'])) !==
+                        JSON.stringify(Object.keys(partsPerRank['Master Rank'])))
+                        console.error(`Assumption violation: ${monsterName} has different part breaks at high/master rank`);
+                     validateSever(monsterName, 'High Rank', 'Master Rank');
+                  }
+                  else console.error(`Assumption violation: ${monsterName} can be fought at high rank but not master rank`);
                }
-               if(monsterData[monsterName]['Master Rank'])
-               {
-                  if(JSON.stringify(Object.keys(partsPerRank['Low Rank'])) !==
-                     JSON.stringify(Object.keys(partsPerRank['Master Rank'])))
-                     console.error(`Assumption violation: ${monsterName} has different part breaks at low/master rank`);
-                  validateSever(monsterName, 'Low Rank', 'Master Rank');
-               }
-            }
-            if(monsterData[monsterName]['High Rank'] && monsterData[monsterName]['Master Rank'])
-            {
-               if(JSON.stringify(Object.keys(partsPerRank['High Rank'])) !==
-                  JSON.stringify(Object.keys(partsPerRank['Master Rank'])))
-                  console.error(`Assumption violation: ${monsterName} has different part breaks at high/master rank`);
-               validateSever(monsterName, 'High Rank', 'Master Rank');
             }
 
             const allMaterialNames = Object.keys(materialForMonster);
@@ -476,30 +494,57 @@
             console.error(`Assumption violation: ${monsterName} has different tail sever at ${rank1}/${rank2}`);
       }
 
+      function hasTable(monsterName, rankText, sectionName, tableName)
+      {
+         return monsterData[monsterName][rankText][sectionName][tableName] &&
+            //there are no scenarios with empty tables but it's easy to check. TODO: confirm no empty tables (else might need to mark)
+            0 !== Object.keys(monsterData[monsterName][rankText][sectionName][tableName]).length;
+      }
+
+      function requireTable(monsterName, rankText, sectionName, tableName)
+      {
+         if(!hasTable(monsterName, rankText, sectionName, tableName))
+         {
+            //TODO: check if these should be console.error
+            markBadData(`Missing required new table ${rankText} ${sectionName} > ${tableName}`, monsterName);
+            delete monsterData[monsterName][rankText][sectionName][tableName];
+            return true;
+         }
+         return false;
+      }
+
       function groomMonsterData()
       {
+         //Zorah is excluded
+         if(70 !== Object.keys(monsterData).length)
+            console.error(`Missing large monsters. Current length: `, Object.keys(monsterData).length);
+         verifyManualCorrection('wrong breakable part', ['Teostra', 'Kushala Daora']);
+         verifyManualCorrection('wrong material', ['Safi\'jiiva']);
+         verifyManualCorrection('wrong Investigation', noInvestigations);
+         verifyManualCorrection('no rewards at Low Rank', ['Nergigante']);
+
          //TODO: sort monsterData by making a new object that has keys in alpha order
+      }
+
+      function verifyManualCorrection(manualCorrectionName, expectedValue)
+      {
+         const badDataName = 'Manual Correction: ' + manualCorrectionName;
+         if(JSON.stringify(expectedValue) !== JSON.stringify(badData[badDataName]))
+         {
+            console.error(`Need to update: ${badDataName}. Current value: `, badData[badDataName]);
+         }
       }
 
       function makeMaterialAutoComplete()
       {
          const monsterName = document.getElementById('monster').value.trim();
 
-         //only actually needs to be cleared if Zorah or no data
+         //clearing breaks and auto complete is only actually needed if Zorah or no data
          document.getElementById('breakingSection').innerHTML = '';
+         const materialInput = $('#material');
+         materialInput.autocomplete({source: []});
 
-         if('Zorah Magdaros' === monsterName)
-         {
-            alert("Zorah Magdaros isn't currently supported (see reason below).");
-            /* If you aren't master rank and have no investigations then the calc would "just work"
-             * but I don't want that validation, the data is questionable, and no one will mind this being excluded. */
-            return;
-         }
-         if(!monsterData[monsterName])
-         {
-            alert(`No data for monster named "${monsterName}". Check your spelling and try again.`);
-            return;
-         }
+         if(!validateMonsterName(monsterName)) return;
 
          const basicMonsterData = findLowestRank(monsterName);
          /* if old material name isn't valid then replace it with the most common material.
@@ -514,7 +559,7 @@
             document.getElementById('material').value = basicMonsterData.General.Kill[0].material;
          }
 
-         $('#material').autocomplete({
+         materialInput.autocomplete({
             source: monsterData[monsterName].material
          });
 
@@ -523,6 +568,7 @@
          //highest rank would be fewer checks but then I couldn't reuse basicMonsterData
          Object.keys(basicMonsterData.Break).forEach(partName =>
          {
+            //TODO: have break and investigation display x1 25%
             //this handles some tail
             breakingSectionHtml += `<label>Break ${partName}: <input type="checkbox" checked="checked" value="${partName}" /></label><br />`;
          });
@@ -533,6 +579,26 @@
          }
 
          document.getElementById('breakingSection').innerHTML = breakingSectionHtml;
+      }
+
+      /**
+       * @returns {boolean} true if valid
+       */
+      function validateMonsterName(monsterName)
+      {
+         if('Zorah Magdaros' === monsterName)
+         {
+            alert('Zorah Magdaros isn\'t currently supported (see reason below).');
+            /* If you aren't master rank and have no investigations then the calc would "just work"
+             * but I don't want that validation, the data is questionable, and no one will mind this being excluded. */
+            return false;
+         }
+         if(!monsterData[monsterName])
+         {
+            alert(`No data for monster named "${monsterName}". Check your spelling and try again.`);
+            return false;
+         }
+         return true;
       }
 
       function findLowestRank(monsterName)
@@ -551,10 +617,11 @@
          const material = document.getElementById('material').value.trim();
          const rank = document.getElementById('huntRank').value;
 
-         //maybe they can be fought so give a diff message but all the low ranks are not real
-         if(badData['Partial ' + rank].includes(monsterName) && 'Low Rank' !== rank)
+         if(!validateMonsterName(monsterName)) return;
+
+         if('Nergigante' === monsterName && 'Low Rank' === rank)
          {
-            alert(`${monsterName} missing data for ${rank}`);
+            alert(`Nergigante has no Low Rank rewards`);
             return;
          }
          if(!monsterData[monsterName][rank])
@@ -562,6 +629,7 @@
             alert(`${monsterName} can't be fought at ${rank}`);
             return;
          }
+         //else assume they can be fought and just calc partial data
 
          const dataToCrunch = [];
          //this table is too hard to make DRY with above since this uses the form
@@ -614,8 +682,8 @@
 
          tablesToSearch.forEach(tableStructure =>
          {
-            //Investigations can be 0
-            if(0 !== tableStructure.rewardCount)
+            //Investigations can be 0. table is only missing for the Leshens and partial data
+            if(0 !== tableStructure.rewardCount && monsterData[monsterName][rank][tableStructure.section][tableStructure.table])
             {
                const materialData = monsterData[monsterName][rank][tableStructure.section][tableStructure.table]
                .find(monsterTable => material === monsterTable.material);
@@ -822,10 +890,9 @@
    and Investigations doesn't apply to him at all (I think). Rewards: Break Zorah Magdaros's head, Rewards: Break Zorah Magdaros's chest,
    and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle. In the future I might
    add special logic for handling Zorah Magdaros.</p>
-<p><a href="https://mhworld.kiranico.com/monsters/aYaUV/nergigante">Nergigante</a> and
-   <a href="https://mhworld.kiranico.com/monsters/oAnim/ruiner-nergigante">Ruiner Nergigante</a>
-   have had some bad data ignored and thus can be used at HR and MR respectively (and no other rank). Every monster under Rewards of
-   master rank has duplicate tables for Capture that seem to be guiding lands low, mid, high, and tempered: they are ignored.</p>
+<p>It turns out that all 71 (including Zorah Magdaros) large monster pages have something about the data incorrect. The calculations
+   will run on partial data in order to give the best results possible.
+   TODO: list the general corrections once I have them all</p>
 <p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in
    <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">★5 Redefining the "Power Couple"</a> since it's a 2
    monster quest it makes me think I was cheated out of the 4 possible remaining reward slots.
@@ -834,11 +901,16 @@
    I always get 8 when I have 0 faints and I usually don't faint. It is possible that the Lucky Voucher's description of
    "to add bonus rewards" is only talking about doubling the money (and thus doesn't affect what I call "reward slots" at all).
    Poogie does not affect the hunt at all (reward slots, material count, cash, or research points). Deal with it.
-   Although if Poogie likes you (any amount) then you can use him to find treasure which are materials that could be sold.
-   The armor skills Good Luck and Great Luck supposedly have a chance to increase the number of materials in a given reward slots but not
+   Although if Poogie likes you (any amount) then you can use him to find treasure which are materials that could be sold.</p>
+<p>The armor skills Good Luck and Great Luck and the food skill Lucky Cat supposedly have a chance to increase the number of materials
+   (0-5 more) in a given reward slot but not
    the number of reward slots used and thus don't affect the chances of getting "at least 1" of the material desired. It would
    be very tedious to verify those skills since it would require doing a ton of hunts with the skill and comparing to the expected number
-   of each material.</p>
+   of each material. Armor skill Capture Master does the same thing but only if the monster is captured. The food skill Felyne Carver (Hi)
+   on the other hand increases the number of times you can carve which would make
+   <span title="Carves: Carves" class="hoverInfo">Carve</span> be 4-5 reward slots making it the same as the 4-5 normally gotten from
+   capturing a monster. The details of all of these are unknown and thus not included but (unlike Poogie) aren't superstitious
+   so it is a good idea to have them.</p>
 <br /><br /><br /><br />
 <script>
    'use strict';
@@ -851,6 +923,8 @@
    $('#monster').autocomplete({
       source: allMonsterNames
    });
+   //autocomplete default monster (in case it doesn't on change)
+   makeMaterialAutoComplete();
 </script>
 </body>
 </html>
