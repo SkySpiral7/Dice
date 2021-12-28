@@ -129,7 +129,8 @@
        * Latest game version is 15.11.01 (2021-06-03) */
       function scrapeMonsterList()
       {
-         /**This disables jquery from requesting images when parsing html*/
+         /** This disables jquery from requesting images when parsing html.
+          * Not in cache since it shouldn't be needed normally and scraping only creates it once. */
          const virtualDocument = document.implementation.createHTMLDocument('virtual');
 
          $.get('https://mhworld.kiranico.com/monsters').fail(() =>
@@ -148,7 +149,7 @@
          });
       }
 
-      /* Debug example:
+      /* Debug examples:
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Nergigante', 'https://mhworld.kiranico.com/monsters/aYaUV/nergigante')
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Alatreon', 'https://mhworld.kiranico.com/monsters/ErdcV/alatreon')
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Rathalos', 'https://mhworld.kiranico.com/monsters/BnetX/rathalos')
@@ -561,7 +562,7 @@
 
       function makeMonsterAutoComplete()
       {
-         const rank = document.getElementById('huntRank').value;
+         const rank = cache.dom.huntRank.value;
 
          const monsterNamesInRank = Object.keys(monsterData).filter(monsterName => monsterData[monsterName][rank]);
          //Zorah Magdaros (which is all rank) has no data but is in the list so that people can see the alert message (since they won't RTFM)
@@ -572,14 +573,11 @@
          //Zorah is last (for all rank) but LR Nergigante needs to be sorted
          monsterNamesInRank.sort();
 
-         //only query the DOM once but auto complete is only defined on j query
-         const monsterJQuerySelector = $('#monster');
-         const monsterElement = monsterJQuerySelector[0];
-         monsterJQuerySelector.autocomplete({
+         cache.jQuery.monster.autocomplete({
             source: monsterNamesInRank
          });
 
-         const monsterName = monsterElement.value.trim();
+         const monsterName = cache.dom.monster.value.trim();
 
          //don't default these away so that user can see special message
          if(!['Nergigante', 'Zorah Magdaros'].includes(monsterName))
@@ -590,7 +588,7 @@
             //if old monster doesn't exist or isn't in this rank then replace it with the first monster
             if(!monsterData[monsterName] || !monsterData[monsterName][rank])
             {
-               monsterElement.value = monsterNamesInRank[0];
+               cache.dom.monster.value = monsterNamesInRank[0];
             }
          }
 
@@ -600,32 +598,29 @@
 
       function makeMaterialAutoComplete()
       {
-         const rank = document.getElementById('huntRank').value;
-         const monsterName = document.getElementById('monster').value.trim();
+         const rank = cache.dom.huntRank.value;
+         const monsterName = cache.dom.monster.value.trim();
 
-         //minimize DOM query but auto complete is only defined on j query
-         const materialJQuerySelector = $('#material');
-         materialJQuerySelector.autocomplete({source: []});
+         cache.jQuery.material.autocomplete({source: []});
 
          if(!validateMonsterName(monsterName, rank)) return;
 
-         const materialElement = materialJQuerySelector[0];
+         cache.jQuery.material.autocomplete({
+            source: monsterData[monsterName][rank].material
+         });
+
          /* if old material name isn't valid then replace it with the most common material.
           * Rath Wingtalon exists for LR Rathian and LR Rathalos so it is possible to stay across monsters but rare.
           * I didn't want to replace it with the first material because that's typically
           * Ancient Feystone which isn't monster specific (it's Purple investigation). */
-         if(!monsterData[monsterName][rank].material.includes(materialElement.value.trim()))
+         if(!monsterData[monsterName][rank].material.includes(cache.dom.material.value.trim()))
          {
             //[0] will be the one with the highest %
             if(monsterData[monsterName][rank].General.Kill)
-               materialElement.value = monsterData[monsterName][rank].General.Kill[0].material;
+               cache.dom.material.value = monsterData[monsterName][rank].General.Kill[0].material;
             //if partial data just grab the first for simplicity
-            else materialElement.value = monsterData[monsterName][rank].material[0];
+            else cache.dom.material.value = monsterData[monsterName][rank].material[0];
          }
-
-         materialJQuerySelector.autocomplete({
-            source: monsterData[monsterName][rank].material
-         });
 
          let breakingSectionHtml = '';
          Object.keys(monsterData[monsterName][rank].Break).forEach(partName =>
@@ -646,7 +641,7 @@
          if('' === breakingSectionHtml)
             breakingSectionHtml = 'Part breaking info not found';
 
-         breakingSectionElement.innerHTML = breakingSectionHtml;
+         cache.dom.breakingSection.innerHTML = breakingSectionHtml;
       }
 
       /**
@@ -675,19 +670,19 @@
             errorMessage = `${monsterName} can't be fought at ${rank}`;
          }
 
-         //don't touch breakingSectionElement since they will be set later
+         //don't touch breakingSection since it will be set later
          if('' === errorMessage) return true;
 
-         breakingSectionElement.innerHTML = errorMessage;
+         cache.dom.breakingSection.innerHTML = errorMessage;
          alert(errorMessage);
          return false;
       }
 
       function readForm()
       {
-         const rank = document.getElementById('huntRank').value;
-         const monsterName = document.getElementById('monster').value.trim();
-         const material = document.getElementById('material').value.trim();
+         const rank = cache.dom.huntRank.value;
+         const monsterName = cache.dom.monster.value.trim();
+         const material = cache.dom.material.value.trim();
 
          if(!validateMonsterName(monsterName, rank)) return;
          //else assume they can be fought and just calc partial data
@@ -701,45 +696,49 @@
             {
                section: 'Investigation',
                table: 'Bronze',
-               rewardCount: Number.parseInt(document.getElementById('bronzeReward').value)
+               rewardCount: Number.parseInt(cache.dom.bronzeReward.value)
             },
             {
                section: 'Investigation',
                table: 'Silver',
-               rewardCount: Number.parseInt(document.getElementById('silverReward').value)
+               rewardCount: Number.parseInt(cache.dom.silverReward.value)
             },
             {
                section: 'Investigation',
                table: 'Gold',
-               rewardCount: Number.parseInt(document.getElementById('goldReward').value)
+               rewardCount: Number.parseInt(cache.dom.goldReward.value)
             },
             {
                section: 'Investigation',
                table: 'Purple',
-               rewardCount: Number.parseInt(document.getElementById('purpleReward').value)
+               rewardCount: Number.parseInt(cache.dom.purpleReward.value)
             }
          ];
 
+         //can't cache break/sever since they are dynamically created/destroyed
          document.querySelectorAll('input[type="checkbox"]').forEach(checkElement =>
          {
-            if(checkElement.checked && 'sever-tail' !== checkElement.id)
+            if(checkElement.checked)
             {
-               //this handles break tail as well
-               tablesToSearch.push({
-                  section: 'Break',
-                  table: checkElement.value,
-                  rewardCount: 1
-               });
+               if('sever-tail' === checkElement.id)
+               {
+                  tablesToSearch.push({
+                     section: 'Sever',
+                     table: 'tail',
+                     rewardCount: 1
+                  });
+               }
+               else
+               {
+                  //this handles break tail as well
+                  tablesToSearch.push({
+                     section: 'Break',
+                     table: checkElement.value,
+                     rewardCount: 1
+                  });
+               }
             }
          });
-         if(document.getElementById('sever-tail') && document.getElementById('sever-tail').checked)
-         {
-            tablesToSearch.push({
-               section: 'Sever',
-               table: 'tail',
-               rewardCount: 1
-            });
-         }
 
          tablesToSearch.forEach(tableStructure =>
          {
@@ -756,8 +755,8 @@
             }
          });
 
-         const questItemCount = Number.parseInt(document.getElementById('questItemCount').value);
-         const questPercent = Number.parseInt(document.getElementById('questPercent').value);
+         const questItemCount = Number.parseInt(cache.dom.questItemCount.value);
+         const questPercent = Number.parseInt(cache.dom.questPercent.value);
          if(0 !== questItemCount && 0 !== questPercent)
          {
             dataToCrunch.push({tableCount: 3, itemCount: questItemCount, probability: questPercent / 100});
@@ -769,7 +768,7 @@
             return;
          }
 
-         crunchData(dataToCrunch, Number.parseInt(document.getElementById('huntCount').value));
+         crunchData(dataToCrunch, Number.parseInt(cache.dom.huntCount.value));
       }
 
       //TODO: verify results via simulation (input small numbers) and write unit tests
@@ -805,7 +804,7 @@
          out += GenerateHtml.aggregates(aggregate);
          out += GenerateHtml.statistics(finalResults, '>='); //default col
          out = out.replace('<th>Roll</th>', '<th>Count</th>');  //easier to just edit than some new arg etc
-         document.getElementById('graphResults').innerHTML = out;
+         cache.dom.graphResults.innerHTML = out;
 
          function calcEveryHuntOutcome(eachTable)
          {
@@ -844,7 +843,7 @@
    </script>
 </head>
 <body>
-<form action="javascript:readForm();" onchange="document.getElementById('graphResults').innerHTML = ''">
+<form action="javascript:readForm();" onchange="cache.dom.graphResults.innerHTML = ''">
    <br />
    <label>Hunt at: <select id="huntRank" onchange="makeMonsterAutoComplete()">
       <option>Low Rank</option>
@@ -975,10 +974,31 @@
 <br /><br /><br /><br />
 <script>
    'use strict';
-   document.getElementById('huntRank').focus();
-   //TODO: cache every DOM
-   const breakingSectionElement = document.getElementById('breakingSection');
-   makeMonsterAutoComplete();
+   const cache = {dom: {}, jQuery: {}};
+
+   $(document).ready(() =>
+   {
+      cache.jQuery.monster = $('#monster');
+      cache.jQuery.material = $('#material');
+
+      cache.dom = {
+         monster: cache.jQuery.monster[0],
+         material: cache.jQuery.material[0],
+         breakingSection: document.getElementById('breakingSection'),
+         huntRank: document.getElementById('huntRank'),
+         bronzeReward: document.getElementById('bronzeReward'),
+         silverReward: document.getElementById('silverReward'),
+         goldReward: document.getElementById('goldReward'),
+         purpleReward: document.getElementById('purpleReward'),
+         questItemCount: document.getElementById('questItemCount'),
+         questPercent: document.getElementById('questPercent'),
+         huntCount: document.getElementById('huntCount'),
+         graphResults: document.getElementById('graphResults')
+      };
+      cache.dom.huntRank.focus();
+
+      makeMonsterAutoComplete();
+   });
 </script>
 </body>
 </html>
