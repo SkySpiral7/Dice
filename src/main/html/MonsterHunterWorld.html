@@ -58,13 +58,13 @@
        * 3 Rewards: Capture is same as Carves: Carves
        * 4 each table adds up to 100% (won't affect calculations but would be good to verify non bad data)
        * 5 LR monsters will have HR and MR fights
-       * 6 HR monsters will have MR fights
+       * 6 HR monsters will have MR fights except ['Ancient Leshen', 'Leshen'] which are event only
        * 7 LR can't have purple investigation
        * 8 if a monster can be fought at rank then it must have all tables I look for (including investigations) except tail/breaks
        * 9 There will not be duplicate tables (auto ignores the rest)
        * 10 there will not be duplicate material of same count in a table
        * 11 monsters have the same breakable parts (including sever tail) at every rank
-       * 12 every monster will have at least 1 break (excluding sever tail)
+       * 12 every monster will have at least 1 break (excluding sever tail). if missing this is assumed partial data
        *
        * Ask data:
        * 1 are there any tables with duplicate material of diff count
@@ -151,6 +151,9 @@
       /* Debug example:
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Nergigante', 'https://mhworld.kiranico.com/monsters/aYaUV/nergigante')
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Alatreon', 'https://mhworld.kiranico.com/monsters/ErdcV/alatreon')
+       * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Rathalos', 'https://mhworld.kiranico.com/monsters/BnetX/rathalos')
+       * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Silver Rathalos', 'https://mhworld.kiranico.com/monsters/B0ktO/silver-rathalos')
+       * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Ancient Leshen', 'https://mhworld.kiranico.com/monsters/N3vuk/ancient-leshen')
        */
       function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
       {
@@ -362,69 +365,67 @@
             //true when a rank has 1 table but not all of them
             let partialRank = false;
             //have to wait for entire data because these are in different sections
-            ['Low Rank', 'High Rank', 'Master Rank'].forEach(rankText =>
+            ['Low Rank', 'High Rank', 'Master Rank'].forEach(rank =>
             {
                /* If this rank might exist (non-LR) but has no data then delete rank.
                 * LR is already deleted for non-LR monsters so they won't enter here.
                 * Actual LR monsters shouldn't be missing everything.
                 * HR/MR needs to validate Purple and the rest.
                 * Therefore Purple doesn't need special handling. */
-               if(monsterData[monsterName][rankText] &&
-                  !hasTable(monsterName, rankText, 'General', 'Kill') &&
-                  !hasTable(monsterName, rankText, 'General', 'Capture') &&
-                  !hasTable(monsterName, rankText, 'General', 'Hunt') &&
-                  0 === Object.keys(monsterData[monsterName][rankText].Break).length &&
-                  !hasTable(monsterName, rankText, 'Sever', 'tail') &&
-                  !hasTable(monsterName, rankText, 'Investigation', 'Bronze') &&
-                  !hasTable(monsterName, rankText, 'Investigation', 'Silver') &&
-                  !hasTable(monsterName, rankText, 'Investigation', 'Gold') &&
-                  !hasTable(monsterName, rankText, 'Investigation', 'Purple'))
+               if(monsterData[monsterName][rank] &&
+                  !hasTable(monsterName, rank, 'General', 'Kill') &&
+                  !hasTable(monsterName, rank, 'General', 'Capture') &&
+                  !hasTable(monsterName, rank, 'General', 'Hunt') &&
+                  0 === Object.keys(monsterData[monsterName][rank].Break).length &&
+                  !hasTable(monsterName, rank, 'Sever', 'tail') &&
+                  !hasTable(monsterName, rank, 'Investigation', 'Bronze') &&
+                  !hasTable(monsterName, rank, 'Investigation', 'Silver') &&
+                  !hasTable(monsterName, rank, 'Investigation', 'Gold') &&
+                  !hasTable(monsterName, rank, 'Investigation', 'Purple'))
                {
-                  delete monsterData[monsterName][rankText];
+                  delete monsterData[monsterName][rank];
                }
 
                //if monster still has this rank. don't connect with else since LR is already deleted
-               if(monsterData[monsterName][rankText])
+               if(monsterData[monsterName][rank])
                {
                   /* If these 2 tables are different. Elders can't be captured so ignore Capture table.
                    * It's debatable if elders should have the same capture table or none so don't mark as invalid. */
                   if(!elderDragons.includes(monsterName) &&
-                     JSON.stringify(monsterData[monsterName][rankText].General.Kill) !==
-                     JSON.stringify(monsterData[monsterName][rankText].General.Capture))
+                     JSON.stringify(monsterData[monsterName][rank].General.Kill) !==
+                     JSON.stringify(monsterData[monsterName][rank].General.Capture))
                   {
-                     markBadData(`Kill/Capture tables don't match for ${rankText}`, monsterName);
+                     markBadData(`Kill/Capture tables don't match for ${rank}`, monsterName);
                      //no action: keep kill and Capture is always deleted anyway to save space
                   }
-                  delete monsterData[monsterName][rankText].General.Capture;
+                  delete monsterData[monsterName][rank].General.Capture;
 
                   //tail is only possible sever if not there then delete sever
-                  if(!monsterData[monsterName][rankText].Sever.tail)
-                     delete monsterData[monsterName][rankText].Sever;
+                  if(!monsterData[monsterName][rank].Sever.tail)
+                     delete monsterData[monsterName][rank].Sever;
                   //has Sever.tail
-                  else if(monsterData[monsterName][rankText].Break.tail)
+                  else if(monsterData[monsterName][rank].Break.tail)
                   {
-                     markBadData(`Break and sever tail at ${rankText}`, monsterName);
+                     markBadData(`Break and sever tail at ${rank}`, monsterName);
                      //assume that sever is correct
-                     delete monsterData[monsterName][rankText].Break.tail;
+                     delete monsterData[monsterName][rank].Break.tail;
                   }
-                  if(0 === Object.keys(monsterData[monsterName][rankText].Break).length)
-                     console.error(`Assumption violation: ${monsterName} has no breaks`);
 
                   /* make sure the rank has all the data. always check each table which is why the funct is first
                    * and it can't be a single line. Capture is already deleted above.
                    * already validated Break and Sever above. */
-                  partialRank = requireTable(monsterName, rankText, 'General', 'Kill') || partialRank;
-                  partialRank = requireTable(monsterName, rankText, 'General', 'Hunt') || partialRank;
+                  partialRank = requireTable(monsterName, rank, 'General', 'Kill') || partialRank;
+                  partialRank = requireTable(monsterName, rank, 'General', 'Hunt') || partialRank;
 
                   if(!noInvestigations.includes(monsterName))
                   {
-                     partialRank = requireTable(monsterName, rankText, 'Investigation', 'Bronze') || partialRank;
-                     partialRank = requireTable(monsterName, rankText, 'Investigation', 'Silver') || partialRank;
-                     partialRank = requireTable(monsterName, rankText, 'Investigation', 'Gold') || partialRank;
+                     partialRank = requireTable(monsterName, rank, 'Investigation', 'Bronze') || partialRank;
+                     partialRank = requireTable(monsterName, rank, 'Investigation', 'Silver') || partialRank;
+                     partialRank = requireTable(monsterName, rank, 'Investigation', 'Gold') || partialRank;
 
                      //Purple doesn't exist for LR but required for HR/MR
-                     if('Low Rank' !== rankText)
-                        partialRank = requireTable(monsterName, rankText, 'Investigation', 'Purple') || partialRank;
+                     if('Low Rank' !== rank)
+                        partialRank = requireTable(monsterName, rank, 'Investigation', 'Purple') || partialRank;
                   }
                }
             });
@@ -462,7 +463,9 @@
                         console.error(`Assumption violation: ${monsterName} has different part breaks at high/master rank`);
                      validateSever(monsterName, 'High Rank', 'Master Rank');
                   }
-                  else console.error(`Assumption violation: ${monsterName} can be fought at high rank but not master rank`);
+                  //these are event only and that event is only HR
+                  else if(!['Ancient Leshen', 'Leshen'].includes(monsterName))
+                     console.error(`Assumption violation: ${monsterName} can be fought at high rank but not master rank`);
                }
             }
 
@@ -494,20 +497,27 @@
             console.error(`Assumption violation: ${monsterName} has different tail sever at ${rank1}/${rank2}`);
       }
 
-      function hasTable(monsterName, rankText, sectionName, tableName)
+      function hasTable(monsterName, rank, sectionName, tableName)
       {
-         return monsterData[monsterName][rankText][sectionName][tableName] &&
-            //there are no scenarios with empty tables but it's easy to check. TODO: confirm no empty tables (else might need to mark)
-            0 !== Object.keys(monsterData[monsterName][rankText][sectionName][tableName]).length;
+         const exists = monsterData[monsterName][rank][sectionName][tableName];
+         if(!exists) return false;
+
+         const empty = (0 === monsterData[monsterName][rank][sectionName][tableName].length);
+         if(!empty) return true;
+
+         //there are no scenarios with empty tables but it's easy to check
+         console.error(`Assumption violation: empty table: ${monsterName} ${rank} ${sectionName} > ${tableName}`);
+
+         return false;
       }
 
-      function requireTable(monsterName, rankText, sectionName, tableName)
+      function requireTable(monsterName, rank, sectionName, tableName)
       {
-         if(!hasTable(monsterName, rankText, sectionName, tableName))
+         if(!hasTable(monsterName, rank, sectionName, tableName))
          {
-            //TODO: check if these should be console.error
-            markBadData(`Missing required new table ${rankText} ${sectionName} > ${tableName}`, monsterName);
-            delete monsterData[monsterName][rankText][sectionName][tableName];
+            //these are mark because all 6 tables currently happen
+            markBadData(`Missing required new table ${rank} ${sectionName} > ${tableName}`, monsterName);
+            delete monsterData[monsterName][rank][sectionName][tableName];
             return true;
          }
          return false;
@@ -568,8 +578,11 @@
          //highest rank would be fewer checks but then I couldn't reuse basicMonsterData
          Object.keys(basicMonsterData.Break).forEach(partName =>
          {
-            //TODO: have break and investigation display x1 25%
-            //this handles some tail
+            //TODO: have break and investigation display x1 25% but only possible after rank based auto complete
+            //break doesn't work until then for silver rathalos. or until I beat HR and exclude his HR
+            //TODO: actually silver rathalos throws because no HR kill
+
+            //this handles some tail (break)
             breakingSectionHtml += `<label>Break ${partName}: <input type="checkbox" checked="checked" value="${partName}" /></label><br />`;
          });
          if(basicMonsterData.Sever)
@@ -577,6 +590,10 @@
             breakingSectionHtml += '<label>Sever and carve tail: <input type="checkbox" checked="checked" ' +
                'id="sever-tail" value="tail" /></label><br />';
          }
+
+         //not valid. this is to support partial data
+         if('' === breakingSectionHtml)
+            breakingSectionHtml = 'Part breaking info not found';
 
          document.getElementById('breakingSection').innerHTML = breakingSectionHtml;
       }
