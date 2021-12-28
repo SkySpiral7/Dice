@@ -154,6 +154,7 @@
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Rathalos', 'https://mhworld.kiranico.com/monsters/BnetX/rathalos')
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Silver Rathalos', 'https://mhworld.kiranico.com/monsters/B0ktO/silver-rathalos')
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Ancient Leshen', 'https://mhworld.kiranico.com/monsters/N3vuk/ancient-leshen')
+       * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Kulu-Ya-Ku', 'https://mhworld.kiranico.com/monsters/YQ1FE/kulu-ya-ku')
        */
       function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
       {
@@ -182,7 +183,11 @@
                   'High Rank': {General: {}, Break: {}, Sever: {}, Investigation: {}},
                   'Master Rank': {General: {}, Break: {}, Sever: {}, Investigation: {}}
                };
-            const materialForMonster = {};
+            const materialForRank = {
+               'Low Rank': {},
+               'High Rank': {},
+               'Master Rank': {}
+            };
             //partsPerRank is for validation
             const partsPerRank = {
                'Low Rank': {},
@@ -345,7 +350,7 @@
                            console.error(`Assumption violation: ${monsterName} ${rankText} ` +
                               `${sectionText} > ${tableText} duplicate material: ${material} x${materialCount}`);
 
-                        materialForMonster[material] = true;
+                        materialForRank[rankText][material] = true;
                         materialInTable[material] = materialCount;
 
                         dataLocation.push({
@@ -427,6 +432,11 @@
                      if('Low Rank' !== rank)
                         partialRank = requireTable(monsterName, rank, 'Investigation', 'Purple') || partialRank;
                   }
+
+                  //materialForRank is a set so the keys is everything
+                  const materialNames = Object.keys(materialForRank[rank]);
+                  materialNames.sort();
+                  monsterData[monsterName][rank].material = materialNames;
                }
             });
 
@@ -468,10 +478,6 @@
                      console.error(`Assumption violation: ${monsterName} can be fought at high rank but not master rank`);
                }
             }
-
-            const allMaterialNames = Object.keys(materialForMonster);
-            allMaterialNames.sort();
-            monsterData[monsterName].material = allMaterialNames;
 
             console.log(monsterName + ' is done');
          });
@@ -553,43 +559,84 @@
          }
       }
 
-      function makeMaterialAutoComplete()
+      function makeMonsterAutoComplete()
       {
-         const monsterName = document.getElementById('monster').value.trim();
+         const rank = document.getElementById('huntRank').value;
 
-         //clearing breaks and auto complete is only actually needed if Zorah or no data
-         document.getElementById('breakingSection').innerHTML = '';
-         const materialInput = $('#material');
-         materialInput.autocomplete({source: []});
+         const monsterNamesInRank = Object.keys(monsterData).filter(monsterName => monsterData[monsterName][rank]);
+         //Zorah Magdaros (which is all rank) has no data but is in the list so that people can see the alert message (since they won't RTFM)
+         monsterNamesInRank.push('Zorah Magdaros');
+         //LR Nergigante also has a special message. HR/MR is valid and already in list
+         if('Low Rank' === rank) monsterNamesInRank.push('Nergigante');
 
-         if(!validateMonsterName(monsterName)) return;
+         //Zorah is last (for all rank) but LR Nergigante needs to be sorted
+         monsterNamesInRank.sort();
 
-         /* if old material name isn't valid then replace it with the most common material.
-          * Rath Wingtalon exists for Low Rank Rathian and Rathalos so it is possible to stay but rare.
-          * I didn't want to replace it with the first material because that's typically
-          * Ancient Feystone which isn't monster specific (it's Purple investigation). */
-         if(!monsterData[monsterName].material.includes(document.getElementById('material').value.trim()))
+         //only query the DOM once but auto complete is only defined on j query
+         const monsterJQuerySelector = $('#monster');
+         const monsterElement = monsterJQuerySelector[0];
+         monsterJQuerySelector.autocomplete({
+            source: monsterNamesInRank
+         });
+
+         const monsterName = monsterElement.value.trim();
+
+         //don't default these away so that user can see special message
+         if(!['Nergigante', 'Zorah Magdaros'].includes(monsterName))
          {
-            /* [0] will be the one with the highest %
-             * Have to check each rank because some monsters aren't at every rank
-             * But I want the lowest available rank */
-            document.getElementById('material').value = findLowestRankTable(monsterName, 'General', 'Kill')[0].material;
+            if(monsterData[monsterName] && !monsterData[monsterName][rank])
+               alert(`${monsterName} can't be fought at ${rank}. Defaulting to ${monsterNamesInRank[0]} instead`);
+
+            //if old monster doesn't exist or isn't in this rank then replace it with the first monster
+            if(!monsterData[monsterName] || !monsterData[monsterName][rank])
+            {
+               monsterElement.value = monsterNamesInRank[0];
+            }
          }
 
-         materialInput.autocomplete({
-            source: monsterData[monsterName].material
+         //autocomplete default monster (in case it changed)
+         makeMaterialAutoComplete();
+      }
+
+      function makeMaterialAutoComplete()
+      {
+         const rank = document.getElementById('huntRank').value;
+         const monsterName = document.getElementById('monster').value.trim();
+
+         //minimize DOM query but auto complete is only defined on j query
+         const materialJQuerySelector = $('#material');
+         materialJQuerySelector.autocomplete({source: []});
+
+         if(!validateMonsterName(monsterName, rank)) return;
+
+         const materialElement = materialJQuerySelector[0];
+         /* if old material name isn't valid then replace it with the most common material.
+          * Rath Wingtalon exists for LR Rathian and LR Rathalos so it is possible to stay across monsters but rare.
+          * I didn't want to replace it with the first material because that's typically
+          * Ancient Feystone which isn't monster specific (it's Purple investigation). */
+         if(!monsterData[monsterName][rank].material.includes(materialElement.value.trim()))
+         {
+            //[0] will be the one with the highest %
+            if(monsterData[monsterName][rank].General.Kill)
+               materialElement.value = monsterData[monsterName][rank].General.Kill[0].material;
+            //if partial data just grab the first for simplicity
+            else materialElement.value = monsterData[monsterName][rank].material[0];
+         }
+
+         materialJQuerySelector.autocomplete({
+            source: monsterData[monsterName][rank].material
          });
 
          let breakingSectionHtml = '';
-         Object.keys(findHighestRankBreakSection(monsterName)).forEach(partName =>
+         Object.keys(monsterData[monsterName][rank].Break).forEach(partName =>
          {
-            //TODO: have break and investigation display x1 25% but only possible after rank based auto complete
-            //break doesn't work until then for silver rathalos. or until I beat HR and exclude his HR
+            //TODO: have break and investigation display x1 25%
 
             //this handles some tail (break)
             breakingSectionHtml += `<label>Break ${partName}: <input type="checkbox" checked="checked" value="${partName}" /></label><br />`;
          });
-         if(findLowestRankTable(monsterName, 'Sever', 'tail'))
+         //Sever section is deleted if no tail. it can only have tail
+         if(monsterData[monsterName][rank].Sever)
          {
             breakingSectionHtml += '<label>Sever and carve tail: <input type="checkbox" checked="checked" ' +
                'id="sever-tail" value="tail" /></label><br />';
@@ -599,72 +646,50 @@
          if('' === breakingSectionHtml)
             breakingSectionHtml = 'Part breaking info not found';
 
-         document.getElementById('breakingSection').innerHTML = breakingSectionHtml;
+         breakingSectionElement.innerHTML = breakingSectionHtml;
       }
 
       /**
        * @returns {boolean} true if valid
        */
-      function validateMonsterName(monsterName)
+      function validateMonsterName(monsterName, rank)
       {
+         let errorMessage = '';
          if('Zorah Magdaros' === monsterName)
          {
-            alert('Zorah Magdaros isn\'t currently supported (see reason below).');
             /* If you aren't master rank and have no investigations then the calc would "just work"
              * but I don't want that validation, the data is questionable, and no one will mind this being excluded. */
-            return false;
+            errorMessage = 'Zorah Magdaros isn\'t currently supported (see reason below).';
          }
-         if(!monsterData[monsterName])
+         else if('Nergigante' === monsterName && 'Low Rank' === rank)
          {
-            alert(`No data for monster named "${monsterName}". Check your spelling and try again.`);
-            return false;
+            errorMessage = `Nergigante has no Low Rank rewards`;
          }
-         return true;
-      }
+         //below is to check if people ignored the auto complete
+         else if(!monsterData[monsterName])
+         {
+            errorMessage = `No data for monster named "${monsterName}". Check your spelling and try again.`;
+         }
+         else if(!monsterData[monsterName][rank])
+         {
+            errorMessage = `${monsterName} can't be fought at ${rank}`;
+         }
 
-      /** @returns {Array} table. not found will throw */
-      function findLowestRankTable(monsterName, section, table)
-      {
-         //if the rank exists then all sections (except sever) will exist
-         const lowestRank = ['Low Rank', 'High Rank', 'Master Rank'].find(rank =>
-            monsterData[monsterName][rank] && monsterData[monsterName][rank][section] && monsterData[monsterName][rank][section][table]);
-         if(lowestRank) return monsterData[monsterName][lowestRank][section][table];
+         //don't touch breakingSectionElement since they will be set later
+         if('' === errorMessage) return true;
 
-         //must stop because it would cause NPE
-         alert(`Assumption violation: no table for any rank: ${monsterName} ${section} > ${table}`);
-         throw new Error(`Assumption violation: no table for any rank: ${monsterName} ${section} > ${table}`);
-      }
-
-      /** @returns {object} Break object. not found returns {} */
-      function findHighestRankBreakSection(monsterName)
-      {
-         //check highest first since all monsters should have MR
-         //const highestRank = ['Master Rank', 'High Rank', 'Low Rank'].find(rank =>
-         const highestRank = ['High Rank', 'Low Rank'].find(rank =>
-            monsterData[monsterName][rank] && 0 !== Object.keys(monsterData[monsterName][rank].Break).length);
-         if(highestRank) return monsterData[monsterName][highestRank].Break;
-
-         return {};
+         breakingSectionElement.innerHTML = errorMessage;
+         alert(errorMessage);
+         return false;
       }
 
       function readForm()
       {
+         const rank = document.getElementById('huntRank').value;
          const monsterName = document.getElementById('monster').value.trim();
          const material = document.getElementById('material').value.trim();
-         const rank = document.getElementById('huntRank').value;
 
-         if(!validateMonsterName(monsterName)) return;
-
-         if('Nergigante' === monsterName && 'Low Rank' === rank)
-         {
-            alert(`Nergigante has no Low Rank rewards`);
-            return;
-         }
-         if(!monsterData[monsterName][rank])
-         {
-            alert(`${monsterName} can't be fought at ${rank}`);
-            return;
-         }
+         if(!validateMonsterName(monsterName, rank)) return;
          //else assume they can be fought and just calc partial data
 
          const dataToCrunch = [];
@@ -821,14 +846,14 @@
 <body>
 <form action="javascript:readForm();" onchange="document.getElementById('graphResults').innerHTML = ''">
    <br />
-   <label>Monster to hunt:<input type="text" id="monster" value="Rathalos" onchange="makeMaterialAutoComplete()" /></label>
-   <label>Material:<input type="text" id="material" value="Rathalos Scale" /></label><br />
-
-   <label>Rank: <select id="huntRank">
+   <label>Hunt at: <select id="huntRank" onchange="makeMonsterAutoComplete()">
       <option>Low Rank</option>
       <option>High Rank</option>
       <option>Master Rank</option>
    </select></label><br />
+
+   <label>Monster to hunt:<input type="text" id="monster" value="Rathalos" onchange="makeMaterialAutoComplete()" /></label>
+   <label>Material desired:<input type="text" id="material" value="Rathalos Scale" /></label><br />
 
    <h2>Breaking parts</h2>
    <div id="breakingSection"></div>
@@ -950,18 +975,10 @@
 <br /><br /><br /><br />
 <script>
    'use strict';
-   document.getElementById('monster').focus();
-
-   const allMonsterNames = Object.keys(monsterData);
-   //Zorah Magdaros has no data but is in the list so that people can see the alert message (since they won't RTFM)
-   allMonsterNames.push('Zorah Magdaros');
-   //already sorted since Zorah is last but enforce it anyway
-   allMonsterNames.sort();
-   $('#monster').autocomplete({
-      source: allMonsterNames
-   });
-   //autocomplete default monster (in case it doesn't on change)
-   makeMaterialAutoComplete();
+   document.getElementById('huntRank').focus();
+   //TODO: cache every DOM
+   const breakingSectionElement = document.getElementById('breakingSection');
+   makeMonsterAutoComplete();
 </script>
 </body>
 </html>
