@@ -4,6 +4,7 @@
    <meta charset="UTF-8" />
    <title>Material Hunt Stats - MHW</title>
    <script id="DiceInclude" src="../javascript/Include.js"></script>
+   <script src="mhwDb.js"></script>
    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css" />
    <style>
       /*Style based on the H&H css but with red hover and blue links*/
@@ -75,7 +76,7 @@
        * Ask data:
        * 1 are there any tables with duplicate material of diff count? Kulve Taroth HR Breaks
        * 2 are there any monsters who are MR only? looks like fatalis, safi-jiiva, silver-rathalos
-       * 3 is each table highest % to least order? if not I could sort them for default material
+       * 3 is each table highest % to least order? yes which is good for default material
        *
        * Data corrections:
        * 1 ignore duplicate tables keeping only the first
@@ -97,7 +98,6 @@
        * Notes:
        * 71 total monsters (including Zorah)
        */
-      //TODO: store data offline (more legit) then validate it and correct Zorah
       /** Elder Dragons can't be captured. LR Kirin stood on the trap without it triggering.
        * Zorah is out and Nergigante so far is story only. Don't know if other Elder dragons have other issues but they can get normal and purple Investigations.
        * Currently this is only used to ignore capture table validation for which Zorah is ignored but he is in fact an ED and definitely can't be captured normally. */
@@ -121,10 +121,6 @@
          'Paolumu', 'Pukei-Pukei', 'Rabodaan', 'Rathian', 'Tobi-Kadachi', 'Tzitzi-Ya-Ku', 'Zorah Magdaros'
       ];
       */
-      //Sever is the only section that's deleted if empty. all other empty sections are partial data
-      const monsterData = {};
-      //markBadData for auto corrected issues and console.error for ones that are unexpected
-      const badData = {monsters: []};
 
       /** Builds monsterData via web scraping. It's faster than I expected but rarely if ever needs to be re-ran.
        *
@@ -132,7 +128,7 @@
        * 1 that there are no console.error else add more corrections
        * 2 run groomMonsterData (verify still no console.error). copy the console.log output into DB
        *
-       * Last run on 2021-12-? ? the website says ver. 15.11
+       * Last run on 2021-12-28 20:30 the website says ver. 15.11
        * Latest game version is 15.11.01 (2021-06-03) */
       function scrapeMonsterList()
       {
@@ -551,13 +547,19 @@
          verifyManualCorrection('wrong Investigation', noInvestigations);
          verifyManualCorrection('no rewards at Low Rank', ['Nergigante']);
 
-         //sort monsterData by making a new object that has keys in alpha order
+         sortKeysAndLog(monsterData);
+         sortKeysAndLog(badData);
+      }
+
+      function sortKeysAndLog(object)
+      {
+         //sort by making a new object that has keys in alpha order
          const newData = {};
-         const allMonsterNames = Object.keys(monsterData);
+         const allMonsterNames = Object.keys(object);
          allMonsterNames.sort();
          allMonsterNames.forEach(monsterName =>
          {
-            newData[monsterName] = monsterData[monsterName];
+            newData[monsterName] = object[monsterName];
          });
          console.log(JSON.stringify(newData));
       }
