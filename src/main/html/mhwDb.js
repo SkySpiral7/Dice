@@ -1,3 +1,5 @@
+'use strict';
+
 /** Sever is the only section that's deleted if empty. all empty sections are partial data.
  * Empty ranks are deleted (HR/MR would be partial data). */
 const monsterData = {
