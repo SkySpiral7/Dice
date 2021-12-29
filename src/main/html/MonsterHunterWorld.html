@@ -81,14 +81,14 @@
        *
        * Data corrections:
        * 1 ignore duplicate tables keeping only the first
-       * 2 ignore partial rank data
-       * 3 if sever and break tail then keep the sever
-       * 4 if kill/capture tables don't match keep the kill (the capture tables I saw were all Monster Bone L 100%)
-       * 5 Kushala Daora and Teostra don't have breakable forelimbs
-       * 6 Safi'jiiva Master Rank Rewards > Capture Safi'jiiva Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match the Kill table
-       * 7 Ancient Leshen/Leshen don't have Investigations and are thus ignored. Leshen HR Bronze was the only one that looked valid anyway
-       * 8 Nergigante doesn't have LR rewards. Break might be possible but I can't confirm that
-       * 9 I made a list of LR monsters. LR data from a monster not in the list is ignored
+       * 2 I made a list of LR monsters. LR data from a monster not in the list is ignored
+       * 3 if rank has none of the tables I check then delete that rank
+       * 4 if sever and break tail then keep the sever
+       * 5 if kill/capture tables don't match keep the kill (the capture tables I saw were all Monster Bone L 100%)
+       * 6 Kushala Daora and Teostra don't have breakable forelimbs
+       * 7 Safi'jiiva Master Rank Rewards > Capture Safi'jiiva Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match the Kill table
+       * 8 Ancient Leshen/Leshen don't have Investigations and are thus ignored. Leshen HR Bronze was the only one that looked valid anyway
+       * 9 Nergigante doesn't have LR rewards. Break might be possible but I can't confirm that
        *
        * Assumptions (don't affect calc):
        * 1 Bandit Mantle only gives trade-in items (pretty sure the game says this)
@@ -122,6 +122,7 @@
          //don't default these away so that user can see special message
          if(!['Nergigante', 'Zorah Magdaros'].includes(monsterName))
          {
+            //Defaults: LR Anjanath, HR/MR Acidic Glavenus (HR should be Ancient Leshen)
             if(monsterData[monsterName] && !monsterData[monsterName][rank])
                alert(`${monsterName} can't be fought at ${rank}. Defaulting to ${monsterNamesInRank[0]} instead`);
 
@@ -488,10 +489,11 @@
       probability of each possible number of material you'll get.
       This programs calculates as much as possible and is pessimistic about the rest so that your actual odds should be better than
       reported.
-      This scrapes data from <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>.
+      This uses a DB that was scraped from <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>.
       Text with red underline will show the name of the table from <a href="https://mhworld.kiranico.com/">kiranico</a> when you hover over
       it.
-      First of all some terminology: a reward slot is a single square on the results page after a hunt. Each reward slot generally has 1
+      First of all some unofficial terminology: a reward slot is a single square on the results page after a hunt. Each reward slot
+      generally has 1
       material but it can have more than 1.</p>
    <p><span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span> are
       always identical tables the only difference is that you can always carve a dead monster 4 times, each of which puts in your box
@@ -552,9 +554,24 @@
       and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle. In the future I
       might
       add special logic for handling Zorah Magdaros.</p>
-   <p>It turns out that all 71 (including Zorah Magdaros) large monster pages have something about the data incorrect. The calculations
-      will run on partial data in order to give the best results possible.
-      TODO: list the general corrections once I have them all</p>
+   <p>It turns out that all 71 (including Zorah Magdaros) large monster pages have some part of the data incorrect. The calculations
+      will run on partial data in order to give the best results possible. For duplicate tables I kept the first. For monsters that I know
+      aren't in Low Rank I ignored the LR column. If a non-LR rank column didn't include any of the 4 Investigations,
+      <span title="Carves: Carves" class="hoverInfo">Carve</span>, <span title="Rewards: Capture" class="hoverInfo">Capture</span>,
+      <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>, breaks, and sever tail then I ignored the rest of the column and assumed
+      that the monster can't be fought at that rank. If page said that a tail could be both severed and broken then I ignored the break.
+      If <span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span>
+      didn't match I kept <span title="Carves: Carves" class="hoverInfo">Carve</span>. Elder Dragons had
+      <span title="Rewards: Capture" class="hoverInfo">Capture</span> ignored since they can't be captured.
+      <a href="https://mhworld.kiranico.com/monsters/jJxin/kushala-daora">Kushala Daora</a> and
+      <a href="https://mhworld.kiranico.com/monsters/jGeS0/teostra">Teostra</a> don't have breakable forelimbs (tables ignored).
+      <a href="https://mhworld.kiranico.com/monsters/0kVsV/safi-jiiva">Safi'jiiva</a> Master Rank Rewards: Capture Safi'jiiva table
+      row Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match <span title="Carves: Carves" class="hoverInfo">Carve</span> and to
+      avoid duplication (I corrected this). <a href="https://mhworld.kiranico.com/monsters/N3vuk/ancient-leshen">Ancient Leshen</a> and
+      <a href="https://mhworld.kiranico.com/monsters/GmYh0/leshen">Leshen</a> don't have Investigations and are thus ignored
+      (Leshen HR Bronze was the only one that looked valid anyway).
+      <a href="https://mhworld.kiranico.com/monsters/aYaUV/nergigante">Nergigante</a> doesn't have LR rewards
+      (break might be possible but I can't confirm that) so I ignored that rank.</p>
    <p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in
       <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">★5 Redefining the "Power Couple"</a> since it's a 2
       monster quest it makes me think I was cheated out of the 4 possible remaining reward slots.
