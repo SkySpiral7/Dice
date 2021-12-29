@@ -1,0 +1,629 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+   <meta charset="UTF-8" />
+   <title>Material Hunt Stats - MHW</title>
+   <script id="DiceInclude" src="../javascript/Include.js"></script>
+   <script src="mhwDb.js"></script>
+   <!--<script src="mhwScrape.js"></script>-->
+   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css" />
+   <style>
+      /*Style based on the H&H css but with red hover and blue links*/
+
+      /*classes autocomplete etc are from jquery-ui*/
+      html, body, input, textarea, select, button,
+      .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
+         background-color: black;
+         border-color: #202020;
+         color: #A0A0A0;
+      }
+
+      .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+         background-color: #000040;
+      }
+
+      ::-webkit-scrollbar {
+         background-color: #101010;
+      }
+
+      ::-webkit-scrollbar-thumb {
+         background-color: #202020;
+      }
+
+      a:link, a:visited {
+         color: #79AAFF;
+      }
+
+      p {
+         max-width: 1000px;
+      }
+
+      h2 {
+         font-size: 28px;
+      }
+
+      .hoverInfo {
+         color: red;
+         border-bottom: 1px dotted red;
+      }
+
+      table {
+         border-spacing: 1em;
+         -webkit-border-vertical-spacing: 2px;
+      }
+   </style>
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+           crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA="
+           crossorigin="anonymous"></script>
+   <script>
+      'use strict';
+
+      /* Data validations:
+       * 1 A tail can't both break and be severed
+       * 2 Only a tail can be severed
+       * 3 Rewards: Capture is same as Carves: Carves
+       * 4 each table adds up to 100% (won't affect calculations but would be good to verify non bad data)
+       * 5 LR monsters will have HR and MR fights
+       * 6 HR monsters will have MR fights except ['Ancient Leshen', 'Leshen'] which are event only
+       * 7 LR can't have purple investigation
+       * 8 if a monster can be fought at rank then it must have all tables I look for (including investigations) except tail/breaks
+       * 9 There will not be duplicate tables (auto ignores the rest)
+       * 10 a table's material count is never 0
+       * 11 a table will not have duplicate material of the same count. diff counts are fine
+       * 12 monsters have the same breakable parts (including sever tail) at every rank
+       * 13 every monster will have at least 1 break (excluding sever tail). if missing this is assumed partial data
+       *
+       * Ask data:
+       * 1 are there any tables with duplicate material of diff count? Kulve Taroth HR Breaks
+       * 2 are there any monsters who are MR only? looks like fatalis, safi-jiiva, silver-rathalos
+       * 3 is each table highest % to least order? yes which is good for default material
+       *
+       * Data corrections:
+       * 1 ignore duplicate tables keeping only the first
+       * 2 I made a list of LR monsters. LR data from a monster not in the list is ignored
+       * 3 if rank has none of the tables I check then delete that rank
+       * 4 if sever and break tail then keep the sever
+       * 5 if kill/capture tables don't match keep the kill (the capture tables I saw were all Monster Bone L 100%)
+       * 6 Kushala Daora and Teostra don't have breakable forelimbs
+       * 7 Safi'jiiva Master Rank Rewards > Capture Safi'jiiva Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match the Kill table
+       * 8 Ancient Leshen/Leshen don't have Investigations and are thus ignored. Leshen HR Bronze was the only one that looked valid anyway
+       * 9 Nergigante doesn't have LR rewards. Break might be possible but I can't confirm that
+       *
+       * Assumptions (don't affect calc):
+       * 1 Bandit Mantle only gives trade-in items (pretty sure the game says this)
+       * 2 some monsters are not in low rank (I know this 1)
+       * 3 some monsters are not in high rank (probably but not sure)
+       * 4 master rank can fight everything and high can fight all low
+       *
+       * Notes:
+       * 71 total monsters (including Zorah)
+       */
+
+      function makeMonsterAutoComplete()
+      {
+         const rank = cache.dom.huntRank.value;
+
+         const monsterNamesInRank = Object.keys(monsterData).filter(monsterName => monsterData[monsterName][rank]);
+         //Zorah Magdaros (which is all rank) has no data but is in the list so that people can see the alert message (since they won't RTFM)
+         monsterNamesInRank.push('Zorah Magdaros');
+         //LR Nergigante also has a special message. HR/MR is valid and already in list
+         if('Low Rank' === rank) monsterNamesInRank.push('Nergigante');
+
+         //Zorah is last (for all rank) but LR Nergigante needs to be sorted
+         monsterNamesInRank.sort();
+
+         cache.jQuery.monster.autocomplete({
+            source: monsterNamesInRank
+         });
+
+         const monsterName = cache.dom.monster.value.trim();
+
+         //don't default these away so that user can see special message
+         if(!['Nergigante', 'Zorah Magdaros'].includes(monsterName))
+         {
+            //Defaults: LR Anjanath, HR/MR Acidic Glavenus (HR should be Ancient Leshen)
+            if(monsterData[monsterName] && !monsterData[monsterName][rank])
+               alert(`${monsterName} can't be fought at ${rank}. Defaulting to ${monsterNamesInRank[0]} instead`);
+
+            //if old monster doesn't exist or isn't in this rank then replace it with the first monster
+            if(!monsterData[monsterName] || !monsterData[monsterName][rank])
+            {
+               cache.dom.monster.value = monsterNamesInRank[0];
+            }
+         }
+
+         //autocomplete default monster (in case it changed)
+         makeMaterialAutoComplete();
+      }
+
+      function makeMaterialAutoComplete()
+      {
+         const rank = cache.dom.huntRank.value;
+         const monsterName = cache.dom.monster.value.trim();
+
+         cache.jQuery.material.autocomplete({source: []});
+
+         if(!validateMonsterName(monsterName, rank)) return;
+
+         cache.jQuery.material.autocomplete({
+            source: monsterData[monsterName][rank].material
+         });
+
+         /* if old material name isn't valid then replace it with the most common material.
+          * Rath Wingtalon exists for LR Rathian and LR Rathalos so it is possible to stay across monsters but rare.
+          * I didn't want to replace it with the first material because that's typically
+          * Ancient Feystone which isn't monster specific (it's Purple investigation). */
+         let material = cache.dom.material.value.trim();
+         if(!monsterData[monsterName][rank].material.includes(material))
+         {
+            //[0] will be the one with the highest %
+            if(monsterData[monsterName][rank].General.Kill)
+               cache.dom.material.value = material = monsterData[monsterName][rank].General.Kill[0].material;
+            //if partial data just grab the first for simplicity
+            else cache.dom.material.value = material = monsterData[monsterName][rank].material[0];
+         }
+
+         let breakingSectionHtml = '';
+         Object.keys(monsterData[monsterName][rank].Break).forEach(partName =>
+         {
+            const breakCount = formatMaterialLocation(' ', monsterName, rank, 'Break', partName, material);
+
+            //this handles some tail (break)
+            breakingSectionHtml += `<label>Break ${partName}: <input type="checkbox" checked="checked" value="${partName}" /></label> ` +
+               `<span id="break-${partName}-count">${breakCount}</span><br />`;
+         });
+         //Sever section is deleted if no tail. it can only have tail
+         if(monsterData[monsterName][rank].Sever)
+         {
+            const breakCount = formatMaterialLocation(' ', monsterName, rank, 'Sever', 'tail', material);
+            breakingSectionHtml += `<label>Sever and carve tail: <input type="checkbox" checked="checked" ` +
+               `id="sever-tail" value="tail" /></label> <span id="sever-tail-count">${breakCount}</span><br />`;
+         }
+
+         //not valid. this is to support partial data
+         if('' === breakingSectionHtml)
+            breakingSectionHtml = 'Part breaking info not found';
+
+         updateMaterialInvestigation(monsterName, rank, material);
+         cache.dom.breakingSection.innerHTML = breakingSectionHtml;
+      }
+
+      /**
+       * @returns {boolean} true if valid
+       */
+      function validateMonsterName(monsterName, rank)
+      {
+         let errorMessage = '';
+         if('Zorah Magdaros' === monsterName)
+         {
+            /* If you aren't master rank and have no investigations then the calc would "just work"
+             * but I don't want that validation, the data is questionable, and no one will mind this being excluded. */
+            errorMessage = 'Zorah Magdaros isn\'t currently supported (see reason below).';
+         }
+         else if('Nergigante' === monsterName && 'Low Rank' === rank)
+         {
+            errorMessage = `Nergigante has no Low Rank rewards`;
+         }
+         //below is to check if people ignored the auto complete
+         else if(!monsterData[monsterName])
+         {
+            errorMessage = `No data for monster named "${monsterName}". Check your spelling and try again.`;
+         }
+         else if(!monsterData[monsterName][rank])
+         {
+            errorMessage = `${monsterName} can't be fought at ${rank}`;
+         }
+
+         //don't touch breakingSection since it will be set later
+         if('' === errorMessage) return true;
+
+         cache.dom.breakingSection.innerHTML = errorMessage;
+         alert(errorMessage);
+         return false;
+      }
+
+      function formatMaterialLocation(separator, monsterName, rank, section, table, material)
+      {
+         //if table doesn't exist. this is possible for missing investigation data
+         if(!monsterData[monsterName][rank][section][table]) return '-';
+         const allMatchingMaterialInfo = monsterData[monsterName][rank][section][table].filter(it => it.material === material);
+         if(0 === allMatchingMaterialInfo.length) return '0%';
+
+         let output = '';
+         allMatchingMaterialInfo.forEach(materialInfo =>
+         {
+            output += `${separator}x${materialInfo.itemCount} ${(materialInfo.probability * 100).toFixed(0)}%`
+         });
+         //remove leading separator
+         return output.substring(separator.length);
+      }
+
+      function updateMaterialInvestigation(monsterName, rank, material)
+      {
+         //there are no Investigation tables that need a separator but br would look good
+         cache.dom.bronzeRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Bronze', material);
+         cache.dom.silverRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Silver', material);
+         cache.dom.goldRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Gold', material);
+         //formatMaterialLocation handles missing LR Purple
+         cache.dom.purpleRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Purple', material);
+      }
+
+      function updateMaterialLocation()
+      {
+         const rank = cache.dom.huntRank.value;
+         const monsterName = cache.dom.monster.value.trim();
+         const material = cache.dom.material.value.trim();
+
+         Object.keys(monsterData[monsterName][rank].Break).forEach(partName =>
+         {
+            //this handles some tail (break)
+            //can't cache break/sever since they are dynamically created/destroyed
+            document.getElementById(`break-${partName}-count`).textContent =
+               formatMaterialLocation(' ', monsterName, rank, 'Break', partName, material);
+         });
+         //Sever section is deleted if no tail. it can only have tail
+         if(monsterData[monsterName][rank].Sever)
+            document.getElementById(`sever-tail-count`).textContent =
+               formatMaterialLocation(' ', monsterName, rank, 'Sever', 'tail', material);
+
+         updateMaterialInvestigation(monsterName, rank, material);
+      }
+
+      function readForm()
+      {
+         const rank = cache.dom.huntRank.value;
+         const monsterName = cache.dom.monster.value.trim();
+         const material = cache.dom.material.value.trim();
+
+         if(!validateMonsterName(monsterName, rank)) return;
+         //else assume they can be fought and just calc partial data
+
+         const dataToCrunch = [];
+         //this table is too hard to make DRY with above since this uses the form
+         const tablesToSearch = [
+            {section: 'General', table: 'Kill', rewardCount: 4},
+            {section: 'General', table: 'Hunt', rewardCount: 4},
+            //quest table added below
+            {
+               section: 'Investigation',
+               table: 'Bronze',
+               rewardCount: Number.parseInt(cache.dom.bronzeReward.value)
+            },
+            {
+               section: 'Investigation',
+               table: 'Silver',
+               rewardCount: Number.parseInt(cache.dom.silverReward.value)
+            },
+            {
+               section: 'Investigation',
+               table: 'Gold',
+               rewardCount: Number.parseInt(cache.dom.goldReward.value)
+            },
+            {
+               section: 'Investigation',
+               table: 'Purple',
+               rewardCount: Number.parseInt(cache.dom.purpleReward.value)
+            }
+         ];
+
+         //can't cache break/sever since they are dynamically created/destroyed
+         document.querySelectorAll('input[type="checkbox"]').forEach(checkElement =>
+         {
+            if(checkElement.checked)
+            {
+               if('sever-tail' === checkElement.id)
+               {
+                  tablesToSearch.push({
+                     section: 'Sever',
+                     table: 'tail',
+                     rewardCount: 1
+                  });
+               }
+               else
+               {
+                  //this handles break tail as well
+                  tablesToSearch.push({
+                     section: 'Break',
+                     table: checkElement.value,
+                     rewardCount: 1
+                  });
+               }
+            }
+         });
+
+         tablesToSearch.forEach(tableStructure =>
+         {
+            //Investigations can be 0. table is only missing for the Leshens and partial data
+            if(0 !== tableStructure.rewardCount && monsterData[monsterName][rank][tableStructure.section][tableStructure.table])
+            {
+               const materialData = monsterData[monsterName][rank][tableStructure.section][tableStructure.table]
+               .find(monsterTable => material === monsterTable.material);
+               if(materialData) dataToCrunch.push({
+                  tableCount: tableStructure.rewardCount,
+                  itemCount: materialData.itemCount,
+                  probability: materialData.probability
+               });
+            }
+         });
+
+         const questItemCount = Number.parseInt(cache.dom.questItemCount.value);
+         const questPercent = Number.parseInt(cache.dom.questPercent.value);
+         if(0 !== questItemCount && 0 !== questPercent)
+         {
+            dataToCrunch.push({tableCount: 3, itemCount: questItemCount, probability: questPercent / 100});
+         }
+
+         if(0 === dataToCrunch.length)
+         {
+            alert(`"${material}" can't be obtained from ${monsterName} at ${rank} with this form data.`);
+            return;
+         }
+
+         crunchData(dataToCrunch, Number.parseInt(cache.dom.huntCount.value));
+      }
+
+      //TODO: verify results via simulation (input small numbers) and write unit tests
+      function crunchData(data, completeCount)
+      {
+         if(0 === data.length) alert('No data');  //unreachable through form
+         const eachTable = [];
+         for(let tableIndex = 0; tableIndex < data.length; ++tableIndex)
+         {
+            const thisTable = Combination.binomialDistribution(data[tableIndex].tableCount, data[tableIndex].probability);
+            for(let outcomeIndex = 0; outcomeIndex < thisTable.length; ++outcomeIndex)
+            {
+               //convert number of times got reward to number of items
+               thisTable[outcomeIndex].result *= data[tableIndex].itemCount;
+            }
+            eachTable.push(thisTable);
+         }
+
+         const everyHuntOutcome = calcEveryHuntOutcome(eachTable);
+         let finalResults = everyHuntOutcome;
+         if(1 !== completeCount)
+         {
+            const huntCartesianHolder = [];
+            for(let completeIndex = 1; completeIndex <= completeCount; ++completeIndex)
+            {
+               huntCartesianHolder.push(everyHuntOutcome.copy());
+            }
+            finalResults = calcEveryHuntOutcome(huntCartesianHolder);
+         }
+
+         let out = '<b>Monster material</b> ';
+         const aggregate = Statistics.calculateAggregates(finalResults);
+         out += GenerateHtml.aggregates(aggregate);
+         out += GenerateHtml.statistics(finalResults, '>='); //default col
+         out = out.replace('<th>Roll</th>', '<th>Count</th>');  //easier to just edit than some new arg etc
+         cache.dom.graphResults.innerHTML = out;
+
+         function calcEveryHuntOutcome(eachTable)
+         {
+            if(1 === eachTable.length) return eachTable[0];  //if there's only 1 table then this already is every outcome
+            /*
+             * eachTable[0].length ^ eachTable.length == huntCartesianProduct.length
+             * magic number based on testing
+             * max: Math.log(16777216) / Math.log(eachTable[0].length)
+             * however 5 completeCount won't hit this and 5+ is unrealistic
+             */
+            const huntCartesianProduct = Combination.cartesianProduct(eachTable);
+            const everyHuntOutcomeObj = {};
+            for(let productIndex = 0; productIndex < huntCartesianProduct.length; ++productIndex)
+            {
+               let thisResult = 0;
+               let thisProbability = 1;
+               for(let resultIndex = 0; resultIndex < huntCartesianProduct[productIndex].length; ++resultIndex)
+               {
+                  thisResult += huntCartesianProduct[productIndex][resultIndex].result;
+                  thisProbability *= huntCartesianProduct[productIndex][resultIndex].probability;
+               }
+               if(everyHuntOutcomeObj[thisResult] === undefined) everyHuntOutcomeObj[thisResult] = 0;
+               everyHuntOutcomeObj[thisResult] += thisProbability;
+            }
+            const everyHuntOutcome = [];
+            for(let resultProp in everyHuntOutcomeObj)
+            {
+               if(everyHuntOutcomeObj.hasOwnProperty(resultProp))
+               {
+                  everyHuntOutcome.push({result: Number.parseInt(resultProp), probability: everyHuntOutcomeObj[resultProp]});
+               }
+            }
+            return everyHuntOutcome;
+         }
+      }
+   </script>
+</head>
+<body>
+<form action="javascript:readForm();" onchange="cache.dom.graphResults.innerHTML = ''">
+   <br />
+   <label>Hunt at: <select id="huntRank" onchange="makeMonsterAutoComplete()">
+      <option>Low Rank</option>
+      <option>High Rank</option>
+      <option>Master Rank</option>
+   </select></label><br />
+
+   <label>Monster to hunt:<input type="text" id="monster" value="Rathalos" onchange="makeMaterialAutoComplete()" /></label>
+   <label>Material desired:<input type="text" id="material" value="Rathalos Scale" onchange="updateMaterialLocation()" /></label><br />
+
+   <h2>Breaking parts</h2>
+   <div id="breakingSection"></div>
+
+   <h2><span title="Quest Rewards" class="hoverInfo">Quest</span></h2>
+   <label>Material per reward slot <input type="number" min="1" value="1" max="5" id="questItemCount" /></label>
+   <label>Chance <input type="number" min="0" max="100" value="0" id="questPercent" />%</label><br />
+
+   <h2>Investigation reward slots</h2>
+   <table>
+      <tbody>
+      <tr>
+         <th><label for="bronzeReward" style="color: #993D00">Bronze</label></th>
+         <th><label for="silverReward">Silver</label></th>
+         <th><label for="goldReward" style="color: #E6E600">Gold</label></th>
+         <th><label for="purpleReward" style="color: #8000FF">Purple</label></th>
+      </tr>
+      <tr>
+         <td><input type="number" min="0" max="5" value="0" id="bronzeReward" /></td>
+         <td><input type="number" min="0" max="5" value="0" id="silverReward" /></td>
+         <td><input type="number" min="0" max="5" value="0" id="goldReward" /></td>
+         <td><input type="number" min="0" max="5" value="0" id="purpleReward" /></td>
+      </tr>
+      <tr style="text-align: center">
+         <td><span id="bronzeRewardCount"></span></td>
+         <td><span id="silverRewardCount"></span></td>
+         <td><span id="goldRewardCount"></span></td>
+         <td><span id="purpleRewardCount"></span></td>
+      </tr>
+      </tbody>
+   </table>
+   <br />
+
+   <label>Number of times you do will this hunt: <input type="number" min="1" value="1" max="5" id="huntCount" /></label><br />
+
+   <input type="submit" value="Calculate" />
+</form>
+<br />
+<div id="graphResults"></div>
+<div>
+   <p>If you need a specific rare material in Monster Hunter World then input the stats of hunting a single monster and this will output the
+      probability of each possible number of material you'll get.
+      This programs calculates as much as possible and is pessimistic about the rest so that your actual odds should be better than
+      reported.
+      This uses a DB that was scraped from <a href="https://mhworld.kiranico.com/">https://mhworld.kiranico.com/</a>.
+      Text with red underline will show the name of the table from <a href="https://mhworld.kiranico.com/">kiranico</a> when you hover over
+      it.
+      First of all some unofficial terminology: a reward slot is a single square on the results page after a hunt. Each reward slot
+      generally has 1
+      material but it can have more than 1.</p>
+   <p><span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span> are
+      always identical tables the only difference is that you can always carve a dead monster 4 times, each of which puts in your box
+      the equivalent of a reward slot (it won't be on the results page), but capturing will give 4 or 5 reward slots.
+      However since I don't know the criteria/formula for when you would get 5 this calculator assumes you get 4 and
+      thus they are completely identical which is why there's no input to indicate if the monster was captured.
+      <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> you get whether you kill or capture and is 4-8 reward slots however I once
+      again don't know the criteria/formula so this assumes 4. An expedition would give 3-4 reward slots from the
+      <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> table but this calculator assumes you aren't doing an expedition.
+      <span title="Carves: Carves" class="hoverInfo">Carve</span>/<span title="Rewards: Capture" class="hoverInfo">Capture</span> and
+      <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> are based on the large monster (I don't know how expeditions or multiple
+      large
+      monsters are calculated) and those tables are scraped from the large monster's page
+      (and thus are covered by the name and material inputs).
+      <span title="Quest Rewards" class="hoverInfo">Quest</span> is specific to the quest taken and this info can be found on
+      <a href="https://mhworld.kiranico.com/quests">kiranico</a> as well.
+      <span title="Quest Rewards" class="hoverInfo">Quest</span> will give 4-8 reward slots but the first
+      <span title="Quest Rewards" class="hoverInfo">Quest</span> reward slot is always 100%
+      (and thus doesn't need to be calculated) thus this calculator assumes 3.
+      You may input the info for <span title="Quest Rewards" class="hoverInfo">Quest</span> above however it's unlikely to have the desired
+      material.
+      Investigations do in fact have <span title="Quest Rewards" class="hoverInfo">Quest</span>
+      rewards which can be found <a href="https://game8.co/games/Monster-Hunter-World/archives/306257#hm_4">here</a>.
+      You'll notice that (beside the 100%) they don't have percentages listed but this is the only place I could find the info.</p>
+   <p>After a hunt the "Quest completion rewards" will have the rewards from both <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
+      and <span title="Quest Rewards" class="hoverInfo">Quest</span> the only way to tell them apart is that the
+      <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
+      rewards are first then the 100% <span title="Quest Rewards" class="hoverInfo">Quest</span> reward then the rest of the
+      <span title="Quest Rewards" class="hoverInfo">Quest</span> rewards. The "Quest completion rewards" can hold a
+      maximum of 20 reward slots (each might have multiple copies of the material) which is enough room for the max 16 slots for single
+      monster hunts. The box below it "Bonus rewards" has 20 slots for materials from breaking monster parts then for Capture rewards (they
+      will be labeled). After that are the Investigation slots (max of 5?) then the 20 Palico slots and 20 Tailraider slots
+      (10 gathered and 10 stolen each).</p>
+   <p>Some monster breaks involve multiple body parts, such as having 2 wings. In that case each wing has it's own HP but both wings
+      need to be broken to receive the reward slot for the break (for "Break Rathalos's wings") therefore you can only get 1 reward slot
+      per break table per monster. This
+      is why the input for breaking is a checkbox instead of asking how many times. There is a partial exception for
+      <a href="https://mhworld.kiranico.com/monsters/aYaUV/nergigante">Nergigante</a> and
+      <a href="https://mhworld.kiranico.com/monsters/oAnim/ruiner-nergigante">Ruiner Nergigante</a> who have "break horn" and "break horns"
+      as separate tables for breaking 1 horn then both horns.
+      <a href="https://mhworld.kiranico.com/monsters/oAnim/ruiner-nergigante">Ruiner Nergigante</a>
+      also has separate tables for each front leg and each wing these cases are covered by having separate checkboxes
+      (in this case 8 of them).</p>
+   <p><a href="https://mhworld.kiranico.com/">Kiranico</a> also has info on Tailraider Safari, Bandit Mantle, Plunderblade,
+      Items Gathered by Palicoes, materials from Monster tracks, Dropped Material, Guiding lands, and basically everything you can think of.
+      The Dropped Material table is
+      what a monster may drop when they are toppled or have their body parts broken (the white items you have to pick up), which is not
+      to be confused with the tables for "Break Rathalos's head" etc which are Bonus rewards for breaking monster parts at the end
+      of a hunt. The calculator doesn't account for any of these except breaking and you should break as many parts are you can.</p>
+   <p><a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> is excluded for now because the page's data
+      is invalid: Carves master rank is missing, I don't know if it's ever possible to carve his corpse (so Carves: Carves should be N/A),
+      Carves: Dropped Material is obviously impossible (you can break parts but not run to his feet to get a white material drop),
+      Carves: Bandit Mantle is wrong since it lists non trade-in items, Carves: Plunderblade is impossible since your Palico won't help with
+      the magma cores, Carves: Items Gathered by Palicoes is wrong since it lists a Bandit Mantle material, master rank of Rewards and
+      Investigations are obviously wrong, Rewards: Capture Zorah Magdaros is probably impossible (ref:
+      <a href="https://mhworld.kiranico.com/quests/nXmB6/one-for-the-history-books">★4 One for the History Books</a>),
+      and Investigations doesn't apply to him at all (I think). Rewards: Break Zorah Magdaros's head, Rewards: Break Zorah Magdaros's chest,
+      and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle. In the future I
+      might
+      add special logic for handling Zorah Magdaros.</p>
+   <p>It turns out that all 71 (including Zorah Magdaros) large monster pages have some part of the data incorrect. The calculations
+      will run on partial data in order to give the best results possible. For duplicate tables I kept the first. For monsters that I know
+      aren't in Low Rank I ignored the LR column. If a non-LR rank column didn't include any of the 4 Investigations,
+      <span title="Carves: Carves" class="hoverInfo">Carve</span>, <span title="Rewards: Capture" class="hoverInfo">Capture</span>,
+      <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>, breaks, and sever tail then I ignored the rest of the column and assumed
+      that the monster can't be fought at that rank. If page said that a tail could be both severed and broken then I ignored the break.
+      If <span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span>
+      didn't match I kept <span title="Carves: Carves" class="hoverInfo">Carve</span>. Elder Dragons had
+      <span title="Rewards: Capture" class="hoverInfo">Capture</span> ignored since they can't be captured.
+      <a href="https://mhworld.kiranico.com/monsters/jJxin/kushala-daora">Kushala Daora</a> and
+      <a href="https://mhworld.kiranico.com/monsters/jGeS0/teostra">Teostra</a> don't have breakable forelimbs (tables ignored).
+      <a href="https://mhworld.kiranico.com/monsters/0kVsV/safi-jiiva">Safi'jiiva</a> Master Rank Rewards: Capture Safi'jiiva table
+      row Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match <span title="Carves: Carves" class="hoverInfo">Carve</span> and to
+      avoid duplication (I corrected this). <a href="https://mhworld.kiranico.com/monsters/N3vuk/ancient-leshen">Ancient Leshen</a> and
+      <a href="https://mhworld.kiranico.com/monsters/GmYh0/leshen">Leshen</a> don't have Investigations and are thus ignored
+      (Leshen HR Bronze was the only one that looked valid anyway).
+      <a href="https://mhworld.kiranico.com/monsters/aYaUV/nergigante">Nergigante</a> doesn't have LR rewards
+      (break might be possible but I can't confirm that) so I ignored that rank.</p>
+   <p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in
+      <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">★5 Redefining the "Power Couple"</a> since it's a 2
+      monster quest it makes me think I was cheated out of the 4 possible remaining reward slots.
+      Supposedly a Lucky Voucher will guarantee the max of 8 <span title="Quest Rewards" class="hoverInfo">Quest</span>
+      rewards, I can't disprove that since
+      I always get 8 when I have 0 faints and I usually don't faint. It is possible that the Lucky Voucher's description of
+      "to add bonus rewards" is only talking about doubling the money (and thus doesn't affect what I call "reward slots" at all).
+      Poogie does not affect the hunt at all (reward slots, material count, cash, or research points). Deal with it.
+      Although if Poogie likes you (any amount) then you can use him to find treasure which are materials that could be sold.</p>
+   <p>The armor skills Good Luck and Great Luck and the food skill Lucky Cat supposedly have a chance to increase the number of materials
+      (0-5 more) in a given reward slot but not
+      the number of reward slots used and thus don't affect the chances of getting "at least 1" of the material desired. It would
+      be very tedious to verify those skills since it would require doing a ton of hunts with the skill and comparing to the expected number
+      of each material. Armor skill Capture Master does the same thing but only if the monster is captured. The food skill Felyne Carver
+      (Hi)
+      on the other hand increases the number of times you can carve which would make
+      <span title="Carves: Carves" class="hoverInfo">Carve</span> be 4-5 reward slots making it the same as the 4-5 normally gotten from
+      capturing a monster. The details of all of these are unknown and thus not included but (unlike Poogie) aren't superstitious
+      so it is a good idea to have them.</p>
+</div>
+<br /><br /><br /><br />
+<script>
+   'use strict';
+   const cache = {dom: {}, jQuery: {}};
+
+   $(document).ready(() =>
+   {
+      cache.jQuery.monster = $('#monster');
+      cache.jQuery.material = $('#material');
+
+      cache.dom = {
+         huntRank: document.getElementById('huntRank'),
+         monster: cache.jQuery.monster[0],
+         material: cache.jQuery.material[0],
+         breakingSection: document.getElementById('breakingSection'),
+         questItemCount: document.getElementById('questItemCount'),
+         questPercent: document.getElementById('questPercent'),
+         bronzeReward: document.getElementById('bronzeReward'),
+         silverReward: document.getElementById('silverReward'),
+         goldReward: document.getElementById('goldReward'),
+         purpleReward: document.getElementById('purpleReward'),
+         graphResults: document.getElementById('graphResults'),
+         bronzeRewardCount: document.getElementById('bronzeRewardCount'),
+         silverRewardCount: document.getElementById('silverRewardCount'),
+         goldRewardCount: document.getElementById('goldRewardCount'),
+         purpleRewardCount: document.getElementById('purpleRewardCount'),
+         huntCount: document.getElementById('huntCount')
+      };
+      cache.dom.huntRank.focus();
+
+      makeMonsterAutoComplete();
+   });
+</script>
+</body>
+</html>

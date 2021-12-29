@@ -16,7 +16,7 @@ Combination.cartesianProduct = function(superArray)
    //so I could could count up in a number base which would be comparable complicated but easier to understand
 
    //TODO: validate cartesianProduct
-   if(1 === superArray.length) return superArray;
+   if(2 > superArray.length) return superArray;
    let results = firstCartesianProduct(superArray[0], superArray[1]);
    for(var i = 2; i < superArray.length; ++i)
    {
