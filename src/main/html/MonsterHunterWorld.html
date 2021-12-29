@@ -68,12 +68,12 @@
        * 8 if a monster can be fought at rank then it must have all tables I look for (including investigations) except tail/breaks
        * 9 There will not be duplicate tables (auto ignores the rest)
        * 10 a table's material count is never 0
-       * 11 a table will not have duplicate material of any count
+       * 11 a table will not have duplicate material of the same count. diff counts are fine
        * 12 monsters have the same breakable parts (including sever tail) at every rank
        * 13 every monster will have at least 1 break (excluding sever tail). if missing this is assumed partial data
        *
        * Ask data:
-       * 1 are there any tables with duplicate material of diff count?
+       * 1 are there any tables with duplicate material of diff count? Kulve Taroth HR Breaks
        * 2 are there any monsters who are MR only? looks like fatalis, safi-jiiva, silver-rathalos
        * 3 is each table highest % to least order? if not I could sort them for default material
        *
@@ -163,6 +163,7 @@
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Silver Rathalos', 'https://mhworld.kiranico.com/monsters/B0ktO/silver-rathalos')
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Ancient Leshen', 'https://mhworld.kiranico.com/monsters/N3vuk/ancient-leshen')
        * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Kulu-Ya-Ku', 'https://mhworld.kiranico.com/monsters/YQ1FE/kulu-ya-ku')
+       * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Kulve Taroth', 'https://mhworld.kiranico.com/monsters/5xbCn/kulve-taroth')
        */
       function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
       {
@@ -305,7 +306,7 @@
                      //all breaks including break tail is handled here
                      else if(thisPartName)
                      {
-                        if(['Teostra', 'Kushala Daora'].includes(monsterName) && 'forelimbs' === thisPartName)
+                        if(['Kushala Daora', 'Teostra'].includes(monsterName) && 'forelimbs' === thisPartName)
                         {
                            markBadData('Manual Correction: wrong breakable part', monsterName);
                            //ignore this table (not a real breakable part)
@@ -356,9 +357,9 @@
                         if(0 === materialCount)
                            console.error(`Assumption violation: ${monsterName} ${rankText} ` +
                               `${sectionText} > ${tableText} x0 material: ${material}`);
-                        if(undefined !== materialInTable[material])
+                        if(materialCount === materialInTable[material])
                            console.error(`Assumption violation: ${monsterName} ${rankText} ` +
-                              `${sectionText} > ${tableText} duplicate material: ${material} x${materialCount}`);
+                              `${sectionText} > ${tableText} duplicate material of same count: ${material} x${materialCount}`);
 
                         materialForRank[rankText][material] = true;
                         //store count for debugging since diff counts could be possible
@@ -545,7 +546,7 @@
          //Zorah is excluded
          if(70 !== Object.keys(monsterData).length)
             console.error(`Missing large monsters. Current length: `, Object.keys(monsterData).length);
-         verifyManualCorrection('wrong breakable part', ['Teostra', 'Kushala Daora']);
+         verifyManualCorrection('wrong breakable part', ['Kushala Daora', 'Teostra']);
          verifyManualCorrection('wrong material', ['Safi\'jiiva']);
          verifyManualCorrection('wrong Investigation', noInvestigations);
          verifyManualCorrection('no rewards at Low Rank', ['Nergigante']);
@@ -564,7 +565,7 @@
       function verifyManualCorrection(manualCorrectionName, expectedValue)
       {
          const badDataName = 'Manual Correction: ' + manualCorrectionName;
-         if(JSON.stringify(expectedValue) !== JSON.stringify(badData[badDataName]))
+         if(JSON.stringify(expectedValue.sort()) !== JSON.stringify(badData[badDataName].slice().sort()))
          {
             console.error(`Need to update: ${badDataName}. Current value: `, badData[badDataName]);
          }
@@ -636,7 +637,7 @@
          let breakingSectionHtml = '';
          Object.keys(monsterData[monsterName][rank].Break).forEach(partName =>
          {
-            const breakCount = formatMaterialLocation(monsterName, rank, 'Break', partName, material);
+            const breakCount = formatMaterialLocation(' ', monsterName, rank, 'Break', partName, material);
 
             //this handles some tail (break)
             breakingSectionHtml += `<label>Break ${partName}: <input type="checkbox" checked="checked" value="${partName}" /></label> ` +
@@ -645,7 +646,7 @@
          //Sever section is deleted if no tail. it can only have tail
          if(monsterData[monsterName][rank].Sever)
          {
-            const breakCount = formatMaterialLocation(monsterName, rank, 'Sever', 'tail', material);
+            const breakCount = formatMaterialLocation(' ', monsterName, rank, 'Sever', 'tail', material);
             breakingSectionHtml += `<label>Sever and carve tail: <input type="checkbox" checked="checked" ` +
                `id="sever-tail" value="tail" /></label> <span id="sever-tail-count">${breakCount}</span><br />`;
          }
@@ -654,12 +655,7 @@
          if('' === breakingSectionHtml)
             breakingSectionHtml = 'Part breaking info not found';
 
-         cache.dom.bronzeRewardCount.textContent = formatMaterialLocation(monsterName, rank, 'Investigation', 'Bronze', material);
-         cache.dom.silverRewardCount.textContent = formatMaterialLocation(monsterName, rank, 'Investigation', 'Silver', material);
-         cache.dom.goldRewardCount.textContent = formatMaterialLocation(monsterName, rank, 'Investigation', 'Gold', material);
-         //formatMaterialLocation handles missing LR Purple
-         cache.dom.purpleRewardCount.textContent = formatMaterialLocation(monsterName, rank, 'Investigation', 'Purple', material);
-
+         updateMaterialInvestigation(monsterName, rank, material);
          cache.dom.breakingSection.innerHTML = breakingSectionHtml;
       }
 
@@ -697,13 +693,30 @@
          return false;
       }
 
-      function formatMaterialLocation(monsterName, rank, section, table, material)
+      function formatMaterialLocation(separator, monsterName, rank, section, table, material)
       {
          //if table doesn't exist. this is possible for missing investigation data
          if(!monsterData[monsterName][rank][section][table]) return '-';
-         const materialInfo = monsterData[monsterName][rank][section][table].find(it => it.material === material);
-         if(!materialInfo) return '0%';
-         return `x${materialInfo.itemCount} ${materialInfo.probability * 100}%`;
+         const allMatchingMaterialInfo = monsterData[monsterName][rank][section][table].filter(it => it.material === material);
+         if(0 === allMatchingMaterialInfo.length) return '0%';
+
+         let output = '';
+         allMatchingMaterialInfo.forEach(materialInfo =>
+         {
+            output += `${separator}x${materialInfo.itemCount} ${(materialInfo.probability * 100).toFixed(0)}%`
+         });
+         //remove leading separator
+         return output.substring(separator.length);
+      }
+
+      function updateMaterialInvestigation(monsterName, rank, material)
+      {
+         //there are no Investigation tables that need a separator but br would look good
+         cache.dom.bronzeRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Bronze', material);
+         cache.dom.silverRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Silver', material);
+         cache.dom.goldRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Gold', material);
+         //formatMaterialLocation handles missing LR Purple
+         cache.dom.purpleRewardCount.innerHTML = formatMaterialLocation('<br />', monsterName, rank, 'Investigation', 'Purple', material);
       }
 
       function updateMaterialLocation()
@@ -717,12 +730,14 @@
             //this handles some tail (break)
             //can't cache break/sever since they are dynamically created/destroyed
             document.getElementById(`break-${partName}-count`).textContent =
-               formatMaterialLocation(monsterName, rank, 'Break', partName, material);
+               formatMaterialLocation(' ', monsterName, rank, 'Break', partName, material);
          });
          //Sever section is deleted if no tail. it can only have tail
          if(monsterData[monsterName][rank].Sever)
             document.getElementById(`sever-tail-count`).textContent =
-               formatMaterialLocation(monsterName, rank, 'Sever', 'tail', material);
+               formatMaterialLocation(' ', monsterName, rank, 'Sever', 'tail', material);
+
+         updateMaterialInvestigation(monsterName, rank, material);
       }
 
       function readForm()
