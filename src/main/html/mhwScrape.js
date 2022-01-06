@@ -2,15 +2,6 @@
 
 //these globals are valid data but only used when scraping
 
-/** Elder Dragons can't be captured. LR Kirin stood on the trap without it triggering.
- * Zorah is out and Nergigante so far is story only. Don't know if other Elder dragons have other issues but they can get normal and purple
- * Investigations. Currently this is only used to ignore capture table validation for which Zorah is ignored but he is in fact an ED and
- * definitely can't be captured normally. */
-const elderDragons = [
-   'Alatreon', 'Behemoth', 'Blackveil Vaal Hazak', 'Fatalis', 'Kirin', 'Kulve Taroth', 'Kushala Daora', 'Lunastra', 'Namielle',
-   'Nergigante', 'Ruiner Nergigante', 'Safi\'jiiva', 'Shara Ishvalda', 'Teostra', 'Vaal Hazak', 'Velkhana', 'Xeno\'jiiva',
-   'Zorah Magdaros'
-];
 const noInvestigations = ['Ancient Leshen', 'Leshen'];
 /** These are the only monsters that are possible for low rank. Kirin can get LR investigations in addition to the LR optional quest.
  * Nergigante and Zorah Magdaros are story only (no LR investigations). Zorah is ignored and Nergigante is excluded since you can't
@@ -19,13 +10,12 @@ const lowRankMonsters = [
    'Anjanath', 'Barroth', 'Diablos', 'Great Girros', 'Great Jagras', 'Jyuratodas', 'Kirin', 'Kulu-Ya-Ku', 'Legiana',
    'Odogaron', 'Paolumu', 'Pukei-Pukei', 'Rabodaan', 'Rathalos', 'Rathian', 'Tobi-Kadachi', 'Tzitzi-Ya-Ku', 'Zorah Magdaros'
 ];
-//I haven't finished HR yet so there'll be more on this list later. ignore for now
-/*
-const highRankMonsters = [
-   'Anjanath', 'Barroth', 'Great Girros', 'Jyuratodas', 'Kulu-Ya-Ku',
-   'Paolumu', 'Pukei-Pukei', 'Rabodaan', 'Rathian', 'Tobi-Kadachi', 'Tzitzi-Ya-Ku', 'Zorah Magdaros'
-];
-*/
+/** Add Nergigante since he has a normal HR fight. Kirin can be fought in a HR event and the rest of LR (including Zorah) has a HR optional quest.
+ * I haven't finished HR yet so there'll be more on this list later. ignore for now.
+ * need to look over all events (and arena?) to see the full HR list. MR is ice born only */
+const highRankMonsters = lowRankMonsters.concat([
+   'Pink Rathian', 'Lavasioth', 'Uragaan', 'Dodogama', 'Bazelgeuse', 'Black Diablos', 'Azure Rathalos', 'Devilijho', 'Nergigante',
+   'Vaal Hazak', 'Kushala Daora', 'Teostra', 'Xeno\'jiiva']);
 
 /** Builds monsterData via web scraping. It's faster than I expected but rarely if ever needs to be re-ran.
  *

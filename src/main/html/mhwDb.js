@@ -1,5 +1,15 @@
 'use strict';
 
+/** Elder Dragons can't be captured but have an extra carve (4). LR Kirin stood on the trap without it triggering.
+ * Zorah is ignored but he is in fact an ED and definitely can't be captured normally (he also can't be carved).
+ * Nergigante has a normal HR fight. Don't know if other Elder dragons have other issues but they can get normal and purple
+ * Investigations. This is used to determine number of rewards. Scrape also uses this to ignore capture table validation. */
+const elderDragons = [
+   'Alatreon', 'Behemoth', 'Blackveil Vaal Hazak', 'Fatalis', 'Kirin', 'Kulve Taroth', 'Kushala Daora', 'Lunastra', 'Namielle',
+   'Nergigante', 'Ruiner Nergigante', 'Safi\'jiiva', 'Shara Ishvalda', 'Teostra', 'Vaal Hazak', 'Velkhana', 'Xeno\'jiiva',
+   'Zorah Magdaros'
+];
+
 /** Sever is the only section that's deleted if empty. all empty sections are partial data.
  * Empty ranks are deleted (HR/MR would be partial data). */
 const monsterData = {

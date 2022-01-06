@@ -88,7 +88,7 @@
        * 6 Kushala Daora and Teostra don't have breakable forelimbs
        * 7 Safi'jiiva Master Rank Rewards > Capture Safi'jiiva Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match the Kill table
        * 8 Ancient Leshen/Leshen don't have Investigations and are thus ignored. Leshen HR Bronze was the only one that looked valid anyway
-       * 9 Nergigante doesn't have LR rewards. Break might be possible but I can't confirm that
+       * 9 Nergigante doesn't have LR rewards. He dropped a Monster Bone L which might also be true for breaks but I can't confirm that.
        *
        * Assumptions (don't affect calc):
        * 1 Bandit Mantle only gives trade-in items (pretty sure the game says this)
@@ -143,6 +143,19 @@
          const monsterName = cache.dom.monster.value.trim();
 
          cache.jQuery.material.autocomplete({source: []});
+
+         //can't be captured. this has to be before name/rank validation
+         if(elderDragons.includes(monsterName))
+         {
+            cache.dom.canCaptureSection.style.display = 'none';
+            cache.dom.noCaptureSection.style.display = '';
+         }
+         //leave dom.captured as it is but make sure it's enabled
+         else
+         {
+            cache.dom.canCaptureSection.style.display = '';
+            cache.dom.noCaptureSection.style.display = 'none';
+         }
 
          if(!validateMonsterName(monsterName, rank)) return;
 
@@ -203,7 +216,7 @@
          }
          else if('Nergigante' === monsterName && 'Low Rank' === rank)
          {
-            errorMessage = `Nergigante has no Low Rank rewards`;
+            errorMessage = `Nergigante has no Low Rank rewards (he only drops Monster Bone L when fought on Zorah Magdaros)`;
          }
          //below is to check if people ignored the auto complete
          else if(!monsterData[monsterName])
@@ -280,9 +293,15 @@
          //else assume they can be fought and just calc partial data
 
          const dataToCrunch = [];
+
+         /* normal carve 3, capture 4, elder carve 4
+          * kill/capture is the same table but DB only has kill. */
+         let killRewardCount = 3;
+         if(elderDragons.includes(monsterName) || cache.dom.captured.checked) killRewardCount = 4;
+
          //this table is too hard to make DRY with above since this uses the form
          const tablesToSearch = [
-            {section: 'General', table: 'Kill', rewardCount: 4},
+            {section: 'General', table: 'Kill', rewardCount: killRewardCount},
             {section: 'General', table: 'Hunt', rewardCount: 4},
             //quest table added below
             {
@@ -310,7 +329,8 @@
          //can't cache break/sever since they are dynamically created/destroyed
          document.querySelectorAll('input[type="checkbox"]').forEach(checkElement =>
          {
-            if(checkElement.checked)
+            //captured is the only checkbox that isn't part breaking
+            if(checkElement.checked && 'captured' !== checkElement.id)
             {
                if('sever-tail' === checkElement.id)
                {
@@ -445,6 +465,8 @@
 
    <label>Monster to hunt:<input type="text" id="monster" value="Rathalos" onchange="makeMaterialAutoComplete()" /></label>
    <label>Material desired:<input type="text" id="material" value="Rathalos Scale" onchange="updateMaterialLocation()" /></label><br />
+   <div id="canCaptureSection"><label>Captured? <input type="checkbox" checked="checked" id="captured" /></label></div>
+   <div id="noCaptureSection" style="display: none;">Elder Dragons can't be captured.</div>
 
    <h2>Breaking parts</h2>
    <div id="breakingSection"></div>
@@ -496,17 +518,16 @@
       generally has 1
       material but it can have more than 1.</p>
    <p><span title="Carves: Carves" class="hoverInfo">Carve</span> and <span title="Rewards: Capture" class="hoverInfo">Capture</span> are
-      always identical tables the only difference is that you can always carve a dead monster 4 times, each of which puts in your box
+      always identical tables the only difference is that you can always carve a dead monster 3 times, each of which puts in your box
       the equivalent of a reward slot (it won't be on the results page), but capturing will give 4 or 5 reward slots.
-      However since I don't know the criteria/formula for when you would get 5 this calculator assumes you get 4 and
-      thus they are completely identical which is why there's no input to indicate if the monster was captured.
+      However since I don't know the criteria/formula for when you would get 5 this calculator assumes you get 4.
       <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> you get whether you kill or capture and is 4-8 reward slots however I once
       again don't know the criteria/formula so this assumes 4. An expedition would give 3-4 reward slots from the
       <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> table but this calculator assumes you aren't doing an expedition.
       <span title="Carves: Carves" class="hoverInfo">Carve</span>/<span title="Rewards: Capture" class="hoverInfo">Capture</span> and
       <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> are based on the large monster (I don't know how expeditions or multiple
       large
-      monsters are calculated) and those tables are scraped from the large monster's page
+      monsters are calculated) and those tables were scraped from the large monster's page
       (and thus are covered by the name and material inputs).
       <span title="Quest Rewards" class="hoverInfo">Quest</span> is specific to the quest taken and this info can be found on
       <a href="https://mhworld.kiranico.com/quests">kiranico</a> as well.
@@ -518,6 +539,12 @@
       Investigations do in fact have <span title="Quest Rewards" class="hoverInfo">Quest</span>
       rewards which can be found <a href="https://game8.co/games/Monster-Hunter-World/archives/306257#hm_4">here</a>.
       You'll notice that (beside the 100%) they don't have percentages listed but this is the only place I could find the info.</p>
+   <p>Elder Dragons can't be captured (and thus <span title="Rewards: Capture" class="hoverInfo">Capture</span> is N/A)
+      but have an extra carve on <span title="Carves: Carves" class="hoverInfo">Carve</span> (4 times).
+      Tempered monsters and Elder Dragons have blue scout flies (instead of the typical green).
+      Here is the list of every Elder Dragon: Alatreon, Behemoth, Blackveil Vaal Hazak, Fatalis, Kirin, Kulve Taroth, Kushala Daora,
+      Lunastra, Namielle, Nergigante, Ruiner Nergigante, Safi'jiiva, Shara Ishvalda, Teostra, Vaal Hazak, Velkhana, Xeno'jiiva, Zorah
+      Magdaros.</p>
    <p>After a hunt the "Quest completion rewards" will have the rewards from both <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
       and <span title="Quest Rewards" class="hoverInfo">Quest</span> the only way to tell them apart is that the
       <span title="Rewards: Hunt" class="hoverInfo">Hunt</span>
@@ -545,16 +572,20 @@
       of a hunt. The calculator doesn't account for any of these except breaking and you should break as many parts are you can.</p>
    <p><a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> is excluded for now because the page's data
       is invalid: Carves master rank is missing, I don't know if it's ever possible to carve his corpse (so Carves: Carves should be N/A),
-      Carves: Dropped Material is obviously impossible (you can break parts but not run to his feet to get a white material drop),
       Carves: Bandit Mantle is wrong since it lists non trade-in items, Carves: Plunderblade is impossible since your Palico won't help with
       the magma cores, Carves: Items Gathered by Palicoes is wrong since it lists a Bandit Mantle material, master rank of Rewards and
       Investigations are obviously wrong, Rewards: Capture Zorah Magdaros is probably impossible (ref:
       <a href="https://mhworld.kiranico.com/quests/nXmB6/one-for-the-history-books">★4 One for the History Books</a>),
       and Investigations doesn't apply to him at all (I think). Rewards: Break Zorah Magdaros's head, Rewards: Break Zorah Magdaros's chest,
-      and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle. In the future I
-      might
-      add special logic for handling Zorah Magdaros.</p>
-   <p>It turns out that all 71 (including Zorah Magdaros) large monster pages have some part of the data incorrect. The calculations
+      and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle.
+      Carves: Dropped Material is actually possible since destroying a magma core drops a white material near it.
+      The limited time <a href="https://mhworld.kiranico.com/quests/6Ymy6/left-quite-the-impression">★6 Left Quite the Impression</a> is HR
+      (and has identical rewards to story only <a href="https://mhworld.kiranico.com/quests/AoRK6/a-colossal-task">★6 A Colossal Task</a>)
+      however <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> has the same material in LR and HR.
+      In the future I might add special logic for handling
+      <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a>.</p>
+   <p>It turns out that all 71 (including <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a>) large
+      monster pages have some part of the data incorrect. The calculations
       will run on partial data in order to give the best results possible. For duplicate tables I kept the first. For monsters that I know
       aren't in Low Rank I ignored the LR column. If a non-LR rank column didn't include any of the 4 Investigations,
       <span title="Carves: Carves" class="hoverInfo">Carve</span>, <span title="Rewards: Capture" class="hoverInfo">Capture</span>,
@@ -570,8 +601,11 @@
       avoid duplication (I corrected this). <a href="https://mhworld.kiranico.com/monsters/N3vuk/ancient-leshen">Ancient Leshen</a> and
       <a href="https://mhworld.kiranico.com/monsters/GmYh0/leshen">Leshen</a> don't have Investigations and are thus ignored
       (Leshen HR Bronze was the only one that looked valid anyway).
-      <a href="https://mhworld.kiranico.com/monsters/aYaUV/nergigante">Nergigante</a> doesn't have LR rewards
-      (break might be possible but I can't confirm that) so I ignored that rank.</p>
+      <a href="https://mhworld.kiranico.com/monsters/aYaUV/nergigante">Nergigante</a> doesn't have LR rewards because
+      whenever he is fought on <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a>
+      (the only way to fight him in LR) he will drop Monster Bone L instead of his material (even if the quest you are on is HR)
+      so I ignored his LR data since Carves: Dropped Material is the only valid table (I can't confirm if it's possible to break parts)
+      which isn't used by this calculator (even if the LR table was populated) so there's no data.</p>
    <p>Personal experience and rumors: I had all 20 "Quest completion rewards" filled in
       <a href="https://mhworld.kiranico.com/quests/naKbA/redefining-the-power-couple">★5 Redefining the "Power Couple"</a> since it's a 2
       monster quest it makes me think I was cheated out of the 4 possible remaining reward slots.
@@ -585,11 +619,11 @@
       (0-5 more) in a given reward slot but not
       the number of reward slots used and thus don't affect the chances of getting "at least 1" of the material desired. It would
       be very tedious to verify those skills since it would require doing a ton of hunts with the skill and comparing to the expected number
-      of each material. Armor skill Capture Master does the same thing but only if the monster is captured. The food skill Felyne Carver
-      (Hi)
-      on the other hand increases the number of times you can carve which would make
-      <span title="Carves: Carves" class="hoverInfo">Carve</span> be 4-5 reward slots making it the same as the 4-5 normally gotten from
-      capturing a monster. The details of all of these are unknown and thus not included but (unlike Poogie) aren't superstitious
+      of each material. Armor skill Capture Master does the same thing but only if the monster is captured.
+      The food skill Felyne Carver (Hi) on the other hand increases the number of times you can carve which would make
+      <span title="Carves: Carves" class="hoverInfo">Carve</span> be 4 reward slots (5 for Elder Dragons) making it the same as the
+      4-5 normally gotten from capturing a monster.
+      The details of all of these are unknown and thus not included but (unlike Poogie) aren't superstitious
       so it is a good idea to have them.</p>
 </div>
 <br /><br /><br /><br />
@@ -606,6 +640,9 @@
          huntRank: document.getElementById('huntRank'),
          monster: cache.jQuery.monster[0],
          material: cache.jQuery.material[0],
+         canCaptureSection: document.getElementById('canCaptureSection'),
+         captured: document.getElementById('captured'),
+         noCaptureSection: document.getElementById('noCaptureSection'),
          breakingSection: document.getElementById('breakingSection'),
          questItemCount: document.getElementById('questItemCount'),
          questPercent: document.getElementById('questPercent'),
