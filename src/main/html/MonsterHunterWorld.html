@@ -122,15 +122,13 @@
          //don't default these away so that user can see special message
          if(!['Nergigante', 'Zorah Magdaros'].includes(monsterName))
          {
-            //Defaults: LR Anjanath, HR/MR Acidic Glavenus (HR should be Ancient Leshen)
+            //Defaults: LR Anjanath, HR Ancient Leshen, MR Acidic Glavenus
             if(monsterData[monsterName] && !monsterData[monsterName][rank])
                alert(`${monsterName} can't be fought at ${rank}. Defaulting to ${monsterNamesInRank[0]} instead`);
 
             //if old monster doesn't exist or isn't in this rank then replace it with the first monster
             if(!monsterData[monsterName] || !monsterData[monsterName][rank])
-            {
                cache.dom.monster.value = monsterNamesInRank[0];
-            }
          }
 
          //autocomplete default monster (in case it changed)

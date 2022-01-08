@@ -11,22 +11,9 @@ const elderDragons = [
 ];
 
 /** Sever is the only section that's deleted if empty. all empty sections are partial data.
- * Empty ranks are deleted (HR/MR would be partial data). */
+ * Empty ranks are deleted. */
 const monsterData = {
    "Acidic Glavenus": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -93,8 +80,7 @@ const monsterData = {
          },
          "material": [
             "Acidic Glavenus Cortex", "Acidic Glavenus Hardfang", "Acidic Glavenus Shard", "Acidic Glavenus Spineshell",
-            "Acidic Glavenus Tailedge", "Ancient Feystone", "Carved Feystone", "Glavenus Mantle", "Honed Acidcryst",
-            "Sealed Feystone"]
+            "Acidic Glavenus Tailedge", "Ancient Feystone", "Carved Feystone", "Glavenus Mantle", "Honed Acidcryst", "Sealed Feystone"]
       }
    },
    "Alatreon": {
@@ -132,8 +118,8 @@ const monsterData = {
          },
          "Investigation": {},
          "material": [
-            "Alatreon Diretail", "Alatreon Direwing", "Alatreon Mantle", "Alatreon Pallium", "Alatreon Riptalon",
-            "Azure Dragonsphire", "Skyswayer"]
+            "Alatreon Diretail", "Alatreon Direwing", "Alatreon Mantle", "Alatreon Pallium", "Alatreon Riptalon", "Azure Dragonsphire",
+            "Skyswayer"]
       }
    },
    "Ancient Leshen": {
@@ -155,8 +141,7 @@ const monsterData = {
                {"material": "Mutagen", "itemCount": 1, "probability": 0.07}]
          },
          "Investigation": {},
-         "material": [
-            "Ancient Cursed Bone", "Ancient Leshen Antlers", "Ancient Leshen Claw", "Leshen Resin", "Monster Bone L", "Mutagen"]
+         "material": ["Ancient Cursed Bone", "Ancient Leshen Antlers", "Ancient Leshen Claw", "Leshen Resin", "Monster Bone L", "Mutagen"]
       }
    },
    "Anjanath": {
@@ -284,9 +269,8 @@ const monsterData = {
                {"material": "Anjanath Plate", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Anjanath Fang+", "Anjanath Gem", "Anjanath Nosebone+", "Anjanath Pelt+", "Anjanath Plate", "Anjanath Scale+",
-            "Anjanath Tail", "Glowing Feystone", "Inferno Sac", "Monster Keenbone", "Mysterious Feystone", "Warped Feystone",
-            "Worn Feystone"]
+            "Anjanath Fang+", "Anjanath Gem", "Anjanath Nosebone+", "Anjanath Pelt+", "Anjanath Plate", "Anjanath Scale+", "Anjanath Tail",
+            "Glowing Feystone", "Inferno Sac", "Monster Keenbone", "Mysterious Feystone", "Warped Feystone", "Worn Feystone"]
       },
       "Master Rank": {
          "General": {
@@ -346,8 +330,8 @@ const monsterData = {
                {"material": "Anjanath Gem", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Ancient Feystone", "Anjanath Fur", "Anjanath Gem", "Anjanath Hardfang", "Anjanath Lash", "Anjanath Mantle",
-            "Anjanath Shard", "Carved Feystone", "Conflagrant Sac", "Heavy Anjanath Nosebone"]
+            "Ancient Feystone", "Anjanath Fur", "Anjanath Gem", "Anjanath Hardfang", "Anjanath Lash", "Anjanath Mantle", "Anjanath Shard",
+            "Carved Feystone", "Conflagrant Sac", "Heavy Anjanath Nosebone"]
       }
    },
    "Azure Rathalos": {
@@ -503,18 +487,6 @@ const monsterData = {
       }
    },
    "Banbaro": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Mysterious Feystone", "itemCount": 1, "probability": 0.55},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.25},
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.15},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Glowing Feystone", "Mysterious Feystone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -566,24 +538,11 @@ const monsterData = {
                {"material": "Large Wyvern Gem", "itemCount": 1, "probability": 0.02}]
          },
          "material": [
-            "Ancient Feystone", "Banbaro Chine", "Banbaro Cortex", "Banbaro Great Horn", "Banbaro Lash", "Carved Feystone",
-            "Dash Extract", "Large Wyvern Gem"]
+            "Ancient Feystone", "Banbaro Chine", "Banbaro Cortex", "Banbaro Great Horn", "Banbaro Lash", "Carved Feystone", "Dash Extract",
+            "Large Wyvern Gem"]
       }
    },
    "Barioth": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -698,8 +657,7 @@ const monsterData = {
                {"material": "Monster Bone M", "itemCount": 1, "probability": 0.13},
                {"material": "Barroth Scalp", "itemCount": 1, "probability": 0.09}]
          },
-         "material": [
-            "Barroth Claw", "Barroth Ridge", "Barroth Scalp", "Barroth Shell", "Barroth Tail", "Fertile Mud", "Monster Bone M"]
+         "material": ["Barroth Claw", "Barroth Ridge", "Barroth Scalp", "Barroth Shell", "Barroth Tail", "Fertile Mud", "Monster Bone M"]
       },
       "High Rank": {
          "General": {
@@ -815,8 +773,8 @@ const monsterData = {
                {"material": "Large Wyvern Gem", "itemCount": 1, "probability": 0.02}]
          },
          "material": [
-            "Ancient Feystone", "Barroth Chine", "Barroth Cortex", "Barroth Crown", "Barroth Hardclaw", "Barroth Lash",
-            "Carved Feystone", "Large Wyvern Gem", "Rich Mud", "Wyvern Gem"]
+            "Ancient Feystone", "Barroth Chine", "Barroth Cortex", "Barroth Crown", "Barroth Hardclaw", "Barroth Lash", "Carved Feystone",
+            "Large Wyvern Gem", "Rich Mud", "Wyvern Gem"]
       }
    },
    "Bazelgeuse": {
@@ -891,8 +849,8 @@ const monsterData = {
          },
          "material": [
             "Bazelgeuse Carapace", "Bazelgeuse Fuse", "Bazelgeuse Gem", "Bazelgeuse Scale+", "Bazelgeuse Tail", "Bazelgeuse Talon",
-            "Bazelgeuse Wing", "Glowing Feystone", "Monster Hardbone", "Shining Streamstone", "Sullied Streamstone",
-            "Warped Feystone", "Worn Feystone"]
+            "Bazelgeuse Wing", "Glowing Feystone", "Monster Hardbone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone",
+            "Worn Feystone"]
       },
       "Master Rank": {
          "General": {"Hunt": [{"material": "Monster Bone L", "itemCount": 1, "probability": 1}]},
@@ -978,18 +936,6 @@ const monsterData = {
       }
    },
    "Beotodus": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Mysterious Feystone", "itemCount": 1, "probability": 0.55},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.25},
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.15},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Glowing Feystone", "Mysterious Feystone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -1179,24 +1125,11 @@ const monsterData = {
                {"material": "Diablos Hardhorn", "itemCount": 1, "probability": 0.02}]
          },
          "material": [
-            "Ancient Feystone", "Black Diablos Chine", "Black Diablos Cortex", "Blackcurl Stouthorn", "Blos Medulla",
-            "Carved Feystone", "Dash Extract", "Diablos Hardhorn", "Diablos Tailcase+", "Large Wyvern Gem", "Sealed Feystone",
-            "Wyvern Gem"]
+            "Ancient Feystone", "Black Diablos Chine", "Black Diablos Cortex", "Blackcurl Stouthorn", "Blos Medulla", "Carved Feystone",
+            "Dash Extract", "Diablos Hardhorn", "Diablos Tailcase+", "Large Wyvern Gem", "Sealed Feystone", "Wyvern Gem"]
       }
    },
    "Blackveil Vaal Hazak": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -1265,24 +1198,11 @@ const monsterData = {
          },
          "material": [
             "Carved Feystone", "Deathweaver Membrane", "Deceased Shard", "Large Elder Dragon Bone", "Large Elder Dragon Gem",
-            "Pure Dragon Blood", "Sealed Feystone", "Shadowpierce Fang", "Vaal Hazak Cortex", "Vaal Hazak Fellwing",
-            "Vaal Hazak Flail", "Vaal Hazak Gem", "Vaal Hazak Hardclaw"]
+            "Pure Dragon Blood", "Sealed Feystone", "Shadowpierce Fang", "Vaal Hazak Cortex", "Vaal Hazak Fellwing", "Vaal Hazak Flail",
+            "Vaal Hazak Gem", "Vaal Hazak Hardclaw"]
       }
    },
    "Brachydios": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -1345,24 +1265,11 @@ const monsterData = {
                {"material": "Brachydios Lash", "itemCount": 1, "probability": 0.09}]
          },
          "material": [
-            "Ancient Feystone", "Brachydios Cortex", "Brachydios Crown", "Brachydios Lash", "Brachydios Pallium",
-            "Brachydios Pounder+", "Carved Feystone", "Fine Brachydios Ebonshell", "Glowing Slime", "Sealed Feystone"]
+            "Ancient Feystone", "Brachydios Cortex", "Brachydios Crown", "Brachydios Lash", "Brachydios Pallium", "Brachydios Pounder+",
+            "Carved Feystone", "Fine Brachydios Ebonshell", "Glowing Slime", "Sealed Feystone"]
       }
    },
    "Brute Tigrex": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -1427,18 +1334,6 @@ const monsterData = {
       }
    },
    "Coral Pukei-Pukei": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Mysterious Feystone", "itemCount": 1, "probability": 0.55},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.25},
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.15},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Glowing Feystone", "Mysterious Feystone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -1574,9 +1469,9 @@ const monsterData = {
                {"material": "Deviljho Tail", "itemCount": 1, "probability": 0.08}]
          },
          "material": [
-            "Deviljho Gem", "Deviljho Hide", "Deviljho Saliva", "Deviljho Scale", "Deviljho Scalp", "Deviljho Tail",
-            "Deviljho Tallfang", "Deviljho Talon", "Glowing Feystone", "Monster Hardbone", "Shining Streamstone",
-            "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
+            "Deviljho Gem", "Deviljho Hide", "Deviljho Saliva", "Deviljho Scale", "Deviljho Scalp", "Deviljho Tail", "Deviljho Tallfang",
+            "Deviljho Talon", "Glowing Feystone", "Monster Hardbone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone",
+            "Worn Feystone"]
       },
       "Master Rank": {
          "General": {
@@ -1646,8 +1541,8 @@ const monsterData = {
                {"material": "Deviljho Tail", "itemCount": 1, "probability": 0.08}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Deviljho Gem", "Deviljho Hide", "Deviljho Saliva", "Deviljho Scale",
-            "Deviljho Scalp", "Deviljho Tail", "Deviljho Tallfang", "Deviljho Talon", "Monster Hardbone", "Sealed Feystone"]
+            "Ancient Feystone", "Carved Feystone", "Deviljho Gem", "Deviljho Hide", "Deviljho Saliva", "Deviljho Scale", "Deviljho Scalp",
+            "Deviljho Tail", "Deviljho Tallfang", "Deviljho Talon", "Monster Hardbone", "Sealed Feystone"]
       }
    },
    "Diablos": {
@@ -1773,9 +1668,9 @@ const monsterData = {
                {"material": "Wyvern Gem", "itemCount": 1, "probability": 0.01}]
          },
          "material": [
-            "Blos Medulla", "Dash Extract", "Diablos Carapace", "Diablos Fang", "Diablos Ridge+", "Diablos Tailcase",
-            "Glowing Feystone", "Majestic Horn", "Monster Hardbone", "Shining Streamstone", "Sullied Streamstone", "Twisted Horn",
-            "Warped Feystone", "Worn Feystone", "Wyvern Gem"]
+            "Blos Medulla", "Dash Extract", "Diablos Carapace", "Diablos Fang", "Diablos Ridge+", "Diablos Tailcase", "Glowing Feystone",
+            "Majestic Horn", "Monster Hardbone", "Shining Streamstone", "Sullied Streamstone", "Twisted Horn", "Warped Feystone",
+            "Worn Feystone", "Wyvern Gem"]
       },
       "Master Rank": {
          "General": {
@@ -1838,8 +1733,8 @@ const monsterData = {
                {"material": "Large Wyvern Gem", "itemCount": 1, "probability": 0.01}]
          },
          "material": [
-            "Ancient Feystone", "Blos Medulla", "Carved Feystone", "Dash Extract", "Diablos Chine", "Diablos Cortex",
-            "Diablos Hardhorn", "Diablos Tailcase+", "Large Wyvern Gem", "Sealed Feystone", "Twisted Stouthorn", "Wyvern Gem"]
+            "Ancient Feystone", "Blos Medulla", "Carved Feystone", "Dash Extract", "Diablos Chine", "Diablos Cortex", "Diablos Hardhorn",
+            "Diablos Tailcase+", "Large Wyvern Gem", "Sealed Feystone", "Twisted Stouthorn", "Wyvern Gem"]
       }
    },
    "Dodogama": {
@@ -1945,19 +1840,6 @@ const monsterData = {
       }
    },
    "Ebony Odogaron": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -2081,19 +1963,6 @@ const monsterData = {
       }
    },
    "Fulgur Anjanath": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -2214,19 +2083,6 @@ const monsterData = {
       }
    },
    "Glavenus": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -2297,18 +2153,6 @@ const monsterData = {
       }
    },
    "Gold Rathian": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -2434,8 +2278,8 @@ const monsterData = {
                {"material": "Great Girros Hood", "itemCount": 1, "probability": 0.09}]
          },
          "material": [
-            "Great Girros Fang", "Great Girros Hide", "Great Girros Hood", "Great Girros Scale", "Great Girros Tail",
-            "Monster Bone L", "Paralysis Sac"]
+            "Great Girros Fang", "Great Girros Hide", "Great Girros Hood", "Great Girros Scale", "Great Girros Tail", "Monster Bone L",
+            "Paralysis Sac"]
       },
       "High Rank": {
          "General": {
@@ -2490,8 +2334,8 @@ const monsterData = {
                {"material": "Great Girros Hood+", "itemCount": 1, "probability": 0.09}]
          },
          "material": [
-            "Great Girros Fang+", "Great Girros Hide+", "Great Girros Hood+", "Great Girros Scale+", "Great Girros Tail",
-            "Monster Bone+", "Omniplegia Sac"]
+            "Great Girros Fang+", "Great Girros Hide+", "Great Girros Hood+", "Great Girros Scale+", "Great Girros Tail", "Monster Bone+",
+            "Omniplegia Sac"]
       },
       "Master Rank": {
          "General": {
@@ -2588,8 +2432,7 @@ const monsterData = {
                {"material": "Monster Bone S", "itemCount": 2, "probability": 0.1},
                {"material": "Great Jagras Claw", "itemCount": 1, "probability": 0.09}]
          },
-         "material": [
-            "Great Jagras Claw", "Great Jagras Hide", "Great Jagras Mane", "Great Jagras Scale", "Iron Ore", "Monster Bone S"]
+         "material": ["Great Jagras Claw", "Great Jagras Hide", "Great Jagras Mane", "Great Jagras Scale", "Iron Ore", "Monster Bone S"]
       },
       "High Rank": {
          "General": {
@@ -2669,11 +2512,52 @@ const monsterData = {
                {"material": "Great Jagras Mane+", "itemCount": 1, "probability": 0.16},
                {"material": "Great Jagras Hardclaw", "itemCount": 1, "probability": 0.09}]
          },
-         "material": [
-            "Great Jagras Hardclaw", "Great Jagras Mane+", "Great Jagras Shard", "Great Jagras Thickhide", "Monster Toughbone"]
+         "material": ["Great Jagras Hardclaw", "Great Jagras Mane+", "Great Jagras Shard", "Great Jagras Thickhide", "Monster Toughbone"]
       }
    },
    "Jyuratodus": {
+      "Low Rank": {
+         "General": {
+            "Kill": [
+               {"material": "Jyuratodus Scale", "itemCount": 1, "probability": 0.36},
+               {"material": "Jyuratodus Shell", "itemCount": 1, "probability": 0.28},
+               {"material": "Jyuratodus Fin", "itemCount": 1, "probability": 0.21},
+               {"material": "Jyuratodus Fang", "itemCount": 1, "probability": 0.15}],
+            "Hunt": [
+               {"material": "Jyuratodus Shell", "itemCount": 1, "probability": 0.27},
+               {"material": "Jyuratodus Scale", "itemCount": 1, "probability": 0.21},
+               {"material": "Aqua Sac", "itemCount": 1, "probability": 0.18},
+               {"material": "Jyuratodus Fang", "itemCount": 1, "probability": 0.15},
+               {"material": "Monster Bone M", "itemCount": 2, "probability": 0.1},
+               {"material": "Jyuratodus Fin", "itemCount": 1, "probability": 0.09}]
+         },
+         "Break": {
+            "head": [{"material": "Jyuratodus Fang", "itemCount": 1, "probability": 1}],
+            "back": [{"material": "Jyuratodus Fin", "itemCount": 1, "probability": 1}]
+         },
+         "Investigation": {
+            "Silver": [
+               {"material": "Jyuratodus Fang", "itemCount": 1, "probability": 0.32},
+               {"material": "Jyuratodus Fin", "itemCount": 1, "probability": 0.25},
+               {"material": "Jyuratodus Shell", "itemCount": 2, "probability": 0.18},
+               {"material": "Aqua Sac", "itemCount": 2, "probability": 0.14},
+               {"material": "Jyuratodus Scale", "itemCount": 2, "probability": 0.11}],
+            "Gold": [
+               {"material": "Jyuratodus Fang", "itemCount": 1, "probability": 0.36},
+               {"material": "Jyuratodus Fin", "itemCount": 1, "probability": 0.3},
+               {"material": "Jyuratodus Shell", "itemCount": 3, "probability": 0.14},
+               {"material": "Aqua Sac", "itemCount": 3, "probability": 0.12},
+               {"material": "Jyuratodus Scale", "itemCount": 3, "probability": 0.08}],
+            "Bronze": [
+               {"material": "Jyuratodus Shell", "itemCount": 1, "probability": 0.27},
+               {"material": "Jyuratodus Scale", "itemCount": 1, "probability": 0.21},
+               {"material": "Aqua Sac", "itemCount": 1, "probability": 0.18},
+               {"material": "Jyuratodus Fang", "itemCount": 1, "probability": 0.15},
+               {"material": "Monster Bone M", "itemCount": 2, "probability": 0.1},
+               {"material": "Jyuratodus Fin", "itemCount": 1, "probability": 0.09}]
+         },
+         "material": ["Aqua Sac", "Jyuratodus Fang", "Jyuratodus Fin", "Jyuratodus Scale", "Jyuratodus Shell", "Monster Bone M"]
+      },
       "High Rank": {
          "General": {
             "Kill": [
@@ -3001,8 +2885,7 @@ const monsterData = {
                {"material": "Kulu-Ya-Ku Beak+", "itemCount": 1, "probability": 0.11},
                {"material": "Bird Wyvern Gem", "itemCount": 1, "probability": 0.03}]
          },
-         "material": [
-            "Bird Wyvern Gem", "Kulu-Ya-Ku Beak+", "Kulu-Ya-Ku Hide+", "Kulu-Ya-Ku Plume+", "Kulu-Ya-Ku Scale+", "Monster Bone+"]
+         "material": ["Bird Wyvern Gem", "Kulu-Ya-Ku Beak+", "Kulu-Ya-Ku Hide+", "Kulu-Ya-Ku Plume+", "Kulu-Ya-Ku Scale+", "Monster Bone+"]
       },
       "Master Rank": {
          "General": {
@@ -3097,9 +2980,9 @@ const monsterData = {
                {"material": "Elder Dragon Blood", "itemCount": 3, "probability": 0.07}]
          },
          "material": [
-            "Dissolved Weapon", "Elder Dragon Blood", "Elder Dragon Bone", "Kulve Taroth Golden Glimstone",
-            "Kulve Taroth Golden Nugget", "Kulve Taroth Golden Scale", "Kulve Taroth Golden Shell", "Kulve Taroth Golden Spiralhorn",
-            "Kulve Taroth Golden Tailshell", "Monster Bone L"]
+            "Dissolved Weapon", "Elder Dragon Blood", "Elder Dragon Bone", "Kulve Taroth Golden Glimstone", "Kulve Taroth Golden Nugget",
+            "Kulve Taroth Golden Scale", "Kulve Taroth Golden Shell", "Kulve Taroth Golden Spiralhorn", "Kulve Taroth Golden Tailshell",
+            "Monster Bone L"]
       },
       "Master Rank": {
          "General": {
@@ -3210,8 +3093,7 @@ const monsterData = {
          },
          "material": [
             "Daora Carapace", "Daora Claw+", "Daora Dragon Scale+", "Daora Gem", "Daora Horn+", "Daora Tail", "Daora Webbing",
-            "Elder Dragon Blood", "Elder Dragon Bone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone",
-            "Worn Feystone"]
+            "Elder Dragon Blood", "Elder Dragon Bone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
       },
       "Master Rank": {
          "General": {
@@ -3524,8 +3406,8 @@ const monsterData = {
          },
          "material": [
             "Freezer Sac", "Glowing Feystone", "Legiana Claw+", "Legiana Gem", "Legiana Hide+", "Legiana Plate", "Legiana Scale+",
-            "Legiana Tail Webbing", "Legiana Wing", "Monster Hardbone", "Shining Streamstone", "Sullied Streamstone",
-            "Warped Feystone", "Worn Feystone"]
+            "Legiana Tail Webbing", "Legiana Wing", "Monster Hardbone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone",
+            "Worn Feystone"]
       },
       "Master Rank": {
          "General": {
@@ -3593,8 +3475,8 @@ const monsterData = {
                {"material": "Legiana Gem", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Cryo Sac", "Legiana Fellwing", "Legiana Gem", "Legiana Hardclaw",
-            "Legiana Mantle", "Legiana Shard", "Legiana Tail Webbing+", "Legiana Thickhide", "Sealed Feystone"]
+            "Ancient Feystone", "Carved Feystone", "Cryo Sac", "Legiana Fellwing", "Legiana Gem", "Legiana Hardclaw", "Legiana Mantle",
+            "Legiana Shard", "Legiana Tail Webbing+", "Legiana Thickhide", "Sealed Feystone"]
       }
    },
    "Leshen": {
@@ -3747,24 +3629,11 @@ const monsterData = {
                {"material": "Lunastra Gem", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Carved Feystone", "Large Elder Dragon Bone", "Large Elder Dragon Gem", "Lunastra Cortex", "Lunastra Fellwing",
-            "Lunastra Gem", "Lunastra Hardhorn", "Lunastra Lash", "Lunastra Mane+", "Lunastra Shard", "Pure Dragon Blood",
-            "Sealed Feystone"]
+            "Carved Feystone", "Large Elder Dragon Bone", "Large Elder Dragon Gem", "Lunastra Cortex", "Lunastra Fellwing", "Lunastra Gem",
+            "Lunastra Hardhorn", "Lunastra Lash", "Lunastra Mane+", "Lunastra Shard", "Pure Dragon Blood", "Sealed Feystone"]
       }
    },
    "Namielle": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -3833,19 +3702,6 @@ const monsterData = {
       }
    },
    "Nargacuga": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -3908,8 +3764,8 @@ const monsterData = {
                {"material": "Nargacuga Lash", "itemCount": 1, "probability": 0.09}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Nargacuga Blackfur+", "Nargacuga Cutwing+", "Nargacuga Hardfang",
-            "Nargacuga Lash", "Nargacuga Mantle", "Nargacuga Shard", "Nargacuga Tailspear", "Sealed Feystone"]
+            "Ancient Feystone", "Carved Feystone", "Nargacuga Blackfur+", "Nargacuga Cutwing+", "Nargacuga Hardfang", "Nargacuga Lash",
+            "Nargacuga Mantle", "Nargacuga Shard", "Nargacuga Tailspear", "Sealed Feystone"]
       }
    },
    "Nergigante": {
@@ -3975,9 +3831,9 @@ const monsterData = {
                {"material": "Elder Dragon Blood", "itemCount": 1, "probability": 0.08}]
          },
          "material": [
-            "Elder Dragon Blood", "Elder Dragon Bone", "Immortal Dragonscale", "Nergigante Carapace", "Nergigante Gem",
-            "Nergigante Horn+", "Nergigante Regrowth Plate", "Nergigante Tail", "Nergigante Talon", "Shining Streamstone",
-            "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
+            "Elder Dragon Blood", "Elder Dragon Bone", "Immortal Dragonscale", "Nergigante Carapace", "Nergigante Gem", "Nergigante Horn+",
+            "Nergigante Regrowth Plate", "Nergigante Tail", "Nergigante Talon", "Shining Streamstone", "Sullied Streamstone",
+            "Warped Feystone", "Worn Feystone"]
       },
       "Master Rank": {
          "General": {"Hunt": [{"material": "Monster Bone L", "itemCount": 1, "probability": 1}]},
@@ -3997,23 +3853,14 @@ const monsterData = {
       }
    },
    "Nightshade Paolumu": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Mysterious Feystone", "itemCount": 1, "probability": 0.55},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.25},
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.15},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Glowing Feystone", "Mysterious Feystone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
-               {"material": "Nightshade Paolumu Shard", "itemCount": 1, "probability": 0.32},
-               {"material": "Nightshade Paolumu Thickfur", "itemCount": 1, "probability": 0.26},
+               {
+                  "material": "Nightshade Paolumu Shard",
+                  "itemCount": 1,
+                  "probability": 0.32
+               }, {"material": "Nightshade Paolumu Thickfur", "itemCount": 1, "probability": 0.26},
                {"material": "Nightshade Paolumu Fellwing", "itemCount": 1, "probability": 0.2},
                {"material": "Paolumu Cortex", "itemCount": 1, "probability": 0.15},
                {"material": "Wyvern Gem", "itemCount": 1, "probability": 0.05},
@@ -4126,8 +3973,8 @@ const monsterData = {
                {"material": "Odogaron Plate", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Monster Bone+", "Nourishing Extract", "Odogaron Claw", "Odogaron Fang", "Odogaron Plate", "Odogaron Scale",
-            "Odogaron Sinew", "Odogaron Tail"]
+            "Monster Bone+", "Nourishing Extract", "Odogaron Claw", "Odogaron Fang", "Odogaron Plate", "Odogaron Scale", "Odogaron Sinew",
+            "Odogaron Tail"]
       },
       "High Rank": {
          "General": {
@@ -4700,9 +4547,8 @@ const monsterData = {
                {"material": "Bird Wyvern Gem", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Bird Wyvern Gem", "Glowing Feystone", "Monster Keenbone", "Mysterious Feystone", "Pukei-Pukei Carapace",
-            "Pukei-Pukei Sac+", "Pukei-Pukei Scale+", "Pukei-Pukei Tail", "Pukei-Pukei Wing", "Toxin Sac", "Warped Feystone",
-            "Worn Feystone"]
+            "Bird Wyvern Gem", "Glowing Feystone", "Monster Keenbone", "Mysterious Feystone", "Pukei-Pukei Carapace", "Pukei-Pukei Sac+",
+            "Pukei-Pukei Scale+", "Pukei-Pukei Tail", "Pukei-Pukei Wing", "Toxin Sac", "Warped Feystone", "Worn Feystone"]
       },
       "Master Rank": {
          "General": {
@@ -4764,11 +4610,69 @@ const monsterData = {
                {"material": "Fey Wyvern Gem", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Deadly Poison Sac", "Fey Wyvern Gem", "Large Pukei-Pukei Sac",
-            "Pukei-Pukei Cortex", "Pukei-Pukei Fellwing", "Pukei-Pukei Lash", "Pukei-Pukei Shard"]
+            "Ancient Feystone", "Carved Feystone", "Deadly Poison Sac", "Fey Wyvern Gem", "Large Pukei-Pukei Sac", "Pukei-Pukei Cortex",
+            "Pukei-Pukei Fellwing", "Pukei-Pukei Lash", "Pukei-Pukei Shard"]
       }
    },
    "Radobaan": {
+      "Low Rank": {
+         "General": {
+            "Kill": [
+               {"material": "Radobaan Scale", "itemCount": 1, "probability": 0.38},
+               {"material": "Radobaan Shell", "itemCount": 1, "probability": 0.28},
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.2},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.14}],
+            "Hunt": [
+               {"material": "Radobaan Shell", "itemCount": 1, "probability": 0.27},
+               {"material": "Radobaan Scale", "itemCount": 1, "probability": 0.21},
+               {"material": "Sleep Sac", "itemCount": 1, "probability": 0.18},
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.12},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.12},
+               {"material": "Monster Bone L", "itemCount": 2, "probability": 0.1}]
+         },
+         "Break": {
+            "head": [
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.7},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.3}],
+            "back": [
+               {"material": "Wyvern Bonemass", "itemCount": 2, "probability": 0.5},
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.35},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.15}],
+            "hindleg": [
+               {"material": "Wyvern Bonemass", "itemCount": 1, "probability": 0.7},
+               {"material": "Radobaan Scale", "itemCount": 1, "probability": 0.3}]
+         },
+         "Sever": {
+            "tail": [
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.72},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.28}]
+         },
+         "Investigation": {
+            "Silver": [
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.22},
+               {"material": "Radobaan Scale", "itemCount": 2, "probability": 0.18},
+               {"material": "Wyvern Bonemass", "itemCount": 1, "probability": 0.18},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.16},
+               {"material": "Radobaan Shell", "itemCount": 2, "probability": 0.14},
+               {"material": "Sleep Sac", "itemCount": 2, "probability": 0.12}],
+            "Gold": [
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.24},
+               {"material": "Wyvern Bonemass", "itemCount": 1, "probability": 0.22},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.2},
+               {"material": "Radobaan Shell", "itemCount": 3, "probability": 0.14},
+               {"material": "Sleep Sac", "itemCount": 3, "probability": 0.1},
+               {"material": "Radobaan Scale", "itemCount": 3, "probability": 0.1}],
+            "Bronze": [
+               {"material": "Radobaan Shell", "itemCount": 1, "probability": 0.27},
+               {"material": "Radobaan Scale", "itemCount": 1, "probability": 0.21},
+               {"material": "Sleep Sac", "itemCount": 1, "probability": 0.18},
+               {"material": "Radobaan Oilshell", "itemCount": 1, "probability": 0.12},
+               {"material": "Radobaan Marrow", "itemCount": 1, "probability": 0.12},
+               {"material": "Monster Bone L", "itemCount": 2, "probability": 0.1}]
+         },
+         "material": [
+            "Monster Bone L", "Radobaan Marrow", "Radobaan Oilshell", "Radobaan Scale", "Radobaan Shell", "Sleep Sac", "Wyvern Bonemass"]
+      },
       "High Rank": {
          "General": {
             "Kill": [
@@ -4913,11 +4817,8 @@ const monsterData = {
       "Master Rank": {
          "General": {
             "Kill": [
-               {
-                  "material": "Indestructible Ebonshell",
-                  "itemCount": 1,
-                  "probability": 0.36
-               }, {"material": "Flashpoint Slime", "itemCount": 1, "probability": 0.24},
+               {"material": "Indestructible Ebonshell", "itemCount": 1, "probability": 0.36},
+               {"material": "Flashpoint Slime", "itemCount": 1, "probability": 0.24},
                {"material": "Brach Obliterator", "itemCount": 1, "probability": 0.21},
                {"material": "Brach Warhead", "itemCount": 1, "probability": 0.14},
                {"material": "Immortal Reactor", "itemCount": 1, "probability": 0.05}],
@@ -4975,18 +4876,6 @@ const monsterData = {
       }
    },
    "Rajang": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -5411,8 +5300,7 @@ const monsterData = {
          },
          "material": [
             "Glowing Feystone", "Inferno Sac", "Monster Keenbone", "Mysterious Feystone", "Rath Wingtalon", "Rathian Carapace",
-            "Rathian Plate", "Rathian Ruby", "Rathian Scale+", "Rathian Spike+", "Rathian Webbing", "Warped Feystone",
-            "Worn Feystone"]
+            "Rathian Plate", "Rathian Ruby", "Rathian Scale+", "Rathian Spike+", "Rathian Webbing", "Warped Feystone", "Worn Feystone"]
       },
       "Master Rank": {
          "General": {
@@ -5481,23 +5369,11 @@ const monsterData = {
                {"material": "Rathian Ruby", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Conflagrant Sac", "Rath Wingtalon+", "Rathian Cortex", "Rathian Mantle",
-            "Rathian Ruby", "Rathian Shard", "Rathian Surspike", "Rathian Weave"]
+            "Ancient Feystone", "Carved Feystone", "Conflagrant Sac", "Rath Wingtalon+", "Rathian Cortex", "Rathian Mantle", "Rathian Ruby",
+            "Rathian Shard", "Rathian Surspike", "Rathian Weave"]
       }
    },
    "Ruiner Nergigante": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -5577,8 +5453,8 @@ const monsterData = {
          },
          "material": [
             "Annihilating Greathorn", "Carved Feystone", "Eternal Regrowth Plate", "Immortal Shard", "Large Elder Dragon Bone",
-            "Large Elder Dragon Gem", "Nergigante Cortex", "Nergigante Flail", "Nergigante Gem", "Nergigante Hardclaw",
-            "Pure Dragon Blood", "Sealed Feystone"]
+            "Large Elder Dragon Gem", "Nergigante Cortex", "Nergigante Flail", "Nergigante Gem", "Nergigante Hardclaw", "Pure Dragon Blood",
+            "Sealed Feystone"]
       }
    },
    "Safi'jiiva": {
@@ -5672,18 +5548,6 @@ const monsterData = {
       }
    },
    "Savage Deviljho": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -5750,24 +5614,11 @@ const monsterData = {
                {"material": "Deviljho Gem", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Black Blood", "Carved Feystone", "Deviljho Blackpiel", "Deviljho Crook", "Deviljho Flail", "Deviljho Gem",
-            "Deviljho Ripper", "Deviljho Shard", "Sealed Feystone", "Vile Fang"]
+            "Black Blood", "Carved Feystone", "Deviljho Blackpiel", "Deviljho Crook", "Deviljho Flail", "Deviljho Gem", "Deviljho Ripper",
+            "Deviljho Shard", "Sealed Feystone", "Vile Fang"]
       }
    },
    "Scarred Yian Garuga": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -5835,23 +5686,11 @@ const monsterData = {
                {"material": "Garuga Lash", "itemCount": 1, "probability": 0.08}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Fancy Beak", "Fey Wyvern Gem", "Garuga Auricle", "Garuga Cortex",
-            "Garuga Fellwing", "Garuga Lash", "Garuga Shard", "Garuga Silverpelt", "Scratched Shell", "Sealed Feystone"]
+            "Ancient Feystone", "Carved Feystone", "Fancy Beak", "Fey Wyvern Gem", "Garuga Auricle", "Garuga Cortex", "Garuga Fellwing",
+            "Garuga Lash", "Garuga Shard", "Garuga Silverpelt", "Scratched Shell", "Sealed Feystone"]
       }
    },
    "Seething Bazelgeuse": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -5929,11 +5768,8 @@ const monsterData = {
       "Master Rank": {
          "General": {
             "Kill": [
-               {
-                  "material": "Shara Ishvalda Tenderscale",
-                  "itemCount": 1,
-                  "probability": 0.33
-               }, {"material": "Shara Ishvalda Boulderplate", "itemCount": 1, "probability": 0.27},
+               {"material": "Shara Ishvalda Tenderscale", "itemCount": 1, "probability": 0.33},
+               {"material": "Shara Ishvalda Boulderplate", "itemCount": 1, "probability": 0.27},
                {"material": "Shara Ishvalda Petalstone", "itemCount": 1, "probability": 0.21},
                {"material": "Shara Ishvalda Tenderclaw", "itemCount": 1, "probability": 0.15},
                {"material": "Shara Ishvalda Gem", "itemCount": 1, "probability": 0.04}],
@@ -6001,19 +5837,6 @@ const monsterData = {
       }
    },
    "Shrieking Legiana": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -6081,18 +5904,6 @@ const monsterData = {
       }
    },
    "Silver Rathalos": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -6164,18 +5975,6 @@ const monsterData = {
       }
    },
    "Stygian Zinogre": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -6238,9 +6037,9 @@ const monsterData = {
                {"material": "Stygian Zinogre Hardhorn", "itemCount": 1, "probability": 0.09}]
          },
          "material": [
-            "Carved Feystone", "Dracophage Bug", "Purecrystal", "Sealed Feystone", "Stygian Zinogre Cortex",
-            "Stygian Zinogre Dragonhold", "Stygian Zinogre Dragonlocks", "Stygian Zinogre Hardclaw", "Stygian Zinogre Hardhorn",
-            "Stygian Zinogre Lash", "Stygian Zinogre Skymerald"]
+            "Carved Feystone", "Dracophage Bug", "Purecrystal", "Sealed Feystone", "Stygian Zinogre Cortex", "Stygian Zinogre Dragonhold",
+            "Stygian Zinogre Dragonlocks", "Stygian Zinogre Hardclaw", "Stygian Zinogre Hardhorn", "Stygian Zinogre Lash",
+            "Stygian Zinogre Skymerald"]
       }
    },
    "Teostra": {
@@ -6380,24 +6179,11 @@ const monsterData = {
          },
          "material": [
             "Carved Feystone", "Fire Dragon Hardclaw", "Hellfire Shard", "Large Elder Dragon Bone", "Large Elder Dragon Gem",
-            "Pure Dragon Blood", "Sealed Feystone", "Teostra Cortex", "Teostra Fellwing", "Teostra Gem", "Teostra Hardhorn",
-            "Teostra Lash", "Teostra Mane+"]
+            "Pure Dragon Blood", "Sealed Feystone", "Teostra Cortex", "Teostra Fellwing", "Teostra Gem", "Teostra Hardhorn", "Teostra Lash",
+            "Teostra Mane+"]
       }
    },
    "Tigrex": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -6512,8 +6298,8 @@ const monsterData = {
                {"material": "Tobi-Kadachi Claw", "itemCount": 1, "probability": 0.09}]
          },
          "material": [
-            "Electro Sac", "Monster Bone M", "Tobi-Kadachi Claw", "Tobi-Kadachi Electrode", "Tobi-Kadachi Membrane",
-            "Tobi-Kadachi Pelt", "Tobi-Kadachi Scale"]
+            "Electro Sac", "Monster Bone M", "Tobi-Kadachi Claw", "Tobi-Kadachi Electrode", "Tobi-Kadachi Membrane", "Tobi-Kadachi Pelt",
+            "Tobi-Kadachi Scale"]
       },
       "High Rank": {
          "General": {
@@ -6575,9 +6361,8 @@ const monsterData = {
                {"material": "Wyvern Gem", "itemCount": 1, "probability": 0.01}]
          },
          "material": [
-            "Glowing Feystone", "Monster Keenbone", "Mysterious Feystone", "Thunder Sac", "Tobi-Kadachi Claw+",
-            "Tobi-Kadachi Electrode+", "Tobi-Kadachi Membrane", "Tobi-Kadachi Pelt+", "Tobi-Kadachi Scale+", "Warped Feystone",
-            "Worn Feystone", "Wyvern Gem"]
+            "Glowing Feystone", "Monster Keenbone", "Mysterious Feystone", "Thunder Sac", "Tobi-Kadachi Claw+", "Tobi-Kadachi Electrode+",
+            "Tobi-Kadachi Membrane", "Tobi-Kadachi Pelt+", "Tobi-Kadachi Scale+", "Warped Feystone", "Worn Feystone", "Wyvern Gem"]
       },
       "Master Rank": {
          "General": {
@@ -6636,8 +6421,8 @@ const monsterData = {
                {"material": "Large Wyvern Gem", "itemCount": 1, "probability": 0.02}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Large Wyvern Gem", "Lightning Sac", "Tobi-Kadachi Cathode",
-            "Tobi-Kadachi Hardclaw", "Tobi-Kadachi Membrane+", "Tobi-Kadachi Shard", "Tobi-Kadachi Thickfur", "Wyvern Gem"]
+            "Ancient Feystone", "Carved Feystone", "Large Wyvern Gem", "Lightning Sac", "Tobi-Kadachi Cathode", "Tobi-Kadachi Hardclaw",
+            "Tobi-Kadachi Membrane+", "Tobi-Kadachi Shard", "Tobi-Kadachi Thickfur", "Wyvern Gem"]
       }
    },
    "Tzitzi-Ya-Ku": {
@@ -6679,8 +6464,7 @@ const monsterData = {
                {"material": "Tzitzi-Ya-Ku Photophore", "itemCount": 1, "probability": 0.09}]
          },
          "material": [
-            "Dash Extract", "Monster Bone L", "Tzitzi-Ya-Ku Claw", "Tzitzi-Ya-Ku Hide", "Tzitzi-Ya-Ku Photophore",
-            "Tzitzi-Ya-Ku Scale"]
+            "Dash Extract", "Monster Bone L", "Tzitzi-Ya-Ku Claw", "Tzitzi-Ya-Ku Hide", "Tzitzi-Ya-Ku Photophore", "Tzitzi-Ya-Ku Scale"]
       },
       "High Rank": {
          "General": {
@@ -6725,8 +6509,8 @@ const monsterData = {
                {"material": "Bird Wyvern Gem", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Bird Wyvern Gem", "Dash Extract", "Monster Bone+", "Tzitzi-Ya-Ku Claw+", "Tzitzi-Ya-Ku Hide+",
-            "Tzitzi-Ya-Ku Photophore+", "Tzitzi-Ya-Ku Scale+"]
+            "Bird Wyvern Gem", "Dash Extract", "Monster Bone+", "Tzitzi-Ya-Ku Claw+", "Tzitzi-Ya-Ku Hide+", "Tzitzi-Ya-Ku Photophore+",
+            "Tzitzi-Ya-Ku Scale+"]
       },
       "Master Rank": {
          "General": {
@@ -6840,8 +6624,8 @@ const monsterData = {
          },
          "material": [
             "Firecell Stone", "Glowing Feystone", "Inferno Sac", "Lava Nugget", "Monster Hardbone", "Shining Streamstone",
-            "Sullied Streamstone", "Uragaan Carapace", "Uragaan Jaw", "Uragaan Marrow", "Uragaan Ruby", "Uragaan Scale+",
-            "Uragaan Scute", "Warped Feystone", "Worn Feystone"]
+            "Sullied Streamstone", "Uragaan Carapace", "Uragaan Jaw", "Uragaan Marrow", "Uragaan Ruby", "Uragaan Scale+", "Uragaan Scute",
+            "Warped Feystone", "Worn Feystone"]
       },
       "Master Rank": {
          "General": {
@@ -6906,8 +6690,8 @@ const monsterData = {
                {"material": "Uragaan Ruby", "itemCount": 1, "probability": 0.03}]
          },
          "material": [
-            "Ancient Feystone", "Carved Feystone", "Conflagrant Sac", "Lava Nugget", "Sealed Feystone", "Uragaan Cortex",
-            "Uragaan Jaw+", "Uragaan Marrow", "Uragaan Pallium", "Uragaan Ruby", "Uragaan Scute+", "Uragaan Shard"]
+            "Ancient Feystone", "Carved Feystone", "Conflagrant Sac", "Lava Nugget", "Sealed Feystone", "Uragaan Cortex", "Uragaan Jaw+",
+            "Uragaan Marrow", "Uragaan Pallium", "Uragaan Ruby", "Uragaan Scute+", "Uragaan Shard"]
       }
    },
    "Vaal Hazak": {
@@ -7005,18 +6789,6 @@ const monsterData = {
       }
    },
    "Velkhana": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.7},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.13},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.12},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -7083,18 +6855,6 @@ const monsterData = {
       }
    },
    "Viper Tobi-Kadachi": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Mysterious Feystone", "itemCount": 1, "probability": 0.55},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.25},
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.15},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.05}]
-         },
-         "material": ["Glowing Feystone", "Mysterious Feystone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -7316,19 +7076,6 @@ const monsterData = {
       }
    },
    "Zinogre": {
-      "High Rank": {
-         "General": {},
-         "Break": {},
-         "Investigation": {
-            "Purple": [
-               {"material": "Worn Feystone", "itemCount": 1, "probability": 0.35},
-               {"material": "Glowing Feystone", "itemCount": 1, "probability": 0.34},
-               {"material": "Warped Feystone", "itemCount": 1, "probability": 0.26},
-               {"material": "Sullied Streamstone", "itemCount": 1, "probability": 0.03},
-               {"material": "Shining Streamstone", "itemCount": 1, "probability": 0.02}]
-         },
-         "material": ["Glowing Feystone", "Shining Streamstone", "Sullied Streamstone", "Warped Feystone", "Worn Feystone"]
-      },
       "Master Rank": {
          "General": {
             "Kill": [
@@ -7393,8 +7140,7 @@ const monsterData = {
          },
          "material": [
             "Ancient Feystone", "Carved Feystone", "Fulgurbug", "Lightning Sac", "Sealed Feystone", "Zinogre Cortex",
-            "Zinogre Deathly Shocker", "Zinogre Electrofur+", "Zinogre Hardclaw", "Zinogre Hardhorn", "Zinogre Lash",
-            "Zinogre Skymerald"]
+            "Zinogre Deathly Shocker", "Zinogre Electrofur+", "Zinogre Hardclaw", "Zinogre Hardhorn", "Zinogre Lash", "Zinogre Skymerald"]
       }
    }
 };
@@ -7415,12 +7161,11 @@ const badData = {
       "Alatreon", "Acidic Glavenus", "Banbaro", "Behemoth", "Azure Rathalos", "Barroth", "Anjanath", "Blackveil Vaal Hazak",
       "Black Diablos", "Beotodus", "Barioth", "Ebony Odogaron", "Furious Rajang", "Brute Tigrex", "Gold Rathian", "Frostfang Barioth",
       "Fulgur Anjanath", "Dodogama", "Bazelgeuse", "Kulve Taroth", "Brachydios", "Great Jagras", "Glavenus", "Deviljho", "Lavasioth",
-      "Coral Pukei-Pukei", "Kushala Daora", "Nergigante", "Rathalos", "Pink Rathian", "Pukei-Pukei", "Kulu-Ya-Ku",
-      "Ruiner Nergigante", "Radobaan", "Diablos", "Tigrex", "Raging Brachydios", "Seething Bazelgeuse", "Scarred Yian Garuga",
-      "Lunastra", "Savage Deviljho", "Stygian Zinogre", "Viper Tobi-Kadachi", "Shrieking Legiana", "Vaal Hazak", "Paolumu",
-      "Odogaron", "Nargacuga", "Nightshade Paolumu", "Fatalis", "Tzitzi-Ya-Ku", "Jyuratodus", "Great Girros", "Rajang", "Uragaan",
-      "Kirin", "Namielle", "Yian Garuga", "Shara Ishvalda", "Zinogre", "Legiana", "Teostra", "Xeno'jiiva", "Tobi-Kadachi", "Rathian",
-      "Silver Rathalos", "Safi'jiiva", "Velkhana"],
+      "Coral Pukei-Pukei", "Kushala Daora", "Nergigante", "Rathalos", "Pink Rathian", "Pukei-Pukei", "Kulu-Ya-Ku", "Ruiner Nergigante",
+      "Radobaan", "Diablos", "Tigrex", "Raging Brachydios", "Seething Bazelgeuse", "Scarred Yian Garuga", "Lunastra", "Savage Deviljho",
+      "Stygian Zinogre", "Viper Tobi-Kadachi", "Shrieking Legiana", "Vaal Hazak", "Paolumu", "Odogaron", "Nargacuga", "Nightshade Paolumu",
+      "Fatalis", "Tzitzi-Ya-Ku", "Jyuratodus", "Great Girros", "Rajang", "Uragaan", "Kirin", "Namielle", "Yian Garuga", "Shara Ishvalda",
+      "Zinogre", "Legiana", "Teostra", "Xeno'jiiva", "Tobi-Kadachi", "Rathian", "Silver Rathalos", "Safi'jiiva", "Velkhana"],
    "Duplicate new table Master Rank General > Kill": ["Kulve Taroth"],
    "Kill/Capture tables don't match for High Rank": ["Ancient Leshen", "Leshen"],
    "Kill/Capture tables don't match for Master Rank": ["Bazelgeuse"],
@@ -7462,16 +7207,21 @@ const badData = {
       "Alatreon", "Behemoth", "Furious Rajang", "Frostfang Barioth", "Dodogama", "Kulve Taroth", "Great Jagras", "Kulu-Ya-Ku",
       "Raging Brachydios", "Fatalis", "Tzitzi-Ya-Ku", "Great Girros", "Yian Garuga", "Shara Ishvalda", "Xeno'jiiva", "Safi'jiiva"],
    "Missing required new table Master Rank Investigation > Silver": ["Alatreon", "Frostfang Barioth", "Fatalis"],
+   "Wrong rank data: monster can't be fought at High Rank": [
+      "Acidic Glavenus", "Coral Pukei-Pukei", "Banbaro", "Glavenus", "Blackveil Vaal Hazak", "Gold Rathian", "Barioth", "Beotodus",
+      "Ebony Odogaron", "Brachydios", "Brute Tigrex", "Shrieking Legiana", "Ruiner Nergigante", "Namielle", "Nargacuga",
+      "Nightshade Paolumu", "Scarred Yian Garuga", "Seething Bazelgeuse", "Tigrex", "Viper Tobi-Kadachi", "Zinogre", "Velkhana",
+      "Fulgur Anjanath", "Silver Rathalos", "Savage Deviljho", "Rajang", "Stygian Zinogre"],
    "Wrong rank data: monster can't be fought at Low Rank": [
       "Ancient Leshen", "Kushala Daora", "Radobaan", "Vaal Hazak", "Jyuratodus", "Teostra"],
    "monsters": [
       "Alatreon", "Acidic Glavenus", "Ancient Leshen", "Banbaro", "Behemoth", "Azure Rathalos", "Barroth", "Anjanath",
-      "Blackveil Vaal Hazak", "Black Diablos", "Beotodus", "Barioth", "Ebony Odogaron", "Furious Rajang", "Brute Tigrex",
-      "Gold Rathian", "Frostfang Barioth", "Fulgur Anjanath", "Dodogama", "Bazelgeuse", "Kulve Taroth", "Brachydios", "Great Jagras",
-      "Glavenus", "Deviljho", "Lavasioth", "Coral Pukei-Pukei", "Kushala Daora", "Nergigante", "Rathalos", "Pink Rathian",
-      "Pukei-Pukei", "Kulu-Ya-Ku", "Ruiner Nergigante", "Radobaan", "Diablos", "Tigrex", "Raging Brachydios", "Seething Bazelgeuse",
-      "Scarred Yian Garuga", "Lunastra", "Savage Deviljho", "Stygian Zinogre", "Viper Tobi-Kadachi", "Leshen", "Shrieking Legiana",
-      "Vaal Hazak", "Paolumu", "Odogaron", "Nargacuga", "Nightshade Paolumu", "Fatalis", "Tzitzi-Ya-Ku", "Jyuratodus", "Great Girros",
-      "Rajang", "Uragaan", "Kirin", "Namielle", "Yian Garuga", "Shara Ishvalda", "Zinogre", "Legiana", "Teostra", "Xeno'jiiva",
-      "Tobi-Kadachi", "Rathian", "Silver Rathalos", "Safi'jiiva", "Velkhana"]
+      "Blackveil Vaal Hazak", "Black Diablos", "Beotodus", "Barioth", "Ebony Odogaron", "Furious Rajang", "Brute Tigrex", "Gold Rathian",
+      "Frostfang Barioth", "Fulgur Anjanath", "Dodogama", "Bazelgeuse", "Kulve Taroth", "Brachydios", "Great Jagras", "Glavenus",
+      "Deviljho", "Lavasioth", "Coral Pukei-Pukei", "Kushala Daora", "Nergigante", "Rathalos", "Pink Rathian", "Pukei-Pukei", "Kulu-Ya-Ku",
+      "Ruiner Nergigante", "Radobaan", "Diablos", "Tigrex", "Raging Brachydios", "Seething Bazelgeuse", "Scarred Yian Garuga", "Lunastra",
+      "Savage Deviljho", "Stygian Zinogre", "Viper Tobi-Kadachi", "Leshen", "Shrieking Legiana", "Vaal Hazak", "Paolumu", "Odogaron",
+      "Nargacuga", "Nightshade Paolumu", "Fatalis", "Tzitzi-Ya-Ku", "Jyuratodus", "Great Girros", "Rajang", "Uragaan", "Kirin", "Namielle",
+      "Yian Garuga", "Shara Ishvalda", "Zinogre", "Legiana", "Teostra", "Xeno'jiiva", "Tobi-Kadachi", "Rathian", "Silver Rathalos",
+      "Safi'jiiva", "Velkhana"]
 };

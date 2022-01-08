@@ -7,15 +7,17 @@ const noInvestigations = ['Ancient Leshen', 'Leshen'];
  * Nergigante and Zorah Magdaros are story only (no LR investigations). Zorah is ignored and Nergigante is excluded since you can't
  * get LR rewards from him (see data corrections) */
 const lowRankMonsters = [
-   'Anjanath', 'Barroth', 'Diablos', 'Great Girros', 'Great Jagras', 'Jyuratodas', 'Kirin', 'Kulu-Ya-Ku', 'Legiana',
-   'Odogaron', 'Paolumu', 'Pukei-Pukei', 'Rabodaan', 'Rathalos', 'Rathian', 'Tobi-Kadachi', 'Tzitzi-Ya-Ku', 'Zorah Magdaros'
+   'Anjanath', 'Barroth', 'Diablos', 'Great Girros', 'Great Jagras', 'Jyuratodus', 'Kirin', 'Kulu-Ya-Ku', 'Legiana',
+   'Odogaron', 'Paolumu', 'Pukei-Pukei', 'Radobaan', 'Rathalos', 'Rathian', 'Tobi-Kadachi', 'Tzitzi-Ya-Ku', 'Zorah Magdaros'
 ];
 /** Add Nergigante since he has a normal HR fight. Kirin can be fought in a HR event and the rest of LR (including Zorah) has a HR optional quest.
- * I haven't finished HR yet so there'll be more on this list later. ignore for now.
- * need to look over all events (and arena?) to see the full HR list. MR is ice born only */
+ * I haven't finished HR yet so I don't know if you can re-fight Leshen */
 const highRankMonsters = lowRankMonsters.concat([
-   'Pink Rathian', 'Lavasioth', 'Uragaan', 'Dodogama', 'Bazelgeuse', 'Black Diablos', 'Azure Rathalos', 'Devilijho', 'Nergigante',
-   'Vaal Hazak', 'Kushala Daora', 'Teostra', 'Xeno\'jiiva']);
+   'Ancient Leshen', 'Azure Rathalos', 'Bazelgeuse', 'Behemoth', 'Black Diablos', 'Deviljho', 'Dodogama', 'Kulve Taroth', 'Kushala Daora',
+   'Lavasioth', 'Leshen', 'Lunastra', 'Nergigante', 'Pink Rathian', 'Teostra', 'Uragaan', 'Vaal Hazak', 'Xeno\'jiiva']);
+highRankMonsters.sort();
+
+//MR is Iceborne only. there doesn't need to be a var for MR name list since it's (presumably) all of them (except Ancient Leshen, Leshen)
 
 /** Builds monsterData via web scraping. It's faster than I expected but rarely if ever needs to be re-ran.
  *
@@ -23,7 +25,7 @@ const highRankMonsters = lowRankMonsters.concat([
  * 1 that there are no console.error else add more corrections
  * 2 run groomMonsterData (verify still no console.error). copy the console.log output into DB
  *
- * Last run on 2021-12-28 20:30 the website says ver. 15.11
+ * Last run on 2022-01-07 20:44 the website says ver. 15.11
  * Latest game version is 15.11.01 (2021-06-03) */
 function scrapeMonsterList()
 {
@@ -114,6 +116,9 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
 
       //delete unused structure
       if(!lowRankMonsters.includes(monsterName)) delete monsterData[monsterName]['Low Rank'];
+      if(!highRankMonsters.includes(monsterName)) delete monsterData[monsterName]['High Rank'];
+      /* MR presumably has all of them except Ancient Leshen, Leshen so nothing to delete
+       * the Leshens have empty MR so they will be deleted later */
 
       $(html, virtualDocument).find('h6').each((index, sectionSearch) =>
       {
