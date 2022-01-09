@@ -2,9 +2,9 @@
 
 //these globals are valid data but only used when scraping
 
-const noInvestigations = ['Ancient Leshen', 'Leshen'];
+const noInvestigations = ['Ancient Leshen', 'Leshen', 'Zorah Magdaros'];
 /** These are the only monsters that are possible for low rank. Kirin can get LR investigations in addition to the LR optional quest.
- * Nergigante and Zorah Magdaros are story only (no LR investigations). Zorah is ignored and Nergigante is excluded since you can't
+ * Nergigante and Zorah Magdaros are story only (no LR investigations). Nergigante is excluded since you can't
  * get LR rewards from him (see data corrections) */
 const lowRankMonsters = [
    'Anjanath', 'Barroth', 'Diablos', 'Great Girros', 'Great Jagras', 'Jyuratodus', 'Kirin', 'Kulu-Ya-Ku', 'Legiana',
@@ -41,10 +41,7 @@ function scrapeMonsterList()
    {
       $(html, virtualDocument).find('h6:contains("Large Monsters")+div>div>table a').each((index, element) =>
       {
-         const monsterName = element.textContent;
-         //exclude all of Zorah Magdaros (RTFM for reason)
-         if('Zorah Magdaros' !== monsterName)
-            scrapeMonsterData(virtualDocument, monsterName, element.href);
+         scrapeMonsterData(virtualDocument, element.textContent, element.href);
       });
    });
 }
@@ -57,6 +54,7 @@ function scrapeMonsterList()
  * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Ancient Leshen', 'https://mhworld.kiranico.com/monsters/N3vuk/ancient-leshen')
  * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Kulu-Ya-Ku', 'https://mhworld.kiranico.com/monsters/YQ1FE/kulu-ya-ku')
  * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Kulve Taroth', 'https://mhworld.kiranico.com/monsters/5xbCn/kulve-taroth')
+ * scrapeMonsterData(document.implementation.createHTMLDocument('virtual'), 'Zorah Magdaros', 'https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros')
  */
 function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
 {
@@ -117,8 +115,9 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
       //delete unused structure
       if(!lowRankMonsters.includes(monsterName)) delete monsterData[monsterName]['Low Rank'];
       if(!highRankMonsters.includes(monsterName)) delete monsterData[monsterName]['High Rank'];
-      /* MR presumably has all of them except Ancient Leshen, Leshen so nothing to delete
+      /* MR presumably has all of them except Leshens and Zorah
        * the Leshens have empty MR so they will be deleted later */
+      if('Zorah Magdaros' === monsterName) delete monsterData[monsterName]['Master Rank'];
 
       $(html, virtualDocument).find('h6').each((index, sectionSearch) =>
       {
@@ -136,13 +135,20 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
             if('Nergigante' === monsterName && 'Low Rank' === rankText)
             {
                markBadData(`Manual Correction: no rewards at Low Rank`, monsterName);
-               //ignore table
+               //ignore rank
                return;  //section looping rankSearch
+            }
+            if('Zorah Magdaros' === monsterName && 'Master Rank' === rankText)
+            {
+               //separate from below since this needs to be marked as manual
+               markBadData(`Manual Correction: monster can't be fought at Master Rank`, monsterName);
+               //ignore rank
+               return;  //rankCol looping tableSearch
             }
             if(!monsterData[monsterName][rankText])
             {
                markBadData(`Wrong rank data: monster can't be fought at ${rankText}`, monsterName);
-               //ignore table
+               //ignore rank
                return;  //section looping rankSearch
             }
 
@@ -166,6 +172,12 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
                }
                //if not a table to keep then continue
                else if(!oldToNewStructure[sectionText][tableText]) return;  //rankCol looping tableSearch
+               else if('Zorah Magdaros' === monsterName && ['Carves', 'Capture Zorah Magdaros'].includes(tableText))
+               {
+                  markBadData(`Manual Correction: kill/capture doesn't apply`, monsterName);
+                  //ignore table
+                  return;  //rankCol looping tableSearch
+               }
                //else parse it
 
                // td > tr > tbody > table
@@ -299,10 +311,10 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
             delete monsterData[monsterName][rank];
          }
 
-         //if monster still has this rank. don't connect with else since LR is already deleted
+         //if monster still has this rank. don't connect with else since some ranks are already deleted
          if(monsterData[monsterName][rank])
          {
-            /* If these 2 tables are different. Elders can't be captured so ignore Capture table.
+            /* If these 2 tables are different. Elders (including Zorah) can't be captured so ignore Capture table.
              * It's debatable if elders should have the same capture table or none so don't mark as invalid. */
             if(!elderDragons.includes(monsterName) &&
                JSON.stringify(monsterData[monsterName][rank].General.Kill) !==
@@ -326,8 +338,9 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
 
             /* make sure the rank has all the data. always check each table which is why the funct is first
              * and it can't be a single line. Capture is already deleted above.
-             * already validated Break and Sever above. */
-            partialRank = requireTable(monsterName, rank, 'General', 'Kill') || partialRank;
+             * already validated Break and Sever above. Zorah doesn't have kill. */
+            if('Zorah Magdaros' !== monsterName)
+               partialRank = requireTable(monsterName, rank, 'General', 'Kill') || partialRank;
             partialRank = requireTable(monsterName, rank, 'General', 'Hunt') || partialRank;
 
             if(!noInvestigations.includes(monsterName))
@@ -370,7 +383,9 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
                   console.error(`Assumption violation: ${monsterName} has different part breaks at low/master rank`);
                validateSever(monsterName, 'Low Rank', 'Master Rank');
             }
-            else console.error(`Assumption violation: ${monsterName} can be fought at low rank but not master rank`);
+            //Leshens aren't LR so they don't apply here. Zorah isn't MR
+            else if('Zorah Magdaros' !== monsterName)
+               console.error(`Assumption violation: ${monsterName} can be fought at low rank but not master rank`);
          }
          if(monsterData[monsterName]['High Rank'])
          {
@@ -381,8 +396,8 @@ function scrapeMonsterData(virtualDocument, monsterName, monsterUrl)
                   console.error(`Assumption violation: ${monsterName} has different part breaks at high/master rank`);
                validateSever(monsterName, 'High Rank', 'Master Rank');
             }
-            //these are event only and that event is only HR
-            else if(!['Ancient Leshen', 'Leshen'].includes(monsterName))
+            //Leshens are event only and that event is only HR. Zorah is even more special
+            else if(!['Ancient Leshen', 'Leshen', 'Zorah Magdaros'].includes(monsterName))
                console.error(`Assumption violation: ${monsterName} can be fought at high rank but not master rank`);
          }
       }
@@ -439,13 +454,14 @@ function requireTable(monsterName, rank, sectionName, tableName)
 
 function groomMonsterData()
 {
-   //Zorah is excluded
-   if(70 !== Object.keys(monsterData).length)
+   if(71 !== Object.keys(monsterData).length)
       console.error(`Missing large monsters. Current length: `, Object.keys(monsterData).length);
    verifyManualCorrection('wrong breakable part', ['Kushala Daora', 'Teostra']);
    verifyManualCorrection('wrong material', ['Safi\'jiiva']);
    verifyManualCorrection('wrong Investigation', noInvestigations);
    verifyManualCorrection('no rewards at Low Rank', ['Nergigante']);
+   verifyManualCorrection('monster can\'t be fought at Master Rank', ['Zorah Magdaros']);
+   verifyManualCorrection('kill/capture doesn\'t apply', ['Zorah Magdaros']);
 
    sortKeysAndLog(monsterData);
    sortKeysAndLog(badData);

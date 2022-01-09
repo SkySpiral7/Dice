@@ -75,7 +75,7 @@
        * 13 every monster will have at least 1 break (excluding sever tail). if missing this is assumed partial data
        *
        * Ask data:
-       * 1 are there any tables with duplicate material of diff count? Kulve Taroth HR Breaks
+       * 1 are there any tables with duplicate material of diff count? Kulve Taroth HR Breaks, Zorah Magdaros break head
        * 2 are there any monsters who are MR only? looks like fatalis, safi-jiiva, silver-rathalos
        * 3 is each table highest % to least order? yes which is good for default material
        *
@@ -89,6 +89,7 @@
        * 7 Safi'jiiva Master Rank Rewards > Capture Safi'jiiva Safi'jiiva Shard x1 22% should be Safi'jiiva Cortex to match the Kill table
        * 8 Ancient Leshen/Leshen don't have Investigations and are thus ignored. Leshen HR Bronze was the only one that looked valid anyway
        * 9 Nergigante doesn't have LR rewards. He dropped a Monster Bone L which might also be true for breaks but I can't confirm that.
+       * 10 Zorah Magdaros can't be fought in MR, doesn't have kill/capture tables (LR/HR looked valid), and doesn't have Investigations (HR looked valid)
        *
        * Assumptions (don't affect calc):
        * 1 Bandit Mantle only gives trade-in items (pretty sure the game says this)
@@ -97,7 +98,7 @@
        * 4 master rank can fight everything and high can fight all low
        *
        * Notes:
-       * 71 total monsters (including Zorah)
+       * 71 total large monsters
        */
 
       function makeMonsterAutoComplete()
@@ -105,12 +106,10 @@
          const rank = cache.dom.huntRank.value;
 
          const monsterNamesInRank = Object.keys(monsterData).filter(monsterName => monsterData[monsterName][rank]);
-         //Zorah Magdaros (which is all rank) has no data but is in the list so that people can see the alert message (since they won't RTFM)
-         monsterNamesInRank.push('Zorah Magdaros');
-         //LR Nergigante also has a special message. HR/MR is valid and already in list
+         //LR Nergigante has a special message. HR/MR is valid and already in list
          if('Low Rank' === rank) monsterNamesInRank.push('Nergigante');
 
-         //Zorah is last (for all rank) but LR Nergigante needs to be sorted
+         //LR Nergigante needs to be sorted
          monsterNamesInRank.sort();
 
          cache.jQuery.monster.autocomplete({
@@ -119,8 +118,8 @@
 
          const monsterName = cache.dom.monster.value.trim();
 
-         //don't default these away so that user can see special message
-         if(!['Nergigante', 'Zorah Magdaros'].includes(monsterName))
+         //don't default LR Nerg away so that user can see special message
+         if('Nergigante' !== monsterName)
          {
             //Defaults: LR Anjanath, HR Ancient Leshen, MR Acidic Glavenus
             if(monsterData[monsterName] && !monsterData[monsterName][rank])
@@ -206,13 +205,7 @@
       function validateMonsterName(monsterName, rank)
       {
          let errorMessage = '';
-         if('Zorah Magdaros' === monsterName)
-         {
-            /* If you aren't master rank and have no investigations then the calc would "just work"
-             * but I don't want that validation, the data is questionable, and no one will mind this being excluded. */
-            errorMessage = 'Zorah Magdaros isn\'t currently supported (see reason below).';
-         }
-         else if('Nergigante' === monsterName && 'Low Rank' === rank)
+         if('Nergigante' === monsterName && 'Low Rank' === rank)
          {
             errorMessage = `Nergigante has no Low Rank rewards (he only drops Monster Bone L when fought on Zorah Magdaros)`;
          }
@@ -568,21 +561,20 @@
       what a monster may drop when they are toppled or have their body parts broken (the white items you have to pick up), which is not
       to be confused with the tables for "Break Rathalos's head" etc which are Bonus rewards for breaking monster parts at the end
       of a hunt. The calculator doesn't account for any of these except breaking and you should break as many parts are you can.</p>
-   <p><a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> is excluded for now because the page's data
+   <p><a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> is included but special. His page's data
       is invalid: Carves master rank is missing, I don't know if it's ever possible to carve his corpse (so Carves: Carves should be N/A),
       Carves: Bandit Mantle is wrong since it lists non trade-in items, Carves: Plunderblade is impossible since your Palico won't help with
       the magma cores, Carves: Items Gathered by Palicoes is wrong since it lists a Bandit Mantle material, master rank of Rewards and
       Investigations are obviously wrong, Rewards: Capture Zorah Magdaros is probably impossible (ref:
       <a href="https://mhworld.kiranico.com/quests/nXmB6/one-for-the-history-books">★4 One for the History Books</a>),
       and Investigations doesn't apply to him at all (I think). Rewards: Break Zorah Magdaros's head, Rewards: Break Zorah Magdaros's chest,
-      and Rewards: Hunt Zorah Magdaros might be valid but it breaks too many assumptions for this calculator to handle.
+      and Rewards: Hunt Zorah Magdaros might be valid.
       Carves: Dropped Material is actually possible since destroying a magma core drops a white material near it.
       The limited time <a href="https://mhworld.kiranico.com/quests/6Ymy6/left-quite-the-impression">★6 Left Quite the Impression</a> is HR
       (and has identical rewards to story only <a href="https://mhworld.kiranico.com/quests/AoRK6/a-colossal-task">★6 A Colossal Task</a>)
-      however <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> has the same material in LR and HR.
-      In the future I might add special logic for handling
-      <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a>.</p>
-   <p>It turns out that all 71 (including <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a>) large
+      however <a href="https://mhworld.kiranico.com/monsters/EmVcV/zorah-magdaros">Zorah Magdaros</a> has the same material in LR and HR
+      (except LR <span title="Rewards: Hunt" class="hoverInfo">Hunt</span> Lightcrystal becomes HR Zorah Magdaros Gem).</p>
+   <p>It turns out that all 71 large
       monster pages have some part of the data incorrect. The calculations
       will run on partial data in order to give the best results possible. For duplicate tables I kept the first. For monsters that I know
       aren't in Low Rank I ignored the LR column. If a non-LR rank column didn't include any of the 4 Investigations,

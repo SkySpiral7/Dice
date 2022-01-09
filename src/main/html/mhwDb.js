@@ -1,7 +1,7 @@
 'use strict';
 
 /** Elder Dragons can't be captured but have an extra carve (4). LR Kirin stood on the trap without it triggering.
- * Zorah is ignored but he is in fact an ED and definitely can't be captured normally (he also can't be carved).
+ * Zorah is technically an ED and definitely can't be captured normally (he also can't be carved).
  * Nergigante has a normal HR fight. Don't know if other Elder dragons have other issues but they can get normal and purple
  * Investigations. This is used to determine number of rewards. Scrape also uses this to ignore capture table validation. */
 const elderDragons = [
@@ -10,7 +10,7 @@ const elderDragons = [
    'Zorah Magdaros'
 ];
 
-/** Sever is the only section that's deleted if empty. all empty sections are partial data.
+/** Sever is the only section that's deleted if empty. all empty sections are partial data except for a few Investigations.
  * Empty ranks are deleted. */
 const monsterData = {
    "Acidic Glavenus": {
@@ -7142,6 +7142,50 @@ const monsterData = {
             "Ancient Feystone", "Carved Feystone", "Fulgurbug", "Lightning Sac", "Sealed Feystone", "Zinogre Cortex",
             "Zinogre Deathly Shocker", "Zinogre Electrofur+", "Zinogre Hardclaw", "Zinogre Hardhorn", "Zinogre Lash", "Zinogre Skymerald"]
       }
+   },
+   "Zorah Magdaros": {
+      "Low Rank": {
+         "General": {
+            "Hunt": [
+               {"material": "Zorah Magdaros Ridge", "itemCount": 1, "probability": 0.24},
+               {"material": "Zorah Magdaros Heat Scale", "itemCount": 1, "probability": 0.21},
+               {"material": "Zorah Magdaros Pleura", "itemCount": 1, "probability": 0.18},
+               {"material": "Zorah Magdaros Magma", "itemCount": 1, "probability": 0.18},
+               {"material": "Zorah Magdaros Carapace", "itemCount": 2, "probability": 0.15},
+               {"material": "Lightcrystal", "itemCount": 1, "probability": 0.04}]
+         },
+         "Break": {
+            "head": [
+               {"material": "Zorah Magdaros Magma", "itemCount": 1, "probability": 0.67},
+               {"material": "Zorah Magdaros Magma", "itemCount": 2, "probability": 0.33}],
+            "chest": [{"material": "Zorah Magdaros Pleura", "itemCount": 1, "probability": 1}]
+         },
+         "Investigation": {},
+         "material": [
+            "Lightcrystal", "Zorah Magdaros Carapace", "Zorah Magdaros Heat Scale", "Zorah Magdaros Magma", "Zorah Magdaros Pleura",
+            "Zorah Magdaros Ridge"]
+      },
+      "High Rank": {
+         "General": {
+            "Hunt": [
+               {"material": "Zorah Magdaros Ridge", "itemCount": 1, "probability": 0.24},
+               {"material": "Zorah Magdaros Heat Scale", "itemCount": 1, "probability": 0.21},
+               {"material": "Zorah Magdaros Pleura", "itemCount": 1, "probability": 0.18},
+               {"material": "Zorah Magdaros Magma", "itemCount": 1, "probability": 0.18},
+               {"material": "Zorah Magdaros Carapace", "itemCount": 2, "probability": 0.15},
+               {"material": "Zorah Magdaros Gem", "itemCount": 1, "probability": 0.04}]
+         },
+         "Break": {
+            "head": [
+               {"material": "Zorah Magdaros Magma", "itemCount": 1, "probability": 0.67},
+               {"material": "Zorah Magdaros Magma", "itemCount": 2, "probability": 0.33}],
+            "chest": [{"material": "Zorah Magdaros Pleura", "itemCount": 1, "probability": 1}]
+         },
+         "Investigation": {},
+         "material": [
+            "Zorah Magdaros Carapace", "Zorah Magdaros Gem", "Zorah Magdaros Heat Scale", "Zorah Magdaros Magma", "Zorah Magdaros Pleura",
+            "Zorah Magdaros Ridge"]
+      }
    }
 };
 
@@ -7169,8 +7213,10 @@ const badData = {
    "Duplicate new table Master Rank General > Kill": ["Kulve Taroth"],
    "Kill/Capture tables don't match for High Rank": ["Ancient Leshen", "Leshen"],
    "Kill/Capture tables don't match for Master Rank": ["Bazelgeuse"],
+   "Manual Correction: kill/capture doesn't apply": ["Zorah Magdaros"],
+   "Manual Correction: monster can't be fought at Master Rank": ["Zorah Magdaros"],
    "Manual Correction: no rewards at Low Rank": ["Nergigante"],
-   "Manual Correction: wrong Investigation": ["Ancient Leshen", "Leshen"],
+   "Manual Correction: wrong Investigation": ["Ancient Leshen", "Leshen", "Zorah Magdaros"],
    "Manual Correction: wrong breakable part": ["Kushala Daora", "Teostra"],
    "Manual Correction: wrong material": ["Safi'jiiva"],
    "Missing required new table High Rank General > Hunt": [
