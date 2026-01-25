@@ -369,9 +369,26 @@ runStressTest(Algorithm.singleDrop, new DicePool('3d265 drop lowest'));
 function runStressTest(algorithm, dicePool)
 {
    var diceGroup = dicePool.toJSON().pool[0];
+   var everyDieValue = DiceExpression.everyValue(diceGroup);
    var start = Date.now();
-   algorithm(diceGroup, DiceExpression.everyValue(diceGroup));
+   algorithm(diceGroup, everyDieValue);
    var end = Date.now();
    //The output will be obviously wrong if it takes a minute or more.
    return new Date(end - start).toISOString().replace('1970-01-01T00:00:', '').replace('Z', '') + ' seconds';
+}
+/**
+Used for quick correctness test to compare different algorithms.
+
+Examples:
+runAlgorithm(Algorithm.bruteForce, new DicePool('3d4'));
+runAlgorithm(Algorithm.nonDropping, new DicePool('3d4'));
+runAlgorithm(Algorithm.singleDrop, new DicePool('3d4 drop lowest'));
+*/
+function runAlgorithm(algorithm, dicePool)
+{
+   var diceGroup = dicePool.toJSON().pool[0];
+   var everyDieValue = DiceExpression.everyValue(diceGroup);
+   var stats = algorithm(diceGroup, everyDieValue);
+   Statistics.determineProbability(stats);
+   return stats;
 }

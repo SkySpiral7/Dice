@@ -134,3 +134,131 @@ Algorithm.singleDrop = function(diceGroup, everyDieValue)
       return workingExpression.toDiceResults();
    }
 };
+/**
+Based on https://math.stackexchange.com/questions/3765873/generating-function-for-sum-of-n-dice-or-other-multinomial-distribution-where
+which reposts my https://stats.stackexchange.com/questions/299974/formula-for-dropping-2-dice-non-brute-force
+TODO: not yet implemented.
+Algorithm.drop2 = function(diceGroup, everyDieValue)
+{
+};
+*/
+/*
+//AI generated this wrong junk. all failed tests.
+
+function gcab(numberOfDice, sides, x) {
+    let result = 0;
+    for (let i = 0; i <= numberOfDice * sides; i++) {
+        let coefficient = 0;
+        for (let j = 0; j <= numberOfDice; j++) {
+            for (let k = 0; k <= numberOfDice; k++) {
+                for (let l = 0; l <= numberOfDice; l++) {
+                    let sum = j + k + l;
+                    if (sum === numberOfDice && j + 2 * k + 3 * l === i) {
+                        let coefficientTerm = 1;
+                        for (let m = 1; m <= numberOfDice; m++) {
+                            coefficientTerm *= (m === j) ? 1 : (m === k) ? 2 : (m === l) ? 3 : 1;
+                        }
+                        coefficient += coefficientTerm;
+                    }
+                }
+            }
+        }
+        result += coefficient * Math.pow(x, i);
+    }
+    return result;
+}
+
+function getProbabilitiesGcab(numberOfDice, sides) {
+    let probabilities = [];
+    for (let targetSum = 0; targetSum <= numberOfDice * sides; targetSum++) {
+        let x = Math.pow(targetSum, -1); // Example: using the reciprocal of the sum as 'x'
+        let polynomial = gcab(numberOfDice, sides, x);
+        probabilities.push({ result: targetSum, probability: polynomial });
+    }
+    return probabilities;
+}
+
+function gcab2(numberOfDice, sides, x) {
+    let coefficients = new Array(numberOfDice * sides + 1).fill(0);
+    coefficients[0] = 1;
+
+    for (let i = 0; i < numberOfDice; i++) {
+        let newCoefficients = new Array(numberOfDice * sides + 1).fill(0);
+        for (let j = 0; j <= numberOfDice * sides; j++) {
+            for (let k = 1; k <= sides; k++) {
+                if (j - k >= 0) {
+                    newCoefficients[j] += coefficients[j - k];
+                }
+            }
+        }
+        coefficients = newCoefficients;
+    }
+
+    let result = 0;
+    for (let i = 0; i <= numberOfDice * sides; i++) {
+        result += coefficients[i] * Math.pow(x, i);
+    }
+    return result;
+}
+
+function getProbabilitiesGcab2(numberOfDice, sides) {
+    let probabilities = [];
+    for (let targetSum = 0; targetSum <= numberOfDice * sides; targetSum++) {
+        let x = Math.pow(targetSum, -1); // Example: using the reciprocal of the sum as 'x'
+        let polynomial = gcab2(numberOfDice, sides, x);
+        probabilities.push({ result: targetSum, probability: polynomial });
+    }
+    return probabilities;
+}
+
+function gcab3(numberOfDice, sides, target) {
+    let result = 0;
+    for (let k = 0; k <= numberOfDice; k++) {
+        let coefficient = Math.pow(-1, k) * binomialCoefficient(numberOfDice, k) * binomialCoefficient(target + numberOfDice - 1 - k * (sides + 1), target - k * (sides + 1));
+        result += coefficient;
+    }
+    return result;
+}
+
+function getProbabilitiesGcab3(numberOfDice, sides) {
+    let probabilities = [];
+    for (let targetSum = 0; targetSum <= numberOfDice * sides; targetSum++) {
+        let frequency = gcab3(numberOfDice, sides, targetSum);
+        probabilities.push({ result: targetSum, frequency: frequency });
+    }
+    return probabilities;
+}
+
+function markusScheuer(numberOfDice, sides, target, deleted) {
+    let result = 0;
+    for (let u = 0; u <= sides; u++) {
+        for (let e = 0; e <= numberOfDice - deleted; e++) {
+            let sum = 0;
+            for (let c = 0; c <= deleted - 1; c++) {
+                sum += binomialCoefficient(deleted + e, c) * Math.pow(sides - u, c);
+            }
+            result += sum * binomialCoefficient(numberOfDice, deleted + e) * Math.pow(u, e) * gcab3(u - 1, numberOfDice - deleted - e, target);
+        }
+    }
+    return result;
+}
+
+function binomialCoefficient(n, k) {
+    let result = 1;
+    for (let i = 1; i <= k; i++) {
+        result = result * (n - i + 1) / i;
+    }
+    return result;
+}
+//in the previous response in this chat, what are the function args target and deleted?
+//target is the desired sum after dropping dice, deleted is the number of dice dropped
+
+function getProbabilitiesMarkusScheuer(numberOfDice, sides) {
+    let probabilities = [];
+    for (let targetSum = 0; targetSum <= numberOfDice * sides; targetSum++) {
+        let probability = markusScheuer(numberOfDice, sides, targetSum, 2);
+        probabilities.push({ result: targetSum, probability: probability });
+    }
+    return probabilities;
+}
+*/
