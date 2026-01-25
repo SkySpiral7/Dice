@@ -180,6 +180,7 @@
             const breakCount = formatMaterialLocation(' ', monsterName, rank, 'Break', partName, material);
 
             //this handles some tail (break)
+            //TODO: I broke radobaan hind legs twice, Uragaan can break and sever tail, leshen horns can break twice, leshen can't be captured
             breakingSectionHtml += `<label>Break ${partName}: <input type="checkbox" checked="checked" value="${partName}" /></label> ` +
                `<span id="break-${partName}-count">${breakCount}</span><br />`;
          });

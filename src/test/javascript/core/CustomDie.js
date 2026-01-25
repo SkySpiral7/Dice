@@ -49,6 +49,12 @@ TestSuite.CustomDice.DeckOfCards = async function(testState={})
          Actual: e, Description: 'No more values'});
    }
 
+   try{
+   deck.reshuffle();
+   nonRandomGenerator = numberGenerator.dice(3, [2]);
+   assertions.push({Expected: 'b', Actual: deck.draw(nonRandomGenerator), Description: 'Reshuffle then draw'});
+   } catch(e){assertions.push({Error: e, Description: 'Reshuffle'});}
+
    return TestRunner.displayResults('CustomDice CustomDice.DeckOfCards', assertions, testState);
 };
 TestSuite.CustomDice.RollTable = async function(testState={})

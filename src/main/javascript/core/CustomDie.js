@@ -27,6 +27,7 @@ CustomDice.CustomDie = function(possibleValues)
 CustomDice.DeckOfCards = function(possibleValues)
 {
    possibleValues = possibleValues.copy();
+   const allValues = possibleValues.copy();
    /**
     * @param randomSource passed down to Die.roll
     * @return a random element of possibleValues. Will be removed then returned as-is rather than wrapped in an array.
@@ -44,6 +45,7 @@ CustomDice.DeckOfCards = function(possibleValues)
     * Alias for roll.
     */
    this.draw = this.roll;
+   this.reshuffle = function(){possibleValues = allValues.copy();};
 };
 /**
  * An object with a single function named roll.
