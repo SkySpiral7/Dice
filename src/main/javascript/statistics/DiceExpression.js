@@ -1,6 +1,18 @@
 'use strict';
 //mx^a. m: coefficient, x: indeterminate, a: exponent (must be a natural number), mx^a: term
 //is actually a Expression > Algebraic Expression > Rational Expression.
+/**
+ * I think all these work:
+new DiceExpression()
+new DiceExpression(new Die(6))
+new DiceExpression(new DiceExpression().toJSON())
+new DiceExpression(new DiceExpression().toDiceResults())
+new DiceExpression(true)
+new DiceExpression([{result: 1, frequency: 2}])
+new DiceExpression([{result: 1, probability: 0.5}], true)
+new DiceExpression([{coefficient: 1, exponent: 2}])
+new DiceExpression(new DicePool('1d6'))
+ */
 function DiceExpression(arg1, arg2)
 {
    var termArray, useProbability;
@@ -73,6 +85,57 @@ function DiceExpression(arg1, arg2)
          }
       }
    };
+
+   this.divide = function(divisor) {
+      //TODO: basically ignores negative exponents right now (always put in reaminder)
+      Validation.requireInstanceOf(DiceExpression, divisor);
+      const divisorTerms = divisor.toJSON();
+      if (divisorTerms.length === 0) {
+         //TODO: there are other NaN cases when Infinity or NaN coefficients/exponents are used
+         throw new Error("Can't divide by zero");
+      }
+
+      let remainder = this.clone();
+      const quotient = new DiceExpression();
+
+      const divLead = divisorTerms[0];  // highest degree term
+
+      while (true) {
+         const remTerms = remainder.toJSON();
+         if (remTerms.length === 0) break;
+
+         const remLead = remTerms[0];
+
+         if (remLead.exponent < divLead.exponent) {
+            // degree(remainder) < degree(divisor) → stop
+            break;
+         }
+
+         const qCoeff = remLead.coefficient / divLead.coefficient;
+         const qExp   = remLead.exponent - divLead.exponent;
+
+         quotient.addTerm({ coefficient: qCoeff, exponent: qExp });
+
+         const qPoly = new DiceExpression();
+         qPoly.addTerm({ coefficient: qCoeff, exponent: qExp });
+
+         const toSubtract = divisor.clone();
+         toSubtract.multiply(qPoly);  // qTerm * divisor
+
+         remainder.subtract(toSubtract);
+      }
+
+      return { quotient, remainder };
+   };
+
+   this.mustDivide = function(divisor) {
+      const result = this.divide(divisor);
+      if (0 !== result.remainder.toJSON().length) {
+         throw new Error("Division is not exact");
+      }
+      return result.quotient;
+   };
+
    /**All exponents are multiplied by -1. Doesn't change any coefficients.*/
    this.negateExponents = function()
    {

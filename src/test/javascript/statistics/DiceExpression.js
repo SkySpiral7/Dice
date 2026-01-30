@@ -159,6 +159,347 @@ TestSuite.DiceExpression.multiply = async function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().multiply()', assertions, testState);
 };
+TestSuite.DiceExpression.divide = async function(testState = {}) {
+    TestRunner.clearResults(testState);
+    var assertions = [], polyA, polyB, result, expectedQ, expectedR;
+
+    // Exact division (remainder = 0)
+    // x^3+x^2-2 / x-1 => q=x^2+2x+2, r=0
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 3},
+            {coefficient: 1, exponent: 2},
+            {coefficient: -2, exponent: 0}
+         ]);   // x^3+x^2-2
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 1},
+            {coefficient: -1, exponent: 0}
+         ]);   // x-1
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [
+         {coefficient: 1, exponent: 2},
+         {coefficient: 2, exponent: 1},
+         {coefficient: 2, exponent: 0},
+      ];  // x^2+2x+2
+        expectedR = [];  // 0
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Exact division (remainder = 0)'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Exact division (remainder = 0)' });
+    }
+
+    // Normal division with remainder
+    // 0.5x^3-1 / x^2 => q = 0.5x, r = -1
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 0.5, exponent: 3},
+            {coefficient: -1, exponent: 0}
+         ]);   // 0.5x^3-1
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 2}
+         ]);   // x^2
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [{coefficient: 0.5, exponent: 1}];  // 0.5x
+        expectedR = [{coefficient: -1, exponent: 0}];  // -1
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Normal division with remainder'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Normal division with remainder' });
+    }
+
+    // Edge case: everything remains
+    // x^2 - 1 / x^3 => q = 0, r = x^2 - 1
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 2},
+            {coefficient: -1, exponent: 0}
+         ]);   // x^2 - 1
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 3}
+         ]);   // x^3
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [];  // 0
+        expectedR = polyA.toJSON();  // x^2 - 1
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Edge case: everything remains'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Edge case: everything remains' });
+    }
+
+    // Dividing by constant
+    // 25x^3 - 100 / 5 => q = 5x^3 - 20, r = 0
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 25, exponent: 3},
+            {coefficient: -100, exponent: 0}
+         ]);   // 25x^3 - 100
+        polyB = new DiceExpression(
+         [
+            {coefficient: 5, exponent: 0}
+         ]);   // 5
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [
+         {coefficient: 5, exponent: 3},
+         {coefficient: -20, exponent: 0}
+      ];  // 5x^3 - 20
+        expectedR = [];  // 0
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Dividing by constant'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Dividing by constant' });
+    }
+
+    // Edge case: both degree 0
+    // 10 / 2 => q = 5, r = 0
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 10, exponent: 0}
+         ]);   // 10
+        polyB = new DiceExpression(
+         [
+            {coefficient: 2, exponent: 0}
+         ]);   // 2
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [
+         {coefficient: 5, exponent: 0}
+      ];  // 5
+        expectedR = [];  // 0
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Edge case: both degree 0'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Edge case: both degree 0' });
+    }
+
+    // Edge case: zero dividend 
+    // 0 / anything => q = 0, r = 0
+    try {
+        polyA = new DiceExpression();   // 0
+        polyB = new DiceExpression(
+         [
+            {coefficient: 2, exponent: 0}
+         ]);   // 2
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [];  // 0
+        expectedR = [];  // 0
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Edge case: zero dividend'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Edge case: zero dividend' });
+    }
+
+    // Division by zero polynomial
+    // anything / 0 => throw
+   try{
+        polyA = new DiceExpression(
+         [
+            {coefficient: 5, exponent: 1}
+         ]);   // 5x
+        polyB = new DiceExpression();   // 0
+        polyA.divide(polyB);
+   TestRunner.failedToThrow(assertions, 'Division by zero polynomial');
+   }
+   catch(e)
+   {
+       assertions.push({Expected: new Error("Can't divide by zero"), Actual: e, Description: 'Division by zero polynomial'});
+   }
+
+   // Negative coefficients
+    // -3x^2 + 5x / x => q = -3x + 5, r = 0
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: -3, exponent: 2},
+            {coefficient: 5, exponent: 1}
+         ]);   // -3x^2 + 5x
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 1}
+         ]);   // x
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [
+            {coefficient: -3, exponent: 1},
+            {coefficient: 5, exponent: 0}
+         ];  // -3x + 5
+        expectedR = [];  // 0
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Negative coefficients'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Negative coefficients' });
+    }
+
+    // Missing terms (many zeros)
+    // x^4 - 1 / x + 1 => q = x^3 - x^2 + x - 1, r = 0
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 4},
+            {coefficient: -1, exponent: 0}
+         ]);   // x^4 - 1
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 1},
+            {coefficient: 1, exponent: 0}
+         ]);   // x + 1
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [
+            {coefficient: 1, exponent: 3},
+            {coefficient: -1, exponent: 2},
+            {coefficient: 1, exponent: 1},
+            {coefficient: -1, exponent: 0}
+         ];  // x^3 - x^2 + x - 1
+        expectedR = [];  // 0
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Missing terms (many zeros)'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Missing terms (many zeros)' });
+    }
+
+    // Negative exponents
+    // x^2 + x + x^-1 / x => q = x + 1, r = x^-1
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 2},
+            {coefficient: 1, exponent: 1},
+            {coefficient: 1, exponent: -1}
+         ]);   // x^2 + x + x^-1
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 1}
+         ]);   // x
+
+        result = polyA.divide(polyB);
+
+        expectedQ = [
+            {coefficient: 1, exponent: 1},
+            {coefficient: 1, exponent: 0}
+         ];  // x + 1
+        expectedR = [{coefficient: 1, exponent: -1}];  // x^-1
+
+        assertions.push({
+            Expected: { quotient: expectedQ, remainder: expectedR },
+            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
+            Description: 'Negative exponents'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Negative exponents' });
+    }
+
+    return TestRunner.displayResults('DiceExpression new DiceExpression().divide()', assertions, testState);
+};
+TestSuite.DiceExpression.mustDivide = async function(testState = {}) {
+    TestRunner.clearResults(testState);
+    var assertions = [], polyA, polyB, result, expected;
+
+    // Exact division (remainder = 0)
+    // x^3+x^2-2 / x-1 => q=x^2+2x+2, r=0 => q
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 3},
+            {coefficient: 1, exponent: 2},
+            {coefficient: -2, exponent: 0}
+         ]);   // x^3+x^2-2
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 1},
+            {coefficient: -1, exponent: 0}
+         ]);   // x-1
+
+        result = polyA.mustDivide(polyB);
+
+        expected = [
+         {coefficient: 1, exponent: 2},
+         {coefficient: 2, exponent: 1},
+         {coefficient: 2, exponent: 0},
+      ];  // x^2+2x+2
+
+        assertions.push({
+            Expected: expected,
+            Actual:   result.toJSON(),
+            Description: 'Exact division (remainder = 0)'
+        });
+    } catch (e) {
+        assertions.push({ Error: e, Description: 'Exact division (remainder = 0)' });
+    }
+
+    // Normal division with remainder throws
+    // 0.5x^3-1 / x^2 => q = 0.5x, r = -1 => throw
+    try {
+        polyA = new DiceExpression(
+         [
+            {coefficient: 0.5, exponent: 3},
+            {coefficient: -1, exponent: 0}
+         ]);   // 0.5x^3-1
+        polyB = new DiceExpression(
+         [
+            {coefficient: 1, exponent: 2}
+         ]);   // x^2
+
+        polyA.mustDivide(polyB);
+        TestRunner.failedToThrow(assertions, 'Normal division with remainder throws');
+    } catch (e) {
+       assertions.push({Expected: new Error("Division is not exact"), Actual: e, Description: 'Normal division with remainder throws'});
+    }
+
+    return TestRunner.displayResults('DiceExpression new DiceExpression().mustDivide()', assertions, testState);
+};
 TestSuite.DiceExpression.negateExponents = async function(testState={})
 {
    TestRunner.clearResults(testState);
