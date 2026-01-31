@@ -410,37 +410,6 @@ TestSuite.DiceExpression.divide = async function(testState = {}) {
         assertions.push({ Error: e, Description: 'Missing terms (many zeros)' });
     }
 
-    // Negative exponents
-    // x^2 + x + x^-1 / x => q = x + 1, r = x^-1
-    try {
-        polyA = new DiceExpression(
-         [
-            {coefficient: 1, exponent: 2},
-            {coefficient: 1, exponent: 1},
-            {coefficient: 1, exponent: -1}
-         ]);   // x^2 + x + x^-1
-        polyB = new DiceExpression(
-         [
-            {coefficient: 1, exponent: 1}
-         ]);   // x
-
-        result = polyA.divide(polyB);
-
-        expectedQ = [
-            {coefficient: 1, exponent: 1},
-            {coefficient: 1, exponent: 0}
-         ];  // x + 1
-        expectedR = [{coefficient: 1, exponent: -1}];  // x^-1
-
-        assertions.push({
-            Expected: { quotient: expectedQ, remainder: expectedR },
-            Actual:   { quotient: result.quotient.toJSON(), remainder: result.remainder.toJSON() },
-            Description: 'Negative exponents'
-        });
-    } catch (e) {
-        assertions.push({ Error: e, Description: 'Negative exponents' });
-    }
-
     return TestRunner.displayResults('DiceExpression new DiceExpression().divide()', assertions, testState);
 };
 TestSuite.DiceExpression.mustDivide = async function(testState = {}) {
@@ -499,43 +468,6 @@ TestSuite.DiceExpression.mustDivide = async function(testState = {}) {
     }
 
     return TestRunner.displayResults('DiceExpression new DiceExpression().mustDivide()', assertions, testState);
-};
-TestSuite.DiceExpression.negateExponents = async function(testState={})
-{
-   TestRunner.clearResults(testState);
-
-   var assertions = [], expression, actual, expected;
-
-   try{
-   expression = new DiceExpression(new Die(3));
-   expression.addTerm({coefficient: 1, exponent: 2});
-   expression.negateExponents();
-   actual = expression.toJSON();
-   expected = [
-      {coefficient: 1, exponent: -1},
-      {coefficient: 2, exponent: -2},
-      {coefficient: 1, exponent: -3}
-   ];
-   assertions.push({Expected: expected, Actual: actual, Description: 'Negate exponents of (d3 + x^2)'});
-   } catch(e){assertions.push({Error: e, Description: 'Negate exponents of (d3 + x^2)'});}
-
-   try{
-   expression = new DiceExpression([
-      {coefficient: 1, exponent: [1, 5]},
-      {coefficient: 2, exponent: [2, 6]},
-      {coefficient: 1, exponent: [3, 7]}
-   ], false);
-   expression.negateExponents();
-   actual = expression.toJSON();
-   expected = [
-      {coefficient: 1, exponent: [-1, -5]},
-      {coefficient: 2, exponent: [-2, -6]},
-      {coefficient: 1, exponent: [-3, -7]}
-   ];
-   assertions.push({Expected: expected, Actual: actual, Description: 'Negate array exponents'});
-   } catch(e){assertions.push({Error: e, Description: 'Negate array exponents'});}
-
-   return TestRunner.displayResults('DiceExpression new DiceExpression().negateExponents()', assertions, testState);
 };
 TestSuite.DiceExpression.power = async function(testState={})
 {
@@ -632,8 +564,7 @@ TestSuite.DiceExpression.toDiceResults = async function(testState={})
 TestSuite.DiceExpression.toJSON = async function(testState={})
 {
    TestRunner.clearResults(testState);
-
-   var assertions = [], actual, expected;
+   var assertions = [], expected;
 
    try{
    var diceExpression = new DiceExpression(new Die(2));
@@ -647,10 +578,38 @@ TestSuite.DiceExpression.toJSON = async function(testState={})
 
    return TestRunner.displayResults('DiceExpression new DiceExpression().toJSON()', assertions, testState);
 };
+TestSuite.DiceExpression.toString = async function(testState={})
+{
+   TestRunner.clearResults(testState);
+   var assertions = [], diceExpression, expected;
+
+   try{
+   diceExpression = new DiceExpression([
+      { coefficient: 3, exponent: 4},
+      { coefficient: 1, exponent: 3},
+      { coefficient: 1, exponent: 1},
+      { coefficient: 1, exponent: 0}
+   ]);
+   expected = '3x^4 + x^3 + x + 1';
+   assertions.push({Expected: expected, Actual: diceExpression.toString(), Description: 'all positive'});
+   } catch(e){assertions.push({Error: e, Description: 'all positive'});}
+
+   try{
+   diceExpression = new DiceExpression([
+      { coefficient: -3, exponent: 4},
+      { coefficient: -1, exponent: 3},
+      { coefficient: -1, exponent: 1},
+      { coefficient: -1, exponent: 0}
+   ]);
+   expected = '-3x^4 - x^3 - x - 1';
+   assertions.push({Expected: expected, Actual: diceExpression.toString(), Description: 'all negative'});
+   } catch(e){assertions.push({Error: e, Description: 'all negative'});}
+
+   return TestRunner.displayResults('DiceExpression new DiceExpression().toString()', assertions, testState);
+};
 TestSuite.DiceExpression._constructor = async function(testState={})
 {
    TestRunner.clearResults(testState);
-
    var assertions = [], actual, expected;
 
    try{

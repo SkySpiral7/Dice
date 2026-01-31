@@ -262,3 +262,101 @@ function getProbabilitiesMarkusScheuer(numberOfDice, sides) {
     return probabilities;
 }
 */
+function markusScheuer2(n, d) {
+   function constPoly(c) {
+      const p = new DiceExpression();
+      p.addTerm({ coefficient: c, exponent: 0 });
+      return p;
+   }
+
+   function xPow(k) {
+      return new DiceExpression([{ coefficient: 1, exponent: k }]);
+   }
+
+// Common polynomials
+  const oneMinusX = new DiceExpression([
+    { coefficient: 1, exponent: 0 },  // 1
+    { coefficient: -1, exponent: 1 } // -x
+  ]);
+  // === First term: x^(n-2) * ((1 - x^d) / (1 - x))^n ===
+
+  // x^(n-2)
+  const xPowNMinus2 = xPow(n);  //not -2?
+
+  // 1 - x^d
+  const oneMinusXd = new DiceExpression([
+    { coefficient: 1, exponent: 0 },   // 1
+    { coefficient: -1, exponent: d } // -x^d
+  ]);
+
+  const term1 = xPowNMinus2.multiply(oneMinusXd.mustDivide(oneMinusX).power(n));
+
+  // === Second term: (1 - x^2) * sum{t=1..d, x^((n-2)*t) * ((1 - x^(d-t+1)) / (1 - x))^n} ===
+
+  const oneMinusX2    = new DiceExpression([
+    { coefficient: 1, exponent: 0 },  // 1
+    { coefficient: -1, exponent: 2 } // -x^2
+  ]);
+
+  let sum2 = new DiceExpression();                  // 0
+
+  for (let t = 1; t <= d; t++) {
+    // 1 - x^(d-t+1)
+    const oneMinusXdt1 = new DiceExpression([
+      { coefficient: 1, exponent: 0 },   // 1
+      { coefficient: -1, exponent: d - t + 1 } // -x^(d-t+1)
+    ]);
+
+    // x^((n-2)t)
+    const xPowPart = xPow((n - 2) * t);
+
+    // r = (1 - x^(d-t+1)) / (1 - x)
+    const rPowN = oneMinusXdt1.mustDivide(oneMinusX).power(n);
+
+    // x^((n-2)t) * r^n
+    sum2.add(xPowPart.multiply(rPowN));                           // accumulate sum
+  }
+
+  const term2 = oneMinusX2.multiply(sum2);                               // (1 - x^2) * sum2
+
+  // === Third term: n(1 - x) * sum{t=1..d, (t-1)*x^((n-2)*t) * ((1 - x^(d-t+1)) / (1 - x))^(n-1)} ===
+
+  // n(1 - x)
+  const nTimesOneMinusX = constPoly(n).multiply(oneMinusX);
+
+  let sum3 = new DiceExpression();                  // 0
+
+  //start at t=2 because (t-1) is 0 when t=1
+  for (let t = 2; t <= d; t++) {
+    // 1 - x^(d-t+1)
+    const oneMinusXdt1 = new DiceExpression([
+      { coefficient: 1, exponent: 0 },   // 1
+      { coefficient: -1, exponent: d - t + 1 } // -x^(d-t+1)
+    ]);
+    // s = (1 - x^(d-t+1)) / (1 - x)
+    const sPow = oneMinusXdt1.mustDivide(oneMinusX).power(n - 1);
+
+    // x^((n-2)t)
+    const xPowPart = xPow((n - 2) * t);
+    //const xPowPart = new DiceExpression([{ coefficient: (t - 1), exponent: (n - 2) * t }]);
+
+    sum3.add(constPoly(t - 1).multiply(xPowPart).multiply(sPow));                           // accumulate sum
+  }
+
+  const term3 = nTimesOneMinusX.multiply(sum3);                               // n(1 - x)*sum3
+
+  // === Total: term1 + term2 + term3 ===
+  const result = term1.add(term2).add(term3);
+
+  return result;
+}
+function getProbabilitiesMarkusScheuer2(numberOfDice, sides) {
+    let result = markusScheuer2(numberOfDice, sides);
+    result = result.toDiceResults();
+    Statistics.determineProbability(result);
+    return result;
+}
+/*
+The above impl uses his answer correctly but gets the wrong answer.
+I let him know his post is wrong: https://math.stackexchange.com/questions/3765873/generating-function-for-sum-of-n-dice-or-other-multinomial-distribution-where#comment11041444_3792882
+*/

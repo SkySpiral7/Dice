@@ -26,6 +26,7 @@ function DiceExpression(arg1, arg2)
       {
         this.addTerm(otherTerms[i]);
       }
+      return this;
    };
    /**
    This function lets you add a term to this Expression (this Expression is mutated to be the result).
@@ -49,6 +50,7 @@ function DiceExpression(arg1, arg2)
       }
       termArray.push(term);
       termArray.sort(DiceExpression.exponentDescending);  //TODO: is this needed?
+      return this;
    };
    /**@returns a copy of this object.*/
    this.clone = function()
@@ -84,16 +86,28 @@ function DiceExpression(arg1, arg2)
             this.addTerm({exponent: newExponent, coefficient: newCoefficient});
          }
       }
+      return this;
+   };
+
+   this.warnNegativeExponents = function() {
+      for (const term of this.toJSON()) {
+         if (term.exponent < 0) {
+            console.warn("DiceExpression contains negative exponents which may cause unexpected results");
+            break;
+         }
+      }
    };
 
    this.divide = function(divisor) {
-      //TODO: basically ignores negative exponents right now (always put in reaminder)
+      //TODO: basically ignores negative exponents right now (always put in remainder)
       Validation.requireInstanceOf(DiceExpression, divisor);
       const divisorTerms = divisor.toJSON();
       if (divisorTerms.length === 0) {
          //TODO: there are other NaN cases when Infinity or NaN coefficients/exponents are used
          throw new Error("Can't divide by zero");
       }
+      this.warnNegativeExponents();
+      divisor.warnNegativeExponents();
 
       let remainder = this.clone();
       const quotient = new DiceExpression();
@@ -125,6 +139,8 @@ function DiceExpression(arg1, arg2)
          remainder.subtract(toSubtract);
       }
 
+      quotient.warnNegativeExponents();
+      remainder.warnNegativeExponents();
       return { quotient, remainder };
    };
 
@@ -136,23 +152,6 @@ function DiceExpression(arg1, arg2)
       return result.quotient;
    };
 
-   /**All exponents are multiplied by -1. Doesn't change any coefficients.*/
-   this.negateExponents = function()
-   {
-      for (var termIndex = 0; termIndex < termArray.length; ++termIndex)
-      {
-         if('number' === typeof(termArray[termIndex].exponent)) termArray[termIndex].exponent *= -1;
-         else  //instance of Array
-         {
-            for (var exponentIndex = 0; exponentIndex < termArray[termIndex].exponent.length; ++exponentIndex)
-            {
-               termArray[termIndex].exponent[exponentIndex] *= -1;
-               //TODO: this is only fine if all functions allow exponent array
-            }
-         }
-      }
-      termArray.reverse();  //works in this case
-   };
    /** Used to multiply by itself a given number of times.*/
    this.power = function(raisedTo)
    {
@@ -162,6 +161,7 @@ function DiceExpression(arg1, arg2)
       {
          this.multiply(multiplier);
       }
+      return this;
    };
    /**This function lets you subtract another DiceExpression from this Expression (this Expression is mutated to be the result).*/
    this.subtract = function(otherExpression)
@@ -172,6 +172,7 @@ function DiceExpression(arg1, arg2)
       {
         this.addTerm({exponent: otherTerms[i].exponent, coefficient: -otherTerms[i].coefficient});
       }
+      return this;
    };
    /**@returns {object[]} objects contain result (the sum rolled) and either frequency (if possible) or probability (otherwise).*/
    this.toDiceResults = function()
@@ -191,6 +192,35 @@ function DiceExpression(arg1, arg2)
    {
       //TODO: doesn't include useProbability
       return JSON.clone(termArray);  //defensive copy
+   };
+   /**@returns a string representing the polynomial of this DiceExpression*/
+   this.toString = function()
+   {
+      function termToString(term)
+      {
+         let termString = '';
+         if (term.exponent === 0) {
+            //don't print the - since the loop will add it
+            termString += Math.abs(term.coefficient);
+         } else {
+            if (term.coefficient !== 1 && term.coefficient !== -1)
+               termString += Math.abs(term.coefficient);
+            termString += 'x';
+            if (term.exponent !== 1) {
+               termString += '^' + term.exponent;
+            }
+         }
+         return termString;
+      }
+
+      let result = '' + termToString(termArray[0]);
+      if(termArray[0].coefficient < 0) result = '-' + result;
+      for (let i = 1; i < termArray.length; ++i)
+      {
+         if (termArray[i].coefficient >= 0) result += ' + ' + termToString(termArray[i]);
+         else result += ' - ' + termToString(termArray[i]);
+      }
+      return result;
    };
 
    /**You can't call this function. It is only used internally to create a DiceExpression object.*/
